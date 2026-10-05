@@ -14,17 +14,17 @@ gantt
     dateFormat  YYYY-MM-DD
     section Phase 1 to 4 (Core Marketplace & B2B Hub)
     Phase 1: Architecture, DB, RBAC, Design System         :done,    p1, 2026-10-01, 2026-10-15
-    Phase 2: Org Onboarding, Doctor & Assistant Accounts   :active,  p2, 2026-10-16, 2026-10-31
-    Phase 3: Real-Time Slots, 5-Min Hold, Live Queue       :         p3, 2026-11-01, 2026-11-15
-    Phase 4: Diagnostic Tests, Reports & Prescriptions     :         p4, 2026-11-16, 2026-11-30
+    Phase 2: Org Onboarding, Doctor & Assistant Accounts   :done,    p2, 2026-10-16, 2026-10-31
+    Phase 3: Real-Time Slots, 5-Min Hold, Live Queue       :done,    p3, 2026-11-01, 2026-11-15
+    Phase 4: Diagnostic Tests, Reports & Prescriptions     :done,    p4, 2026-11-16, 2026-11-30
     section Phase 5 to 7 (Monetization & Hardening)
-    Phase 5: Payments (bKash/Nagad), Ledger & Subscriptions:         p5, 2026-12-01, 2026-12-15
-    Phase 6: Multi-Criteria Search, Reviews & Analytics    :         p6, 2026-12-16, 2026-12-31
-    Phase 7: PWA, Performance Optimization & Backup Drills :         p7, 2027-01-01, 2027-01-15
+    Phase 5: Payments (bKash/Nagad), Ledger & Subscriptions:done,    p5, 2026-12-01, 2026-12-15
+    Phase 6: Multi-Criteria Search, Reviews & Analytics    :done,    p6, 2026-12-16, 2026-12-31
+    Phase 7: PWA, Performance Optimization & Backup Drills :done,    p7, 2027-01-01, 2027-01-15
     section Phase 8 to 10 (Geographic Rollout)
-    Phase 8: Moulvibazar Initial Market Launch             :         p8, 2027-01-16, 2027-02-28
-    Phase 9: Sylhet Division Expansion                     :         p9, 2027-03-01, 2027-04-30
-    Phase 10: Nationwide Bangladesh Scaling                :         p10, 2027-05-01, 2027-12-31
+    Phase 8: Moulvibazar Initial Market Launch             :done,    p8, 2027-01-16, 2027-02-28
+    Phase 9: Sylhet Division Expansion                     :active,  p9, 2027-03-01, 2027-04-30
+    Phase 10: Nationwide Bangladesh Scaling                :active,  p10, 2027-05-01, 2027-12-31
 ```
 
 ---

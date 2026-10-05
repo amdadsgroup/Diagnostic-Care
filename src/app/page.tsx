@@ -13,6 +13,21 @@ import { LiveQueueCard } from '@/components/LiveQueueCard';
 import { DoctorAssistantView } from '@/components/DoctorAssistantView';
 import { DiagnosticAdminView } from '@/components/DiagnosticAdminView';
 import { SuperAdminView } from '@/components/SuperAdminView';
+import AuthModal from '@/components/auth/AuthModal';
+import ProviderOnboardingModal from '@/components/provider/ProviderOnboardingModal';
+import DoctorPortal from '@/components/doctor/DoctorPortal';
+import PatientDashboard from '@/components/patient/PatientDashboard';
+import LiveQueueTracker from '@/components/queue/LiveQueueTracker';
+import TestBookingModal from '@/components/diagnostic/TestBookingModal';
+import SecureReportViewer from '@/components/diagnostic/SecureReportViewer';
+import PrescriptionSlipModal from '@/components/prescription/PrescriptionSlipModal';
+import PaymentModal from '@/components/payment/PaymentModal';
+import LedgerViewer from '@/components/finance/LedgerViewer';
+import AdvancedSearchFilter from '@/components/search/AdvancedSearchFilter';
+import VerifiedReviewsModal from '@/components/reviews/VerifiedReviewsModal';
+import ProviderAnalyticsDashboard from '@/components/analytics/ProviderAnalyticsDashboard';
+import HelplineBookingConsole from '@/components/support/HelplineBookingConsole';
+import { DiagnosticTest } from '@/types';
 import {
   Search,
   MapPin,
@@ -48,6 +63,14 @@ export default function HomePage() {
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   const [selectedAssociation, setSelectedAssociation] = useState<DoctorAssociation | null>(null);
   const [confirmedBookingNotice, setConfirmedBookingNotice] = useState<Appointment | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProviderOnboardOpen, setIsProviderOnboardOpen] = useState(false);
+  const [selectedBookingTest, setSelectedBookingTest] = useState<DiagnosticTest | null>(null);
+  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [activePaymentPayload, setActivePaymentPayload] = useState<{ bookingCode: string; amount: number; name: string; org: string } | null>(null);
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const [isHelplineOpen, setIsHelplineOpen] = useState(false);
 
   const t = TRANSLATIONS[language];
   const todayKey = 'assoc-anisur-popular_' + new Date().toISOString().split('T')[0];
@@ -202,6 +225,8 @@ export default function HomePage() {
         setCurrentRole={setCurrentRole}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenOnboard={() => setIsProviderOnboardOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -223,6 +248,27 @@ export default function HomePage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  onClick={() => {
+                    setActivePaymentPayload({
+                      bookingCode: confirmedBookingNotice.bookingCode,
+                      amount: confirmedBookingNotice.consultationFee,
+                      name: confirmedBookingNotice.doctorName,
+                      org: confirmedBookingNotice.organizationName,
+                    });
+                    setIsPaymentModalOpen(true);
+                  }}
+                  style={{
+                    backgroundColor: '#D12053',
+                    color: '#FFFFFF',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                  }}
+                >
+                  💳 বিকাশ / নগদ এ পরিশোধ করুন
+                </button>
                 <button
                   onClick={() => setActiveTab('queue')}
                   style={{
@@ -248,6 +294,22 @@ export default function HomePage() {
         )}
 
         {/* ROLE BASED VIEWS */}
+        {activeTab === 'portal' && currentRole === 'DOCTOR' && (
+          <div className="container" style={{ padding: '32px 20px' }}>
+            <DoctorPortal
+              doctorName={appState.doctors[0].fullName}
+              specialization={appState.doctors[0].specialization}
+              chamberName={`${appState.organizations[0].name} (${appState.organizations[0].branches[0].name})`}
+            />
+          </div>
+        )}
+
+        {activeTab === 'portal' && currentRole === 'PATIENT' && (
+          <div className="container" style={{ padding: '32px 20px' }}>
+            <PatientDashboard />
+          </div>
+        )}
+
         {activeTab === 'portal' && currentRole === 'DOCTOR_ASSISTANT' && (
           <div className="container" style={{ padding: '32px 20px' }}>
             <DoctorAssistantView
@@ -266,7 +328,7 @@ export default function HomePage() {
         )}
 
         {activeTab === 'portal' && currentRole === 'DIAGNOSTIC_ADMIN' && (
-          <div className="container" style={{ padding: '32px 20px' }}>
+          <div className="container" style={{ padding: '32px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <DiagnosticAdminView
               organization={appState.organizations[0]}
               tests={appState.diagnosticTests}
@@ -274,147 +336,40 @@ export default function HomePage() {
               subscriptionPlans={appState.subscriptionPlans}
               language={language}
             />
+            <HelplineBookingConsole />
+            <ProviderAnalyticsDashboard />
+            <LedgerViewer />
           </div>
         )}
 
         {activeTab === 'portal' && currentRole === 'SUPER_ADMIN' && (
-          <div className="container" style={{ padding: '32px 20px' }}>
+          <div className="container" style={{ padding: '32px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <SuperAdminView
               organizations={appState.organizations}
               doctors={appState.doctors}
               language={language}
             />
+            <HelplineBookingConsole />
+            <ProviderAnalyticsDashboard />
+            <LedgerViewer />
           </div>
         )}
 
-        {/* LIVE QUEUE TAB */}
+        {/* LIVE QUEUE TAB (PHASE 3 ENHANCED) */}
         {activeTab === 'queue' && (
-          <div className="container" style={{ padding: '32px 20px', maxWidth: '900px' }}>
-            <div style={{ marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
-                {t.queueTitle}
-              </h2>
-              <p style={{ color: 'var(--slate-600)', fontSize: '14px', marginTop: '4px' }}>
-                Real-time waiting room token status for evening specialist chambers in Moulvibazar.
-              </p>
-            </div>
-
-            <LiveQueueCard
-              queue={activeQueue}
+          <div className="container" style={{ padding: '32px 20px', maxWidth: '1000px' }}>
+            <LiveQueueTracker
               doctorName={appState.doctors[0].fullName}
               specialization={appState.doctors[0].specialization}
               chamberName={`${appState.organizations[0].name} (${appState.organizations[0].branches[0].name})`}
-              appointments={appState.appointments}
-              language={language}
-              currentRole={currentRole}
-              onCallNext={handleCallNext}
-              onUpdateStatus={handleUpdateAppointmentStatus}
             />
           </div>
         )}
 
-        {/* SECURE HEALTH VAULT: REPORTS TAB */}
+        {/* SECURE HEALTH VAULT: REPORTS TAB (PHASE 4 ENHANCED) */}
         {activeTab === 'reports' && (
-          <div className="container" style={{ padding: '32px 20px' }}>
-            <div style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ShieldCheck size={24} color="#10B981" />
-                <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
-                  My Diagnostic Reports & Pathology Vault
-                </h2>
-              </div>
-              <p style={{ color: 'var(--slate-600)', fontSize: '14px', marginTop: '4px' }}>
-                Protected by Diagnostic Care Zero-Leakage Policy. Download certified pathology reports via secure 15-minute signed links.
-              </p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-              <div
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '14px',
-                  border: '1px solid var(--slate-200)',
-                  padding: '20px',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div>
-                    <span style={{ backgroundColor: 'var(--brand-emerald-50)', color: '#065F46', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
-                      VERIFIED & READY
-                    </span>
-                    <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-navy-900)', marginTop: '8px' }}>
-                      CBC (Complete Blood Count with ESR)
-                    </h4>
-                    <div style={{ fontSize: '12px', color: 'var(--slate-500)' }}>
-                      Popular Diagnostic Center (Moulvibazar Main Branch)
-                    </div>
-                  </div>
-                  <FileText size={28} color="var(--brand-teal-600)" />
-                </div>
-
-                <div style={{ fontSize: '12px', color: 'var(--slate-600)', lineHeight: 1.6, marginBottom: '16px', backgroundColor: 'var(--slate-50)', padding: '10px', borderRadius: '6px' }}>
-                  <div>Patient: <strong>Kamrul Hassan (34 yrs)</strong></div>
-                  <div>Verified By: <strong>Dr. S. M. Faruq (Consultant Pathologist)</strong></div>
-                  <div>Released: <strong>Today, 14:30 PM</strong></div>
-                </div>
-
-                <button
-                  onClick={() => alert('Diagnostic Care Security Invariant: Generating cryptographically signed 15-minute token. Downloading verified PDF report... [Audit logged]')}
-                  style={{
-                    backgroundColor: 'var(--brand-navy-700)',
-                    color: '#FFFFFF',
-                    padding: '10px 16px',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    width: '100%',
-                  }}
-                >
-                  <Download size={15} />
-                  Download Secure Report PDF
-                </button>
-              </div>
-
-              <div
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '14px',
-                  border: '1px solid var(--slate-200)',
-                  padding: '20px',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div>
-                    <span style={{ backgroundColor: '#FEF3C7', color: '#92400E', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
-                      SAMPLE IN LABORATORY
-                    </span>
-                    <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-navy-900)', marginTop: '8px' }}>
-                      Lipid Profile Panel (Fasting)
-                    </h4>
-                    <div style={{ fontSize: '12px', color: 'var(--slate-500)' }}>
-                      Ibn Sina Diagnostic & Consultation Centre, Moulvibazar
-                    </div>
-                  </div>
-                  <TestTube2 size={28} color="#D97706" />
-                </div>
-
-                <div style={{ fontSize: '12px', color: 'var(--slate-600)', lineHeight: 1.6, marginBottom: '16px', backgroundColor: 'var(--slate-50)', padding: '10px', borderRadius: '6px' }}>
-                  <div>Sample: Fasting Serum Blood</div>
-                  <div>Status: Centrifuged & Analyzing</div>
-                  <div>Estimated Availability: <strong>Today by 06:00 PM</strong></div>
-                </div>
-
-                <div style={{ fontSize: '12px', color: 'var(--slate-500)', textAlign: 'center', padding: '8px' }}>
-                  You will receive an automated SMS alert upon release.
-                </div>
-              </div>
-            </div>
+          <div className="container" style={{ padding: '32px 20px', maxWidth: '1000px' }}>
+            <SecureReportViewer />
           </div>
         )}
 
@@ -558,7 +513,7 @@ export default function HomePage() {
                   Certified Digital Prescription generated on <strong>Diagnostic Care</strong> platform.
                 </div>
                 <button
-                  onClick={() => alert('Prescription sent to local printer or saved as PDF.')}
+                  onClick={() => setIsPrescriptionModalOpen(true)}
                   style={{
                     backgroundColor: 'var(--brand-navy-700)',
                     color: '#FFFFFF',
@@ -568,7 +523,7 @@ export default function HomePage() {
                     fontWeight: 700,
                   }}
                 >
-                  Print / Save PDF
+                  Print / Save Official PDF Slip 🖨
                 </button>
               </div>
             </div>
@@ -702,11 +657,31 @@ export default function HomePage() {
                   </div>
 
                   {/* Customer Care Callout in Hero */}
-                  <div style={{ marginTop: '20px', fontSize: '13px', color: 'var(--slate-300)' }}>
-                    Need immediate booking assistance? Call Customer Care Helpline: <a href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`} style={{ color: '#38BDF8', fontWeight: 700, textDecoration: 'none' }}>{BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}</a>
+                  <div style={{ marginTop: '20px', fontSize: '13px', color: 'var(--slate-300)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <span>Need immediate booking assistance? Call Helpline: <a href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`} style={{ color: '#38BDF8', fontWeight: 700, textDecoration: 'none' }}>{BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}</a></span>
+                    <button
+                      onClick={() => setIsHelplineOpen(true)}
+                      style={{
+                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                        color: '#38BDF8',
+                        border: '1px solid rgba(56, 189, 248, 0.4)',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      📞 অপারেটর টেলি-বুকিং ডেস্ক
+                    </button>
                   </div>
                 </div>
               </div>
+            </section>
+
+            {/* ADVANCED MULTI-CRITERIA SEARCH & FILTER ENGINE (PHASE 6) */}
+            <section className="container" style={{ padding: '36px 20px 0 20px' }}>
+              <AdvancedSearchFilter />
             </section>
 
             {/* SPECIALIST DOCTORS SECTION */}
@@ -795,6 +770,26 @@ export default function HomePage() {
                             </div>
                             <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
                               {doctor.qualifications} • BMDC: <strong>{doctor.bmdcNumber}</strong>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+                              <button
+                                onClick={() => setIsReviewsModalOpen(true)}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  color: '#B45309',
+                                  backgroundColor: '#FEF3C7',
+                                  padding: '3px 8px',
+                                  borderRadius: '12px',
+                                  border: '1px solid #FCD34D',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                ⭐ ৪.৯ (১২৮ ভেরিফায়েড রিভিউ)
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -951,7 +946,7 @@ export default function HomePage() {
                         </div>
 
                         <button
-                          onClick={() => alert(`Test booking confirmed for ${test.name} at ${test.organizationName}. A phlebotomist or center receptionist will contact you via 01886748564.`)}
+                          onClick={() => setSelectedBookingTest(test)}
                           style={{
                             backgroundColor: 'var(--brand-navy-700)',
                             color: '#FFFFFF',
@@ -1036,6 +1031,105 @@ export default function HomePage() {
           onConfirmBooking={handleConfirmBooking}
           onSimulateConflict={() => {}}
         />
+      )}
+
+      {/* PATIENT AUTH MODAL (LOGIN / REGISTER / FORGOT) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={(user) => {
+          setIsAuthModalOpen(false);
+          alert(`স্বাগতম, ${user.name}! আপনার অ্যাকাউন্টে সফলভাবে লগইন হয়েছে।`);
+        }}
+      />
+
+      {/* B2B PROVIDER ONBOARDING WIZARD */}
+      <ProviderOnboardingModal
+        isOpen={isProviderOnboardOpen}
+        onClose={() => setIsProviderOnboardOpen(false)}
+        onSuccess={(org) => {
+          alert(`অভিনন্দন! ${org.name} এর অনবোর্ডিং রিকোয়েস্ট গৃহীত হয়েছে। হেল্পলাইন: 01886748564`);
+        }}
+      />
+
+      {/* DIAGNOSTIC TEST BOOKING MODAL */}
+      <TestBookingModal
+        test={selectedBookingTest}
+        isOpen={Boolean(selectedBookingTest)}
+        onClose={() => setSelectedBookingTest(null)}
+        onBookingSuccess={() => {}}
+      />
+
+      {/* DIGITAL PRESCRIPTION SLIP MODAL */}
+      <PrescriptionSlipModal
+        isOpen={isPrescriptionModalOpen}
+        onClose={() => setIsPrescriptionModalOpen(false)}
+      />
+
+      {/* BANGLADESH PAYMENT MODAL (BKASH / NAGAD / CASH) */}
+      {activePaymentPayload && (
+        <PaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => {
+            setIsPaymentModalOpen(false);
+            setActivePaymentPayload(null);
+          }}
+          bookingCode={activePaymentPayload.bookingCode}
+          amount={activePaymentPayload.amount}
+          doctorOrTestName={activePaymentPayload.name}
+          organizationName={activePaymentPayload.org}
+          onPaymentSuccess={() => {}}
+        />
+      )}
+
+      {/* VERIFIED PATIENT REVIEWS MODAL (PHASE 6) */}
+      <VerifiedReviewsModal
+        isOpen={isReviewsModalOpen}
+        onClose={() => setIsReviewsModalOpen(false)}
+        doctorOrCenterName="ডাঃ আনিসুর রহমান"
+      />
+
+      {/* OPERATIONAL HELPLINE DISPATCHER MODAL (PHASE 8) */}
+      {isHelplineOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(11, 37, 69, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px',
+          }}
+        >
+          <div style={{ maxWidth: '850px', width: '100%', position: 'relative' }}>
+            <button
+              onClick={() => setIsHelplineOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '-14px',
+                right: '-14px',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: '#0B2545',
+                color: '#FFFFFF',
+                border: '2px solid #FFFFFF',
+                fontSize: '16px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                zIndex: 10,
+              }}
+            >
+              ✕
+            </button>
+            <HelplineBookingConsole />
+          </div>
+        </div>
       )}
 
       <Footer language={language} />

@@ -14,6 +14,8 @@ interface HeaderProps {
   setCurrentRole: (role: UserRole) => void;
   activeTab: 'marketplace' | 'queue' | 'reports' | 'prescriptions' | 'portal';
   setActiveTab: (tab: 'marketplace' | 'queue' | 'reports' | 'prescriptions' | 'portal') => void;
+  onOpenAuth?: () => void;
+  onOpenOnboard?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,6 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
   setCurrentRole,
   activeTab,
   setActiveTab,
+  onOpenAuth,
+  onOpenOnboard,
 }) => {
   const t = TRANSLATIONS[language];
 
@@ -182,39 +186,82 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Persona / RBAC Switcher Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--slate-100)', padding: '4px 10px', borderRadius: '8px', border: '1px solid var(--slate-200)' }}>
-          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-            Role View:
-          </span>
-          <select
-            id="role-switcher-select"
-            value={currentRole}
-            onChange={(e) => {
-              const role = e.target.value as UserRole;
-              setCurrentRole(role);
-              if (role !== 'PATIENT') {
-                setActiveTab('portal');
-              } else {
-                setActiveTab('marketplace');
-              }
-            }}
-            style={{
-              fontSize: '12px',
-              fontWeight: 600,
-              color: 'var(--brand-navy-900)',
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="PATIENT">Patient (Marketplace & Health Vault)</option>
-            <option value="DOCTOR">Doctor (Dr. Anisur Rahman, Cardiologist)</option>
-            <option value="DOCTOR_ASSISTANT">Doctor Assistant (Rahim Uddin - Sandboxed)</option>
-            <option value="DIAGNOSTIC_ADMIN">Diagnostic Center Admin (Popular Moulvibazar)</option>
-            <option value="SUPER_ADMIN">Platform Super Admin</option>
-          </select>
+        {/* Action Buttons: Patient Login & Provider Onboard */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {onOpenOnboard && (
+            <button
+              onClick={onOpenOnboard}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: 'var(--brand-teal-50)',
+                color: 'var(--brand-teal-600)',
+                border: '1px solid var(--brand-teal-500)',
+                fontWeight: 700,
+                fontSize: '12px',
+              }}
+            >
+              🏥 প্রতিষ্ঠান অনবোর্ডিং
+            </button>
+          )}
+
+          {onOpenAuth && (
+            <button
+              onClick={onOpenAuth}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: '8px',
+                background: 'var(--brand-navy-900)',
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '12px',
+              }}
+            >
+              <User size={13} />
+              লগইন / সাইন আপ
+            </button>
+          )}
+
+          {/* Persona / RBAC Switcher Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--slate-100)', padding: '4px 10px', borderRadius: '8px', border: '1px solid var(--slate-200)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
+              Role View:
+            </span>
+            <select
+              id="role-switcher-select"
+              value={currentRole}
+              onChange={(e) => {
+                const role = e.target.value as UserRole;
+                setCurrentRole(role);
+                if (role !== 'PATIENT') {
+                  setActiveTab('portal');
+                } else {
+                  setActiveTab('marketplace');
+                }
+              }}
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--brand-navy-900)',
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="PATIENT">Patient (Marketplace & Health Vault)</option>
+              <option value="DOCTOR">Doctor (Dr. Anisur Rahman, Cardiologist)</option>
+              <option value="DOCTOR_ASSISTANT">Doctor Assistant (Rahim Uddin - Sandboxed)</option>
+              <option value="DIAGNOSTIC_ADMIN">Diagnostic Center Admin (Popular Moulvibazar)</option>
+              <option value="SUPER_ADMIN">Platform Super Admin</option>
+            </select>
+          </div>
         </div>
       </div>
     </header>

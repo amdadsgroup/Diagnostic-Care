@@ -21,4 +21,12 @@ export const BRAND_CONSTANTS = {
   COPYRIGHT_YEAR: 2026,
 } as const;
 
+export const BRAND = {
+  name: BRAND_CONSTANTS.BRAND_NAME,
+  tagline: BRAND_CONSTANTS.TAGLINE,
+  helpline: BRAND_CONSTANTS.CUSTOMER_CARE_PHONE,
+  displayPhone: BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY,
+  ...BRAND_CONSTANTS,
+};
+
 export type SupportedLanguage = 'en' | 'bn';

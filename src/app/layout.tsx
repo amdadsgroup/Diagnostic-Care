@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   },
 };
 
+import PWAController from '@/components/pwa/PWAController';
+
 export default function RootLayout({
   children,
 }: {
@@ -29,7 +31,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="bn">
-      <body>{children}</body>
+      <body>
+        <PWAController />
+        {children}
+      </body>
     </html>
   );
 }
