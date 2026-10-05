@@ -1,0 +1,23 @@
+{
+  "name": "Diagnostic Care — Your Healthcare Marketplace",
+  "short_name": "DiagnosticCare",
+  "description": "Digital healthcare marketplace connecting patients and healthcare providers in Moulvibazar, Sylhet, and Bangladesh. Helpline: 01886748564",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0B2545",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

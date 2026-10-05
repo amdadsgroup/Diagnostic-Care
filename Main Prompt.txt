@@ -1,0 +1,2765 @@
+You are a senior product architect, UX designer, full stack software engineer, security engineer, database architect, QA engineer, DevOps engineer, and healthcare technology systems architect.
+
+Build a production ready, scalable, secure, Bangladesh focused digital healthcare marketplace and healthcare provider management platform under the brand:
+
+BRAND NAME:
+Diagnostic Care
+
+TAGLINE:
+Your Healthcare Marketplace
+
+CUSTOMER CARE:
+01886748564
+
+Diagnostic Care is NOT only a doctor appointment booking application and NOT only a diagnostic center booking application.
+
+Diagnostic Care is a complete healthcare marketplace and healthcare provider management infrastructure connecting:
+
+Patients
+Doctors
+Doctor Assistants
+Diagnostic Centers
+Clinics
+Hospitals
+Pharmacies
+Ambulance Providers
+Home Healthcare Providers
+Healthcare Staff
+Platform Administrators
+
+The primary B2B customer during the initial business phase is the Diagnostic Center.
+
+The platform should allow diagnostic centers to digitize their operations while simultaneously allowing patients to discover healthcare providers and book healthcare services.
+
+The architecture must be designed from day one so that additional healthcare services can be introduced later without rebuilding the core platform.
+
+==================================================
+1. BRAND IDENTITY
+==================================================
+
+Platform Brand:
+
+Diagnostic Care
+
+Tagline:
+
+Your Healthcare Marketplace
+
+Customer Care:
+
+01886748564
+
+The brand should communicate:
+
+Trust
+Healthcare
+Accessibility
+Technology
+Professionalism
+Reliability
+Simplicity
+
+The platform must feel like a professional healthcare technology company rather than a simple appointment booking website.
+
+Use the brand consistently across:
+
+Patient web application
+PWA
+Provider dashboards
+Doctor portal
+Admin panel
+Emails
+SMS
+Notifications
+Booking confirmations
+Prescriptions
+Diagnostic reports
+Invoices
+Payment receipts
+Support system
+SEO metadata
+Public marketplace pages
+Provider onboarding
+Marketing pages
+
+Do not use temporary placeholder branding such as:
+
+Healthcare App
+Demo Healthcare
+Doctor Booking
+Test Platform
+
+Use Diagnostic Care as the production product identity.
+
+==================================================
+2. PRODUCT VISION
+==================================================
+
+Build Diagnostic Care as a Bangladesh wide digital healthcare ecosystem.
+
+Core concept:
+
+Patient
+→ discovers healthcare provider
+→ searches doctor/service/test
+→ views real time availability
+→ books healthcare service
+→ receives confirmation
+→ visits provider or receives service
+→ receives prescription/report
+→ securely stores healthcare information
+→ continues follow up
+
+Provider
+→ creates/manages services
+→ manages doctors
+→ manages schedules
+→ manages bookings
+→ manages patients
+→ manages reports
+→ manages staff
+→ receives payments
+→ sees analytics
+→ acquires new patients through Diagnostic Care
+
+The initial operational headquarters and launch market will be:
+
+Moulvibazar, Bangladesh
+
+However, the software must be architected as a nationwide Bangladesh platform from day one.
+
+==================================================
+3. CORE BUSINESS MODEL
+==================================================
+
+Primary B2B customer:
+
+Diagnostic Centers
+
+Secondary business customers:
+
+Doctors
+Clinics
+Hospitals
+Pharmacies
+Healthcare service providers
+
+Consumers:
+
+Patients and their families
+
+Diagnostic Care revenue architecture must support:
+
+Diagnostic center subscription
+Provider SaaS subscription
+Appointment commission
+Diagnostic booking commission
+Featured listings
+Sponsored provider placement
+Home sample collection commission
+Telemedicine commission
+Enterprise plans
+Future healthcare services
+
+Initial provider pricing may support low entry plans around:
+
+BDT 200/month
+BDT 500/month
+
+Pricing must NEVER be hardcoded.
+
+Administrators must be able to create and modify:
+
+Free
+Basic
+Professional
+Enterprise
+
+Each plan must support configurable:
+
+Monthly price
+Yearly price
+Feature limits
+User limits
+Doctor limits
+Branch limits
+Booking limits
+Report limits
+Storage limits
+Commission rates
+
+==================================================
+4. PLATFORM APPLICATIONS
+==================================================
+
+Build the following major applications/interfaces:
+
+1. Diagnostic Care Patient Web App
+2. Diagnostic Care Patient PWA
+3. Doctor Portal
+4. Doctor Assistant Portal
+5. Diagnostic Center Portal
+6. Clinic Portal
+7. Hospital Portal
+8. Pharmacy Portal
+9. Ambulance Provider Portal
+10. Home Healthcare Provider Portal
+11. Provider Staff Portal
+12. Diagnostic Care Super Admin Panel
+13. Diagnostic Care Support/Operations Panel
+
+The architecture must allow new provider types to be added later without restructuring the entire platform.
+
+==================================================
+5. USER ROLES
+==================================================
+
+Create a robust Role Based Access Control system.
+
+Core roles:
+
+PATIENT
+
+DOCTOR
+
+DOCTOR_ASSISTANT
+
+DIAGNOSTIC_ADMIN
+
+DIAGNOSTIC_STAFF
+
+CLINIC_ADMIN
+
+CLINIC_STAFF
+
+HOSPITAL_ADMIN
+
+HOSPITAL_STAFF
+
+PHARMACY_ADMIN
+
+PHARMACY_STAFF
+
+AMBULANCE_PROVIDER
+
+HOME_HEALTHCARE_PROVIDER
+
+SUPPORT_AGENT
+
+SALES_AGENT
+
+OPERATIONS_MANAGER
+
+FINANCE_MANAGER
+
+SUPER_ADMIN
+
+Each role must have explicit permissions.
+
+Never depend on frontend role hiding.
+
+All authorization must be enforced server side.
+
+==================================================
+6. DIAGNOSTIC CENTER ACCOUNT STRUCTURE
+==================================================
+
+This is a core architectural requirement.
+
+A Diagnostic Center has a main organization account.
+
+Example:
+
+ABC Diagnostic Center
+
+Main Admin:
+
+ABC Diagnostic Center Admin
+
+The Diagnostic Center Admin can manage:
+
+Center profile
+Branches
+Doctors
+Doctor schedules
+Doctor booking configuration
+Diagnostic tests
+Test pricing
+Bookings
+Patients
+Reports
+Staff
+Payments
+Subscriptions
+Analytics
+
+The Diagnostic Center must NOT need to give its main administrator account to every doctor or assistant.
+
+Instead, the Diagnostic Center Admin can create or invite associated doctor accounts.
+
+Example:
+
+ABC Diagnostic Center
+    |
+    |-- Dr. Rahman
+    |       |
+    |       |-- Doctor Account
+    |       |-- Doctor Assistant Account
+    |
+    |-- Dr. Karim
+    |       |
+    |       |-- Doctor Account
+    |
+    |-- Dr. Ahmed
+
+Each associated doctor must have isolated access.
+
+==================================================
+7. DOCTOR ASSOCIATED ACCOUNT
+==================================================
+
+Diagnostic Center Admin can create or invite a doctor.
+
+Doctor profile fields:
+
+Full name
+Professional title
+Specialization
+Qualifications
+BMDC registration number
+Profile photo
+Gender
+Languages
+Experience
+Biography
+Consultation fee
+Associated organizations
+Associated branches
+Status
+Verification status
+
+The doctor can have:
+
+Doctor login
+Doctor dashboard
+Doctor schedule
+Appointment list
+Patient list
+Patient details
+Prescription
+Follow up
+Availability
+Notifications
+
+The doctor must only see information related to their own appointments and authorized patients.
+
+A doctor may be associated with multiple healthcare organizations where legally and operationally appropriate.
+
+Do not assume one doctor belongs to only one organization.
+
+==================================================
+8. DOCTOR ASSISTANT ACCOUNT
+==================================================
+
+A doctor may have one or more assistant accounts depending on configured organizational rules.
+
+Example:
+
+Dr. Rahman
+    |
+    └── Assistant: Rahim
+
+Assistant can see:
+
+Today's appointments
+Upcoming appointments
+Completed appointments
+Cancelled appointments
+Waiting patients
+Patient name
+Patient mobile number
+Patient age
+Appointment time
+Booking status
+Patient notes permitted by configured permissions
+
+Assistant must NOT see:
+
+Other doctors' patients
+Other doctors' schedules
+Diagnostic center financial information
+Diagnostic center settings
+Unauthorized branches
+Unauthorized staff information
+Platform administration
+
+Permissions must be configurable.
+
+Doctor can invite/remove assistant.
+
+Authorized Diagnostic Center Admin may also create/revoke assistant association according to organizational permissions.
+
+==================================================
+9. PATIENT REGISTRATION
+==================================================
+
+Patients must be able to create a Diagnostic Care account.
+
+Required fields:
+
+Full name
+Mobile number
+Date of birth or age
+Gender
+Email optional
+Address optional
+Emergency contact optional
+
+Do not collect unnecessary sensitive information.
+
+Support:
+
+Mobile authentication
+Email authentication
+Password login
+Password reset
+Session management
+Device/session management
+
+Authentication must be secure and scalable.
+
+==================================================
+10. PATIENT PROFILE
+==================================================
+
+Patient dashboard:
+
+Profile
+Appointments
+Upcoming appointments
+Past appointments
+Prescriptions
+Diagnostic reports
+Health records
+Favorite doctors
+Favorite providers
+Family members
+Notifications
+Payments
+Support
+
+Patients must be able to add family members.
+
+Example:
+
+My Account
+    |
+    ├── Self
+    ├── Father
+    ├── Mother
+    ├── Child
+    └── Other family member
+
+Patient can book services for themselves or an authorized family member.
+
+==================================================
+11. REAL TIME DOCTOR SLOT BOOKING
+==================================================
+
+This is a CORE Diagnostic Care feature.
+
+The system must support real time appointment slot management.
+
+Example:
+
+Doctor starts:
+
+08:00 AM
+
+Doctor ends:
+
+12:00 PM
+
+Slot duration:
+
+15 minutes
+
+Available capacity:
+
+16 patients
+
+System generates:
+
+08:00
+08:15
+08:30
+08:45
+09:00
+...
+
+When a patient books 08:15:
+
+08:15 becomes unavailable immediately.
+
+Another patient must NOT be able to successfully book the same slot.
+
+Implement backend transaction safety and concurrency control.
+
+Do not rely on frontend validation.
+
+Database must prevent double booking.
+
+==================================================
+12. SLOT CONFIGURATION
+==================================================
+
+Authorized Diagnostic Center Admin or Doctor can configure:
+
+Consultation days
+Start time
+End time
+Break time
+Slot duration
+Maximum patients
+Booking opening time
+Booking closing time
+Advance booking period
+Same day booking
+Cancellation deadline
+Waiting list
+Holiday
+Doctor leave
+Branch
+Consultation fee
+
+Example:
+
+Doctor:
+Dr. Rahman
+
+Location:
+ABC Diagnostic Center, Moulvibazar
+
+Saturday
+
+Start:
+08:00 AM
+
+End:
+12:00 PM
+
+Slot:
+15 minutes
+
+Maximum:
+16 patients
+
+The system automatically generates slots.
+
+==================================================
+13. DAILY BOOKING CAPACITY
+==================================================
+
+Each doctor schedule must support maximum daily capacity.
+
+Example:
+
+Maximum:
+
+20 patients
+
+After 20 valid bookings:
+
+Status:
+
+FULL
+
+Patients cannot create another normal booking.
+
+Display:
+
+"All appointments for today are currently booked."
+
+Provide:
+
+Next available date
+Waiting list
+Other available doctors
+
+==================================================
+14. BOOKING STATES
+==================================================
+
+Appointment states:
+
+AVAILABLE
+
+HELD
+
+PENDING
+
+CONFIRMED
+
+CHECKED_IN
+
+IN_PROGRESS
+
+COMPLETED
+
+CANCELLED_BY_PATIENT
+
+CANCELLED_BY_PROVIDER
+
+NO_SHOW
+
+EXPIRED
+
+WAITLISTED
+
+Booking state transitions must be validated server side.
+
+==================================================
+15. TEMPORARY SLOT HOLD
+==================================================
+
+When a patient selects a slot but has not completed payment or confirmation:
+
+Temporarily hold the slot.
+
+Default configurable hold:
+
+5 minutes
+
+After expiration:
+
+Automatically release slot.
+
+Prevent abandoned checkout from blocking slots indefinitely.
+
+==================================================
+16. DIAGNOSTIC TEST BOOKING
+==================================================
+
+Diagnostic Centers must be able to create test services.
+
+Fields:
+
+Test name
+Test category
+Description
+Preparation instructions
+Price
+Discount
+Home collection availability
+Report delivery method
+Expected report time
+Sample type
+Status
+Branch availability
+
+Example:
+
+CBC
+
+Price:
+
+BDT 500
+
+Home collection:
+
+Available
+
+Report:
+
+Digital
+
+Expected:
+
+Same day
+
+Patients can:
+
+Search test
+Compare providers
+View price
+View availability
+Book test
+Select branch
+Select date
+Select home collection
+Pay
+Receive confirmation
+
+==================================================
+17. DIAGNOSTIC CENTER DASHBOARD
+==================================================
+
+Dashboard must include:
+
+Today's bookings
+Upcoming bookings
+Completed bookings
+Cancelled bookings
+Pending reports
+Revenue
+Patients
+Doctors
+Tests
+Branches
+Staff
+Subscriptions
+Notifications
+Analytics
+
+Quick actions:
+
+Add Doctor
+Add Test
+Create Schedule
+View Bookings
+Upload Report
+Add Staff
+View Revenue
+
+==================================================
+18. DIAGNOSTIC CENTER DOCTOR MANAGEMENT
+==================================================
+
+Diagnostic Center Admin can:
+
+Add doctor
+Invite doctor
+Edit doctor
+Verify doctor information
+Associate doctor with branch
+Configure schedule
+Configure consultation fee
+Configure booking capacity
+Configure slot duration
+Assign assistant
+Suspend doctor
+Reactivate doctor
+
+Doctor association must support multiple organizations where appropriate.
+
+==================================================
+19. MULTI BRANCH SUPPORT
+==================================================
+
+A healthcare organization may have multiple branches.
+
+Example:
+
+ABC Diagnostic Center
+
+Branch 1:
+Moulvibazar
+
+Branch 2:
+Sylhet
+
+Branch 3:
+Dhaka
+
+Each branch can have:
+
+Doctors
+Schedules
+Tests
+Staff
+Bookings
+Patients
+Revenue
+Settings
+
+Organization Admin can see all authorized branches.
+
+Branch Staff can only access authorized branch information.
+
+==================================================
+20. PATIENT SEARCH
+==================================================
+
+Patients can search:
+
+Doctors
+Diagnostic Centers
+Clinics
+Hospitals
+Tests
+Services
+
+Search filters:
+
+Location
+Division
+District
+Upazila
+Specialization
+Gender
+Availability
+Price
+Rating
+Provider
+Service
+Home collection
+Online consultation
+
+Search must be optimized for Bangladesh.
+
+Support:
+
+Bangla
+English
+
+==================================================
+21. DOCTOR PROFILE
+==================================================
+
+Doctor profile should display:
+
+Name
+Photo
+Specialization
+Qualifications
+Experience
+Verification status
+BMDC information where appropriate
+Associated facilities
+Consultation fee
+Available schedule
+Next available appointment
+Languages
+Location
+Patient reviews
+Appointment button
+
+Do not display unverified professional claims as verified facts.
+
+==================================================
+22. DIAGNOSTIC CENTER PROFILE
+==================================================
+
+Profile:
+
+Name
+Logo
+Photos
+Address
+District
+Map location
+Phone
+Opening hours
+Services
+Tests
+Prices
+Doctors
+Branches
+Home collection
+Report delivery
+Verification status
+Reviews
+
+Patients can:
+
+Call
+View location
+Book doctor
+Book test
+Request home collection
+
+Customer support/contact information:
+
+Diagnostic Care Customer Care:
+01886748564
+
+==================================================
+23. APPOINTMENT WORKFLOW
+==================================================
+
+Patient:
+
+1. Search doctor
+2. Open doctor profile
+3. Select location
+4. Select date
+5. View real time slots
+6. Select slot
+7. Enter/select patient information
+8. Confirm
+9. Payment if required
+10. Receive booking ID
+11. Receive notification
+12. Provider sees booking immediately
+
+Booking confirmation must contain:
+
+Diagnostic Care branding
+Booking ID
+Doctor
+Provider
+Branch
+Date
+Time
+Patient
+Fee
+Payment status
+Booking status
+Customer Care: 01886748564
+
+==================================================
+24. PATIENT INFORMATION FOR BOOKING
+==================================================
+
+Before confirmation require:
+
+Patient name
+Mobile number
+Age/date of birth
+Gender where appropriate
+
+If patient has previously booked:
+
+Allow selecting saved patient profile.
+
+This allows provider/doctor assistant to have authorized information such as:
+
+Name
+Mobile
+Age
+Relevant permitted information
+
+before the patient arrives.
+
+Do not expose unnecessary health information.
+
+==================================================
+25. QUEUE MANAGEMENT
+==================================================
+
+Support queue management.
+
+Example:
+
+Doctor:
+Dr. Rahman
+
+Today's queue:
+
+Token 01
+Token 02
+Token 03
+Token 04
+
+Patient can see:
+
+Your token
+Current token
+Estimated waiting time
+
+Provider can:
+
+Call next patient
+Mark checked in
+Mark completed
+Skip
+No show
+
+==================================================
+26. DIGITAL PRESCRIPTION
+==================================================
+
+Doctors can create digital prescriptions.
+
+Fields:
+
+Patient
+Doctor
+Date
+Diagnosis/clinical note where appropriate
+Medicine
+Dosage
+Frequency
+Duration
+Instructions
+Follow up
+
+Generate secure digital prescription.
+
+Patient can access prescription from Diagnostic Care account.
+
+Prescription must be downloadable/printable where appropriate.
+
+==================================================
+27. DIAGNOSTIC REPORT MANAGEMENT
+==================================================
+
+Diagnostic Center can upload reports.
+
+Report fields:
+
+Patient
+Test
+Booking
+Report file
+Report date
+Verified by
+Status
+
+Patient receives notification.
+
+Patient can securely view report.
+
+Reports must never be publicly accessible.
+
+Use signed/private file access.
+
+==================================================
+28. HEALTH RECORD
+==================================================
+
+Patient health record may contain:
+
+Appointments
+Prescriptions
+Diagnostic reports
+Provider records
+Medical documents uploaded by patient
+
+Implement strict authorization.
+
+Patients control access where appropriate.
+
+Providers only access information necessary for the current service or authorized relationship.
+
+==================================================
+29. PAYMENTS
+==================================================
+
+Design payment architecture for Bangladesh.
+
+Payment methods must be configurable.
+
+Potential methods:
+
+bKash
+Nagad
+Cards
+Online banking
+Cash at provider
+
+Do not hardcode one payment provider.
+
+Create a payment abstraction layer.
+
+Payment states:
+
+INITIATED
+PENDING
+PAID
+FAILED
+REFUNDED
+PARTIALLY_REFUNDED
+CANCELLED
+
+Maintain a proper financial ledger.
+
+Never rely solely on frontend payment status.
+
+==================================================
+30. COMMISSION ENGINE
+==================================================
+
+Diagnostic Care Admin can configure commissions.
+
+Example:
+
+Doctor booking:
+5%
+
+Diagnostic booking:
+3%
+
+Home collection:
+Configurable
+
+Featured listing:
+Fixed price
+
+Commission rules must support configuration by:
+
+Provider
+Service
+Category
+District
+Plan
+Campaign
+
+==================================================
+31. PROVIDER SUBSCRIPTION
+==================================================
+
+Diagnostic Centers can subscribe to plans.
+
+Example:
+
+FREE
+BDT 200
+BDT 500
+BDT 1000
+ENTERPRISE
+
+Admin can change pricing.
+
+Track:
+
+Subscription start
+Subscription end
+Trial
+Payment
+Renewal
+Cancellation
+Grace period
+Plan limits
+
+Provider must never lose access to historical data because of subscription expiry.
+
+==================================================
+32. FEATURED LISTINGS
+==================================================
+
+Providers can pay for promoted placement.
+
+Admin controls:
+
+Campaign
+Budget
+Start date
+End date
+Placement
+Target district
+Target category
+
+Sponsored content must be clearly distinguished from organic search results.
+
+==================================================
+33. REVIEWS AND RATINGS
+==================================================
+
+Patients can review completed services.
+
+Support:
+
+Doctor rating
+Diagnostic Center rating
+Service rating
+
+Prevent:
+
+Fake reviews
+Multiple reviews for the same transaction
+Provider self reviews
+Manipulated reviews
+
+Only eligible completed transactions can generate reviews.
+
+Admin moderation must exist.
+
+==================================================
+34. NOTIFICATION SYSTEM
+==================================================
+
+Support:
+
+SMS
+Email
+Push notification
+In-app notification
+
+Events:
+
+Booking confirmation
+Booking cancellation
+Appointment reminder
+Slot change
+Payment confirmation
+Report uploaded
+Prescription available
+Subscription renewal
+Provider notification
+Doctor notification
+
+Notification templates must be editable by admin.
+
+Diagnostic Care customer support number:
+
+01886748564
+
+Use this number where appropriate in customer support notifications, booking help, and public support interfaces.
+
+==================================================
+35. ADMIN PANEL
+==================================================
+
+Diagnostic Care Super Admin Dashboard:
+
+Users
+Patients
+Doctors
+Diagnostic centers
+Clinics
+Hospitals
+Pharmacies
+Bookings
+Tests
+Reports
+Payments
+Subscriptions
+Commissions
+Refunds
+Reviews
+Complaints
+Support
+Analytics
+CMS
+Notifications
+Audit logs
+Security
+
+Admin must be able to suspend and restore accounts.
+
+==================================================
+36. PROVIDER VERIFICATION
+==================================================
+
+Create verification workflow.
+
+Diagnostic Center:
+
+Business documents
+License information
+Address
+Contact
+Authorized person
+
+Doctor:
+
+Professional information
+BMDC registration information
+Qualifications
+
+Verification statuses:
+
+PENDING
+
+UNDER_REVIEW
+
+VERIFIED
+
+REJECTED
+
+SUSPENDED
+
+Admin must record verification actions.
+
+==================================================
+37. SECURITY
+==================================================
+
+Healthcare information is sensitive.
+
+Implement:
+
+Encryption in transit
+Encryption at rest where appropriate
+Secure authentication
+RBAC
+Organization-level isolation
+Row-level authorization
+Audit logs
+Session management
+Rate limiting
+CSRF protection where applicable
+Secure headers
+Input validation
+Output encoding
+File validation
+Private storage
+Signed URLs
+Password hashing
+Secret management
+Backup strategy
+Monitoring
+
+Never expose:
+
+Passwords
+Payment secrets
+Private medical files
+Internal API keys
+Sensitive database credentials
+
+==================================================
+38. MULTI TENANCY
+==================================================
+
+Use scalable multi tenant architecture.
+
+Organizations include:
+
+Diagnostic Center A
+Diagnostic Center B
+Clinic A
+Hospital A
+
+Each organization must have isolated data.
+
+A provider must never access another provider's private data.
+
+Implement organization_id / tenant isolation throughout relevant tables.
+
+Use database-level security where supported.
+
+==================================================
+39. DATABASE
+==================================================
+
+Create a normalized scalable database schema.
+
+Core entities:
+
+users
+roles
+permissions
+organizations
+organization_members
+patients
+patient_family_members
+doctors
+doctor_associations
+doctor_assistants
+branches
+services
+diagnostic_tests
+doctor_schedules
+schedule_slots
+appointments
+appointment_patients
+queues
+prescriptions
+prescription_items
+reports
+health_records
+payments
+payment_transactions
+ledger_entries
+commissions
+subscriptions
+subscription_plans
+reviews
+notifications
+notification_templates
+support_tickets
+complaints
+verification_requests
+audit_logs
+files
+addresses
+districts
+upazilas
+campaigns
+featured_listings
+
+Use:
+
+Foreign keys
+Indexes
+Constraints
+Proper timestamps
+
+Prevent duplicate bookings at database level.
+
+==================================================
+40. BANGLADESH LOCATION SYSTEM
+==================================================
+
+Create structured hierarchy:
+
+Bangladesh
+Division
+District
+Upazila
+Union where required
+
+Do not store location only as plain text.
+
+Allow providers to select structured locations.
+
+Search must support location-based healthcare discovery.
+
+Initial launch:
+
+Moulvibazar
+
+Future:
+
+Sylhet Division
+
+Then nationwide Bangladesh.
+
+==================================================
+41. BANGLA AND ENGLISH
+==================================================
+
+Diagnostic Care must support:
+
+English
+Bangla
+
+Design all user-facing text for localization.
+
+Do not hardcode language strings inside components.
+
+Use translation keys.
+
+==================================================
+42. MOBILE FIRST
+==================================================
+
+Patient experience must be mobile first.
+
+Build:
+
+Responsive web application
+Progressive Web App
+
+Patients should be able to:
+
+Install PWA
+Receive notifications where supported
+Search providers
+Book appointments
+View reports
+View prescriptions
+Manage profile
+
+Provider dashboards must also work well on mobile.
+
+==================================================
+43. DESIGN SYSTEM
+==================================================
+
+Diagnostic Care design should feel:
+
+Trustworthy
+Modern
+Clean
+Professional
+Healthcare focused
+Fast
+Accessible
+
+Avoid overly complicated interfaces.
+
+Use:
+
+Clear typography
+Strong information hierarchy
+Simple cards
+Accessible forms
+Status indicators
+Clean dashboards
+Responsive layouts
+
+Healthcare users may not be highly technical.
+
+The product must therefore be extremely easy to use.
+
+==================================================
+44. HOMEPAGE
+==================================================
+
+Homepage branding:
+
+Diagnostic Care
+
+Your Healthcare Marketplace
+
+Customer Care:
+
+01886748564
+
+Homepage should include:
+
+Search Doctor
+Search Diagnostic Test
+Search Diagnostic Center
+Search Healthcare Provider
+
+Sections:
+
+Find a Doctor
+Book Diagnostic Tests
+Nearby Healthcare
+Verified Providers
+Popular Tests
+Popular Doctors
+How It Works
+Health Information
+Provider Registration
+Download / Install PWA
+
+Primary homepage messaging should communicate that Diagnostic Care connects patients with healthcare providers across Bangladesh.
+
+==================================================
+45. DOCTOR DASHBOARD
+==================================================
+
+Doctor dashboard:
+
+Today's appointments
+Next patient
+Queue
+Schedule
+Availability
+Patients
+Prescription
+Reports
+Follow ups
+Assistant management
+Notifications
+Profile
+
+Doctor must only access authorized patient information.
+
+==================================================
+46. ASSISTANT DASHBOARD
+==================================================
+
+Assistant dashboard:
+
+Today's appointments
+Patient queue
+Patient details allowed by permissions
+Booking status
+Check in
+Token management
+Patient contact information
+Notifications
+
+No financial/admin access unless explicitly granted.
+
+==================================================
+47. DIAGNOSTIC ADMIN DASHBOARD
+==================================================
+
+Dashboard:
+
+Total bookings
+Today's bookings
+Revenue
+Doctors
+Tests
+Branches
+Patients
+Reports
+Staff
+Subscription
+Analytics
+
+Management:
+
+Doctor
+Assistant
+Staff
+Schedule
+Test
+Booking
+Report
+Branch
+Billing
+
+==================================================
+48. ANALYTICS
+==================================================
+
+Provider analytics:
+
+Bookings
+Completed bookings
+Cancellation rate
+Revenue
+Popular doctors
+Popular tests
+Patient acquisition
+Repeat patients
+Peak hours
+Branch performance
+
+Platform analytics:
+
+Total users
+Active patients
+Active providers
+Active doctors
+Bookings
+GMV
+Revenue
+Commission
+MRR
+Churn
+CAC
+Provider retention
+Patient retention
+
+==================================================
+49. SEARCH ENGINE
+==================================================
+
+Build scalable search.
+
+Search ranking should consider:
+
+Relevance
+Availability
+Location
+Verification
+Service match
+Provider activity
+
+Do NOT automatically rank providers based only on payment.
+
+Sponsored placement must be clearly separated.
+
+==================================================
+50. SUPPORT SYSTEM
+==================================================
+
+Patient can create support tickets.
+
+Provider can create support tickets.
+
+Categories:
+
+Booking
+Payment
+Refund
+Doctor
+Diagnostic Center
+Report
+Account
+Technical
+Complaint
+
+Diagnostic Care customer care:
+
+01886748564
+
+Support agents can manage tickets.
+
+==================================================
+51. AUDIT LOG
+==================================================
+
+Record important actions:
+
+Login
+Logout
+Profile changes
+Booking creation
+Booking cancellation
+Payment
+Refund
+Report upload
+Report access
+Prescription creation
+Role changes
+Permission changes
+Provider verification
+Subscription changes
+Admin actions
+
+Audit logs must be tamper resistant as practical.
+
+==================================================
+52. API ARCHITECTURE
+==================================================
+
+Use clean API architecture.
+
+Separate:
+
+Authentication
+Users
+Providers
+Doctors
+Schedules
+Appointments
+Diagnostics
+Reports
+Prescriptions
+Payments
+Subscriptions
+Notifications
+Search
+Admin
+
+Example:
+
+/api/v1/auth
+
+/api/v1/patients
+
+/api/v1/doctors
+
+/api/v1/providers
+
+/api/v1/diagnostics
+
+/api/v1/appointments
+
+/api/v1/payments
+
+/api/v1/reports
+
+/api/v1/admin
+
+Use:
+
+Request validation
+Authentication middleware
+Authorization middleware
+Consistent errors
+Pagination
+Filtering
+Sorting
+Rate limits
+API versioning
+
+==================================================
+53. API DOCUMENTATION
+==================================================
+
+Generate complete API documentation.
+
+Document:
+
+Endpoint
+Method
+Authentication
+Permissions
+Request body
+Response
+Errors
+Examples
+
+Use OpenAPI/Swagger.
+
+==================================================
+54. BACKEND REQUIREMENTS
+==================================================
+
+Backend must be production grade.
+
+Implement:
+
+Service layer
+Repository/data access layer where appropriate
+Validation
+Authentication
+Authorization
+Transactions
+Background jobs
+Queues where required
+Caching where appropriate
+Logging
+Error monitoring
+
+Do not put all business logic inside controllers.
+
+==================================================
+55. FRONTEND REQUIREMENTS
+==================================================
+
+Use reusable components.
+
+Create:
+
+Design system
+Forms
+Tables
+Cards
+Modal
+Drawer
+Toast
+Calendar
+Time slot selector
+Booking flow
+Dashboard widgets
+Charts
+Search components
+
+Use proper loading states.
+
+Handle:
+
+Empty states
+Error states
+Offline states
+Slow network
+Unauthorized access
+
+==================================================
+56. REAL TIME
+==================================================
+
+Use real-time updates for:
+
+Appointment availability
+Slot booking
+Queue status
+Booking status
+Provider notifications
+
+If using Supabase Realtime or WebSockets, enforce authorization.
+
+==================================================
+57. CONCURRENCY REQUIREMENTS
+==================================================
+
+This is critical.
+
+Two patients must never successfully book the same doctor slot.
+
+Implement:
+
+Database constraints
+Transactions
+Atomic reservation
+Temporary holds
+Expiration
+Conflict handling
+
+Example:
+
+Patient A selects 10:00
+
+Patient B selects 10:00 simultaneously
+
+Only one can successfully confirm.
+
+The other receives:
+
+"Sorry, this slot has just been booked."
+
+==================================================
+58. FILE STORAGE
+==================================================
+
+Store:
+
+Profile photos
+Diagnostic reports
+Prescriptions
+Business documents
+
+Private healthcare files must never be publicly accessible.
+
+Use:
+
+Private buckets
+Signed URLs
+Access validation
+File type validation
+File size limits
+Virus/malware scanning where practical
+
+==================================================
+59. ADMIN CMS
+==================================================
+
+Admin can manage:
+
+Homepage sections
+Banners
+FAQ
+Health articles
+Categories
+Specializations
+Services
+Locations
+Notification templates
+Terms
+Privacy Policy
+Help content
+
+Brand content:
+
+Diagnostic Care
+
+Your Healthcare Marketplace
+
+Customer Care:
+
+01886748564
+
+==================================================
+60. FUTURE FEATURES
+==================================================
+
+Architecture must support future modules.
+
+Later modules may include:
+
+Telemedicine
+Medicine marketplace
+Pharmacy
+Ambulance booking
+Home sample collection
+Home nursing
+Home healthcare
+Health packages
+Insurance integration
+Corporate healthcare
+Electronic medical records
+AI-assisted search
+AI administrative assistance
+Health reminders
+Family health management
+
+Do NOT implement future modules in a way that damages the core architecture.
+
+==================================================
+61. AMBULANCE MODULE
+==================================================
+
+Prepare architecture for future ambulance booking.
+
+Future workflow:
+
+Patient requests ambulance
+→ selects type
+→ location
+→ destination
+→ availability
+→ price
+→ booking
+→ driver/provider assignment
+→ live status
+→ completion
+
+Do not implement this module unless specifically requested.
+
+==================================================
+62. PHARMACY MODULE
+==================================================
+
+Prepare architecture for future pharmacy marketplace.
+
+Products
+Inventory
+Prescription
+Order
+Payment
+Delivery
+Pharmacy management
+
+Do not tightly couple pharmacy logic to doctor booking.
+
+==================================================
+63. AI LAYER
+==================================================
+
+AI may later support:
+
+Natural language search
+Provider discovery
+Appointment assistance
+Patient support
+Record organization
+Report organization
+Provider analytics
+Reminder generation
+Administrative automation
+
+AI must NOT independently diagnose patients or make autonomous clinical decisions.
+
+Clinical AI functionality must have appropriate medical oversight, safety controls, regulatory review, and human supervision.
+
+==================================================
+64. PERFORMANCE
+==================================================
+
+System must be designed for:
+
+100 providers
+1,000 providers
+10,000 providers
+100,000 providers
+1,000,000+ patients
+
+Use:
+
+Indexes
+Pagination
+Caching
+Lazy loading
+Optimized queries
+Background jobs
+CDN
+Object storage
+Database optimization
+
+Do not prematurely overengineer.
+
+However, do not build architecture that requires a complete rewrite when the platform grows.
+
+==================================================
+65. OBSERVABILITY
+==================================================
+
+Implement:
+
+Application logs
+Error tracking
+Performance monitoring
+Database monitoring
+API latency
+Failed payments
+Failed bookings
+Authentication failures
+Background job monitoring
+
+Create alerts for critical failures.
+
+==================================================
+66. BACKUP AND RECOVERY
+==================================================
+
+Implement:
+
+Automated database backups
+File backup strategy
+Recovery procedure
+Disaster recovery documentation
+
+Test recovery periodically.
+
+==================================================
+67. TESTING
+==================================================
+
+Create:
+
+Unit tests
+Integration tests
+API tests
+Database tests
+Authentication tests
+Authorization tests
+Booking concurrency tests
+Payment tests
+End-to-end tests
+
+Critical test:
+
+Two users attempting to book the same slot simultaneously.
+
+Expected:
+
+Exactly one successful booking.
+
+==================================================
+68. SECURITY TESTING
+==================================================
+
+Test:
+
+Unauthorized provider access
+Cross tenant access
+Role escalation
+IDOR
+Broken authorization
+File access
+SQL injection
+XSS
+CSRF
+Rate limit bypass
+Session attacks
+Payment manipulation
+
+Never trust client supplied:
+
+organization_id
+user_id
+doctor_id
+patient_id
+price
+commission
+payment status
+
+Validate everything server side.
+
+==================================================
+69. BUSINESS RULE ENGINE
+==================================================
+
+Create configurable business rules.
+
+Examples:
+
+Booking fee
+Commission
+Cancellation policy
+Refund policy
+Provider subscription
+Trial period
+Booking limit
+Slot duration
+Daily capacity
+
+Do not hardcode business rules throughout the codebase.
+
+==================================================
+70. FINANCIAL SYSTEM
+==================================================
+
+Create proper financial accounting.
+
+Track:
+
+Patient payment
+Provider payout
+Platform commission
+Refund
+Subscription payment
+Featured listing payment
+Adjustments
+
+Use immutable ledger entries where practical.
+
+Never modify historical financial transactions silently.
+
+Every adjustment must create an audit trail.
+
+==================================================
+71. ADMIN FINANCIAL CONTROLS
+==================================================
+
+Admin can view:
+
+Gross transaction value
+Platform revenue
+Provider earnings
+Commission
+Refund
+Outstanding balance
+Subscription revenue
+Net revenue
+
+Export financial reports.
+
+==================================================
+72. DATA PRIVACY
+==================================================
+
+Treat healthcare information as highly sensitive.
+
+Implement:
+
+Minimum necessary access
+Purpose based access
+Role based access
+Audit trail
+Private storage
+Secure deletion policies
+Data retention policies
+
+Prepare Diagnostic Care for applicable Bangladesh privacy, healthcare, cybersecurity, payment, and regulatory requirements.
+
+Before production launch, applicable legal and regulatory requirements must be reviewed by qualified professionals.
+
+==================================================
+73. DEPLOYMENT
+==================================================
+
+Architecture should support cloud deployment.
+
+Recommended initial stack:
+
+Frontend:
+
+Next.js
+TypeScript
+
+Backend:
+
+NestJS
+TypeScript
+
+Database:
+
+PostgreSQL
+
+Authentication:
+
+Secure managed authentication or properly implemented custom authentication
+
+Storage:
+
+S3-compatible object storage or Supabase Storage
+
+Realtime:
+
+WebSocket/Supabase Realtime
+
+API documentation:
+
+Swagger/OpenAPI
+
+PWA:
+
+Service Worker + Web App Manifest
+
+Payments:
+
+Payment provider abstraction
+
+Use environment variables for all secrets.
+
+Separate:
+
+Development
+Staging
+Production
+
+==================================================
+74. PROJECT STRUCTURE
+==================================================
+
+Organize code cleanly.
+
+Suggested structure:
+
+apps/
+    patient-web
+    provider-dashboard
+    doctor-portal
+    admin-panel
+    api
+
+packages/
+    ui
+    auth
+    database
+    types
+    config
+    validation
+    localization
+
+docs/
+    PRD
+    architecture
+    database
+    API
+    security
+    deployment
+    business-rules
+
+==================================================
+75. DEVELOPMENT RULES
+==================================================
+
+Never:
+
+Hardcode secrets
+Hardcode provider IDs
+Hardcode user IDs
+Trust frontend authorization
+Expose private files
+Store passwords as plain text
+Allow duplicate booking
+Use fake payment success
+Use fake verification
+Mix tenant data
+Delete financial history silently
+
+Always:
+
+Validate server side
+Use transactions
+Use authorization
+Use database constraints
+Use reusable components
+Write tests
+Document important decisions
+Use proper error handling
+Use typed interfaces
+Use migrations
+
+==================================================
+76. DEVELOPMENT PHASES
+==================================================
+
+PHASE 1
+
+Architecture
+Database
+Authentication
+RBAC
+Organization system
+Provider system
+Location system
+Design system
+Admin foundation
+
+PHASE 2
+
+Patient
+Doctor
+Diagnostic Center
+Provider onboarding
+Doctor management
+Doctor association
+Assistant accounts
+
+PHASE 3
+
+Doctor schedule
+Real time slots
+Appointment booking
+Queue
+Booking notifications
+Cancellation
+Waiting list
+
+PHASE 4
+
+Diagnostic tests
+Test booking
+Report management
+Digital prescription
+Health records
+
+PHASE 5
+
+Payments
+Subscriptions
+Commission
+Financial ledger
+Refund
+Provider billing
+
+PHASE 6
+
+Search
+Reviews
+Analytics
+Featured listings
+Marketing tools
+
+PHASE 7
+
+PWA
+Performance
+Security hardening
+Monitoring
+Backup
+Production deployment
+
+PHASE 8
+
+Moulvibazar launch
+
+Provider onboarding
+Doctor onboarding
+Diagnostic center onboarding
+Patient acquisition
+Feedback
+Optimization
+
+PHASE 9
+
+Sylhet Division expansion
+
+Moulvibazar
+Sylhet
+Habiganj
+Sunamganj
+
+PHASE 10
+
+Nationwide Bangladesh expansion.
+
+==================================================
+77. INITIAL LAUNCH STRATEGY
+==================================================
+
+Although Diagnostic Care is architected as a nationwide Bangladesh platform, the initial operational launch should begin from:
+
+Moulvibazar, Bangladesh
+
+Initial target:
+
+Diagnostic Centers
+Doctors
+Patients
+
+The first objective is not merely registration.
+
+Measure:
+
+Active providers
+Active doctors
+Active patients
+Completed appointments
+Completed diagnostic bookings
+Provider retention
+Patient retention
+Revenue
+Monthly recurring revenue
+
+==================================================
+78. PROVIDER ACQUISITION
+==================================================
+
+Diagnostic Care must include provider registration.
+
+Diagnostic Center can:
+
+Apply
+Submit information
+Upload documents
+Create organization
+Add branch
+Add doctors
+Add tests
+
+Admin verifies.
+
+After verification:
+
+Provider becomes visible on marketplace.
+
+==================================================
+79. PATIENT ACQUISITION
+==================================================
+
+Support:
+
+Referral codes
+Referral tracking
+Campaigns
+Landing pages
+Featured providers
+District-specific pages
+Doctor-specific pages
+Diagnostic test pages
+
+Track:
+
+Source
+Campaign
+Referral
+Conversion
+
+==================================================
+80. SEO
+==================================================
+
+Build SEO-friendly pages.
+
+Examples:
+
+/doctors
+
+/doctors/cardiologist
+
+/doctor/dr-name
+
+/diagnostic-centers
+
+/diagnostic-centers/moulvibazar
+
+/tests
+
+/tests/cbc
+
+/providers/provider-name
+
+Use structured metadata where appropriate.
+
+SEO metadata should consistently identify the platform as:
+
+Diagnostic Care
+Your Healthcare Marketplace
+
+==================================================
+81. ADMIN CONTROL OVER MARKETPLACE
+==================================================
+
+Admin can control:
+
+Provider visibility
+Doctor visibility
+Search status
+Verification
+Featured placement
+Categories
+Location
+Reviews
+Reports
+Complaints
+
+Do not allow providers to manipulate global marketplace rankings.
+
+Sponsored placements must be clearly labeled.
+
+==================================================
+82. PRODUCT QUALITY
+==================================================
+
+The final Diagnostic Care product must NOT feel like a basic CRUD application.
+
+It should feel like a professional healthcare technology company.
+
+Prioritize:
+
+Trust
+Speed
+Accuracy
+Security
+Simplicity
+Reliability
+
+==================================================
+83. REQUIRED DOCUMENTATION
+==================================================
+
+Before or alongside implementation, create:
+
+PRD.md
+ARCHITECTURE.md
+DATABASE.md
+API.md
+SECURITY.md
+RBAC.md
+BOOKING_ENGINE.md
+PAYMENT.md
+BUSINESS_RULES.md
+DESIGN.md
+DEPLOYMENT.md
+TESTING.md
+ROADMAP.md
+MEMORY.md
+
+Keep documentation synchronized with implementation.
+
+==================================================
+84. FINAL ACCEPTANCE CRITERIA
+==================================================
+
+The project is production ready only when:
+
+Patient can register.
+
+Patient can search doctors.
+
+Patient can search diagnostic centers.
+
+Patient can view real time doctor slots.
+
+Patient can book an available slot.
+
+Two patients cannot book the same slot.
+
+Diagnostic Center can create doctor accounts.
+
+Diagnostic Center can configure doctor schedules.
+
+Doctor can access own appointments.
+
+Doctor Assistant can access only authorized doctor's bookings.
+
+Assistant can see permitted patient information including:
+
+Name
+Mobile number
+Age
+
+Diagnostic Center Admin cannot accidentally expose another organization's private data.
+
+Diagnostic Center can create diagnostic tests.
+
+Patient can book tests.
+
+Diagnostic Center can upload reports.
+
+Patient can securely access reports.
+
+Doctor can create prescriptions.
+
+Patient can access prescriptions.
+
+Admin can verify providers.
+
+Admin can manage subscriptions.
+
+Admin can manage commissions.
+
+Payments are recorded correctly.
+
+Financial transactions have audit trails.
+
+Private healthcare files are protected.
+
+RBAC works server side.
+
+Multi tenant isolation works.
+
+System is responsive.
+
+PWA works.
+
+Bangla and English localization works.
+
+Critical workflows have automated tests.
+
+Production deployment is documented.
+
+Diagnostic Care branding is consistently implemented.
+
+Customer Care number:
+
+01886748564
+
+is correctly displayed in appropriate customer support and contact locations.
+
+==================================================
+85. IMPORTANT PRODUCT PRINCIPLE
+==================================================
+
+Do not build Diagnostic Care as:
+
+"Just another doctor booking app."
+
+Do not build Diagnostic Care as:
+
+"Just another diagnostic test booking app."
+
+Build Diagnostic Care as:
+
+"A digital healthcare infrastructure connecting patients and healthcare providers across Bangladesh."
+
+Brand:
+
+Diagnostic Care
+
+Tagline:
+
+Your Healthcare Marketplace
+
+Customer Care:
+
+01886748564
+
+The marketplace is the patient-facing layer.
+
+The provider management system is the B2B layer.
+
+The booking engine is the transaction layer.
+
+The health record is the continuity layer.
+
+The financial system is the monetization layer.
+
+The provider network is the growth layer.
+
+The architecture must allow Diagnostic Care to start with diagnostic centers and doctor appointments while later expanding into:
+
+Hospitals
+Clinics
+Pharmacies
+Ambulances
+Home healthcare
+Telemedicine
+Other healthcare services
+
+Build the foundation correctly so future modules can be added without rewriting the core platform.
+
+==================================================
+86. FINAL INSTRUCTION TO THE DEVELOPMENT AI
+==================================================
+
+Do not immediately generate thousands of lines of code.
+
+First:
+
+1. Analyze the complete requirements.
+2. Identify conflicts and missing technical decisions.
+3. Produce the proposed architecture.
+4. Produce the database schema.
+5. Produce the role/permission matrix.
+6. Produce the booking engine design.
+7. Produce the API structure.
+8. Produce the project folder structure.
+9. Produce implementation phases.
+10. Identify security risks.
+11. Identify regulatory considerations.
+12. Define the Diagnostic Care design system and brand implementation.
+13. Then begin implementation phase by phase.
+
+When implementing each phase:
+
+Build
+Test
+Review
+Fix
+Document
+Then continue.
+
+Never sacrifice:
+
+Security
+Tenant isolation
+Booking integrity
+Healthcare data privacy
+Financial accuracy
+Auditability
+
+for development speed.
+
+The final system must be production ready, scalable, secure, maintainable, Bangladesh focused, and suitable for expansion across Bangladesh.
+
+==================================================
+87. BRAND CONSTANTS
+==================================================
+
+Use these values as configurable application-level brand constants rather than scattering hardcoded values throughout the codebase.
+
+BRAND_NAME:
+
+Diagnostic Care
+
+TAGLINE:
+
+Your Healthcare Marketplace
+
+CUSTOMER_CARE_PHONE:
+
+01886748564
+
+COUNTRY:
+
+Bangladesh
+
+INITIAL_LAUNCH_LOCATION:
+
+Moulvibazar
+
+DEFAULT_LANGUAGES:
+
+Bangla
+English
+
+These values should be centrally managed so the brand can be updated in the future without modifying hundreds of components.
