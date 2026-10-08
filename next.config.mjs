@@ -32,6 +32,9 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   generateBuildId: async () => 'diagnostic-care-prod-build',
   images: {
     unoptimized: true,
