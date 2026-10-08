@@ -25,6 +25,7 @@ import {
   ArrowRight,
   Activity,
   FileText,
+  LogOut,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -40,6 +41,8 @@ interface HeaderProps {
   onOpenLocation?: () => void;
   selectedLocation?: string;
   onSelectCategory?: (category: any) => void;
+  currentUser?: any;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -55,6 +58,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenLocation,
   selectedLocation = 'Moulvibazar',
   onSelectCategory,
+  currentUser,
+  onLogout,
 }) => {
   const t = TRANSLATIONS[language];
   const [isScrolled, setIsScrolled] = useState(false);
@@ -418,27 +423,82 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
-          {/* Login Button */}
-          {onOpenAuth && (
-            <button
-              onClick={onOpenAuth}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 14px',
-                borderRadius: '8px',
-                backgroundColor: 'transparent',
-                border: '1px solid var(--brand-border)',
-                color: 'var(--brand-text-dark)',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              <User size={14} color={BRAND_COLORS.textDark} />
-              <span>{language === 'en' ? 'Login' : 'লগইন'}</span>
-            </button>
+          {/* Auth Button (User Profile if logged in, or Login button if guest) */}
+          {currentUser ? (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                onClick={() => handleNavClick('profile')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#0F172A',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                <User size={14} color={BRAND_COLORS.primary} />
+                <span
+                  style={{
+                    maxWidth: '110px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {currentUser.fullName || (language === 'en' ? 'Profile' : 'প্রোফাইল')}
+                </span>
+              </button>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  title={language === 'en' ? 'Sign Out' : 'লগআউট'}
+                  aria-label={language === 'en' ? 'Sign Out' : 'লগআউট'}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEF2F2',
+                    border: '1px solid #FCA5A5',
+                    color: '#DC2626',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <LogOut size={14} />
+                </button>
+              )}
+            </div>
+          ) : (
+            onOpenAuth && (
+              <button
+                onClick={onOpenAuth}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--brand-border)',
+                  color: 'var(--brand-text-dark)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                <User size={14} color={BRAND_COLORS.textDark} />
+                <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
+              </button>
+            )
           )}
 
           {/* Get Started / Partner Button (Signal Blue #0057FF) */}

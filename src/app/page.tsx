@@ -177,7 +177,18 @@ export default function HomePage() {
     setLanguage(lang);
     if (typeof window !== 'undefined') {
       localStorage.setItem('dc_lang', lang);
+      document.documentElement.lang = lang;
     }
+    if (currentUser) {
+      AuthService.updateLanguagePreference(currentUser.id, lang);
+    }
+  };
+
+  const handleLogout = async () => {
+    await AuthService.signOut();
+    setCurrentUser(null);
+    setCurrentRole('PATIENT');
+    setActiveTab('marketplace');
   };
 
   const t = TRANSLATIONS[language];
@@ -421,6 +432,8 @@ export default function HomePage() {
         selectedLocation={selectedLocation}
         onOpenLocation={() => setIsLocationModalOpen(true)}
         onSelectCategory={handleCategorySelection}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}
@@ -599,6 +612,7 @@ export default function HomePage() {
               onOpenNotificationsModal={() => setIsNotificationsModalOpen(true)}
               onNavigateTab={(tab) => setActiveTab(tab)}
               onOpenAuthModal={() => setIsAuthModalOpen(true)}
+              onLogout={handleLogout}
               currentUser={currentUser}
               appointmentsCount={appState.appointments.length}
             />
@@ -1592,17 +1606,16 @@ export default function HomePage() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onAuthSuccess={(user) => {
+        onAuthSuccess={(profile) => {
           setIsAuthModalOpen(false);
-          AuthService.getCurrentUser().then((profile) => {
-            if (profile) {
-              setCurrentUser(profile);
-              setCurrentRole(profile.primaryRole);
-              AppointmentService.getPatientAppointments(profile.id).then((apts) => {
-                if (apts.length > 0) {
-                  setAppState((prev) => ({ ...prev, appointments: apts }));
-                }
-              });
+          setCurrentUser(profile);
+          setCurrentRole(profile.primaryRole);
+          if (profile.languagePreference) {
+            handleLanguageChange(profile.languagePreference);
+          }
+          AppointmentService.getPatientAppointments(profile.id).then((apts) => {
+            if (apts.length > 0) {
+              setAppState((prev) => ({ ...prev, appointments: apts }));
             }
           });
         }}

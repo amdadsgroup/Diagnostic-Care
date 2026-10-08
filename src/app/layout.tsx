@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { BRAND_CONSTANTS, BRAND_COLORS, BRAND_LOGOS, BRAND_FAVICONS } from '@/config/brand';
 import PWAController from '@/components/pwa/PWAController';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 export const viewport: Viewport = {
   themeColor: BRAND_COLORS.primary, // Signal Blue #0057FF
@@ -95,8 +96,10 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body>
-        <PWAController />
-        {children}
+        <LanguageProvider>
+          <PWAController />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

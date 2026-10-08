@@ -32,6 +32,7 @@ interface MobileProfileViewProps {
   onOpenNotificationsModal: () => void;
   onNavigateTab: (tab: any) => void;
   onOpenAuthModal?: () => void;
+  onLogout?: () => void;
   currentUser?: any;
   appointmentsCount?: number;
 }
@@ -44,6 +45,7 @@ export default function MobileProfileView({
   onOpenNotificationsModal,
   onNavigateTab,
   onOpenAuthModal,
+  onLogout,
   currentUser,
   appointmentsCount = 0,
 }: MobileProfileViewProps) {
@@ -481,6 +483,57 @@ export default function MobileProfileView({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Account Session Actions */}
+      <div style={{ marginTop: '4px' }}>
+        {currentUser ? (
+          <button
+            onClick={onLogout}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '14px',
+              borderRadius: '14px',
+              backgroundColor: '#FEF2F2',
+              border: '1.5px solid #FCA5A5',
+              color: '#DC2626',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <LogOut size={16} />
+            <span>{language === 'en' ? 'Sign Out of Diagnostic Care' : 'লগআউট করুন'}</span>
+          </button>
+        ) : (
+          <button
+            onClick={onOpenAuthModal}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '14px',
+              borderRadius: '14px',
+              backgroundColor: '#0057FF',
+              border: 'none',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(0, 87, 255, 0.25)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / রেজিস্ট্রেশন করুন'}</span>
+          </button>
+        )}
       </div>
     </div>
   );
