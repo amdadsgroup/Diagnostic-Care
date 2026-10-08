@@ -1,10 +1,9 @@
 import { supabase } from '@/lib/supabase/client';
-import { Doctor, DoctorAssociation } from '@/types';
-import { INITIAL_DOCTORS, INITIAL_DOCTOR_ASSOCIATIONS } from '@/lib/mock-data';
+import { Doctor, DoctorAssociation, Appointment } from '@/types';
 
 export class DoctorService {
   /**
-   * Fetch doctors with optional specialty and search filters
+   * Fetch doctors with optional specialty and search filters directly from PostgreSQL
    */
   static async getDoctors(params?: {
     specialty?: string;
@@ -54,8 +53,7 @@ export class DoctorService {
       const { data, error } = await query;
 
       if (error || !data || data.length === 0) {
-        // Return seeded fallback doctors if table is yet unpopulated
-        return INITIAL_DOCTORS;
+        return [];
       }
 
       return data.map((d: any) => ({
@@ -67,15 +65,15 @@ export class DoctorService {
         specialization: d.specialization,
         qualifications: d.qualifications,
         experienceYears: d.experience_years || 5,
-        biography: d.bio,
+        biography: d.bio || '',
         avatarUrl: d.profiles?.avatar_url || '/logo.png',
-        verificationStatus: 'VERIFIED' as const,
+        verificationStatus: (d.verification_status?.toUpperCase() as any) || 'VERIFIED',
         rating: Number(d.rating) || 5.0,
         reviewCount: d.total_reviews || 0,
         languages: ['Bangla', 'English'],
       }));
     } catch {
-      return INITIAL_DOCTORS;
+      return [];
     }
   }
 
@@ -98,6 +96,7 @@ export class DoctorService {
           consultation_fee,
           doctors (
             id,
+            bmdc_registration_number,
             specialization,
             qualifications,
             experience_years,
@@ -108,13 +107,19 @@ export class DoctorService {
           ),
           provider_locations (
             branch_name,
-            address_line
+            address_line,
+            districts (
+              name
+            ),
+            upazilas (
+              name
+            )
           )
         `)
         .eq('is_active', true);
 
       if (error || !data || data.length === 0) {
-        return INITIAL_DOCTOR_ASSOCIATIONS;
+        return [];
       }
 
       return data.map((s: any) => ({
@@ -124,8 +129,8 @@ export class DoctorService {
         organizationName: 'Diagnostic Care Partner',
         branchId: s.branch_id || 'branch-default',
         branchName: s.provider_locations?.branch_name || 'Main Branch',
-        districtName: 'Moulvibazar',
-        upazilaName: 'Moulvibazar Sadar',
+        districtName: s.provider_locations?.districts?.name || 'Moulvibazar',
+        upazilaName: s.provider_locations?.upazilas?.name || 'Moulvibazar Sadar',
         chamberRoomNumber: 'Room 204',
         consultationFee: Number(s.consultation_fee) || 800,
         followupFee: 500,
@@ -135,7 +140,7 @@ export class DoctorService {
         doctor: {
           id: s.doctor_id,
           userId: s.doctor_id,
-          bmdcNumber: 'BMDC-REG',
+          bmdcNumber: s.doctors?.bmdc_registration_number || 'A-12345',
           fullName: s.doctors?.profiles?.full_name || 'Specialist Doctor',
           title: 'Consultant Physician',
           specialization: s.doctors?.specialization || 'Consultant',
@@ -150,7 +155,118 @@ export class DoctorService {
         },
       }));
     } catch {
-      return INITIAL_DOCTOR_ASSOCIATIONS;
+      return [];
+    }
+  }
+
+  /**
+   * Fetch today's real appointments for a specific doctor
+   */
+  static async getDoctorTodayAppointments(doctorId: string, date?: string): Promise<Appointment[]> {
+    try {
+      const today = date || new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          booking_code,
+          appointment_date,
+          start_time,
+          token_number,
+          patient_id,
+          patient_name,
+          patient_phone,
+          patient_age,
+          patient_gender,
+          consultation_fee,
+          status,
+          payment_status,
+          created_at
+        `)
+        .eq('doctor_id', doctorId)
+        .eq('appointment_date', today)
+        .order('token_number', { ascending: true });
+
+      if (error || !data) return [];
+
+      return data.map((a: any) => ({
+        id: a.id,
+        bookingCode: a.booking_code,
+        scheduleSlotId: `slot-${a.id}`,
+        doctorAssociationId: doctorId,
+        branchId: 'branch-default',
+        doctorName: 'Dr. Specialist',
+        specialization: 'Consultant',
+        organizationName: 'Diagnostic Care Chamber',
+        branchName: 'Main Branch',
+        patientUserId: a.patient_id,
+        patientName: a.patient_name,
+        patientPhone: a.patient_phone,
+        patientAge: a.patient_age,
+        patientGender: a.patient_gender,
+        appointmentDate: a.appointment_date,
+        startTime: a.start_time,
+        consultationFee: Number(a.consultation_fee) || 800,
+        tokenNumber: a.token_number,
+        status: (a.status?.toUpperCase() as any) || 'CONFIRMED',
+        paymentStatus: (a.payment_status?.toUpperCase() as any) || 'CASH_AT_DESK',
+        createdAt: a.created_at,
+      }));
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Save a digital prescription to database
+   */
+  static async savePrescription(prescription: {
+    appointmentId?: string;
+    patientId: string;
+    doctorId: string;
+    clinicalNotes?: string;
+    diagnosis?: string;
+    medicines: Array<{ name: string; dose: string; instruction: string; days: number }>;
+    recommendedTests?: string;
+    followupDate?: string;
+  }): Promise<{ success: boolean; prescriptionId?: string; error?: string }> {
+    try {
+      const prescriptionCode = `RX-${Date.now().toString().slice(-6)}`;
+      const { data, error } = await supabase
+        .from('prescriptions')
+        .insert({
+          prescription_code: prescriptionCode,
+          appointment_id: prescription.appointmentId || null,
+          patient_id: prescription.patientId,
+          doctor_id: prescription.doctorId,
+          clinical_notes: prescription.clinicalNotes || null,
+          diagnosis: prescription.diagnosis || null,
+          prescribed_date: new Date().toISOString().split('T')[0],
+          followup_date: prescription.followupDate || null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      // Insert prescription items
+      if (prescription.medicines.length > 0 && data?.id) {
+        const items = prescription.medicines.map((m) => ({
+          prescription_id: data.id,
+          medicine_name: m.name,
+          dosage: m.dose,
+          frequency: m.instruction,
+          duration_days: m.days,
+          instructions: m.instruction,
+        }));
+        await supabase.from('prescription_items').insert(items);
+      }
+
+      return { success: true, prescriptionId: data?.id };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Prescription save failed' };
     }
   }
 }

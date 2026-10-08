@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Organization, Doctor, SubscriptionPlan } from '@/types';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { ShieldCheck, CheckCircle2, AlertCircle, FileText, Database, Lock, DollarSign } from 'lucide-react';
+import { AdminService, AdminDashboardMetrics } from '@/services/admin.service';
 
 interface SuperAdminViewProps {
   organizations: Organization[];
@@ -16,6 +17,12 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
   doctors,
   language,
 }) => {
+  const [metrics, setMetrics] = useState<AdminDashboardMetrics | null>(null);
+
+  useEffect(() => {
+    AdminService.getDashboardMetrics().then((m) => setMetrics(m));
+  }, []);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Super Admin Control Bar */}
@@ -53,15 +60,15 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
           <div style={{ backgroundColor: 'var(--slate-50)', padding: '16px', borderRadius: '10px', border: '1px solid var(--slate-200)' }}>
             <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>Active Diagnostic Centers</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-navy-900)', marginTop: '4px' }}>
-              {organizations.length} Organizations
+              {metrics ? metrics.diagnosticCenters : organizations.length} Centers
             </div>
-            <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 600, marginTop: '2px' }}>100% Verified in Moulvibazar</div>
+            <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 600, marginTop: '2px' }}>Verified in Moulvibazar Hub</div>
           </div>
 
           <div style={{ backgroundColor: 'var(--slate-50)', padding: '16px', borderRadius: '10px', border: '1px solid var(--slate-200)' }}>
             <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>BMDC Registered Doctors</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-teal-600)', marginTop: '4px' }}>
-              {doctors.length} Physicians
+              {metrics ? metrics.activeDoctors : doctors.length} Physicians
             </div>
             <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>BMDC Verified</div>
           </div>
@@ -69,15 +76,17 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
           <div style={{ backgroundColor: 'var(--slate-50)', padding: '16px', borderRadius: '10px', border: '1px solid var(--slate-200)' }}>
             <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>Gross Marketplace Volume (GMV)</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-emerald-500)', marginTop: '4px' }}>
-              ৳48,500
+              ৳{(metrics?.totalRevenueBdt || 0).toLocaleString()}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>This Week</div>
+            <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
+              {metrics?.completedAppointments ? `${metrics.completedAppointments} Completed Appointments` : 'Live Database Records'}
+            </div>
           </div>
 
           <div style={{ backgroundColor: 'var(--slate-50)', padding: '16px', borderRadius: '10px', border: '1px solid var(--slate-200)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>Platform Commission (5%)</div>
+            <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>Platform Commission (10%)</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-navy-700)', marginTop: '4px' }}>
-              ৳2,425
+              ৳{Math.round((metrics?.totalRevenueBdt || 0) * 0.1).toLocaleString()}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--brand-emerald-500)', fontWeight: 600, marginTop: '2px' }}>Ledger Balanced</div>
           </div>

@@ -13,7 +13,8 @@ export interface AppNotification {
 
 export class NotificationService {
   /**
-   * Fetch active notifications for logged in user
+   * Fetch active notifications for logged in user directly from PostgreSQL.
+   * Never creates fake notification entries.
    */
   static async getUserNotifications(recipientId: string): Promise<AppNotification[]> {
     try {
@@ -25,18 +26,7 @@ export class NotificationService {
         .limit(20);
 
       if (error || !data) {
-        return [
-          {
-            id: 'notif-1',
-            title: 'Welcome to Diagnostic Care',
-            titleBn: 'ডায়াগনস্টিক কেয়ারে স্বাগতম',
-            message: 'Your healthcare marketplace account is active and verified.',
-            messageBn: 'আপনার অ্যাকাউন্ট সক্রিয় হয়েছে।',
-            notificationType: 'general',
-            isRead: false,
-            createdAt: new Date().toISOString(),
-          },
-        ];
+        return [];
       }
 
       return data.map((n: any) => ({

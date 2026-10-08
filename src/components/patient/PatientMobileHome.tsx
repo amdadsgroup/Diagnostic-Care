@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { SupportedLanguage, BRAND_CONSTANTS } from '@/config/brand';
-import { Appointment, QueueState, DoctorAssociation, DiagnosticTest, ScheduleSlot } from '@/types';
+import { Appointment, QueueState, DoctorAssociation, DiagnosticTest, ScheduleSlot, User } from '@/types';
 import { HealthcareCategoryKey } from '@/components/marketplace/CategoryNavigator';
 import {
   MapPin,
@@ -44,6 +44,7 @@ interface PatientMobileHomeProps {
   diagnosticTests: DiagnosticTest[];
   onSelectSlot: (slot: ScheduleSlot, assoc: DoctorAssociation) => void;
   onSelectTest: (test: DiagnosticTest) => void;
+  currentUser?: { fullName?: string; phone?: string; [key: string]: any } | null;
 }
 
 export default function PatientMobileHome({
@@ -62,6 +63,7 @@ export default function PatientMobileHome({
   diagnosticTests,
   onSelectSlot,
   onSelectTest,
+  currentUser,
 }: PatientMobileHomeProps) {
   const [greeting, setGreeting] = useState('Hello');
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,7 +101,7 @@ export default function PatientMobileHome({
       >
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--slate-500)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span>{greeting}, Tanvir</span>
+            <span>{greeting}, {currentUser?.fullName?.split(' ')[0] || (language === 'en' ? 'Patient' : 'সম্মানিত রোগী')}</span>
             <span style={{ fontSize: '13px' }}>👋</span>
           </div>
 

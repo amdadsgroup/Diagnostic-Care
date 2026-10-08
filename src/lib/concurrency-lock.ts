@@ -189,6 +189,11 @@ class ConcurrencyEngine {
       patientAge: number;
       patientGender: 'MALE' | 'FEMALE' | 'OTHER';
       paymentMethod: 'CASH_AT_DESK' | 'PAID';
+      doctorName?: string;
+      specialization?: string;
+      organizationName?: string;
+      branchName?: string;
+      consultationFee?: number;
     }
   ): Promise<ConfirmResult> {
     const releaseMutex = await this.acquireMutex(slotId);
@@ -244,6 +249,7 @@ class ConcurrencyEngine {
       queue.totalTokensIssued = tokenNumber;
       this.queues.set(queueKey, queue);
 
+      const fee = patientData.consultationFee || 800;
       const bookingCode = `DC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       const appointment: Appointment = {
         id: `apt-${Date.now()}-${tokenNumber}`,
@@ -251,10 +257,10 @@ class ConcurrencyEngine {
         scheduleSlotId: slotId,
         doctorAssociationId: slot.doctorAssociationId,
         branchId: slot.branchId,
-        doctorName: 'ডাঃ আনিসুর রহমান (Dr. Anisur Rahman)',
-        specialization: 'কার্ডিওলজিস্ট ও হৃদরোগ বিশেষজ্ঞ',
-        organizationName: 'পপুলার ডায়াগনস্টিক সেন্টার',
-        branchName: 'মৌলভীবাজার মেইন ব্রাঞ্চ',
+        doctorName: patientData.doctorName || 'ডাঃ আনিসুর রহমান (Dr. Anisur Rahman)',
+        specialization: patientData.specialization || 'কার্ডিওলজিস্ট ও হৃদরোগ বিশেষজ্ঞ',
+        organizationName: patientData.organizationName || 'পপুলার ডায়াগনস্টিক সেন্টার',
+        branchName: patientData.branchName || 'মৌলভীবাজার মেইন ব্রাঞ্চ',
         patientUserId: userId,
         patientName: patientData.patientName,
         patientPhone: patientData.patientPhone,
@@ -262,7 +268,7 @@ class ConcurrencyEngine {
         patientGender: patientData.patientGender,
         appointmentDate: slot.slotDate,
         startTime: slot.startTime,
-        consultationFee: 800,
+        consultationFee: fee,
         tokenNumber,
         status: 'CONFIRMED',
         paymentStatus: patientData.paymentMethod,
@@ -282,8 +288,8 @@ class ConcurrencyEngine {
           appointment_date: slot.slotDate,
           start_time: slot.startTime,
           token_number: tokenNumber,
-          consultation_fee: 800,
-          total_payable: 800,
+          consultation_fee: fee,
+          total_payable: fee,
           status: 'confirmed',
           payment_status: patientData.paymentMethod === 'PAID' ? 'paid' : 'cash_at_desk',
         }).then(({ error }: any) => {

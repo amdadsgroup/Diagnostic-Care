@@ -7,11 +7,12 @@ export interface AmbulanceRequestPayload {
   destinationAddress: string;
   ambulanceType: 'ac' | 'non_ac' | 'icu' | 'freezer';
   isEmergency: boolean;
+  district?: string;
 }
 
 export class AmbulanceService {
   /**
-   * Submit 24/7 emergency ambulance dispatch request
+   * Submit 24/7 emergency ambulance dispatch request to database
    */
   static async requestAmbulance(payload: AmbulanceRequestPayload): Promise<{
     requestCode: string;
@@ -37,12 +38,29 @@ export class AmbulanceService {
       });
 
       if (error) {
-        console.warn('Ambulance DB insert notice:', error.message);
+        return { requestCode: '', estimatedFare: 0, success: false, error: error.message };
       }
 
       return { requestCode, estimatedFare, success: true, error: null };
+    } catch (err: any) {
+      return { requestCode: '', estimatedFare: 0, success: false, error: err.message || 'Dispatch request failed' };
+    }
+  }
+
+  /**
+   * Fetch active ambulance fleet from database
+   */
+  static async getAmbulanceFleet(district?: string) {
+    try {
+      let query = supabase.from('ambulance_providers').select('*').eq('status', 'active');
+      if (district) {
+        query = query.ilike('district_name', `%${district}%`);
+      }
+      const { data, error } = await query;
+      if (error || !data) return [];
+      return data;
     } catch {
-      return { requestCode, estimatedFare, success: true, error: null };
+      return [];
     }
   }
 

@@ -12,7 +12,8 @@ export interface AdminDashboardMetrics {
 
 export class AdminService {
   /**
-   * Fetch live database-driven KPIs for Super Admin and Operations Console
+   * Fetch live database-driven KPIs for Super Admin and Operations Console.
+   * Strictly calculates from actual database rows. Never uses hardcoded or fabricated numbers.
    */
   static async getDashboardMetrics(): Promise<AdminDashboardMetrics> {
     try {
@@ -23,6 +24,7 @@ export class AdminService {
         { count: completedAptCount },
         { count: pendingVerifCount },
         { count: diagCenterCount },
+        { data: completedApts },
       ] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('doctors').select('*', { count: 'exact', head: true }).eq('status', 'active'),
@@ -30,26 +32,32 @@ export class AdminService {
         supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
         supabase.from('provider_verifications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
         supabase.from('diagnostic_centers').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('appointments').select('consultation_fee').eq('status', 'completed'),
       ]);
 
+      const calculatedRevenue = (completedApts || []).reduce(
+        (sum, a) => sum + (Number(a.consultation_fee) || 0),
+        0
+      );
+
       return {
-        totalUsers: userCount || 124,
-        activeDoctors: doctorCount || 18,
-        totalAppointments: aptCount || 42,
-        completedAppointments: completedAptCount || 31,
-        pendingVerifications: pendingVerifCount || 4,
-        diagnosticCenters: diagCenterCount || 8,
-        totalRevenueBdt: (completedAptCount || 31) * 800,
+        totalUsers: userCount || 0,
+        activeDoctors: doctorCount || 0,
+        totalAppointments: aptCount || 0,
+        completedAppointments: completedAptCount || 0,
+        pendingVerifications: pendingVerifCount || 0,
+        diagnosticCenters: diagCenterCount || 0,
+        totalRevenueBdt: calculatedRevenue,
       };
     } catch {
       return {
-        totalUsers: 124,
-        activeDoctors: 18,
-        totalAppointments: 42,
-        completedAppointments: 31,
-        pendingVerifications: 4,
-        diagnosticCenters: 8,
-        totalRevenueBdt: 24800,
+        totalUsers: 0,
+        activeDoctors: 0,
+        totalAppointments: 0,
+        completedAppointments: 0,
+        pendingVerifications: 0,
+        diagnosticCenters: 0,
+        totalRevenueBdt: 0,
       };
     }
   }

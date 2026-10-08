@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BRAND, BRAND_COLORS } from '@/config/brand';
 import { BrandSymbol } from '@/components/brand/BrandSymbol';
 import { CalendarCheck, Lock, Users, Phone, CheckCircle2 } from 'lucide-react';
+import { AppointmentService } from '@/services/appointment.service';
 
 interface FamilyMember {
   id: string;
@@ -30,70 +31,47 @@ interface PatientAppointment {
   hasReport: boolean;
 }
 
-const INITIAL_FAMILY: FamilyMember[] = [
-  { id: 'fm-1', name: 'রহিমা বেগম', relation: 'মা (Mother)', age: 58, gender: 'FEMALE', bloodGroup: 'B+' },
-  { id: 'fm-2', name: 'আয়েশা সিদ্দিকা', relation: 'স্ত্রী (Spouse)', age: 31, gender: 'FEMALE', bloodGroup: 'O+' },
-  { id: 'fm-3', name: 'আরিয়ান আহমেদ', relation: 'ছেলে (Child)', age: 6, gender: 'MALE', bloodGroup: 'B+' },
-];
-
-const INITIAL_APPOINTMENTS: PatientAppointment[] = [
-  {
-    id: 'apt-1',
-    bookingCode: 'DC-2026-9021',
-    doctorName: 'ডাঃ রফিকুল ইসলাম',
-    specialization: 'কার্ডিওলজিস্ট ও মেডিসিন বিশেষজ্ঞ',
-    chamberName: 'মৌলভীবাজার ডিজিটাল ডায়াগনস্টিক কমপ্লেক্স',
-    date: 'আজ (Today)',
-    time: '০৪:১৫ অপরাহ্ন',
-    tokenNumber: 2,
-    status: 'CONFIRMED',
-    forWhom: 'নিজের জন্য (Self)',
-    fee: 800,
-    hasPrescription: true,
-    hasReport: false,
-  },
-  {
-    id: 'apt-2',
-    bookingCode: 'DC-2026-8714',
-    doctorName: 'ডাঃ ফারহানা চৌধুরী',
-    specialization: 'গাইনী ও প্রসূতি বিশেষজ্ঞ',
-    chamberName: 'পপুলার ডায়াগনস্টিক সেন্টার - সিলেট ব্রাঞ্চ',
-    date: '১২ অক্টোবর, ২০২৬',
-    time: '০৫:৩০ অপরাহ্ন',
-    tokenNumber: 7,
-    status: 'CONFIRMED',
-    forWhom: 'আয়েশা সিদ্দিকা (স্ত্রী)',
-    fee: 1000,
-    hasPrescription: false,
-    hasReport: false,
-  },
-  {
-    id: 'apt-3',
-    bookingCode: 'DC-2026-7811',
-    doctorName: 'ডাঃ তৌহিদ হাসান',
-    specialization: 'অর্থোপেডিক সার্জন',
-    chamberName: 'মৌলভীবাজার সেন্ট্রাল ক্লিনিক',
-    date: '২৫ সেপ্টেম্বর, ২০২৬',
-    time: '০৬:০০ অপরাহ্ন',
-    tokenNumber: 12,
-    status: 'COMPLETED',
-    forWhom: 'রহিমা বেগম (মা)',
-    fee: 800,
-    hasPrescription: true,
-    hasReport: true,
-  },
-];
-
 export default function PatientDashboard({
-  patientName = 'তানভীর আহমেদ',
-  phone = '01712-345678',
+  patientName = 'সম্মানিত রোগী',
+  phone = '01886748564',
+  patientId,
 }: {
   patientName?: string;
   phone?: string;
+  patientId?: string;
 }) {
   const [activeTab, setActiveTab] = useState<'appointments' | 'vault' | 'family'>('appointments');
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(INITIAL_FAMILY);
-  const [appointments] = useState<PatientAppointment[]>(INITIAL_APPOINTMENTS);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+  const [appointments, setAppointments] = useState<PatientAppointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (patientId) {
+      AppointmentService.getPatientAppointments(patientId).then((apts) => {
+        if (apts && apts.length > 0) {
+          const mapped: PatientAppointment[] = apts.map((a) => ({
+            id: a.id,
+            bookingCode: a.bookingCode,
+            doctorName: a.doctorName,
+            specialization: a.specialization,
+            chamberName: a.organizationName,
+            date: a.appointmentDate,
+            time: a.startTime,
+            tokenNumber: a.tokenNumber,
+            status: a.status === 'COMPLETED' ? 'COMPLETED' : 'CONFIRMED',
+            forWhom: a.patientName,
+            fee: a.consultationFee,
+            hasPrescription: false,
+            hasReport: false,
+          }));
+          setAppointments(mapped);
+        }
+        setIsLoading(false);
+      });
+    } else {
+      setIsLoading(false);
+    }
+  }, [patientId]);
 
   // Add Family Member state
   const [showAddMember, setShowAddMember] = useState(false);
@@ -268,6 +246,29 @@ export default function PatientDashboard({
               </div>
             </div>
           ))}
+          {appointments.length === 0 && (
+            <div
+              className="portal-card"
+              style={{
+                textAlign: 'center',
+                padding: '48px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+              }}
+            >
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'var(--slate-100)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CalendarCheck size={28} color="var(--slate-500)" />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--brand-navy-900)', margin: 0 }}>
+                এখনও কোনো অ্যাপয়েন্টমেন্ট বুক করা নেই
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--slate-500)', maxWidth: '400px', margin: 0 }}>
+                মৌলভীবাজার ও সিলেটে অভিজ্ঞ বিশেষজ্ঞ ডাক্তার অথবা বিশ্বস্ত ডায়াগনস্টিক সেন্টারের ল্যাব টেস্ট খুব সহজেই বুক করুন।
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -354,6 +355,41 @@ export default function PatientDashboard({
                 </div>
               </div>
             ))}
+            {familyMembers.length === 0 && (
+              <div
+                className="portal-card"
+                style={{
+                  gridColumn: '1 / -1',
+                  textAlign: 'center',
+                  padding: '36px 20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <Users size={28} color="var(--slate-400)" />
+                <p style={{ fontSize: '0.9rem', color: 'var(--slate-600)', margin: 0 }}>
+                  এখনও কোনো পারিবারিক সদস্য যুক্ত করা হয়নি।
+                </p>
+                <button
+                  onClick={() => setShowAddMember(true)}
+                  style={{
+                    backgroundColor: 'var(--brand-teal-600)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    marginTop: '4px',
+                  }}
+                >
+                  + প্রথম সদস্য যোগ করুন
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Add Member Modal */}

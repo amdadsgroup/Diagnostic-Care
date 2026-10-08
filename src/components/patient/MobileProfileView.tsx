@@ -32,6 +32,8 @@ interface MobileProfileViewProps {
   onOpenNotificationsModal: () => void;
   onNavigateTab: (tab: any) => void;
   onOpenAuthModal?: () => void;
+  currentUser?: any;
+  appointmentsCount?: number;
 }
 
 export default function MobileProfileView({
@@ -42,6 +44,8 @@ export default function MobileProfileView({
   onOpenNotificationsModal,
   onNavigateTab,
   onOpenAuthModal,
+  currentUser,
+  appointmentsCount = 0,
 }: MobileProfileViewProps) {
   const [isStandalone, setIsStandalone] = useState(false);
   const [platformName, setPlatformName] = useState('Mobile Browser');
@@ -133,17 +137,17 @@ export default function MobileProfileView({
               flexShrink: 0,
             }}
           >
-            T
+            {currentUser?.fullName ? currentUser.fullName.charAt(0).toUpperCase() : (language === 'en' ? 'P' : 'র')}
           </div>
 
           <div style={{ flex: 1 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', color: '#6EE7B7', fontWeight: 700, marginBottom: '4px' }}>
               <CheckCircle2 size={12} />
-              <span>{language === 'en' ? 'Verified Patient Account' : 'ভেরিফাইড রোগী একাউন্ট'}</span>
+              <span>{currentUser ? (language === 'en' ? 'Verified Account' : 'ভেরিফাইড অ্যাকাউন্ট') : (language === 'en' ? 'Guest Visitor' : 'অতিথি ব্যবহারকারী')}</span>
             </div>
-            <h1 style={{ fontSize: '18px', fontWeight: 800 }}>Tanvir Ahmed</h1>
+            <h1 style={{ fontSize: '18px', fontWeight: 800 }}>{currentUser?.fullName || (language === 'en' ? 'Healthcare Patient' : 'সম্মানিত রোগী')}</h1>
             <div style={{ fontSize: '12.5px', color: '#94A3B8', marginTop: '2px' }}>
-              01712-345678 • Blood: A+ • {selectedLocation}
+              {currentUser?.phone || '01886748564'} • {selectedLocation}
             </div>
           </div>
         </div>
@@ -161,15 +165,15 @@ export default function MobileProfileView({
           }}
         >
           <div onClick={() => onNavigateTab('appointments')} style={{ cursor: 'pointer' }}>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#38BDF8' }}>3</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#38BDF8' }}>{appointmentsCount}</div>
             <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Appointments' : 'বুকিং'}</div>
           </div>
           <div onClick={() => onNavigateTab('reports')} style={{ cursor: 'pointer' }}>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>4</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>0</div>
             <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Health Records' : 'রিপোর্ট'}</div>
           </div>
           <div>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#FBBF24' }}>2</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#FBBF24' }}>0</div>
             <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Family Members' : 'পরিবার'}</div>
           </div>
         </div>

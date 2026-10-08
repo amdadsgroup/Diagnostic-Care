@@ -599,6 +599,8 @@ export default function HomePage() {
               onOpenNotificationsModal={() => setIsNotificationsModalOpen(true)}
               onNavigateTab={(tab) => setActiveTab(tab)}
               onOpenAuthModal={() => setIsAuthModalOpen(true)}
+              currentUser={currentUser}
+              appointmentsCount={appState.appointments.length}
             />
           </div>
         )}
@@ -610,13 +612,18 @@ export default function HomePage() {
               doctorName={appState.doctors[0].fullName}
               specialization={appState.doctors[0].specialization}
               chamberName={`${appState.organizations[0].name} (${appState.organizations[0].branches[0].name})`}
+              doctorId={appState.doctors[0]?.id}
             />
           </div>
         )}
 
         {activeTab === 'portal' && currentRole === 'PATIENT' && (
           <div className="container" style={{ padding: '36px 20px' }}>
-            <PatientDashboard />
+            <PatientDashboard
+              patientName={currentUser?.fullName || (language === 'en' ? 'Patient' : 'সম্মানিত রোগী')}
+              phone={currentUser?.phone || '01886748564'}
+              patientId={currentUser?.id}
+            />
           </div>
         )}
 
@@ -932,6 +939,7 @@ export default function HomePage() {
                   diagnosticTests={appState.diagnosticTests}
                   onSelectSlot={handleSelectSlot}
                   onSelectTest={(test) => setSelectedBookingTest(test)}
+                  currentUser={currentUser}
                 />
               </div>
             )}

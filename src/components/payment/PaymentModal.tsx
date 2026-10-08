@@ -10,6 +10,7 @@ interface PaymentModalProps {
   amount: number;
   doctorOrTestName: string;
   organizationName: string;
+  patientPhone?: string;
   onPaymentSuccess?: (payment: any) => void;
 }
 
@@ -20,11 +21,12 @@ export default function PaymentModal({
   amount,
   doctorOrTestName,
   organizationName,
+  patientPhone = '',
   onPaymentSuccess,
 }: PaymentModalProps) {
   const [gateway, setGateway] = useState<'BKASH' | 'NAGAD' | 'CASH_AT_DESK'>('BKASH');
   const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Number, 2: OTP, 3: PIN
-  const [phone, setPhone] = useState('01712-345678');
+  const [phone, setPhone] = useState(patientPhone);
   const [otp, setOtp] = useState('');
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);

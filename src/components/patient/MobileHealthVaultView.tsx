@@ -94,7 +94,7 @@ export default function MobileHealthVaultView({ language }: MobileHealthVaultVie
         } catch {}
       }
     }
-    return INITIAL_DOCS;
+    return [];
   });
   const [filterType, setFilterType] = useState<'ALL' | 'REPORT' | 'PRESCRIPTION'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -199,7 +199,7 @@ Customer Helpline: 01886748564
           year: 'numeric',
         }),
         facility: uploadFacility || (language === 'en' ? 'Uploaded Patient Document' : 'রোগীর নিজস্ব ডকুমেন্ট'),
-        patientName: 'Tanvir Ahmed',
+        patientName: language === 'en' ? 'Verified Patient' : 'সম্মানিত রোগী',
         summary: language === 'en' ? 'User uploaded document (Encrypted AES-256 storage).' : 'ব্যবহারকারী আপলোডকৃত ডকুমেন্ট (AES-256 এনক্রিপ্টেড)।',
         verified: true,
         fileSize: uploadFile ? `${(uploadFile.size / 1024 / 1024).toFixed(1)} MB` : '1.2 MB',
@@ -517,6 +517,53 @@ Customer Helpline: 01886748564
             </div>
           </div>
         ))}
+        {filteredDocs.length === 0 && (
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '36px 20px',
+              textAlign: 'center',
+              border: '1px dashed #CBD5E1',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FileText size={26} color="#64748B" />
+            </div>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
+              {language === 'en' ? 'No health documents found' : 'কোনো স্বাস্থ্য নথি পাওয়া যায়নি'}
+            </h3>
+            <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '340px', margin: 0, lineHeight: 1.5 }}>
+              {language === 'en'
+                ? 'Completed diagnostic reports and digital prescriptions will automatically appear here. You can also upload existing medical records.'
+                : 'ল্যাব টেস্ট সম্পন্ন হলে বা ডাক্তার প্রেসক্রিপশন প্রদান করলে স্বয়ংসক্রিয়ভাবে এখানে যুক্ত হবে। আপনি নিজস্ব পুরনো রেকর্ডও আপলোড করতে পারেন।'}
+            </p>
+            <button
+              onClick={() => setIsUploadModalOpen(true)}
+              style={{
+                marginTop: '8px',
+                backgroundColor: 'var(--cyan-600)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '10px 18px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Plus size={16} />
+              {language === 'en' ? 'Upload First Document' : 'নতুন ডকুমেন্ট যোগ করুন'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* View Document Modal */}

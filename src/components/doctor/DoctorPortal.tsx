@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BRAND, BRAND_COLORS } from '@/config/brand';
 import { BrandSymbol } from '@/components/brand/BrandSymbol';
 import { MapPin, Settings } from 'lucide-react';
 import ScheduleBuilder from './ScheduleBuilder';
+import { DoctorService } from '@/services/doctor.service';
 
 interface DoctorPortalProps {
   doctorName?: string;
   specialization?: string;
   chamberName?: string;
+  doctorId?: string;
 }
 
 interface QueuePatient {
@@ -24,23 +26,40 @@ interface QueuePatient {
   fee: number;
 }
 
-const INITIAL_QUEUE: QueuePatient[] = [
-  { id: 'p-1', token: 1, name: 'তানভীর আহমেদ', phone: '01712-345678', age: 34, gender: 'MALE', status: 'COMPLETED', time: '04:00 PM', fee: 800 },
-  { id: 'p-2', token: 2, name: 'ফাতেমা বেগম', phone: '01819-876543', age: 48, gender: 'FEMALE', status: 'IN_ROOM', time: '04:15 PM', fee: 800 },
-  { id: 'p-3', token: 3, name: 'মোহাম্মদ করিম', phone: '01911-223344', age: 29, gender: 'MALE', status: 'WAITING', time: '04:30 PM', fee: 800 },
-  { id: 'p-4', token: 4, name: 'সুমাইয়া আক্তার', phone: '01678-998877', age: 22, gender: 'FEMALE', status: 'WAITING', time: '04:45 PM', fee: 800 },
-  { id: 'p-5', token: 5, name: 'আব্দুর রহিম', phone: '01552-334455', age: 60, gender: 'MALE', status: 'WAITING', time: '05:00 PM', fee: 400 },
-];
-
 export default function DoctorPortal({
   doctorName = 'ডাঃ রফিকুল ইসলাম',
   specialization = 'এমবিবিএস, এফসিপিএস (কার্ডিওলজি) - হৃদরোগ ও মেডিসিন বিশেষজ্ঞ',
   chamberName = 'মৌলভীবাজার ডিজিটাল ডায়াগনস্টিক কমপ্লেক্স - রুম ২০৪',
+  doctorId = '20000001-0000-0000-0000-000000000001',
 }: DoctorPortalProps) {
-  const [queue, setQueue] = useState<QueuePatient[]>(INITIAL_QUEUE);
+  const [queue, setQueue] = useState<QueuePatient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showScheduleBuilder, setShowScheduleBuilder] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
-  const [activePatient, setActivePatient] = useState<QueuePatient | null>(INITIAL_QUEUE[1]);
+  const [activePatient, setActivePatient] = useState<QueuePatient | null>(null);
+
+  // Load real appointments for today
+  useEffect(() => {
+    DoctorService.getDoctorTodayAppointments(doctorId).then((apts) => {
+      if (apts && apts.length > 0) {
+        const mapped: QueuePatient[] = apts.map((a) => ({
+          id: a.id,
+          token: a.tokenNumber,
+          name: a.patientName,
+          phone: a.patientPhone,
+          age: a.patientAge,
+          gender: a.patientGender === 'FEMALE' ? 'FEMALE' : 'MALE',
+          status: a.status === 'COMPLETED' ? 'COMPLETED' : (a.status === 'IN_PROGRESS' ? 'IN_ROOM' : 'WAITING'),
+          time: a.startTime,
+          fee: a.consultationFee,
+        }));
+        setQueue(mapped);
+        const inRoom = mapped.find((p) => p.status === 'IN_ROOM') || mapped.find((p) => p.status === 'WAITING') || null;
+        setActivePatient(inRoom);
+      }
+      setIsLoading(false);
+    });
+  }, [doctorId]);
 
   // Prescription Form State
   const [clinicalNotes, setClinicalNotes] = useState('');
@@ -88,8 +107,21 @@ export default function DoctorPortal({
     setNewMedName('');
   };
 
-  const handleSavePrescription = () => {
+  const handleSavePrescription = async () => {
+    if (!activePatient) return;
     setRxSuccess(true);
+    try {
+      await DoctorService.savePrescription({
+        patientId: activePatient.id,
+        doctorId: doctorId,
+        clinicalNotes,
+        diagnosis,
+        medicines,
+        recommendedTests,
+      });
+    } catch (err) {
+      console.warn('Prescription database save notice:', err);
+    }
     setTimeout(() => {
       setRxSuccess(false);
       setShowPrescriptionModal(false);

@@ -277,6 +277,13 @@ export const DoctorAssistantView: React.FC<DoctorAssistantViewProps> = ({
                   </tr>
                 );
               })}
+              {doctorAppointments.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ padding: '28px', textAlign: 'center', color: 'var(--slate-500)' }}>
+                    {language === 'en' ? 'No patient appointments scheduled for this doctor today.' : 'আজকের চেম্বারের জন্য এই ডাক্তারের কোনো অ্যাপয়েন্টমেন্ট শিডিউল নেই।'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

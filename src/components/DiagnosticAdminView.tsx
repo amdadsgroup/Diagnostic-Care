@@ -5,6 +5,7 @@ import { Organization, DiagnosticTest, DoctorAssociation, SubscriptionPlan } fro
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { Building2, MapPin, Stethoscope, TestTube2, FileText, DollarSign, Award, Plus, CheckCircle, Upload } from 'lucide-react';
+import { DiagnosticService } from '@/services/diagnostic.service';
 
 interface DiagnosticAdminViewProps {
   organization: Organization;
@@ -77,6 +78,17 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
     setTestList([created, ...testList]);
     setIsAddTestOpen(false);
     setNewTestName('');
+    DiagnosticService.createLabTest({
+      diagnosticCenterId: organization.id,
+      name: created.name,
+      category: created.category,
+      price: created.price,
+      discountPrice: created.discountPrice,
+      sampleType: created.sampleType,
+      turnaroundHours: created.expectedDeliveryHours,
+      preparationInstructions: created.preparationInstructions,
+      isHomeSampleSupported: created.homeCollectionAvailable,
+    }).catch((err) => console.warn('Diagnostic test database notice:', err));
     setActionSuccessNotice(`Test "${created.name}" successfully added to laboratory catalog.`);
     setTimeout(() => setActionSuccessNotice(null), 4000);
   };

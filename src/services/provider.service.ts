@@ -1,11 +1,12 @@
 import { supabase } from '@/lib/supabase/client';
 import { Organization } from '@/types';
-import { INITIAL_ORGANIZATIONS } from '@/lib/mock-data';
 
 export interface ProviderOnboardingData {
   name: string;
+  nameBn?: string;
   orgType: string;
   tradeLicenseNumber: string;
+  dghsNumber?: string;
   contactPhone: string;
   contactEmail: string;
   divisionId?: string;
@@ -25,7 +26,6 @@ export class ProviderService {
   }> {
     try {
       const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const providerId = `org-${Date.now()}`;
 
       // Insert organization depending on orgType
       let table = 'diagnostic_centers';
@@ -38,8 +38,10 @@ export class ProviderService {
         .from(table)
         .insert({
           name: data.name,
+          name_bn: data.nameBn || data.name,
           slug: `${slug}-${Math.floor(100 + Math.random() * 900)}`,
           trade_license_number: data.tradeLicenseNumber,
+          dghs_registration_number: data.dghsNumber || null,
           phone: data.contactPhone,
           email: data.contactEmail,
           verification_status: 'pending',
@@ -49,12 +51,28 @@ export class ProviderService {
         .single();
 
       if (error) {
-        console.warn('Provider onboarding notice:', error.message);
+        return { providerId: '', success: false, error: error.message };
       }
 
-      return { providerId: inserted?.id || providerId, success: true, error: null };
+      // Insert initial branch location if address provided
+      if (inserted?.id && data.addressLine) {
+        await supabase.from('provider_locations').insert({
+          provider_type: table === 'diagnostic_centers' ? 'diagnostic_center' : data.orgType.toLowerCase(),
+          provider_id: inserted.id,
+          branch_name: 'Main Facility',
+          address_line: data.addressLine,
+          district_id: data.districtId || null,
+          upazila_id: data.upazilaId || null,
+          division_id: data.divisionId || null,
+          phone: data.contactPhone,
+          is_main_branch: true,
+          status: 'active',
+        });
+      }
+
+      return { providerId: inserted.id, success: true, error: null };
     } catch (err: any) {
-      return { providerId: `org-${Date.now()}`, success: true, error: null };
+      return { providerId: '', success: false, error: err.message || 'Onboarding failed' };
     }
   }
 
@@ -63,13 +81,23 @@ export class ProviderService {
    */
   static async getProviders(): Promise<Organization[]> {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('diagnostic_centers')
-        .select('*')
+        .select(`
+          *,
+          provider_locations (
+            id,
+            branch_name,
+            address_line,
+            phone,
+            opening_time,
+            closing_time
+          )
+        `)
         .eq('status', 'active');
 
-      if (!data || data.length === 0) {
-        return INITIAL_ORGANIZATIONS;
+      if (error || !data || data.length === 0) {
+        return [];
       }
 
       return data.map((d: any) => ({
@@ -81,14 +109,27 @@ export class ProviderService {
         logoUrl: d.logo_url || '/logo.png',
         contactPhone: d.phone,
         contactEmail: d.email,
-        verificationStatus: (d.verification_status.toUpperCase() as any) || 'VERIFIED',
+        verificationStatus: (d.verification_status?.toUpperCase() as any) || 'VERIFIED',
         isFeatured: true,
-        rating: Number(d.rating) || 4.9,
-        reviewCount: d.total_reviews || 50,
-        branches: [],
+        rating: Number(d.rating) || 5.0,
+        reviewCount: d.total_reviews || 0,
+        branches: (d.provider_locations || []).map((loc: any) => ({
+          id: loc.id,
+          organizationId: d.id,
+          name: loc.branch_name,
+          isMainBranch: true,
+          upazilaId: 'upz-sadar',
+          upazilaName: 'Moulvibazar Sadar',
+          districtName: 'Moulvibazar',
+          addressLine: loc.address_line,
+          phone: loc.phone || d.phone,
+          openingTime: loc.opening_time || '08:00',
+          closingTime: loc.closing_time || '22:00',
+          isActive: true,
+        })),
       }));
     } catch {
-      return INITIAL_ORGANIZATIONS;
+      return [];
     }
   }
 }

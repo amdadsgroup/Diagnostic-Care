@@ -13,7 +13,7 @@ export interface HomeCareBookingPayload {
 
 export class HomeCareService {
   /**
-   * Book specialized in-home nursing or caregiving services
+   * Book specialized in-home nursing or caregiving services directly in PostgreSQL
    */
   static async bookHomeCare(payload: HomeCareBookingPayload): Promise<{
     bookingCode: string;
@@ -35,12 +35,29 @@ export class HomeCareService {
       });
 
       if (error) {
-        console.warn('Home care booking DB notice:', error.message);
+        return { bookingCode: '', success: false, error: error.message };
       }
 
       return { bookingCode, success: true, error: null };
+    } catch (err: any) {
+      return { bookingCode: '', success: false, error: err.message || 'Booking failed' };
+    }
+  }
+
+  /**
+   * Fetch home care services catalog
+   */
+  static async getHomeCareServices() {
+    try {
+      const { data, error } = await supabase
+        .from('home_healthcare_providers')
+        .select('*')
+        .eq('status', 'active');
+
+      if (error || !data) return [];
+      return data;
     } catch {
-      return { bookingCode, success: true, error: null };
+      return [];
     }
   }
 }

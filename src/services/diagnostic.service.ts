@@ -1,10 +1,9 @@
 import { supabase } from '@/lib/supabase/client';
 import { DiagnosticTest, Organization } from '@/types';
-import { INITIAL_DIAGNOSTIC_TESTS, INITIAL_ORGANIZATIONS } from '@/lib/mock-data';
 
 export class DiagnosticService {
   /**
-   * Fetch all diagnostic tests with optional category or center filtering
+   * Fetch all diagnostic tests with optional category or center filtering directly from PostgreSQL
    */
   static async getLabTests(params?: {
     centerId?: string;
@@ -34,6 +33,10 @@ export class DiagnosticService {
         `)
         .eq('is_available', true);
 
+      if (params?.centerId) {
+        query = query.eq('diagnostic_center_id', params.centerId);
+      }
+
       if (params?.category && params.category !== 'ALL') {
         query = query.ilike('category', `%${params.category}%`);
       }
@@ -44,7 +47,7 @@ export class DiagnosticService {
 
       const { data, error } = await query;
       if (error || !data || data.length === 0) {
-        return INITIAL_DIAGNOSTIC_TESTS;
+        return [];
       }
 
       return data.map((t: any) => ({
@@ -64,7 +67,72 @@ export class DiagnosticService {
         isActive: true,
       }));
     } catch {
-      return INITIAL_DIAGNOSTIC_TESTS;
+      return [];
+    }
+  }
+
+  /**
+   * Create a new diagnostic test in the database
+   */
+  static async createLabTest(params: {
+    diagnosticCenterId: string;
+    name: string;
+    nameBn?: string;
+    category: string;
+    sampleType?: string;
+    turnaroundHours?: number;
+    preparationInstructions?: string;
+    price: number;
+    discountPrice?: number;
+    isHomeSampleSupported?: boolean;
+  }): Promise<{ test: DiagnosticTest | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('lab_tests')
+        .insert({
+          diagnostic_center_id: params.diagnosticCenterId,
+          name: params.name,
+          name_bn: params.nameBn || params.name,
+          category: params.category,
+          sample_type: params.sampleType || 'Blood',
+          turnaround_hours: params.turnaroundHours || 24,
+          preparation_instructions: params.preparationInstructions || null,
+          price: params.price,
+          discount_price: params.discountPrice || null,
+          is_home_sample_supported: Boolean(params.isHomeSampleSupported),
+          is_available: true,
+          status: 'active',
+        })
+        .select(`
+          *,
+          diagnostic_centers (name)
+        `)
+        .single();
+
+      if (error) {
+        return { test: null, error: error.message };
+      }
+
+      const created: DiagnosticTest = {
+        id: data.id,
+        organizationId: data.diagnostic_center_id,
+        organizationName: data.diagnostic_centers?.name || 'Diagnostic Center',
+        name: data.name,
+        code: data.id.slice(0, 8).toUpperCase(),
+        category: data.category,
+        description: data.name_bn || data.name,
+        preparationInstructions: data.preparation_instructions || '',
+        price: Number(data.price),
+        discountPrice: data.discount_price ? Number(data.discount_price) : undefined,
+        sampleType: data.sample_type,
+        expectedDeliveryHours: data.turnaround_hours,
+        homeCollectionAvailable: Boolean(data.is_home_sample_supported),
+        isActive: true,
+      };
+
+      return { test: created, error: null };
+    } catch (err: any) {
+      return { test: null, error: err.message || 'Failed to create test' };
     }
   }
 
@@ -106,8 +174,7 @@ export class DiagnosticService {
         .single();
 
       if (error) {
-        // Fallback simulation for offline mode
-        return { bookingCode, success: true, error: null };
+        return { bookingCode: '', success: false, error: error.message };
       }
 
       // Insert item
@@ -122,7 +189,7 @@ export class DiagnosticService {
 
       return { bookingCode, success: true, error: null };
     } catch (err: any) {
-      return { bookingCode: `DC-LAB-${Math.floor(1000 + Math.random() * 8999)}`, success: true, error: null };
+      return { bookingCode: '', success: false, error: err.message || 'Booking failed' };
     }
   }
 
@@ -145,12 +212,22 @@ export class DiagnosticService {
           rating,
           total_reviews,
           verification_status,
-          has_home_sample_collection
+          has_home_sample_collection,
+          provider_locations (
+            id,
+            branch_name,
+            address_line,
+            phone,
+            opening_time,
+            closing_time,
+            districts (name),
+            upazilas (name)
+          )
         `)
         .eq('status', 'active');
 
       if (error || !data || data.length === 0) {
-        return INITIAL_ORGANIZATIONS;
+        return [];
       }
 
       return data.map((d: any) => ({
@@ -162,29 +239,27 @@ export class DiagnosticService {
         logoUrl: d.logo_url || '/logo.png',
         contactPhone: d.phone,
         contactEmail: d.email,
-        verificationStatus: (d.verification_status.toUpperCase() as any) || 'VERIFIED',
+        verificationStatus: (d.verification_status?.toUpperCase() as any) || 'VERIFIED',
         isFeatured: true,
         rating: Number(d.rating) || 4.9,
-        reviewCount: d.total_reviews || 50,
-        branches: [
-          {
-            id: `branch-${d.id}`,
-            organizationId: d.id,
-            name: `${d.name} Main Branch`,
-            isMainBranch: true,
-            upazilaId: 'upz-moulvibazar-sadar',
-            upazilaName: 'Moulvibazar Sadar',
-            districtName: 'Moulvibazar',
-            addressLine: 'Chowmohana, Syed Mujtoba Ali Road',
-            phone: d.phone,
-            openingTime: '07:30',
-            closingTime: '23:00',
-            isActive: true,
-          },
-        ],
+        reviewCount: d.total_reviews || 0,
+        branches: (d.provider_locations || []).map((loc: any) => ({
+          id: loc.id,
+          organizationId: d.id,
+          name: loc.branch_name,
+          isMainBranch: true,
+          upazilaId: 'upz-moulvibazar-sadar',
+          upazilaName: loc.upazilas?.name || 'Moulvibazar Sadar',
+          districtName: loc.districts?.name || 'Moulvibazar',
+          addressLine: loc.address_line,
+          phone: loc.phone || d.phone,
+          openingTime: loc.opening_time || '07:30',
+          closingTime: loc.closing_time || '23:00',
+          isActive: true,
+        })),
       }));
     } catch {
-      return INITIAL_ORGANIZATIONS;
+      return [];
     }
   }
 }
