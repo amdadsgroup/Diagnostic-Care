@@ -19,7 +19,6 @@ import {
   Pill,
   Ambulance,
   Home,
-  Layers,
   Phone,
   Sparkles,
   ChevronDown,
@@ -31,8 +30,8 @@ import {
 interface HeaderProps {
   language: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
-  currentRole: UserRole;
-  setCurrentRole: (role: UserRole) => void;
+  currentRole?: UserRole;
+  setCurrentRole?: (role: UserRole) => void;
   activeTab: string;
   setActiveTab: (tab: any) => void;
   onOpenAuth?: () => void;
@@ -112,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
             padding: '0 24px',
           }}
         >
-          {/* Left: Location & Launch Hub */}
+          {/* Left: Location */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <button
               onClick={onOpenLocation}
@@ -134,13 +133,9 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Location: <strong>{selectedLocation}</strong></span>
               <ChevronDown size={10} color="#94A3B8" />
             </button>
-
-            <span style={{ color: '#94A3B8', fontSize: '11px' }}>
-              Launch Hub: {BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION}, Sylhet Division
-            </span>
           </div>
 
-          {/* Right: Emergency 24/7 Helpline, Role Switcher & Language */}
+          {/* Right: Emergency 24/7 Helpline & Language */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <a
               href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
@@ -160,50 +155,6 @@ export const Header: React.FC<HeaderProps> = ({
               <Phone size={11} />
               <span>24/7 Helpline: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong></span>
             </a>
-
-            {/* Portal Role View Switcher */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '6px',
-                padding: '2px 8px',
-              }}
-            >
-              <Layers size={11} color="#94A3B8" />
-              <span style={{ fontSize: '10.5px', color: '#94A3B8', fontWeight: 600 }}>Role:</span>
-              <select
-                id="header-role-select"
-                value={currentRole}
-                onChange={(e) => {
-                  const role = e.target.value as UserRole;
-                  setCurrentRole(role);
-                  if (role !== 'PATIENT') {
-                    setActiveTab('portal');
-                  } else {
-                    setActiveTab('marketplace');
-                  }
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#FFFFFF',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="PATIENT" style={{ background: '#0F172A', color: '#FFF' }}>Patient</option>
-                <option value="DOCTOR" style={{ background: '#0F172A', color: '#FFF' }}>Doctor Portal</option>
-                <option value="DOCTOR_ASSISTANT" style={{ background: '#0F172A', color: '#FFF' }}>Doctor Assistant</option>
-                <option value="DIAGNOSTIC_ADMIN" style={{ background: '#0F172A', color: '#FFF' }}>Diagnostic Admin</option>
-                <option value="SUPER_ADMIN" style={{ background: '#0F172A', color: '#FFF' }}>Super Admin</option>
-              </select>
-            </div>
 
             {/* Language Switcher */}
             <div
