@@ -1,0 +1,89 @@
+# Supabase Local Development Configuration
+# Project: Diagnostic Care — Bangladesh Healthcare Marketplace
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 100
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[storage]
+enabled = true
+file_size_limit = "52428800" # 50MB
+
+[storage.buckets.avatars]
+public = true
+file_size_limit = "5242880"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.provider_logos]
+public = true
+file_size_limit = "5242880"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"]
+
+[storage.buckets.provider_covers]
+public = true
+file_size_limit = "10485760"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.provider_documents]
+public = false
+file_size_limit = "20971520"
+allowed_mime_types = ["application/pdf", "image/png", "image/jpeg"]
+
+[storage.buckets.medical_documents]
+public = false
+file_size_limit = "20971520"
+allowed_mime_types = ["application/pdf", "image/png", "image/jpeg"]
+
+[storage.buckets.prescriptions]
+public = false
+file_size_limit = "10485760"
+allowed_mime_types = ["application/pdf", "image/png", "image/jpeg"]
+
+[storage.buckets.lab_reports]
+public = false
+file_size_limit = "20971520"
+allowed_mime_types = ["application/pdf", "image/png", "image/jpeg"]
+
+[storage.buckets.chat_attachments]
+public = false
+file_size_limit = "10485760"
+allowed_mime_types = ["image/png", "image/jpeg", "application/pdf"]
+
+[storage.buckets.review_images]
+public = true
+file_size_limit = "5242880"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.service_images]
+public = true
+file_size_limit = "5242880"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.product_images]
+public = true
+file_size_limit = "5242880"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]

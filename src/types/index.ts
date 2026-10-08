@@ -15,6 +15,11 @@ export type UserRole =
   | 'SUPPORT_AGENT'
   | 'SALES_AGENT'
   | 'OPERATIONS_MANAGER'
+  | 'VERIFICATION_MANAGER'
+  | 'MARKETING_MANAGER'
+  | 'LEAD_GENERATION_MANAGER'
+  | 'REGIONAL_MANAGER'
+  | 'CONTENT_MANAGER'
   | 'FINANCE_MANAGER'
   | 'SUPER_ADMIN';
 
@@ -78,7 +83,7 @@ export interface Organization {
   id: string;
   name: string;
   slug: string;
-  orgType: 'DIAGNOSTIC_CENTER' | 'CLINIC' | 'HOSPITAL' | 'PHARMACY';
+  orgType: 'DIAGNOSTIC_CENTER' | 'CLINIC' | 'HOSPITAL' | 'PHARMACY' | 'AMBULANCE' | 'HOME_HEALTHCARE';
   tradeLicenseNumber?: string;
   logoUrl?: string;
   contactPhone: string;
@@ -168,9 +173,11 @@ export interface ScheduleSlot {
   doctorAssociationId: string;
   branchId: string;
   slotDate: string; // YYYY-MM-DD
+  date?: string; // Optional alias
   startTime: string; // HH:mm
   endTime: string;   // HH:mm
   status: SlotStatus;
+  tokenNumber?: number;
   heldByUserId?: string;
   holdExpiresAt?: string; // ISO timestamp
 }
@@ -282,3 +289,158 @@ export interface SubscriptionPlan {
   features: string[];
   isActive: boolean;
 }
+
+export interface HospitalDetails {
+  organizationId: string;
+  totalBeds: number;
+  icuBeds: number;
+  nicuBeds: number;
+  hasEmergency24h: boolean;
+  hasBloodBank: boolean;
+  hasAmbulanceFleet: boolean;
+  specialistCount: number;
+  featuredDepartments: string[];
+}
+
+export interface PharmacyDetails {
+  organizationId: string;
+  drugLicenseNumber: string;
+  isHomeDeliveryAvailable: boolean;
+  deliveryFeeBDT: number;
+  minimumOrderBDT: number;
+  pharmacistName: string;
+}
+
+export type AmbulanceVehicleType = 'AC' | 'NON_AC' | 'ICU' | 'FREEZING';
+export type AmbulanceStatus = 'AVAILABLE' | 'ON_TRIP' | 'MAINTENANCE';
+
+export interface AmbulanceFleetItem {
+  id: string;
+  organizationId: string;
+  providerName: string;
+  vehicleType: AmbulanceVehicleType;
+  vehiclePlateNumber: string;
+  driverName: string;
+  driverPhone: string;
+  baseFareBDT: number;
+  perKmFareBDT: number;
+  districtName: string;
+  upazilaName: string;
+  isAvailable24h: boolean;
+  status: AmbulanceStatus;
+}
+
+export type HomeCareCategory = 'HOME_NURSING' | 'PHYSIOTHERAPY' | 'POST_OPERATIVE' | 'ELDERLY_CARE' | 'DRESSING_INJECTION';
+
+export interface HomeCareServiceItem {
+  id: string;
+  organizationId: string;
+  providerName: string;
+  serviceCategory: HomeCareCategory;
+  title: string;
+  description: string;
+  feePerVisitBDT: number;
+  districtName: string;
+  upazilaName: string;
+  nurseCertification: string;
+  rating: number;
+  reviewCount: number;
+  isActive: boolean;
+}
+
+export type ServiceRequestType = 'AMBULANCE' | 'HOME_CARE' | 'HOSPITAL_BED' | 'MEDICINE_ORDER';
+export type ServiceRequestStatus = 'PENDING' | 'DISPATCHED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export interface HealthcareServiceRequest {
+  id: string;
+  requestNumber: string;
+  patientUserId: string;
+  patientName: string;
+  patientPhone: string;
+  serviceType: ServiceRequestType;
+  providerId: string;
+  providerName: string;
+  districtName: string;
+  upazilaName: string;
+  deliveryAddress: string;
+  requestedDate: string;
+  status: ServiceRequestStatus;
+  estimatedAmountBDT: number;
+  paymentMethod: 'CASH' | 'BKASH' | 'NAGAD';
+  details: string;
+  createdAt: string;
+}
+
+export type LeadSource = 'GOOGLE' | 'PHONE_CALL' | 'FACEBOOK' | 'WEBSITE' | 'REFERRAL' | 'CAMPAIGN';
+export type LeadStage = 'NEW' | 'CONTACTED' | 'INTERESTED' | 'VERIFICATION_PENDING' | 'ONBOARDING' | 'ACTIVE' | 'REJECTED' | 'LOST';
+
+export interface LeadItem {
+  id: string;
+  businessName: string;
+  contactPerson: string;
+  phone: string;
+  email?: string;
+  providerType: Organization['orgType'];
+  leadSource: LeadSource;
+  stage: LeadStage;
+  assignedToAgentName: string;
+  districtName: string;
+  potentialMonthlyRevenueBDT: number;
+  notes: string;
+  nextFollowupDate: string;
+  createdAt: string;
+}
+
+export type TicketCategory = 'BOOKING' | 'PAYMENT' | 'PROVIDER_QUALITY' | 'MEDICAL_REPORT' | 'TECHNICAL' | 'COMPLAINT';
+export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type TicketStatus = 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'CLOSED';
+
+export interface SupportMessage {
+  id: string;
+  senderUserId: string;
+  senderName: string;
+  senderRole: UserRole;
+  message: string;
+  timestamp: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  ticketNumber: string;
+  requesterUserId: string;
+  requesterName: string;
+  requesterPhone: string;
+  requesterRole: UserRole;
+  subject: string;
+  category: TicketCategory;
+  priority: TicketPriority;
+  status: TicketStatus;
+  messages: SupportMessage[];
+  assignedAgentName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CMSBanner {
+  id: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  ctaLink: string;
+  bgColor: string;
+  badge: string;
+  isActive: boolean;
+}
+
+export interface MarketingPromotion {
+  id: string;
+  promoCode: string;
+  title: string;
+  discountType: 'PERCENT' | 'FIXED';
+  discountValue: number;
+  minOrderBDT: number;
+  maxDiscountBDT: number;
+  validTill: string;
+  isActive: boolean;
+}
+

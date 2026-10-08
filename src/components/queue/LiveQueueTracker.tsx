@@ -21,9 +21,7 @@ export default function LiveQueueTracker({
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [smsAlertEnabled, setSmsAlertEnabled] = useState(true);
 
-  // Race test simulator state
-  const [isTestingRace, setIsTestingRace] = useState(false);
-  const [raceReport, setRaceReport] = useState<any>(null);
+
 
   // Calculate wait time
   const tokensAhead = myToken && myToken > currentServing ? myToken - currentServing : 0;
@@ -49,25 +47,7 @@ export default function LiveQueueTracker({
     }
   };
 
-  const handleRunRaceTest = async () => {
-    setIsTestingRace(true);
-    setRaceReport(null);
-    try {
-      const res = await fetch('/api/slots/simulate-race', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ candidateCount: 5 }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setRaceReport(data.report);
-      }
-    } catch (err: any) {
-      alert('Error running race simulation: ' + err.message);
-    } finally {
-      setIsTestingRace(false);
-    }
-  };
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -188,60 +168,16 @@ export default function LiveQueueTracker({
         </div>
       </div>
 
-      {/* PHASE 3 CONCURRENCY RACE CONDITION TEST SUITE */}
-      <div className="portal-card" style={{ border: '2px solid var(--brand-teal-500)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
-          <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--brand-teal-50)', color: 'var(--brand-teal-600)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800, marginBottom: '6px' }}>
-              ⚡ Concurrency Stress Test Suite (Zero Double-Booking Validator)
-            </div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
-              হাই-কনকারেন্সি রেস কন্ডিশন সিমুলেটর (Race Condition Battle Test)
-            </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--slate-600)', maxWidth: '600px', marginTop: '4px' }}>
-              একই মিলিসেকেন্ডে ৫ জন রোগী একই স্লট বুকিং করার চেষ্টা করবে। আমাদের অ্যাটমিক মিউটেক্স লক নিশ্চিত করবে যে <strong>ঠিক ১ জন</strong> স্লট পাবে এবং বাকি <strong>৪ জন তাৎক্ষণিক 409 Conflict রেসপন্স</strong> পাবে।
-            </p>
-          </div>
-
-          <button
-            onClick={handleRunRaceTest}
-            disabled={isTestingRace}
-            className="btn-primary"
-            style={{ background: 'var(--brand-navy-900)', whiteSpace: 'nowrap' }}
-          >
-            {isTestingRace ? 'সিমুলেশন চলছে...' : '🚀 ৫টি প্যারালাল রিকোয়েস্ট ফায়ার করুন'}
-          </button>
-        </div>
-
-        {raceReport && (
-          <div style={{ background: raceReport.invariantPassed ? 'var(--brand-emerald-50)' : 'var(--brand-rose-50)', padding: '16px', borderRadius: '10px', border: `1px solid ${raceReport.invariantPassed ? 'var(--brand-emerald-500)' : 'var(--brand-rose-600)'}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <span style={{ fontSize: '1.3rem' }}>{raceReport.invariantPassed ? '✓' : '✗'}</span>
-              <h4 style={{ fontWeight: 800, color: raceReport.invariantPassed ? '#065f46' : 'var(--brand-rose-600)' }}>
-                {raceReport.invariantPassed ? 'ইনভেরিয়েন্ট সফলভাবে রক্ষিত হয়েছে! (Zero Double-Booking Guaranteed)' : 'টেস্ট ব্যর্থ হয়েছে'}
-              </h4>
-              <span style={{ marginLeft: 'auto', fontSize: '0.8rem', fontWeight: 700, color: 'var(--slate-600)' }}>
-                সময়: {raceReport.executionTimeMs}ms
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '14px', fontSize: '0.85rem' }}>
-              <div style={{ background: 'white', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-                সফল বুকিং হোল্ড: <strong style={{ color: 'var(--brand-emerald-500)' }}>{raceReport.successfulHoldCount} জন (বিজয়ী: {raceReport.winnerUserId})</strong>
-              </div>
-              <div style={{ background: 'white', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-                কনফ্লিক্ট রিজেকশন (409): <strong style={{ color: 'var(--brand-rose-600)' }}>{raceReport.conflictRejections} জন (সঠিকভাবে ব্লকড)</strong>
-              </div>
-            </div>
-
-            <details style={{ fontSize: '0.8rem', color: 'var(--slate-700)', cursor: 'pointer' }}>
-              <summary style={{ fontWeight: 700 }}>লগ ডিটেইলস দেখুন (Execution Traces)</summary>
-              <pre style={{ background: 'var(--slate-900)', color: '#a7f3d0', padding: '12px', borderRadius: '6px', marginTop: '8px', overflowX: 'auto', fontSize: '0.75rem', lineHeight: 1.5 }}>
-                {raceReport.logs.join('\n')}
-              </pre>
-            </details>
-          </div>
-        )}
+      {/* Chamber Guidelines Card */}
+      <div className="portal-card" style={{ border: '1px solid var(--border-subtle)', backgroundColor: '#F8FAFC' }}>
+        <h4 style={{ fontWeight: 800, color: 'var(--brand-navy-900)', marginBottom: '8px' }}>
+          চেম্বার পরিদর্শন নির্দেশিকা (Chamber Guidelines)
+        </h4>
+        <ul style={{ fontSize: '0.85rem', color: 'var(--slate-600)', lineHeight: '1.6', margin: 0, paddingLeft: '18px' }}>
+          <li>আপনার সিরিয়ালের কমপক্ষে ২০ মিনিট পূর্বে ডায়াগনস্টিক সেন্টারের ওয়েটিং রুমে উপস্থিত থাকুন।</li>
+          <li>পূর্ববর্তী সকল প্রেসক্রিপশন ও টেস্ট রিপোর্ট সাথে রাখুন।</li>
+          <li>জরুরি সহায়তার জন্য আমাদের সার্বক্ষণিক হেল্পলাইনে যোগাযোগ করুন: <strong>01886748564</strong></li>
+        </ul>
       </div>
     </div>
   );

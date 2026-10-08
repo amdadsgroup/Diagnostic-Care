@@ -5,6 +5,7 @@
  */
 
 import { ScheduleSlot, Appointment, QueueState } from '@/types';
+import { supabase } from '@/lib/supabase/client';
 
 export interface HoldResult {
   success: boolean;
@@ -269,6 +270,28 @@ class ConcurrencyEngine {
       };
 
       this.appointments.set(appointment.id, appointment);
+
+      // Persist to Supabase appointments table
+      try {
+        supabase.from('appointments').insert({
+          booking_code: bookingCode,
+          patient_name: patientData.patientName,
+          patient_phone: patientData.patientPhone,
+          patient_age: patientData.patientAge,
+          patient_gender: patientData.patientGender,
+          appointment_date: slot.slotDate,
+          start_time: slot.startTime,
+          token_number: tokenNumber,
+          consultation_fee: 800,
+          total_payable: 800,
+          status: 'confirmed',
+          payment_status: patientData.paymentMethod === 'PAID' ? 'paid' : 'cash_at_desk',
+        }).then(({ error }: any) => {
+          if (error) console.warn('Supabase appointment insert notice:', error.message);
+        });
+      } catch (dbErr) {
+        console.warn('Database write bypassed in offline mode:', dbErr);
+      }
 
       return {
         success: true,

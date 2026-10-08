@@ -18,7 +18,6 @@ interface SlotBookingModalProps {
     patientGender: 'MALE' | 'FEMALE' | 'OTHER';
     paymentMethod: 'CASH_AT_DESK' | 'PAID';
   }) => void;
-  onSimulateConflict: () => void;
 }
 
 export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
@@ -27,17 +26,44 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
   language,
   onClose,
   onConfirmBooking,
-  onSimulateConflict,
 }) => {
   const t = TRANSLATIONS[language];
   const [secondsRemaining, setSecondsRemaining] = useState<number>(300); // 5 minutes = 300s
-  const [patientName, setPatientName] = useState('Kamrul Hassan');
-  const [patientPhone, setPatientPhone] = useState('01886748564');
-  const [patientAge, setPatientAge] = useState<number>(34);
+  const [patientName, setPatientName] = useState('');
+  const [patientPhone, setPatientPhone] = useState('');
+  const [patientAge, setPatientAge] = useState<string>('');
   const [patientGender, setPatientGender] = useState<'MALE' | 'FEMALE' | 'OTHER'>('MALE');
+  const [patientProblem, setPatientProblem] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'CASH_AT_DESK' | 'BKASH' | 'NAGAD'>('CASH_AT_DESK');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [conflictMessage, setConflictMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Quick fill helper
+  const handleQuickFill = (relation: 'SELF' | 'MOTHER' | 'FATHER' | 'CHILD') => {
+    const defaultPhone = patientPhone.trim() || '01712345678';
+    if (relation === 'SELF') {
+      setPatientName('Tanvir Ahmed');
+      setPatientPhone(defaultPhone);
+      setPatientAge('34');
+      setPatientGender('MALE');
+    } else if (relation === 'MOTHER') {
+      setPatientName('Rahima Begum');
+      setPatientPhone(defaultPhone);
+      setPatientAge('58');
+      setPatientGender('FEMALE');
+    } else if (relation === 'FATHER') {
+      setPatientName('Abdul Latif');
+      setPatientPhone(defaultPhone);
+      setPatientAge('65');
+      setPatientGender('MALE');
+    } else if (relation === 'CHILD') {
+      setPatientName('Arian Ahmed');
+      setPatientPhone(defaultPhone);
+      setPatientAge('6');
+      setPatientGender('MALE');
+    }
+    setErrorMessage(null);
+  };
 
   // 5-minute countdown timer
   useEffect(() => {
@@ -62,32 +88,41 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
+
     if (secondsRemaining === 0) {
-      alert('Hold expired! Please select the slot again.');
-      onClose();
+      setErrorMessage(language === 'en' ? 'Slot hold time expired. Please select the chamber slot again.' : 'স্লট হোল্ড করার সময় শেষ হয়েছে। পুনরায় স্লট নির্বাচন করুন।');
       return;
     }
 
-    if (!patientName.trim() || !patientPhone.trim()) {
-      alert('Please provide patient name and valid Bangladesh mobile number.');
+    if (!patientName.trim()) {
+      setErrorMessage(language === 'en' ? 'Please enter patient full name.' : 'রোগীর নাম প্রদান করুন।');
+      return;
+    }
+
+    const cleanPhone = patientPhone.replace(/[\s-]/g, '');
+    if (!cleanPhone || cleanPhone.length < 11) {
+      setErrorMessage(language === 'en' ? 'Please provide a valid 11-digit mobile number.' : 'একটি সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন।');
+      return;
+    }
+
+    const ageNum = parseInt(patientAge, 10);
+    if (!ageNum || ageNum < 1 || ageNum > 120) {
+      setErrorMessage(language === 'en' ? 'Please provide a valid age.' : 'রোগীর সঠিক বয়স লিখুন।');
       return;
     }
 
     setIsSubmitting(true);
     setTimeout(() => {
       onConfirmBooking({
-        patientName,
-        patientPhone,
-        patientAge,
+        patientName: patientName.trim(),
+        patientPhone: cleanPhone,
+        patientAge: ageNum,
         patientGender,
         paymentMethod: paymentMethod === 'CASH_AT_DESK' ? 'CASH_AT_DESK' : 'PAID',
       });
       setIsSubmitting(false);
-    }, 400);
-  };
-
-  const handleSimulateConflict = () => {
-    setConflictMessage('HTTP 409 Conflict: [SQLSTATE 23505] uq_slot_unique_booking violated. A concurrent transaction has already held this slot. Another patient was 40ms faster.');
+    }, 350);
   };
 
   return (
@@ -180,40 +215,56 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
           </div>
         </div>
 
-        {/* Conflict Simulation Warning if Triggered */}
-        {conflictMessage && (
+        {/* Active Hold Protection Banner */}
+        <div style={{ padding: '16px 24px 0 24px' }}>
           <div
             style={{
-              margin: '16px 24px 0 24px',
-              padding: '12px 16px',
+              padding: '10px 14px',
+              backgroundColor: '#EFF6FF',
+              border: '1px solid #BFDBFE',
+              borderRadius: '8px',
+              color: '#1E40AF',
+              fontSize: '12.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <Shield size={16} color="#0057FF" style={{ flexShrink: 0 }} />
+            <div>
+              <strong>{language === 'en' ? 'Exclusive Slot Hold Active' : 'এক্সক্লুসিভ চেম্বার স্লট হোল্ড সক্রিয়'}</strong>: {language === 'en' ? 'This slot is reserved for you for 5 minutes. No other patient can book it during this countdown.' : 'পরবর্তী ৫ মিনিটের জন্য এই স্লটটি আপনার জন্য সংরক্ষিত।'}
+            </div>
+          </div>
+        </div>
+
+        {/* Error Notice */}
+        {errorMessage && (
+          <div
+            style={{
+              margin: '12px 24px 0 24px',
+              padding: '10px 14px',
               backgroundColor: '#FEF2F2',
               border: '1px solid #F87171',
               borderRadius: '8px',
               color: '#991B1B',
-              fontSize: '13px',
+              fontSize: '12.5px',
               display: 'flex',
-              gap: '10px',
-              alignItems: 'flex-start',
+              gap: '8px',
+              alignItems: 'center',
             }}
           >
-            <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <strong>Concurrency Lock Test Activated:</strong>
-              <div style={{ marginTop: '4px', fontFamily: 'monospace', fontSize: '11px' }}>{conflictMessage}</div>
-              <div style={{ marginTop: '4px', fontSize: '12px' }}>
-                This proves the database exclusion lock prevents two users from double-booking this slot!
-              </div>
-            </div>
+            <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+            <div>{errorMessage}</div>
           </div>
         )}
 
         {/* Chamber Details Summary Card */}
-        <div style={{ padding: '20px 24px 0 24px' }}>
+        <div style={{ padding: '16px 24px 0 24px' }}>
           <div
             style={{
-              backgroundColor: 'var(--slate-50)',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '10px',
+              backgroundColor: '#F8F7F4',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
               padding: '14px 18px',
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
@@ -222,22 +273,22 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             }}
           >
             <div>
-              <div style={{ color: 'var(--slate-500)', fontSize: '11px', textTransform: 'uppercase' }}>Doctor & Chamber</div>
-              <div style={{ fontWeight: 700, color: 'var(--brand-navy-900)' }}>{association.doctor?.fullName}</div>
-              <div style={{ color: 'var(--brand-teal-600)', fontSize: '12px' }}>{association.doctor?.specialization}</div>
+              <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Doctor & Chamber</div>
+              <div style={{ fontWeight: 800, color: '#0F172A' }}>{association.doctor?.fullName}</div>
+              <div style={{ color: '#0057FF', fontSize: '12px', fontWeight: 600 }}>{association.doctor?.specialization}</div>
             </div>
             <div>
-              <div style={{ color: 'var(--slate-500)', fontSize: '11px', textTransform: 'uppercase' }}>Facility & Branch</div>
-              <div style={{ fontWeight: 600 }}>{association.organizationName}</div>
-              <div style={{ color: 'var(--slate-600)', fontSize: '12px' }}>{association.branchName}, {association.chamberRoomNumber}</div>
+              <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Facility & Branch</div>
+              <div style={{ fontWeight: 700, color: '#0F172A' }}>{association.organizationName}</div>
+              <div style={{ color: '#4B5563', fontSize: '12px' }}>{association.branchName}, {association.chamberRoomNumber}</div>
             </div>
             <div>
-              <div style={{ color: 'var(--slate-500)', fontSize: '11px', textTransform: 'uppercase' }}>Consultation Date & Slot</div>
-              <div style={{ fontWeight: 600 }}>{slot.slotDate} at {slot.startTime}</div>
+              <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Consultation Date & Slot</div>
+              <div style={{ fontWeight: 700, color: '#0F172A' }}>{slot.slotDate} at {slot.startTime}</div>
             </div>
             <div>
-              <div style={{ color: 'var(--slate-500)', fontSize: '11px', textTransform: 'uppercase' }}>Consultation Fee</div>
-              <div style={{ fontWeight: 800, color: 'var(--brand-emerald-500)', fontSize: '15px' }}>
+              <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Consultation Fee</div>
+              <div style={{ fontWeight: 800, color: '#059669', fontSize: '16px' }}>
                 {BRAND_CONSTANTS.CURRENCY_SYMBOL}{association.consultationFee}
               </div>
             </div>
@@ -246,13 +297,38 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
 
         {/* Patient Registration Form */}
         <form onSubmit={handleSubmit} style={{ padding: '20px 24px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '14px', color: 'var(--brand-navy-900)' }}>
-            {t.patientDetailsTitle}
-          </h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              {t.patientDetailsTitle}
+            </h4>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('SELF')}
+                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '4px', border: '1px solid #CBD5E1', background: '#F1F5F9', cursor: 'pointer' }}
+              >
+                + Self
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('MOTHER')}
+                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '4px', border: '1px solid #CBD5E1', background: '#F1F5F9', cursor: 'pointer' }}
+              >
+                + Mother
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('CHILD')}
+                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '4px', border: '1px solid #CBD5E1', background: '#F1F5F9', cursor: 'pointer' }}
+              >
+                + Child
+              </button>
+            </div>
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px', marginBottom: '14px' }}>
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: 'var(--slate-700)' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#334155' }}>
                 {t.patientNameLabel} *
               </label>
               <input
@@ -261,12 +337,12 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 required
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
-                placeholder="e.g. Kamrul Hassan"
+                placeholder="e.g. Tanvir Ahmed / তানভীর আহমেদ"
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--slate-300)',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
                   fontSize: '14px',
                   outline: 'none',
                 }}
@@ -274,7 +350,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: 'var(--slate-700)' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#334155' }}>
                 {t.patientPhoneLabel} *
               </label>
               <input
@@ -287,8 +363,8 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--slate-300)',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
                   fontSize: '14px',
                   outline: 'none',
                 }}
@@ -296,7 +372,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: 'var(--slate-700)' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#334155' }}>
                 {t.patientAgeLabel} *
               </label>
               <input
@@ -306,12 +382,13 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 min={1}
                 max={120}
                 value={patientAge}
-                onChange={(e) => setPatientAge(Number(e.target.value))}
+                onChange={(e) => setPatientAge(e.target.value)}
+                placeholder="e.g. 34"
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--slate-300)',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
                   fontSize: '14px',
                   outline: 'none',
                 }}
@@ -319,12 +396,12 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: 'var(--slate-700)' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#334155' }}>
                 {t.patientGenderLabel}
               </label>
-              <div style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
+              <div style={{ display: 'flex', gap: '20px', fontSize: '13px' }}>
                 {(['MALE', 'FEMALE', 'OTHER'] as const).map((gender) => (
-                  <label key={gender} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <label key={gender} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 500 }}>
                     <input
                       type="radio"
                       name="gender"
@@ -336,11 +413,31 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 ))}
               </div>
             </div>
+
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#334155' }}>
+                {language === 'en' ? 'Health Symptoms / Chief Complaint (Optional)' : 'রোগের লক্ষণ / সমস্যা (ঐচ্ছিক)'}
+              </label>
+              <input
+                type="text"
+                value={patientProblem}
+                onChange={(e) => setPatientProblem(e.target.value)}
+                placeholder={language === 'en' ? 'e.g. Chest discomfort, severe headache, routine follow-up' : 'যেমনঃ বুকে অস্বস্তি, তীব্র মাথাব্যথা, ফলো-আপ'}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
+                  fontSize: '13px',
+                  outline: 'none',
+                }}
+              />
+            </div>
           </div>
 
           {/* Payment Method Selector */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '6px', color: 'var(--slate-700)' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: '#334155' }}>
               {t.paymentMethodLabel}
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
@@ -351,11 +448,13 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 style={{
                   padding: '10px 8px',
                   borderRadius: '8px',
-                  border: `2px solid ${paymentMethod === 'CASH_AT_DESK' ? 'var(--brand-teal-600)' : 'var(--slate-200)'}`,
-                  backgroundColor: paymentMethod === 'CASH_AT_DESK' ? 'var(--brand-teal-50)' : '#FFFFFF',
+                  border: `2px solid ${paymentMethod === 'CASH_AT_DESK' ? '#0057FF' : '#E2E8F0'}`,
+                  backgroundColor: paymentMethod === 'CASH_AT_DESK' ? '#EFF6FF' : '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  color: paymentMethod === 'CASH_AT_DESK' ? '#0057FF' : '#334155',
                   textAlign: 'center',
+                  cursor: 'pointer',
                 }}
               >
                 💵 Cash at Chamber
@@ -367,14 +466,16 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 style={{
                   padding: '10px 8px',
                   borderRadius: '8px',
-                  border: `2px solid ${paymentMethod === 'BKASH' ? '#E2136E' : 'var(--slate-200)'}`,
+                  border: `2px solid ${paymentMethod === 'BKASH' ? '#E2136E' : '#E2E8F0'}`,
                   backgroundColor: paymentMethod === 'BKASH' ? '#FDF2F8' : '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  color: paymentMethod === 'BKASH' ? '#BE185D' : '#334155',
                   textAlign: 'center',
+                  cursor: 'pointer',
                 }}
               >
-                📱 bKash Payment
+                📱 bKash Online
               </button>
               <button
                 type="button"
@@ -383,14 +484,16 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 style={{
                   padding: '10px 8px',
                   borderRadius: '8px',
-                  border: `2px solid ${paymentMethod === 'NAGAD' ? '#F97316' : 'var(--slate-200)'}`,
+                  border: `2px solid ${paymentMethod === 'NAGAD' ? '#F97316' : '#E2E8F0'}`,
                   backgroundColor: paymentMethod === 'NAGAD' ? '#FFF7ED' : '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  color: paymentMethod === 'NAGAD' ? '#C2410C' : '#334155',
                   textAlign: 'center',
+                  cursor: 'pointer',
                 }}
               >
-                ⚡ Nagad Payment
+                ⚡ Nagad Online
               </button>
             </div>
           </div>
@@ -402,9 +505,9 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
               id="confirm-booking-btn"
               disabled={isSubmitting || secondsRemaining === 0}
               style={{
-                backgroundColor: 'var(--brand-navy-700)',
+                backgroundColor: '#0057FF',
                 color: '#FFFFFF',
-                padding: '12px 20px',
+                padding: '13px 20px',
                 borderRadius: '8px',
                 fontWeight: 700,
                 fontSize: '15px',
@@ -412,39 +515,18 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 10px rgba(19, 64, 116, 0.25)',
+                border: 'none',
+                cursor: secondsRemaining === 0 ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 14px rgba(0, 87, 255, 0.28)',
               }}
             >
               <CheckCircle size={18} />
-              {isSubmitting ? 'Confirming with Database Lock...' : t.bookNowButton}
-            </button>
-
-            {/* Concurrency Simulator Testing Tool Button */}
-            <button
-              type="button"
-              id="simulate-conflict-btn"
-              onClick={handleSimulateConflict}
-              style={{
-                backgroundColor: '#FEF2F2',
-                color: '#B91C1C',
-                border: '1px dashed #F87171',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-              }}
-            >
-              <AlertTriangle size={13} />
-              Test Concurrency Lock: Simulate Another Patient Clicking Same Slot
+              {isSubmitting ? 'Confirming with Database...' : t.bookNowButton}
             </button>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '11px', color: 'var(--slate-500)' }}>
-            Help with booking? Call Helpline: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}</strong>
+          <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '11px', color: '#64748B' }}>
+            Need booking assistance? Call Helpline: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong>
           </div>
         </form>
       </div>

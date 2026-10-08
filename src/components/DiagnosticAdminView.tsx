@@ -26,8 +26,103 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
   const [activeTab, setActiveTab] = useState<'tests' | 'doctors' | 'reports' | 'subscription'>('tests');
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const orgTests = tests.filter((t) => t.organizationId === organization.id);
-  const orgAssociations = associations.filter((a) => a.organizationId === organization.id);
+  // Operational test and doctor state
+  const [testList, setTestList] = useState<DiagnosticTest[]>(tests.filter((t) => t.organizationId === organization.id));
+  const [assocList, setAssocList] = useState<DoctorAssociation[]>(associations.filter((a) => a.organizationId === organization.id));
+  const orgTests = testList;
+  const orgAssociations = assocList;
+  const [actionSuccessNotice, setActionSuccessNotice] = useState<string | null>(null);
+
+  // Modals
+  const [isAddTestOpen, setIsAddTestOpen] = useState(false);
+  const [newTestName, setNewTestName] = useState('');
+  const [newTestCategory, setNewTestCategory] = useState('Hematology');
+  const [newTestPrice, setNewTestPrice] = useState('500');
+  const [newTestDiscount, setNewTestDiscount] = useState('450');
+  const [newTestSample, setNewTestSample] = useState('Blood');
+  const [newTestTurnaround, setNewTestTurnaround] = useState('6');
+  const [newTestPreparation, setNewTestPreparation] = useState('No fasting required');
+  const [newTestHomeCollection, setNewTestHomeCollection] = useState(true);
+
+  const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
+  const [newDocName, setNewDocName] = useState('');
+  const [newDocSpecialty, setNewDocSpecialty] = useState('Cardiology');
+  const [newDocDegrees, setNewDocDegrees] = useState('MBBS, FCPS');
+  const [newDocBmdc, setNewDocBmdc] = useState('A-');
+  const [newDocRoom, setNewDocRoom] = useState('Room 205');
+  const [newDocFee, setNewDocFee] = useState('800');
+  const [newDocFollowupFee, setNewDocFollowupFee] = useState('500');
+
+  const handleCreateTest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTestName.trim()) return;
+
+    const created: DiagnosticTest = {
+      id: `test-custom-${Date.now()}`,
+      organizationId: organization.id,
+      organizationName: organization.name,
+      name: newTestName.trim(),
+      code: `LAB-${Math.floor(100 + Math.random() * 900)}`,
+      category: newTestCategory,
+      description: `Accredited clinical laboratory pathology examination for ${newTestName.trim()}.`,
+      price: parseInt(newTestPrice, 10) || 500,
+      discountPrice: newTestDiscount ? parseInt(newTestDiscount, 10) : undefined,
+      sampleType: newTestSample,
+      expectedDeliveryHours: parseInt(newTestTurnaround, 10) || 6,
+      homeCollectionAvailable: newTestHomeCollection,
+      preparationInstructions: newTestPreparation,
+      isActive: true,
+    };
+
+    setTestList([created, ...testList]);
+    setIsAddTestOpen(false);
+    setNewTestName('');
+    setActionSuccessNotice(`Test "${created.name}" successfully added to laboratory catalog.`);
+    setTimeout(() => setActionSuccessNotice(null), 4000);
+  };
+
+  const handleAssociateDoctor = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDocName.trim()) return;
+
+    const createdAssoc: DoctorAssociation = {
+      id: `assoc-custom-${Date.now()}`,
+      doctorId: `doc-custom-${Date.now()}`,
+      organizationId: organization.id,
+      organizationName: organization.name,
+      branchId: selectedBranchId,
+      branchName: organization.branches.find((b) => b.id === selectedBranchId)?.name || 'Main Branch',
+      districtName: 'Moulvibazar',
+      upazilaName: 'Moulvibazar Sadar',
+      chamberRoomNumber: newDocRoom,
+      consultationFee: parseInt(newDocFee, 10) || 800,
+      followupFee: parseInt(newDocFollowupFee, 10) || 500,
+      followupValidityDays: 14,
+      commissionRatePercent: 10,
+      isActive: true,
+      doctor: {
+        id: `doc-custom-${Date.now()}`,
+        userId: `user-doc-${Date.now()}`,
+        fullName: newDocName.trim(),
+        title: 'Consultant Specialist',
+        bmdcNumber: newDocBmdc,
+        specialization: `${newDocDegrees} - ${newDocSpecialty}`,
+        qualifications: newDocDegrees,
+        experienceYears: 10,
+        biography: 'Specialist consultant associated with Diagnostic Care network.',
+        verificationStatus: 'VERIFIED',
+        rating: 5.0,
+        reviewCount: 1,
+        languages: ['Bangla', 'English'],
+      },
+    };
+
+    setAssocList([createdAssoc, ...assocList]);
+    setIsAddDoctorOpen(false);
+    setNewDocName('');
+    setActionSuccessNotice(`Doctor "${createdAssoc.doctor?.fullName}" associated to ${createdAssoc.branchName}.`);
+    setTimeout(() => setActionSuccessNotice(null), 4000);
+  };
 
   const handleUploadReport = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,22 +286,46 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
-              Laboratory & Imaging Menu
-            </h4>
-            <button
-              onClick={() => alert('New test modal: Add test name, sample type, fasting notes, and price.')}
+          {/* Action Success Toast */}
+          {actionSuccessNotice && (
+            <div
               style={{
-                backgroundColor: 'var(--brand-navy-700)',
-                color: '#FFFFFF',
-                padding: '8px 14px',
-                borderRadius: '6px',
+                backgroundColor: '#ECFDF5',
+                border: '1px solid #10B981',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                color: '#065F46',
                 fontSize: '13px',
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <CheckCircle size={16} color="#10B981" />
+              <span>{actionSuccessNotice}</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
+              Laboratory & Imaging Menu ({testList.length})
+            </h4>
+            <button
+              onClick={() => setIsAddTestOpen(true)}
+              style={{
+                backgroundColor: '#0057FF',
+                color: '#FFFFFF',
+                padding: '8px 14px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
                 gap: '6px',
+                border: 'none',
+                cursor: 'pointer',
               }}
             >
               <Plus size={15} />
@@ -215,7 +334,7 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {orgTests.map((test) => (
+            {testList.map((test) => (
               <div
                 key={test.id}
                 style={{
@@ -275,22 +394,46 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
-              Associated Specialist Consultants
-            </h4>
-            <button
-              onClick={() => alert('Add/Invite Doctor modal: Associate specialist doctor to Moulvibazar Branch.')}
+          {/* Action Success Toast */}
+          {actionSuccessNotice && (
+            <div
               style={{
-                backgroundColor: 'var(--brand-navy-700)',
-                color: '#FFFFFF',
-                padding: '8px 14px',
-                borderRadius: '6px',
+                backgroundColor: '#ECFDF5',
+                border: '1px solid #10B981',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                color: '#065F46',
                 fontSize: '13px',
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <CheckCircle size={16} color="#10B981" />
+              <span>{actionSuccessNotice}</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
+              Associated Specialist Consultants ({assocList.length})
+            </h4>
+            <button
+              onClick={() => setIsAddDoctorOpen(true)}
+              style={{
+                backgroundColor: '#0057FF',
+                color: '#FFFFFF',
+                padding: '8px 14px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
                 gap: '6px',
+                border: 'none',
+                cursor: 'pointer',
               }}
             >
               <Plus size={15} />
@@ -299,7 +442,7 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {orgAssociations.map((assoc) => (
+            {assocList.map((assoc) => (
               <div
                 key={assoc.id}
                 style={{
@@ -531,6 +674,294 @@ export const DiagnosticAdminView: React.FC<DiagnosticAdminViewProps> = ({
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Modal 1: Add New Diagnostic Test */}
+      {isAddTestOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '520px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+            }}
+          >
+            <div style={{ backgroundColor: '#0F172A', color: '#FFFFFF', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}>
+              <div style={{ fontWeight: 800, fontSize: '16px' }}>Add Diagnostic / Lab Test</div>
+              <button onClick={() => setIsAddTestOpen(false)} style={{ background: 'transparent', border: 'none', color: '#FFFFFF', fontSize: '18px', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <form onSubmit={handleCreateTest} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Test Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newTestName}
+                  onChange={(e) => setNewTestName(e.target.value)}
+                  placeholder="e.g. HbA1c (Glycated Hemoglobin)"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Category</label>
+                  <select
+                    value={newTestCategory}
+                    onChange={(e) => setNewTestCategory(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  >
+                    <option value="Hematology">Hematology</option>
+                    <option value="Biochemistry">Biochemistry</option>
+                    <option value="Radiology & Imaging">Radiology & Imaging</option>
+                    <option value="Microbiology">Microbiology</option>
+                    <option value="Hormones & Thyroid">Hormones & Thyroid</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Sample Type</label>
+                  <input
+                    type="text"
+                    value={newTestSample}
+                    onChange={(e) => setNewTestSample(e.target.value)}
+                    placeholder="e.g. EDTA Blood / Serum"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Regular Price (BDT) *</label>
+                  <input
+                    type="number"
+                    required
+                    value={newTestPrice}
+                    onChange={(e) => setNewTestPrice(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Discounted Price (BDT)</label>
+                  <input
+                    type="number"
+                    value={newTestDiscount}
+                    onChange={(e) => setNewTestDiscount(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Turnaround (Hours)</label>
+                  <input
+                    type="number"
+                    value={newTestTurnaround}
+                    onChange={(e) => setNewTestTurnaround(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '24px' }}>
+                  <input
+                    type="checkbox"
+                    id="home-coll"
+                    checked={newTestHomeCollection}
+                    onChange={(e) => setNewTestHomeCollection(e.target.checked)}
+                  />
+                  <label htmlFor="home-coll" style={{ fontSize: '12px', fontWeight: 600 }}>Home Sample Collection</label>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Preparation Instructions</label>
+                <input
+                  type="text"
+                  value={newTestPreparation}
+                  onChange={(e) => setNewTestPreparation(e.target.value)}
+                  placeholder="e.g. Fasting 8 to 10 hours overnight"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsAddTestOpen(false)}
+                  style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '13px', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: '9px 20px', borderRadius: '8px', border: 'none', background: '#0057FF', color: '#FFFFFF', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
+                >
+                  Save & Publish Test
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 2: Associate Specialist Doctor */}
+      {isAddDoctorOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '520px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+            }}
+          >
+            <div style={{ backgroundColor: '#0F172A', color: '#FFFFFF', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}>
+              <div style={{ fontWeight: 800, fontSize: '16px' }}>Associate Specialist Consultant</div>
+              <button onClick={() => setIsAddDoctorOpen(false)} style={{ background: 'transparent', border: 'none', color: '#FFFFFF', fontSize: '18px', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <form onSubmit={handleAssociateDoctor} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Doctor Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newDocName}
+                  onChange={(e) => setNewDocName(e.target.value)}
+                  placeholder="e.g. Dr. Mahbubur Rahman"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Medical Specialty</label>
+                  <select
+                    value={newDocSpecialty}
+                    onChange={(e) => setNewDocSpecialty(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  >
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Gynecology & Obstetrics">Gynecology & Obstetrics</option>
+                    <option value="Medicine & Nephrology">Medicine & Nephrology</option>
+                    <option value="Pediatrics (Child)">Pediatrics (Child)</option>
+                    <option value="Orthopedic Surgery">Orthopedic Surgery</option>
+                    <option value="ENT Specialist">ENT Specialist</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Degrees / Qualifications</label>
+                  <input
+                    type="text"
+                    value={newDocDegrees}
+                    onChange={(e) => setNewDocDegrees(e.target.value)}
+                    placeholder="e.g. MBBS, FCPS, MD"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>BMDC Reg Number</label>
+                  <input
+                    type="text"
+                    value={newDocBmdc}
+                    onChange={(e) => setNewDocBmdc(e.target.value)}
+                    placeholder="e.g. A-48921"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Chamber Room Number</label>
+                  <input
+                    type="text"
+                    value={newDocRoom}
+                    onChange={(e) => setNewDocRoom(e.target.value)}
+                    placeholder="e.g. Room 204 (2nd Floor)"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Consultation Fee (BDT) *</label>
+                  <input
+                    type="number"
+                    required
+                    value={newDocFee}
+                    onChange={(e) => setNewDocFee(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Follow-up Fee (BDT)</label>
+                  <input
+                    type="number"
+                    value={newDocFollowupFee}
+                    onChange={(e) => setNewDocFollowupFee(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsAddDoctorOpen(false)}
+                  style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '13px', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: '9px 20px', borderRadius: '8px', border: 'none', background: '#0057FF', color: '#FFFFFF', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
+                >
+                  Confirm Association
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

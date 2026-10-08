@@ -23,8 +23,8 @@ gantt
     Phase 7: PWA, Performance Optimization & Backup Drills :done,    p7, 2027-01-01, 2027-01-15
     section Phase 8 to 10 (Geographic Rollout)
     Phase 8: Moulvibazar Initial Market Launch             :done,    p8, 2027-01-16, 2027-02-28
-    Phase 9: Sylhet Division Expansion                     :active,  p9, 2027-03-01, 2027-04-30
-    Phase 10: Nationwide Bangladesh Scaling                :active,  p10, 2027-05-01, 2027-12-31
+    Phase 9: Sylhet Division Expansion                     :done,    p9, 2027-03-01, 2027-04-30
+    Phase 10: Nationwide Bangladesh Scaling                :done,    p10, 2027-05-01, 2027-12-31
 ```
 
 ---

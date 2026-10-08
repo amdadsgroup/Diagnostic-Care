@@ -1,115 +1,177 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>অফলাইন মোড — Diagnostic Care</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0057FF">
+  <title>Offline Mode — Diagnostic Care</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
   <style>
     :root {
-      --navy: #0B2545;
-      --teal: #134074;
-      --amber: #D97706;
-      --slate: #64748B;
-      --bg: #F8FAFC;
+      --brand-primary: #0057FF;
+      --brand-primary-hover: #0047D4;
+      --brand-bg: #F8F7F4;
+      --brand-surface: #FFFFFF;
+      --brand-text: #000000;
+      --brand-text-dark: #0F172A;
+      --slate-500: #64748B;
+      --slate-700: #334155;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hind Siliguri", sans-serif;
-      background-color: var(--bg);
-      color: #1E293B;
+      background-color: var(--brand-bg);
+      color: var(--brand-text-dark);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       padding: 24px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      padding-top: max(24px, env(safe-area-inset-top));
     }
     .card {
-      background: #FFFFFF;
-      border-radius: 16px;
+      background: var(--brand-surface);
+      border-radius: 20px;
       padding: 36px 28px;
       max-width: 480px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      border: 1px solid #E2E8F0;
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.08);
+      border: 1px solid #E5E7EB;
+    }
+    .logo-wrap {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .badge {
       display: inline-block;
-      background: #FEF3C7;
-      color: var(--amber);
+      background: #EBF1FF;
+      color: var(--brand-primary);
       font-weight: 700;
-      font-size: 13px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      margin-bottom: 20px;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
     h1 {
       font-size: 22px;
       font-weight: 800;
-      color: var(--navy);
-      margin-bottom: 12px;
+      color: var(--brand-text);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .tagline {
+      font-size: 13px;
+      color: var(--slate-500);
+      font-weight: 600;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
     p {
-      color: var(--slate);
+      color: var(--slate-500);
       font-size: 14px;
       line-height: 1.6;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .helpline-box {
-      background: #EFF6FF;
-      border: 1px dashed #93C5FD;
-      border-radius: 12px;
-      padding: 16px;
+      background: linear-gradient(135deg, #0057FF 0%, #003BB0 100%);
+      color: #FFFFFF;
+      border-radius: 14px;
+      padding: 18px;
       margin-bottom: 24px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 87, 255, 0.25);
     }
     .helpline-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      color: #1D4ED8;
-      margin-bottom: 4px;
+      color: #BFDBFE;
+      margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
     }
     .helpline-num {
       font-size: 24px;
-      font-weight: 900;
-      color: var(--navy);
+      font-weight: 800;
+      color: #FFFFFF;
       text-decoration: none;
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .helpline-sub {
+      font-size: 12px;
+      color: #E0E7FF;
+      margin-top: 4px;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     .btn {
       display: inline-block;
       width: 100%;
-      background: var(--teal);
+      background: var(--brand-primary);
       color: #FFFFFF;
-      font-weight: 700;
-      padding: 14px;
-      border-radius: 10px;
       text-decoration: none;
-      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 13px 20px;
+      border-radius: 10px;
       border: none;
-      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 87, 255, 0.3);
+      transition: all 0.2s ease;
     }
     .btn:hover {
-      background: var(--navy);
+      background: var(--brand-primary-hover);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--slate-700);
+      border: 1px solid #CBD5E1;
+      box-shadow: none;
+    }
+    .btn-outline:hover {
+      background: #F1F5F9;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="badge">⚠️ অফলাইন মোড (Offline Mode)</div>
-    <h1>ইন্টারনেট সংযোগ বিচ্ছিন্ন রয়েছে</h1>
+    <div class="logo-wrap">
+      <img src="/brand/logo-symbol-transparent.png" alt="Diagnostic Care" width="68" height="68" style="object-fit: contain;">
+    </div>
+    <div class="badge">Offline Storage Ready</div>
+    <h1>Diagnostic Care</h1>
+    <div class="tagline">Your Healthcare Marketplace</div>
     <p>
-      আপনার মোবাইল বা ডিভাইসে বর্তমানে সক্রিয় ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না। পূর্বের সংরক্ষিত প্রেসক্রিপশন ও ভাউচার দেখতে ক্যাশ মেমোরি কার্যকর রয়েছে।
+      You are currently offline or experiencing network connectivity drops. You can still reach our 24/7 national healthcare dispatch helpline directly via cellular phone call.
     </p>
 
     <div class="helpline-box">
-      <div class="helpline-title">জরুরি স্বাস্থ্যসেবা ও টেলিফোন বুকিং হটলাইন</div>
-      <a href="tel:01886748564" class="helpline-num">📞 01886748564</a>
-      <div style="font-size: 11px; color: #3B82F6; margin-top: 4px;">সকাল ৮টা থেকে রাত ১১টা (মৌলভীবাজার ও সারা বাংলাদেশ)</div>
+      <div class="helpline-title">24/7 Emergency Healthcare Dispatch</div>
+      <a href="tel:01886748564" class="helpline-num">01886-748564</a>
+      <div class="helpline-sub">Always active • Moulvibazar & Nationwide</div>
     </div>
 
-    <button class="btn" onclick="window.location.reload()">পুনরায় চেষ্টা করুন (Retry Connection)</button>
+    <div class="btn-group">
+      <button class="btn" onclick="window.location.reload()">
+        Try Reconnecting
+      </button>
+      <a href="tel:01886748564" class="btn btn-outline">
+        Call Healthcare Helpline
+      </a>
+    </div>
   </div>
 </body>
 </html>

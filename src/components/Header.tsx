@@ -1,21 +1,46 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
+import React, { useState, useEffect } from 'react';
+import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { UserRole } from '@/types';
-import { Phone, MapPin, Globe, Shield, UserCheck, Stethoscope, Building2, User } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/BrandLogo';
+import {
+  Search,
+  MapPin,
+  Globe,
+  User,
+  Menu,
+  X,
+  Stethoscope,
+  TestTube2,
+  Building2,
+  HeartPulse,
+  Pill,
+  Ambulance,
+  Home,
+  Layers,
+  Phone,
+  Sparkles,
+  ChevronDown,
+  ArrowRight,
+  Activity,
+  FileText,
+} from 'lucide-react';
 
 interface HeaderProps {
   language: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
   currentRole: UserRole;
   setCurrentRole: (role: UserRole) => void;
-  activeTab: 'marketplace' | 'queue' | 'reports' | 'prescriptions' | 'portal';
-  setActiveTab: (tab: 'marketplace' | 'queue' | 'reports' | 'prescriptions' | 'portal') => void;
+  activeTab: string;
+  setActiveTab: (tab: any) => void;
   onOpenAuth?: () => void;
   onOpenOnboard?: () => void;
+  onOpenSearch?: () => void;
+  onOpenLocation?: () => void;
+  selectedLocation?: string;
+  onSelectCategory?: (category: any) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,57 +52,201 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   onOpenAuth,
   onOpenOnboard,
+  onOpenSearch,
+  onOpenLocation,
+  selectedLocation = 'Moulvibazar',
+  onSelectCategory,
 }) => {
   const t = TRANSLATIONS[language];
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleNavClick = (tab: string, category?: string) => {
+    setActiveTab(tab);
+    if (category && onSelectCategory) {
+      onSelectCategory(category);
+    }
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <header className="header-glass">
-      {/* Top Notification / Customer Care Bar */}
-      <div style={{ backgroundColor: 'var(--brand-navy-900)', color: '#FFFFFF', padding: '6px 0', fontSize: '13px' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255, 255, 255, 0.12)', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 500 }}>
-              <MapPin size={13} color="#10B981" />
-              {t.locationBadge}
-            </span>
-            <span style={{ color: 'var(--slate-300)', fontSize: '12px' }}>
-              {t.tagline}
+    <header
+      id="main-header"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 9950,
+        backgroundColor: '#FFFFFF',
+        transition: 'all 0.2s ease',
+        boxShadow: isScrolled
+          ? '0 4px 20px -2px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)'
+          : '0 1px 0 #E5E7EB',
+      }}
+    >
+      {/* Top Utility Bar (Desktop only) */}
+      <div
+        className="d-desktop-only"
+        style={{
+          backgroundColor: '#0F172A',
+          color: '#F8FAFC',
+          padding: '6px 0',
+          fontSize: '11.5px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
+        <div
+          className="container"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 24px',
+          }}
+        >
+          {/* Left: Location & Launch Hub */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <button
+              onClick={onOpenLocation}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                color: '#93C5FD',
+                fontSize: '11px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <MapPin size={11} color="#60A5FA" />
+              <span>Location: <strong>{selectedLocation}</strong></span>
+              <ChevronDown size={10} color="#94A3B8" />
+            </button>
+
+            <span style={{ color: '#94A3B8', fontSize: '11px' }}>
+              Launch Hub: {BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION}, Sylhet Division
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+          {/* Right: Emergency 24/7 Helpline, Role Switcher & Language */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <a
               href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
-              id="header-helpline-link"
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38BDF8', fontWeight: 600, textDecoration: 'none' }}
-              title="Call Diagnostic Care Helpline"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#60A5FA',
+                fontWeight: 700,
+                textDecoration: 'none',
+                background: 'rgba(0, 87, 255, 0.15)',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 87, 255, 0.3)',
+              }}
             >
-              <Phone size={13} />
-              <span>{t.helplineTitle}: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong></span>
+              <Phone size={11} />
+              <span>24/7 Helpline: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong></span>
             </a>
 
-            {/* Language Switcher */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255, 255, 255, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
-              <Globe size={13} />
-              <button
-                onClick={() => setLanguage('en')}
+            {/* Portal Role View Switcher */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '6px',
+                padding: '2px 8px',
+              }}
+            >
+              <Layers size={11} color="#94A3B8" />
+              <span style={{ fontSize: '10.5px', color: '#94A3B8', fontWeight: 600 }}>Role:</span>
+              <select
+                id="header-role-select"
+                value={currentRole}
+                onChange={(e) => {
+                  const role = e.target.value as UserRole;
+                  setCurrentRole(role);
+                  if (role !== 'PATIENT') {
+                    setActiveTab('portal');
+                  } else {
+                    setActiveTab('marketplace');
+                  }
+                }}
                 style={{
-                  color: language === 'en' ? '#38BDF8' : '#FFFFFF',
-                  fontWeight: language === 'en' ? 700 : 400,
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#FFFFFF',
                   fontSize: '11px',
-                  padding: '0 4px',
+                  fontWeight: 600,
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="PATIENT" style={{ background: '#0F172A', color: '#FFF' }}>Patient</option>
+                <option value="DOCTOR" style={{ background: '#0F172A', color: '#FFF' }}>Doctor Portal</option>
+                <option value="DOCTOR_ASSISTANT" style={{ background: '#0F172A', color: '#FFF' }}>Doctor Assistant</option>
+                <option value="DIAGNOSTIC_ADMIN" style={{ background: '#0F172A', color: '#FFF' }}>Diagnostic Admin</option>
+                <option value="SUPER_ADMIN" style={{ background: '#0F172A', color: '#FFF' }}>Super Admin</option>
+              </select>
+            </div>
+
+            {/* Language Switcher */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                padding: '2px 4px',
+                borderRadius: '6px',
+              }}
+            >
+              <Globe size={11} color="#93C5FD" style={{ marginRight: '2px' }} />
+              <button
+                onClick={() => {
+                  setLanguage('en');
+                  if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'en');
+                }}
+                style={{
+                  color: language === 'en' ? '#0F172A' : '#FFFFFF',
+                  background: language === 'en' ? '#60A5FA' : 'transparent',
+                  fontWeight: 700,
+                  fontSize: '10.5px',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  lineHeight: 1.2,
                 }}
               >
                 EN
               </button>
-              <span style={{ opacity: 0.5 }}>|</span>
               <button
-                onClick={() => setLanguage('bn')}
+                onClick={() => {
+                  setLanguage('bn');
+                  if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'bn');
+                }}
                 style={{
-                  color: language === 'bn' ? '#38BDF8' : '#FFFFFF',
-                  fontWeight: language === 'bn' ? 700 : 400,
-                  fontSize: '11px',
-                  padding: '0 4px',
+                  color: language === 'bn' ? '#0F172A' : '#FFFFFF',
+                  background: language === 'bn' ? '#60A5FA' : 'transparent',
+                  fontWeight: 700,
+                  fontSize: '10.5px',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  lineHeight: 1.2,
                 }}
               >
                 বাংলা
@@ -87,183 +256,526 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Main Brand Navigation Bar */}
-      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => setActiveTab('marketplace')}>
-          <div style={{ width: '42px', height: '42px', position: 'relative', borderRadius: '8px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-            <Image src="/logo.png" alt="Diagnostic Care Logo" fill style={{ objectFit: 'contain' }} priority />
+      {/* Primary Navigation Bar */}
+      <div
+        className="container"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 24px',
+          gap: '16px',
+        }}
+      >
+        {/* Left: Horizontal Brand Logo on Desktop, Symbol on Mobile */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Desktop & Tablet: Horizontal Logo */}
+          <div
+            className="d-mobile-none"
+            style={{ cursor: 'pointer' }}
+            onClick={() => handleNavClick('marketplace')}
+          >
+            <BrandLogo
+              variant="horizontal"
+              size={36}
+              priority
+              altText="Diagnostic Care"
+            />
           </div>
-          <div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--brand-navy-900)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-              {BRAND_CONSTANTS.BRAND_NAME}
-            </div>
-            <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--brand-teal-600)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {t.tagline}
-            </div>
+
+          {/* Mobile: Compact Symbol */}
+          <div
+            className="d-mobile-flex"
+            style={{ cursor: 'pointer', display: 'none', alignItems: 'center' }}
+            onClick={() => handleNavClick('marketplace')}
+          >
+            <BrandLogo
+              variant="symbol"
+              size={34}
+              priority
+              altText="Diagnostic Care"
+            />
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+        {/* Center: Desktop Navigation Links */}
+        <nav
+          className="d-desktop-flex"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+          }}
+        >
+          {/* 1. Home */}
           <button
-            onClick={() => setActiveTab('marketplace')}
+            onClick={() => handleNavClick('marketplace')}
             style={{
-              padding: '8px 14px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: activeTab === 'marketplace' ? 600 : 500,
-              color: activeTab === 'marketplace' ? 'var(--brand-navy-900)' : 'var(--slate-600)',
-              backgroundColor: activeTab === 'marketplace' ? 'var(--slate-100)' : 'transparent',
-              transition: 'all 0.15s ease',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: activeTab === 'marketplace' ? 700 : 500,
+              color: activeTab === 'marketplace' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'marketplace' ? BRAND_COLORS.primaryLight : 'transparent',
             }}
           >
-            {t.navFindDoctors} & {t.navDiagnosticTests}
+            {language === 'en' ? 'Home' : 'হোম'}
           </button>
 
+          {/* 2. Find Doctors */}
           <button
-            onClick={() => setActiveTab('queue')}
+            onClick={() => handleNavClick('marketplace', 'DOCTOR')}
             style={{
-              padding: '8px 14px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: activeTab === 'queue' ? 600 : 500,
-              color: activeTab === 'queue' ? 'var(--brand-teal-600)' : 'var(--slate-600)',
-              backgroundColor: activeTab === 'queue' ? 'var(--brand-teal-50)' : 'transparent',
-              display: 'flex',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: BRAND_COLORS.textDark,
+            }}
+          >
+            {language === 'en' ? 'Find Doctors' : 'ডাক্তার'}
+          </button>
+
+          {/* 3. Diagnostic Centers */}
+          <button
+            onClick={() => handleNavClick('marketplace', 'DIAGNOSTIC_CENTER')}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: BRAND_COLORS.textDark,
+            }}
+          >
+            {language === 'en' ? 'Diagnostic Centers' : 'ডায়াগনস্টিক সেন্টার'}
+          </button>
+
+          {/* 4. Hospitals & Clinics */}
+          <button
+            onClick={() => handleNavClick('marketplace', 'HOSPITAL')}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: BRAND_COLORS.textDark,
+            }}
+          >
+            {language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}
+          </button>
+
+          {/* 5. Pharmacies */}
+          <button
+            onClick={() => handleNavClick('marketplace', 'PHARMACY')}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: BRAND_COLORS.textDark,
+            }}
+          >
+            {language === 'en' ? 'Pharmacies' : 'ফার্মেসি'}
+          </button>
+
+          {/* 6. Ambulance */}
+          <button
+            onClick={() => handleNavClick('marketplace', 'AMBULANCE')}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: BRAND_COLORS.textDark,
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
-            {t.navLiveQueue}
+            <span>{language === 'en' ? 'Ambulance' : 'অ্যাম্বুলেন্স'}</span>
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#EF4444',
+                boxShadow: '0 0 6px #EF4444',
+              }}
+            />
           </button>
 
+          {/* 7. Home Healthcare */}
           <button
-            onClick={() => setActiveTab('reports')}
+            onClick={() => handleNavClick('marketplace', 'HOME_CARE')}
             style={{
-              padding: '8px 14px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: activeTab === 'reports' ? 600 : 500,
-              color: activeTab === 'reports' ? 'var(--brand-navy-900)' : 'var(--slate-600)',
-              backgroundColor: activeTab === 'reports' ? 'var(--slate-100)' : 'transparent',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: BRAND_COLORS.textDark,
             }}
           >
-            {t.navMyReports}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('prescriptions')}
-            style={{
-              padding: '8px 14px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: activeTab === 'prescriptions' ? 600 : 500,
-              color: activeTab === 'prescriptions' ? 'var(--brand-navy-900)' : 'var(--slate-600)',
-              backgroundColor: activeTab === 'prescriptions' ? 'var(--slate-100)' : 'transparent',
-            }}
-          >
-            {t.navPrescriptions}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('portal')}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#FFFFFF',
-              backgroundColor: 'var(--brand-navy-700)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <Building2 size={15} />
-            {t.navProviderPortal}
+            {language === 'en' ? 'Home Healthcare' : 'হোম হেলথকেয়ার'}
           </button>
         </nav>
 
-        {/* Action Buttons: Patient Login & Provider Onboard */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          {onOpenOnboard && (
-            <button
-              onClick={onOpenOnboard}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                background: 'var(--brand-teal-50)',
-                color: 'var(--brand-teal-600)',
-                border: '1px solid var(--brand-teal-500)',
-                fontWeight: 700,
-                fontSize: '12px',
-              }}
-            >
-              🏥 প্রতিষ্ঠান অনবোর্ডিং
-            </button>
-          )}
+        {/* Right Side Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Search Trigger */}
+          <button
+            onClick={onOpenSearch || (() => handleNavClick('search'))}
+            aria-label="Search Healthcare Services"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              backgroundColor: 'var(--brand-bg)',
+              border: '1px solid var(--brand-border)',
+              color: 'var(--brand-text-secondary)',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            <Search size={15} color={BRAND_COLORS.primary} />
+            <span className="d-desktop-inline">{language === 'en' ? 'Search' : 'সার্চ'}</span>
+          </button>
 
+          {/* Location Trigger (Desktop & Mobile) */}
+          <button
+            onClick={onOpenLocation}
+            aria-label="Select Location Hub"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              backgroundColor: 'var(--brand-bg)',
+              border: '1px solid var(--brand-border)',
+              color: 'var(--brand-text-dark)',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            <MapPin size={15} color={BRAND_COLORS.primary} />
+            <span style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {selectedLocation}
+            </span>
+          </button>
+
+          {/* Login Button */}
           {onOpenAuth && (
             <button
               onClick={onOpenAuth}
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '6px 14px',
+                padding: '8px 14px',
                 borderRadius: '8px',
-                background: 'var(--brand-navy-900)',
-                color: 'white',
+                backgroundColor: 'transparent',
+                border: '1px solid var(--brand-border)',
+                color: 'var(--brand-text-dark)',
+                fontSize: '13px',
                 fontWeight: 600,
-                fontSize: '12px',
-              }}
-            >
-              <User size={13} />
-              লগইন / সাইন আপ
-            </button>
-          )}
-
-          {/* Persona / RBAC Switcher Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--slate-100)', padding: '4px 10px', borderRadius: '8px', border: '1px solid var(--slate-200)' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-              Role View:
-            </span>
-            <select
-              id="role-switcher-select"
-              value={currentRole}
-              onChange={(e) => {
-                const role = e.target.value as UserRole;
-                setCurrentRole(role);
-                if (role !== 'PATIENT') {
-                  setActiveTab('portal');
-                } else {
-                  setActiveTab('marketplace');
-                }
-              }}
-              style={{
-                fontSize: '12px',
-                fontWeight: 600,
-                color: 'var(--brand-navy-900)',
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
                 cursor: 'pointer',
               }}
             >
-              <option value="PATIENT">Patient (Marketplace & Health Vault)</option>
-              <option value="DOCTOR">Doctor (Dr. Anisur Rahman, Cardiologist)</option>
-              <option value="DOCTOR_ASSISTANT">Doctor Assistant (Rahim Uddin - Sandboxed)</option>
-              <option value="DIAGNOSTIC_ADMIN">Diagnostic Center Admin (Popular Moulvibazar)</option>
-              <option value="SUPER_ADMIN">Platform Super Admin</option>
-            </select>
-          </div>
+              <User size={14} color={BRAND_COLORS.textDark} />
+              <span>{language === 'en' ? 'Login' : 'লগইন'}</span>
+            </button>
+          )}
+
+          {/* Get Started / Partner Button (Signal Blue #0057FF) */}
+          {onOpenOnboard ? (
+            <button
+              onClick={onOpenOnboard}
+              className="btn-primary"
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+              }}
+            >
+              <span>{language === 'en' ? 'Get Started' : 'শুরু করুন'}</span>
+              <ArrowRight size={13} />
+            </button>
+          ) : (
+            <button
+              onClick={() => handleNavClick('marketplace')}
+              className="btn-primary"
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+              }}
+            >
+              <span>{language === 'en' ? 'Get Started' : 'শুরু করুন'}</span>
+            </button>
+          )}
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            className="d-mobile-only"
+            style={{
+              padding: '8px',
+              borderRadius: '8px',
+              border: '1px solid var(--brand-border)',
+              backgroundColor: 'var(--brand-bg)',
+              color: 'var(--brand-text-dark)',
+              cursor: 'pointer',
+            }}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Navigation Drawer / Menu */}
+      {mobileMenuOpen && (
+        <div
+          id="mobile-drawer"
+          style={{
+            borderTop: '1px solid var(--brand-border)',
+            backgroundColor: '#FFFFFF',
+            padding: '20px 24px 28px',
+            boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+            animation: 'slideDown 0.2s ease-out',
+          }}
+          className="d-mobile-only"
+        >
+          {/* Logo in drawer header */}
+          <div style={{ marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid #F1F5F9' }}>
+            <BrandLogo variant="horizontal" size={32} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button
+              onClick={() => handleNavClick('marketplace')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                backgroundColor: activeTab === 'marketplace' ? BRAND_COLORS.primaryLight : 'transparent',
+                color: activeTab === 'marketplace' ? BRAND_COLORS.primary : 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <Home size={18} color={activeTab === 'marketplace' ? BRAND_COLORS.primary : '#64748B'} />
+              <span>{language === 'en' ? 'Home' : 'হোম'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('marketplace', 'DOCTOR')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <Stethoscope size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Find Doctors' : 'ডাক্তার খুঁজুন'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('marketplace', 'DIAGNOSTIC_CENTER')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <TestTube2 size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Diagnostic Centers & Tests' : 'ডায়াগনস্টিক সেন্টার ও টেস্ট'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('marketplace', 'HOSPITAL')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <Building2 size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('marketplace', 'PHARMACY')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <Pill size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Pharmacies & Medicines' : 'ফার্মেসি ও ঔষধ'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('marketplace', 'AMBULANCE')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: '#DC2626',
+                fontWeight: 700,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <Ambulance size={18} color="#DC2626" />
+              <span>{language === 'en' ? 'Emergency Ambulance 24/7' : 'জরুরি অ্যাম্বুলেন্স ২৪/৭'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('marketplace', 'HOME_CARE')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <HeartPulse size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Home Healthcare' : 'হোম হেলথকেয়ার'}</span>
+            </button>
+
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '8px 0' }} />
+
+            <button
+              onClick={() => handleNavClick('queue')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <Activity size={18} color={BRAND_COLORS.primary} />
+              <span>{language === 'en' ? 'Live Chamber Queue' : 'লাইভ সিরিয়াল কিউ'}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('reports')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: 'left',
+              }}
+            >
+              <FileText size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Digital Health Vault & Reports' : 'হেলথ ভল্ট ও রিপোর্ট'}</span>
+            </button>
+
+            {/* Language & Role switch in mobile drawer */}
+            <div
+              style={{
+                marginTop: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 12px',
+                backgroundColor: 'var(--brand-bg)',
+                borderRadius: '10px',
+              }}
+            >
+              <span style={{ fontSize: '13px', fontWeight: 600 }}>Language:</span>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <button
+                  onClick={() => {
+                    setLanguage('en');
+                    if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'en');
+                  }}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    background: language === 'en' ? BRAND_COLORS.primary : 'transparent',
+                    color: language === 'en' ? '#FFFFFF' : 'var(--brand-text-dark)',
+                  }}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => {
+                    setLanguage('bn');
+                    if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'bn');
+                  }}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    background: language === 'bn' ? BRAND_COLORS.primary : 'transparent',
+                    color: language === 'bn' ? '#FFFFFF' : 'var(--brand-text-dark)',
+                  }}
+                >
+                  বাংলা
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
+
+export default Header;

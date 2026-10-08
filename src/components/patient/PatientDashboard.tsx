@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BRAND } from '@/config/brand';
+import { BRAND, BRAND_COLORS } from '@/config/brand';
+import { BrandSymbol } from '@/components/brand/BrandSymbol';
+import { CalendarCheck, Lock, Users, Phone, CheckCircle2 } from 'lucide-react';
 
 interface FamilyMember {
   id: string;
@@ -121,15 +123,15 @@ export default function PatientDashboard({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Patient Profile Card */}
-      <div className="portal-card" style={{ background: 'linear-gradient(135deg, var(--brand-navy-900) 0%, #173863 100%)', color: 'white' }}>
+      <div className="portal-card" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)', color: 'white', border: '1px solid rgba(0, 87, 255, 0.3)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--brand-teal-500)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', fontWeight: 800 }}>
-              {patientName.slice(0, 1)}
+            <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', flexShrink: 0 }}>
+              <BrandSymbol size={42} altText="Diagnostic Care" />
             </div>
             <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.15)', padding: '3px 8px', borderRadius: '12px', fontSize: '0.75rem', marginBottom: '4px' }}>
-                ✓ ভেরিফাইড পেশেন্ট প্রোফাইল
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0, 87, 255, 0.35)', padding: '3px 8px', borderRadius: '12px', fontSize: '0.75rem', marginBottom: '4px', color: '#BFDBFE', fontWeight: 600 }}>
+                <CheckCircle2 size={12} color="#60A5FA" /> ভেরিফাইড পেশেন্ট প্রোফাইল
               </div>
               <h1 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{patientName}</h1>
               <p style={{ opacity: 0.85, fontSize: '0.85rem' }}>
@@ -152,9 +154,10 @@ export default function PatientDashboard({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
+                textDecoration: 'none',
               }}
             >
-              📞 হেল্পলাইন: {BRAND.helpline}
+              <Phone size={14} color="#60A5FA" /> হেল্পলাইন: {BRAND.displayPhone}
             </a>
           </div>
         </div>
@@ -168,11 +171,15 @@ export default function PatientDashboard({
             padding: '10px 18px',
             fontWeight: 700,
             fontSize: '0.95rem',
-            borderBottom: activeTab === 'appointments' ? '3px solid var(--brand-teal-600)' : '3px solid transparent',
-            color: activeTab === 'appointments' ? 'var(--brand-teal-600)' : 'var(--slate-600)',
+            borderBottom: activeTab === 'appointments' ? `3px solid ${BRAND_COLORS.primary}` : '3px solid transparent',
+            color: activeTab === 'appointments' ? BRAND_COLORS.primary : 'var(--slate-600)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          📅 আমার অ্যাপয়েন্টমেন্টস ({appointments.length})
+          <CalendarCheck size={18} color={activeTab === 'appointments' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
+          <span>আমার অ্যাপয়েন্টমেন্টস ({appointments.length})</span>
         </button>
 
         <button
@@ -181,11 +188,15 @@ export default function PatientDashboard({
             padding: '10px 18px',
             fontWeight: 700,
             fontSize: '0.95rem',
-            borderBottom: activeTab === 'vault' ? '3px solid var(--brand-teal-600)' : '3px solid transparent',
-            color: activeTab === 'vault' ? 'var(--brand-teal-600)' : 'var(--slate-600)',
+            borderBottom: activeTab === 'vault' ? `3px solid ${BRAND_COLORS.primary}` : '3px solid transparent',
+            color: activeTab === 'vault' ? BRAND_COLORS.primary : 'var(--slate-600)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          🔒 ডিজিটাল হেলথ ভল্ট (প্রেসক্রিপশন ও রিপোর্ট)
+          <Lock size={18} color={activeTab === 'vault' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
+          <span>ডিজিটাল হেলথ ভল্ট (প্রেসক্রিপশন ও রিপোর্ট)</span>
         </button>
 
         <button
@@ -194,11 +205,15 @@ export default function PatientDashboard({
             padding: '10px 18px',
             fontWeight: 700,
             fontSize: '0.95rem',
-            borderBottom: activeTab === 'family' ? '3px solid var(--brand-teal-600)' : '3px solid transparent',
-            color: activeTab === 'family' ? 'var(--brand-teal-600)' : 'var(--slate-600)',
+            borderBottom: activeTab === 'family' ? `3px solid ${BRAND_COLORS.primary}` : '3px solid transparent',
+            color: activeTab === 'family' ? BRAND_COLORS.primary : 'var(--slate-600)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          👨‍👩‍👦 পরিবার সদস্য প্রোফাইল ({familyMembers.length})
+          <Users size={18} color={activeTab === 'family' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
+          <span>পরিবার সদস্য প্রোফাইল ({familyMembers.length})</span>
         </button>
       </div>
 

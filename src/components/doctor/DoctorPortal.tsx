@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BRAND } from '@/config/brand';
+import { BRAND, BRAND_COLORS } from '@/config/brand';
+import { BrandSymbol } from '@/components/brand/BrandSymbol';
+import { MapPin, Settings } from 'lucide-react';
 import ScheduleBuilder from './ScheduleBuilder';
 
 interface DoctorPortalProps {
@@ -98,15 +100,22 @@ export default function DoctorPortal({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Top Banner */}
-      <div className="portal-card" style={{ background: 'linear-gradient(135deg, var(--brand-navy-900) 0%, var(--brand-navy-700) 100%)', color: 'white' }}>
+      <div className="portal-card" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)', color: 'white', border: '1px solid rgba(0, 87, 255, 0.3)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-          <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.15)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '8px' }}>
-              <span style={{ color: 'var(--brand-emerald-500)' }}>●</span> ডক্টর ওয়ার্কস্পেস (Doctor Clinical Hub)
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', flexShrink: 0 }}>
+              <BrandSymbol size={42} altText="Diagnostic Care" />
             </div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{doctorName}</h1>
-            <p style={{ opacity: 0.9, fontSize: '0.9rem', marginTop: '4px' }}>{specialization}</p>
-            <p style={{ opacity: 0.75, fontSize: '0.8rem', marginTop: '2px' }}>📍 {chamberName}</p>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0, 87, 255, 0.35)', padding: '3px 10px', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '6px', color: '#BFDBFE', fontWeight: 600 }}>
+                <span>●</span> ডক্টর ওয়ার্কস্পেস (Doctor Clinical Hub)
+              </div>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{doctorName}</h1>
+              <p style={{ opacity: 0.9, fontSize: '0.9rem', marginTop: '2px' }}>{specialization}</p>
+              <p style={{ opacity: 0.8, fontSize: '0.8rem', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <MapPin size={13} color="#60A5FA" /> {chamberName}
+              </p>
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -123,9 +132,11 @@ export default function DoctorPortal({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
+                cursor: 'pointer',
               }}
             >
-              ⚙ শিডিউল কনফিগার করুন
+              <Settings size={15} color="#BFDBFE" />
+              <span>শিডিউল কনফিগার করুন</span>
             </button>
           </div>
         </div>

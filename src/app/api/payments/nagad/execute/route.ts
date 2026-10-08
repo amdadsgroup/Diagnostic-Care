@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ledgerEngine } from '@/lib/ledger-engine';
+import { createServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,10 +18,25 @@ export async function POST(req: NextRequest) {
       bookingCode,
       gateway: 'NAGAD',
       amount: Number(amount),
-      patientPhone: patientPhone || '01819-876543',
+      patientPhone: patientPhone || '01886-748564',
       organizationId: organizationId || 'org-pop-mb',
-      organizationName: organizationName || 'মৌলভীবাজার সেন্ট্রাল ক্লিনিক',
+      organizationName: organizationName || 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার)',
     });
+
+    // Record into Supabase payments table
+    try {
+      const supabase = createServerClient();
+      await supabase.from('payments').insert({
+        payment_reference: transaction.gatewayTransactionId || transaction.id,
+        gateway_name: 'nagad',
+        amount: Number(amount),
+        currency: 'BDT',
+        payment_status: 'paid',
+        purpose: 'appointment_fee',
+      });
+    } catch (dbErr) {
+      console.warn('Database nagad payment log notice:', dbErr);
+    }
 
     return NextResponse.json({
       success: true,

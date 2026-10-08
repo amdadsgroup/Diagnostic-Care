@@ -246,8 +246,13 @@ export default function AdvancedSearchFilter({
 
                   <button
                     onClick={() => {
-                      if (onSelectResult) onSelectResult(item);
-                      else alert(`${item.name} নির্বাচন করা হয়েছে! বুকিং প্রসেস শুরু হচ্ছে...`);
+                      if (onSelectResult) {
+                        onSelectResult(item);
+                      } else {
+                        const targetId = item.type === 'DOCTOR' ? 'doctor-discovery-section' : 'diagnostic-tests-section';
+                        const el = document.getElementById(targetId);
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }}
                     className="btn-primary"
                     style={{ fontSize: '0.82rem', padding: '8px 14px' }}

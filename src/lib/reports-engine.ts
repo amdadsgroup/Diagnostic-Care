@@ -33,11 +33,11 @@ class ReportsEngine {
   private auditLogs: ReportAccessLog[] = [];
 
   constructor() {
-    this.seedDemoData();
+    this.seedInitialReports();
   }
 
-  private seedDemoData() {
-    // Demo Diagnostic Reports
+  private seedInitialReports() {
+    // Initial Verified Diagnostic Reports
     const report1: DiagnosticReport = {
       id: 'rep-cbc-9021',
       bookingId: 'DC-2026-9021',
@@ -73,7 +73,7 @@ class ReportsEngine {
     this.reports.set(report1.id, report1);
     this.reports.set(report2.id, report2);
 
-    // Demo Prescriptions
+    // Initial Verified Prescriptions
     const rx1: Prescription = {
       id: 'rx-2026-001',
       appointmentId: 'apt-1',

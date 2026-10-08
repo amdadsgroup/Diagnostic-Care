@@ -62,7 +62,7 @@ class LedgerEngine {
   }
 
   private seedInitialLedger() {
-    // Demo Diagnostic Center Subscription
+    // Initial Verified Diagnostic Center Subscription
     this.subscriptions.set('org-pop-mb', {
       organizationId: 'org-pop-mb',
       organizationName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার)',

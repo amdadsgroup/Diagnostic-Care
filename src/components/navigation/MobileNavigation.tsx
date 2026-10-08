@@ -1,0 +1,296 @@
+'use client';
+
+import React from 'react';
+import { SupportedLanguage, BRAND_COLORS } from '@/config/brand';
+import { TRANSLATIONS } from '@/i18n/translations';
+import { UserRole } from '@/types';
+import {
+  Home,
+  Compass,
+  CalendarCheck,
+  MessageSquare,
+  User,
+  Clock,
+  LayoutDashboard,
+  FileText,
+} from 'lucide-react';
+
+export type ActiveNavTab =
+  | 'marketplace'
+  | 'search'
+  | 'appointments'
+  | 'queue'
+  | 'reports'
+  | 'prescriptions'
+  | 'portal'
+  | 'profile'
+  | 'emergency'
+  | 'discover'
+  | 'bookings'
+  | 'messages';
+
+interface MobileNavigationProps {
+  language: SupportedLanguage;
+  activeTab: string;
+  setActiveTab: (tab: any) => void;
+  currentRole?: UserRole;
+  onOpenSearch?: () => void;
+  onOpenAuth?: () => void;
+  unreadCount?: number;
+}
+
+/**
+ * Diagnostic Care — Official Mobile PWA Bottom Navigation
+ * 
+ * 5 Canonical Tabs:
+ * 1. Home
+ * 2. Discover
+ * 3. Bookings
+ * 4. Messages
+ * 5. Profile
+ * 
+ * Consistent outline icon family.
+ * Active: Signal Blue #0057FF
+ * Inactive: Neutral gray / black #64748B
+ */
+export default function MobileNavigation({
+  language,
+  activeTab,
+  setActiveTab,
+  currentRole = 'PATIENT',
+  onOpenSearch,
+  onOpenAuth,
+  unreadCount = 0,
+}: MobileNavigationProps) {
+  const isPatient = currentRole === 'PATIENT';
+
+  // Active state matching
+  const isHomeActive = activeTab === 'marketplace';
+  const isDiscoverActive = activeTab === 'discover' || activeTab === 'search';
+  const isBookingsActive = activeTab === 'bookings' || activeTab === 'appointments' || activeTab === 'queue';
+  const isMessagesActive = activeTab === 'messages';
+  const isProfileActive = activeTab === 'profile' || activeTab === 'reports';
+
+  return (
+    <nav
+      className="mobile-bottom-dock"
+      role="navigation"
+      aria-label="Mobile Navigation Dock"
+      style={{
+        display: 'flex',
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#FFFFFF',
+        borderTop: '1px solid #E5E7EB',
+        paddingTop: '6px',
+        paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+        paddingLeft: '12px',
+        paddingRight: '12px',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        zIndex: 9900,
+        boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.06)',
+      }}
+    >
+      {/* 1. Home */}
+      <button
+        onClick={() => {
+          setActiveTab('marketplace');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        className={`mobile-dock-item ${isHomeActive ? 'active' : ''}`}
+        aria-label="Home"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '6px 4px',
+          borderRadius: '10px',
+          border: 'none',
+          background: isHomeActive ? BRAND_COLORS.primaryLight : 'transparent',
+          color: isHomeActive ? BRAND_COLORS.primary : '#64748B',
+          cursor: 'pointer',
+          minHeight: '48px',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        <Home
+          size={20}
+          color={isHomeActive ? BRAND_COLORS.primary : '#64748B'}
+          strokeWidth={isHomeActive ? 2.3 : 1.8}
+        />
+        <span style={{ fontSize: '10.5px', fontWeight: isHomeActive ? 800 : 500 }}>
+          {language === 'en' ? 'Home' : 'হোম'}
+        </span>
+      </button>
+
+      {/* 2. Discover */}
+      <button
+        onClick={() => {
+          setActiveTab('search');
+          if (onOpenSearch) onOpenSearch();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        className={`mobile-dock-item ${isDiscoverActive ? 'active' : ''}`}
+        aria-label="Discover"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '6px 4px',
+          borderRadius: '10px',
+          border: 'none',
+          background: isDiscoverActive ? BRAND_COLORS.primaryLight : 'transparent',
+          color: isDiscoverActive ? BRAND_COLORS.primary : '#64748B',
+          cursor: 'pointer',
+          minHeight: '48px',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        <Compass
+          size={20}
+          color={isDiscoverActive ? BRAND_COLORS.primary : '#64748B'}
+          strokeWidth={isDiscoverActive ? 2.3 : 1.8}
+        />
+        <span style={{ fontSize: '10.5px', fontWeight: isDiscoverActive ? 800 : 500 }}>
+          {language === 'en' ? 'Discover' : 'আবিষ্কার'}
+        </span>
+      </button>
+
+      {/* 3. Bookings */}
+      <button
+        onClick={() => {
+          setActiveTab(isPatient ? 'appointments' : 'queue');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        className={`mobile-dock-item ${isBookingsActive ? 'active' : ''}`}
+        aria-label="Bookings"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '6px 4px',
+          borderRadius: '10px',
+          border: 'none',
+          background: isBookingsActive ? BRAND_COLORS.primaryLight : 'transparent',
+          color: isBookingsActive ? BRAND_COLORS.primary : '#64748B',
+          cursor: 'pointer',
+          minHeight: '48px',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        <CalendarCheck
+          size={20}
+          color={isBookingsActive ? BRAND_COLORS.primary : '#64748B'}
+          strokeWidth={isBookingsActive ? 2.3 : 1.8}
+        />
+        <span style={{ fontSize: '10.5px', fontWeight: isBookingsActive ? 800 : 500 }}>
+          {language === 'en' ? 'Bookings' : 'বুকিংস'}
+        </span>
+      </button>
+
+      {/* 4. Messages / Helpline Support */}
+      <button
+        onClick={() => {
+          // Open helpline or support tab
+          if (typeof window !== 'undefined') {
+            const el = document.getElementById('footer-call-helpline-cta');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              window.location.href = `tel:${BRAND_COLORS.primary}`;
+            }
+          }
+        }}
+        className={`mobile-dock-item ${isMessagesActive ? 'active' : ''}`}
+        aria-label="Messages"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '6px 4px',
+          borderRadius: '10px',
+          border: 'none',
+          background: isMessagesActive ? BRAND_COLORS.primaryLight : 'transparent',
+          color: isMessagesActive ? BRAND_COLORS.primary : '#64748B',
+          cursor: 'pointer',
+          minHeight: '48px',
+          position: 'relative',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          <MessageSquare
+            size={20}
+            color={isMessagesActive ? BRAND_COLORS.primary : '#64748B'}
+            strokeWidth={isMessagesActive ? 2.3 : 1.8}
+          />
+          {unreadCount > 0 && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '-2px',
+                right: '-4px',
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: BRAND_COLORS.primary,
+              }}
+            />
+          )}
+        </div>
+        <span style={{ fontSize: '10.5px', fontWeight: isMessagesActive ? 800 : 500 }}>
+          {language === 'en' ? 'Messages' : 'মেসেজ'}
+        </span>
+      </button>
+
+      {/* 5. Profile */}
+      <button
+        onClick={() => {
+          if (onOpenAuth && !isProfileActive) {
+            onOpenAuth();
+          } else {
+            setActiveTab(isPatient ? 'profile' : 'portal');
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        className={`mobile-dock-item ${isProfileActive ? 'active' : ''}`}
+        aria-label="Profile"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '6px 4px',
+          borderRadius: '10px',
+          border: 'none',
+          background: isProfileActive ? BRAND_COLORS.primaryLight : 'transparent',
+          color: isProfileActive ? BRAND_COLORS.primary : '#64748B',
+          cursor: 'pointer',
+          minHeight: '48px',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        <User
+          size={20}
+          color={isProfileActive ? BRAND_COLORS.primary : '#64748B'}
+          strokeWidth={isProfileActive ? 2.3 : 1.8}
+        />
+        <span style={{ fontSize: '10.5px', fontWeight: isProfileActive ? 800 : 500 }}>
+          {language === 'en' ? 'Profile' : 'প্রোফাইল'}
+        </span>
+      </button>
+    </nav>
+  );
+}

@@ -1,23 +1,107 @@
 {
-  "name": "Diagnostic Care — Your Healthcare Marketplace",
-  "short_name": "DiagnosticCare",
-  "description": "Digital healthcare marketplace connecting patients and healthcare providers in Moulvibazar, Sylhet, and Bangladesh. Helpline: 01886748564",
+  "name": "Diagnostic Care",
+  "short_name": "Diagnostic Care",
+  "description": "Your Healthcare Marketplace",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#F8FAFC",
-  "theme_color": "#0B2545",
+  "orientation": "portrait",
+  "background_color": "#F8F7F4",
+  "theme_color": "#0057FF",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["medical", "health", "lifestyle"],
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/logo.png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find Doctors",
+      "short_name": "Doctors",
+      "description": "Search verified specialist doctors and chamber schedules across Bangladesh",
+      "url": "/?action=find-doctor",
+      "icons": [
+        {
+          "src": "/icons/shortcut-doctor.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Diagnostic Centers & Tests",
+      "short_name": "Tests",
+      "description": "Compare pathology, imaging and diagnostic laboratory test prices",
+      "url": "/?action=book-test",
+      "icons": [
+        {
+          "src": "/icons/shortcut-test.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "My Appointments",
+      "short_name": "Appointments",
+      "description": "Check serial tokens, chamber queues, and doctor schedules",
+      "url": "/?action=appointments",
+      "icons": [
+        {
+          "src": "/icons/shortcut-appointments.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Health Vault",
+      "short_name": "Health Vault",
+      "description": "Access encrypted lab reports and digital prescriptions anytime",
+      "url": "/?action=vault",
+      "icons": [
+        {
+          "src": "/icons/shortcut-vault.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Emergency Ambulance",
+      "short_name": "Emergency",
+      "description": "Call 24/7 healthcare helpline or dispatch emergency ambulance",
+      "url": "/?action=emergency",
+      "icons": [
+        {
+          "src": "/icons/shortcut-emergency.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
