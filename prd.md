@@ -3,7 +3,7 @@
 **Brand Name:** Diagnostic Care  
 **Tagline:** Your Healthcare Marketplace  
 **Customer Care:** 01886748564  
-**Primary Market:** Bangladesh (Initial Launch: Moulvibazar -> Sylhet Division -> Nationwide)  
+**Primary Market:** Bangladesh
 **Document Version:** 1.0.0  
 **Status:** Approved Architecture Specification  
 
