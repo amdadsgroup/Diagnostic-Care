@@ -508,3 +508,91 @@ CREATE INDEX idx_audit_user ON audit_logs(user_id);
 CREATE INDEX idx_audit_resource ON audit_logs(resource_type, resource_id);
 CREATE INDEX idx_audit_org ON audit_logs(organization_id);
 ```
+
+### 3.11 Doctor Booking Module Extension (`20261010000001_doctor_booking_module.sql`)
+
+```sql
+-- 1. Patient Family Members
+CREATE TABLE patient_family_members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    full_name VARCHAR(150) NOT NULL,
+    full_name_bn VARCHAR(150),
+    relationship VARCHAR(50) NOT NULL,
+    phone VARCHAR(20),
+    date_of_birth DATE,
+    age INT,
+    gender VARCHAR(20) NOT NULL,
+    blood_group VARCHAR(10),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_family_members_patient ON patient_family_members(patient_id);
+
+-- 2. Doctor Leaves and Schedule Exceptions
+CREATE TABLE doctor_leaves (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    doctor_id UUID NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    branch_id UUID REFERENCES provider_locations(id) ON DELETE SET NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    reason TEXT,
+    is_emergency BOOLEAN NOT NULL DEFAULT FALSE,
+    status general_status_enum NOT NULL DEFAULT 'active',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_leave_dates CHECK (end_date >= start_date)
+);
+CREATE INDEX idx_doctor_leaves_doctor ON doctor_leaves(doctor_id, start_date, end_date);
+
+CREATE TABLE schedule_exceptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    doctor_id UUID NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    schedule_id UUID REFERENCES doctor_schedules(id) ON DELETE CASCADE,
+    exception_date DATE NOT NULL,
+    is_available BOOLEAN NOT NULL DEFAULT FALSE,
+    custom_start_time TIME,
+    custom_end_time TIME,
+    reason TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_doctor_schedule_exception UNIQUE (doctor_id, exception_date)
+);
+
+-- 3. Doctor Assistant Invitations
+CREATE TABLE doctor_assistant_invitations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    doctor_id UUID NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    organization_id UUID,
+    branch_id UUID REFERENCES provider_locations(id) ON DELETE SET NULL,
+    invitee_email VARCHAR(255) NOT NULL,
+    invitee_phone VARCHAR(20),
+    invitee_name VARCHAR(150),
+    invitation_token VARCHAR(100) NOT NULL UNIQUE,
+    can_manage_queue BOOLEAN NOT NULL DEFAULT TRUE,
+    can_view_patient_info BOOLEAN NOT NULL DEFAULT TRUE,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days'),
+    accepted_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    accepted_at TIMESTAMPTZ,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 4. Booking Audit Events
+CREATE TABLE booking_audit_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+    booking_code VARCHAR(30),
+    doctor_id UUID REFERENCES doctors(id) ON DELETE SET NULL,
+    patient_id UUID REFERENCES patients(id) ON DELETE SET NULL,
+    event_type VARCHAR(100) NOT NULL,
+    actor_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    actor_role VARCHAR(50),
+    details JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_booking_audit_apt ON booking_audit_events(appointment_id);
+```
+

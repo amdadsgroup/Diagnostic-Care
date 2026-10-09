@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SlotBookingModal } from '@/components/SlotBookingModal';
@@ -35,6 +36,7 @@ import {
 } from 'lucide-react';
 
 export default function DoctorsPage() {
+  const router = useRouter();
   const { language, setLanguage, t, formatCurrency } = useLanguage();
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -710,9 +712,14 @@ export default function DoctorsPage() {
 
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                            <h2 style={{ fontSize: '17px', fontWeight: 800, color: '#10294F', margin: 0 }}>
-                              {doc.fullName}
-                            </h2>
+                            <Link
+                              href={`/doctors/${doc.id}`}
+                              style={{ textDecoration: 'none', color: '#10294F' }}
+                            >
+                              <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>
+                                {doc.fullName}
+                              </h2>
+                            </Link>
                             <ShieldCheck size={16} color="#15976A" />
                           </div>
 
@@ -817,22 +824,46 @@ export default function DoctorsPage() {
                       </div>
                     </div>
 
-                    {/* Action Button */}
+                    {/* Action Buttons: View Profile + Book */}
                     <div style={{ display: 'flex', gap: '10px', paddingTop: '14px', borderTop: '1px solid #EDF3F9' }}>
+                      <Link
+                        href={`/doctors/${doc.id}`}
+                        style={{
+                          flex: 1,
+                          backgroundColor: '#F0F5FD',
+                          border: '1px solid #D0E1FD',
+                          color: '#1769F5',
+                          padding: '10px',
+                          borderRadius: '10px',
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        <User size={14} />
+                        <span>{language === 'en' ? 'View Profile' : 'প্রোফাইল ও স্লট'}</span>
+                      </Link>
+
                       <button
                         onClick={() => {
                           if (assoc && slots.length > 0) {
                             handleSlotSelect(slots[0], assoc);
+                          } else {
+                            router.push(`/doctors/${doc.id}`);
                           }
                         }}
                         style={{
                           flex: 1,
                           backgroundColor: '#1769F5',
                           color: '#FFFFFF',
-                          padding: '11px',
+                          padding: '10px',
                           borderRadius: '10px',
                           border: 'none',
-                          fontSize: '13.5px',
+                          fontSize: '13px',
                           fontWeight: 700,
                           cursor: 'pointer',
                           display: 'flex',
@@ -842,16 +873,16 @@ export default function DoctorsPage() {
                           boxShadow: '0 4px 12px rgba(23, 105, 245, 0.2)',
                         }}
                       >
-                        <Calendar size={15} />
-                        <span>{language === 'en' ? 'Book Appointment' : 'সিরিয়াল নিশ্চিত করুন'}</span>
+                        <Calendar size={14} />
+                        <span>{language === 'en' ? 'Book Now' : 'সিরিয়াল নিন'}</span>
                       </button>
 
                       <a
                         href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
                         title="Helpline Booking"
                         style={{
-                          width: '42px',
-                          height: '42px',
+                          width: '40px',
+                          height: '40px',
                           borderRadius: '10px',
                           backgroundColor: '#F0F5FD',
                           border: '1px solid #E2EAF4',
@@ -860,9 +891,10 @@ export default function DoctorsPage() {
                           justifyContent: 'center',
                           color: '#1769F5',
                           textDecoration: 'none',
+                          flexShrink: 0,
                         }}
                       >
-                        <Phone size={16} />
+                        <Phone size={15} />
                       </a>
                     </div>
                   </div>

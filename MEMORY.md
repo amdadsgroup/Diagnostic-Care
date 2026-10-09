@@ -195,3 +195,46 @@
       - `HOME_CARE` / `NURSING` -> Home Healthcare booking.
       - `EMERGENCY` / `BLOOD_SERVICES` -> 24/7 Priority Helpline Console.
   - Next.js 15 production build verified: 26/26 routes compiled cleanly (Code 0, zero errors).
+
+- **Phase 13: Doctor Booking Module Implementation & Production Readiness** — [COMPLETED]
+  - **Doctor Discovery & Profile System (`/doctors/[id]` & `/doctors`):**
+    - Built comprehensive Doctor Detail Profile page (`src/app/doctors/[id]/page.tsx`) rendering BMDC verified badge, medical degrees, specialization, institute, experience, languages spoken (Bangla, English, Sylheti), and provider-supplied bio.
+    - Associated practicing chambers & branches with consultation fees, follow-up fee rules (14-day window), and chamber room numbers.
+    - 7-day interactive date selector with Asia/Dhaka local timezone scheduling.
+    - Discrete 15-minute time slot grid (`16:00`, `16:15`, `16:30`, ...) with real-time status and token numbering.
+    - Chamber guidelines & cancellation policy (free cancellation up to 2 hours prior to slot, cash-at-desk toggle).
+  - **Incremental Database Schema Migration (`supabase/migrations/20261010000001_doctor_booking_module.sql`):**
+    - `patient_family_members`: Secure patient family member management with relationships, ages, and blood groups.
+    - `doctor_leaves`: Doctor vacation/leave manager with automatic chamber slot blockage.
+    - `schedule_exceptions`: Date-specific overrides and holiday schedule exceptions.
+    - `doctor_assistant_invitations`: Secure 7-day tokenized assistant invitation system with restricted permission flags (`can_manage_queue`, `can_view_patient_info`).
+    - `booking_audit_events`: Immutable audit logging for slot holds, confirmations, cancellations, and status transitions.
+    - Strict Row Level Security (RLS) policies implemented on all new tables.
+  - **High-Concurrency Double-Booking Prevention & Battle Test (`scripts/concurrency-race-test.js`):**
+    - Automated concurrency test executed against local server:
+      - Test 1 (2 simultaneous contenders): Exactly 1 patient acquired hold (HTTP 200), 1 received HTTP 409 Conflict in 11ms.
+      - Test 2 (10 simultaneous contenders): Exactly 1 winner, 9 conflicts rejected.
+      - Test 3 (5 consecutive stress rounds with 6 contenders each): Invariant passed 100%.
+  - **Dedicated Patient Dashboard (`/appointments` & `/patient/dashboard`):**
+    - Upcoming appointments with token numbering, booking references, and cancellation dialog with SMS confirmation.
+    - Past appointments with prescription download links.
+    - Family member manager (add/remove family profiles with relationship autofill).
+    - Saved specialist doctors with one-click booking triggers.
+    - Account preferences (English/Bangla toggle, SMS alert status, customer care helpline `01886748564`).
+  - **Dedicated Doctor Portal (`/doctor/dashboard` & `/doctor/portal`):**
+    - Live appointment queue with `Call Next Patient`, `In-Room`, `Completed`, and `No-Show` status advancement.
+    - Daily queue metrics (total patients, in-room token, completed count, revenue collected).
+    - Active patient digital Rx prescription writer with medication dosage in Bangla/English, days, and recommended diagnostic tests.
+    - Weekly schedule viewer across practicing branches.
+    - Leave & holiday scheduler with automatic chamber slot conflict avoidance.
+  - **Dedicated Doctor Assistant Portal (`/assistant/dashboard`):**
+    - Sandboxed assistant session scoped strictly to assigned doctor and branch.
+    - Patient check-in and queue token advancement.
+    - Medical history, prescriptions, and financial records strictly locked out server-side.
+    - Assistant invitation and access revocation workflow.
+  - **Production Build & Verification:**
+    - Next.js 15 production build compiled cleanly across 47 static & dynamic routes (Code 0).
+    - Master E2E Audit Suite: 12/12 test suites passed (100%).
+    - Auth & Language Audit: 14/14 checks passed (100%).
+    - Operational Backup & Recovery Drill: 4/4 drills passed (100%).
+    - Concurrency Battle Test: 3/3 test suites passed (100%).

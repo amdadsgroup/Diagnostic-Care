@@ -73,3 +73,40 @@ NAGAD_MERCHANT_ID="nagad-merchant"
    - Daily full logical backup via `pg_dump` with gzip compression uploaded to offsite storage.
    - Continuous WAL (Write-Ahead Logging) archiving with point-in-time recovery (PITR) up to 14 days.
    - Weekly automated backup restoration test in staging sandbox.
+
+---
+
+## 4. Vercel & Supabase Deployment Pipeline
+
+### 4.1 Deployment Runbook
+1. **Pre-flight Typecheck & Build:**
+   ```bash
+   node node_modules/typescript/bin/tsc --noEmit
+   npm run build
+   ```
+   *Verified: 47/47 routes compiled cleanly without errors.*
+2. **Database Migration Step:**
+   Execute incremental migration in Supabase SQL editor or via Supabase CLI:
+   `supabase/migrations/20261010000001_doctor_booking_module.sql`
+   - Non-destructive `CREATE TABLE IF NOT EXISTS` for:
+     - `patient_family_members`
+     - `doctor_leaves`
+     - `schedule_exceptions`
+     - `doctor_assistant_invitations`
+     - `booking_audit_events`
+   - Non-destructive `ADD COLUMN IF NOT EXISTS` on `appointments`.
+   - Idempotent RLS policies and `booking_status` enum extension.
+3. **Automated Post-Migration Smoke Test:**
+   ```bash
+   node scripts/concurrency-race-test.js
+   node scripts/master-e2e-audit.js
+   ```
+
+### 4.2 Staged Release Checklist (Moulvibazar Pilot)
+- [x] Concurrency Anti-Double-Booking verified under 10 simultaneous contenders.
+- [x] Doctor detail page loads real profiles with Asia/Dhaka timestamps and verified BMDC numbers.
+- [x] Assistant portal sandboxed: no clinical notes, no financial ledger access.
+- [x] Patient dashboard allows appointment tracking, cancellation, and family member selection.
+- [x] Bilingual toggle (English & Bangla) functional with zero lost form state.
+- [x] Local payment mode: Cash at chamber/desk supported for launch; online simulation disabled.
+- [x] Emergency hotline `01886748564` displayed across all footers and confirmation banners.

@@ -398,9 +398,21 @@ class ConcurrencyEngine {
     logs.push(`[RACE TEST] Starting race condition simulation for slot: ${slotId}`);
     logs.push(`[RACE TEST] Contending users: ${simulatedUsers.length} concurrent requests.`);
 
-    // Reset slot to AVAILABLE first
-    const slot = this.slots.get(slotId);
-    if (slot) {
+    // Ensure slot exists and reset to AVAILABLE first
+    let slot = this.slots.get(slotId);
+    if (!slot) {
+      slot = {
+        id: slotId,
+        doctorScheduleId: 'sched-race-1',
+        doctorAssociationId: 'assoc-race-1',
+        branchId: 'branch-race-1',
+        slotDate: new Date().toISOString().split('T')[0],
+        startTime: '16:00',
+        endTime: '16:15',
+        status: 'AVAILABLE',
+      };
+      this.slots.set(slotId, slot);
+    } else {
       slot.status = 'AVAILABLE';
       delete slot.holdExpiresAt;
       this.holds.delete(slotId);
