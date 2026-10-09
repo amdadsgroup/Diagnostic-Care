@@ -158,6 +158,11 @@ export default function HomePage() {
       const params = new URLSearchParams(window.location.search);
       const action = params.get('action');
       const tab = params.get('tab');
+      const category = params.get('category');
+
+      if (category && ['DOCTOR', 'DIAGNOSTIC_CENTER', 'HOSPITAL', 'PHARMACY', 'AMBULANCE', 'HOME_CARE', 'BLOOD', 'PACKAGE'].includes(category)) {
+        setActiveCategory(category as HealthcareCategoryKey);
+      }
 
       if (action === 'find-doctor' || action === 'book-test') {
         setActiveTab('search');

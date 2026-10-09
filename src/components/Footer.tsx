@@ -445,10 +445,10 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
             }}
           >
             <li>
-              <a href="#privacy" style={{ color: 'inherit' }}>Privacy Policy</a>
+              <a href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
             </li>
             <li>
-              <a href="#terms" style={{ color: 'inherit' }}>Terms of Service</a>
+              <a href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</a>
             </li>
             <li>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#93C5FD', fontSize: '12px', marginTop: '6px' }}>

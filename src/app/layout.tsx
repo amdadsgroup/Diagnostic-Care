@@ -94,6 +94,34 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="mobile-web-app-capable" content="yes" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'MedicalBusiness',
+              name: 'Diagnostic Care',
+              alternateName: 'ডায়াগনস্টিক কেয়ার',
+              description:
+                'Bangladesh digital healthcare marketplace connecting patients with verified doctors, diagnostic laboratories, hospitals, and 24/7 emergency services.',
+              url: 'https://diagnosticcare.com.bd',
+              telephone: '01886748564',
+              priceRange: '৳৳',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Moulvibazar Sadar',
+                addressRegion: 'Sylhet',
+                addressCountry: 'BD',
+              },
+              areaServed: {
+                '@type': 'Country',
+                name: 'Bangladesh',
+              },
+              availableLanguage: ['en', 'bn'],
+              openingHours: 'Mo,Tu,We,Th,Fr,Sa,Su 00:00-24:00',
+            }),
+          }}
+        />
       </head>
       <body>
         <LanguageProvider>
