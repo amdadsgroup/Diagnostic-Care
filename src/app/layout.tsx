@@ -14,20 +14,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://diagnosticcare.com.bd'),
-  title: `${BRAND_CONSTANTS.BRAND_NAME} — ${BRAND_CONSTANTS.TAGLINE}`,
-  description: `Bangladesh's digital healthcare marketplace connecting patients with verified diagnostic centers, specialist doctors, hospitals, clinics, pharmacies and 24/7 ambulance services in ${BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION}, Sylhet, and nationwide. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
+  title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
+  description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians, check real-time chamber serial queues, and book guaranteed appointments in ${BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION}, Sylhet, and nationwide. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
   applicationName: BRAND_CONSTANTS.BRAND_NAME,
   keywords: [
     'Diagnostic Care',
-    'Your Healthcare Marketplace',
-    'Healthcare Marketplace Bangladesh',
+    'Doctor Booking Bangladesh',
     'Doctor Appointment Moulvibazar',
-    'Diagnostic Center Moulvibazar',
-    'Popular Diagnostic Center',
-    'Pathology Lab Test Bangladesh',
+    'Specialist Doctor Chamber',
     'BMDC Doctor Chamber',
-    'Ambulance Bangladesh',
-    'Health Vault',
+    'Live Chamber Serial Queue',
+    'Cardiologist Moulvibazar',
+    'Gynecologist Moulvibazar',
+    'Pediatrician Moulvibazar',
+    'Digital Prescription Bangladesh',
   ],
   authors: [{ name: BRAND_CONSTANTS.BRAND_NAME }],
   creator: BRAND_CONSTANTS.BRAND_NAME,
@@ -56,8 +56,8 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   openGraph: {
-    title: `${BRAND_CONSTANTS.BRAND_NAME} — ${BRAND_CONSTANTS.TAGLINE}`,
-    description: `Bangladesh's premier digital healthcare marketplace. Find verified specialist doctors, book laboratory diagnostic tests, locate hospitals, call 24/7 emergency ambulance, and store encrypted health records.`,
+    title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
+    description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians and real-time chamber serial queues.`,
     url: 'https://diagnosticcare.com.bd',
     siteName: BRAND_CONSTANTS.BRAND_NAME,
     images: [
@@ -73,8 +73,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${BRAND_CONSTANTS.BRAND_NAME} — ${BRAND_CONSTANTS.TAGLINE}`,
-    description: `Bangladesh's digital healthcare marketplace. Connect with verified doctors, diagnostic centers, hospitals & 24/7 ambulance.`,
+    title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
+    description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians.`,
     images: [BRAND_LOGOS.ogImage],
   },
 };

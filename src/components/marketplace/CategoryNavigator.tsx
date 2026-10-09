@@ -3,47 +3,33 @@
 import React from 'react';
 import {
   Stethoscope,
-  TestTube2,
-  Building2,
   HeartPulse,
-  Pill,
-  Ambulance,
-  Home,
-  UserCheck,
-  Droplet,
-  PackageCheck,
-  Microscope,
-  ShieldAlert,
-  ArrowRight,
+  Baby,
+  Activity,
+  Bone,
   Sparkles,
+  Smile,
+  ArrowRight,
 } from 'lucide-react';
-import { SupportedLanguage, BRAND_COLORS } from '@/config/brand';
-import { TRANSLATIONS } from '@/i18n/translations';
+import { SupportedLanguage } from '@/config/brand';
 
 export type HealthcareCategoryKey =
   | 'ALL'
   | 'DOCTOR'
   | 'DOCTORS'
-  | 'DIAGNOSTIC_CENTER'
-  | 'DIAGNOSTIC_TESTS'
-  | 'TESTS'
-  | 'HOSPITAL'
-  | 'HOSPITALS'
-  | 'PHARMACY'
-  | 'PHARMACIES'
-  | 'AMBULANCE'
-  | 'HOME_CARE'
-  | 'NURSING'
-  | 'BLOOD_SERVICES'
-  | 'PACKAGES'
-  | 'MEDICAL_EQUIPMENT'
-  | 'EMERGENCY';
+  | 'Cardiologist'
+  | 'Gynecologist'
+  | 'Pediatrics'
+  | 'Medicine'
+  | 'Orthopedics'
+  | 'Dermatology'
+  | 'Dentist'
+  | 'Neurology'
+  | 'ENT';
 
 interface CategoryNavigatorProps {
-  activeCategory: HealthcareCategoryKey;
-  onSelectCategory: (category: HealthcareCategoryKey) => void;
-  onOpenAmbulanceModal?: () => void;
-  onOpenHomeCareModal?: () => void;
+  activeCategory: string;
+  onSelectCategory: (specialty: string) => void;
   onOpenSupportModal?: () => void;
   language?: SupportedLanguage;
 }
@@ -51,170 +37,161 @@ interface CategoryNavigatorProps {
 export default function CategoryNavigator({
   activeCategory,
   onSelectCategory,
-  onOpenAmbulanceModal,
-  onOpenHomeCareModal,
-  onOpenSupportModal,
   language = 'en',
 }: CategoryNavigatorProps) {
-  const t = TRANSLATIONS[language];
-
-  // Official Category Card Definitions adhering to brand icon language & required fields
-  const categories = [
+  const specialties = [
     {
-      key: 'DOCTOR' as const,
-      nameEn: 'Doctor',
-      nameBn: 'বিশেষজ্ঞ ডাক্তার',
-      descEn: 'Find and book verified doctors',
-      descBn: 'সান্ধ্যকালীন চেম্বার ও কনসালটেশন',
-      infoEn: 'BMDC Registered • Moulvibazar Hub',
-      infoBn: 'বিএমডিসি রেজিস্টার্ড স্পেশালিস্ট',
-      actionEn: 'Book Doctor',
-      actionBn: 'সিরিয়াল নিন',
+      key: 'ALL',
+      nameEn: 'All Doctors',
+      nameBn: 'সব ডাক্তার',
+      descEn: 'Browse all verified specialists',
+      descBn: 'সকল ভেরিফায়েড বিশেষজ্ঞ চিকিৎসক',
+      count: '1,200+ Doctors',
       icon: Stethoscope,
+      bg: 'rgba(15, 118, 110, 0.1)',
+      color: '#0F766E',
     },
     {
-      key: 'DIAGNOSTIC_CENTER' as const,
-      nameEn: 'Diagnostic Centers',
-      nameBn: 'ডায়াগনস্টিক সেন্টার',
-      descEn: 'Find nearby diagnostic services',
-      descBn: 'আধুনিক প্যাথলজি ল্যাব ও চেম্বার',
-      infoEn: 'Accredited Labs • Fast Turnaround',
-      infoBn: 'অ্যাক্রিডিটেড ল্যাব নেটওয়ার্ক',
-      actionEn: 'Find Centers',
-      actionBn: 'সেন্টার খুঁজুন',
-      icon: Building2,
-    },
-    {
-      key: 'DIAGNOSTIC_TESTS' as const,
-      nameEn: 'Diagnostic Tests',
-      nameBn: 'প্যাথলজি ও টেস্ট',
-      descEn: 'Book lab tests & compare prices',
-      descBn: 'রক্ত, প্রস্রাব ও রেডিওলজি টেস্ট',
-      infoEn: 'Transparent Pricing • Digital Reports',
-      infoBn: 'স্বচ্ছ মূল্য • ডিজিটাল রিপোর্ট',
-      actionEn: 'Book Test',
-      actionBn: 'টেস্ট বুক করুন',
-      icon: TestTube2,
-    },
-    {
-      key: 'HOSPITAL' as const,
-      nameEn: 'Hospitals & Clinics',
-      nameBn: 'হাসপাতাল ও ক্লিনিক',
-      descEn: 'Discover healthcare facilities',
-      descBn: 'ভর্তি, ওটি ও সার্বক্ষণিক চিকিৎসা',
-      infoEn: '24/7 Inpatient • Verified Care',
-      infoBn: 'সার্বক্ষণিক ইনপেশেন্ট সেবা',
-      actionEn: 'Explore Clinics',
-      actionBn: 'হাসপাতাল দেখুন',
+      key: 'Cardiologist',
+      nameEn: 'Cardiology',
+      nameBn: 'কার্ডিওলজি (হৃদরোগ)',
+      descEn: 'Heart, ECG, Echo & Cardiac care',
+      descBn: 'হৃদরোগ, ইসিজি ও কার্ডিয়াক কেয়ার',
+      count: '140+ Doctors',
       icon: HeartPulse,
+      bg: 'rgba(239, 68, 68, 0.1)',
+      color: '#DC2626',
     },
     {
-      key: 'PHARMACY' as const,
-      nameEn: 'Pharmacies',
-      nameBn: 'ফার্মেসি ও ঔষধ',
-      descEn: 'Find medicines and pharmacy services',
-      descBn: 'জেনুইন ঔষধ ও প্রেসক্রিপশন সার্ভিস',
-      infoEn: '100% Genuine • Licensed Pharmacies',
-      infoBn: 'লাইসেন্সপ্রাপ্ত ফার্মেসি',
-      actionEn: 'Find Medicines',
-      actionBn: 'ঔষধ খুঁজুন',
-      icon: Pill,
+      key: 'Medicine',
+      nameEn: 'General Medicine',
+      nameBn: 'জেনারেল মেডিসিন',
+      descEn: 'Internal medicine & chronic care',
+      descBn: 'সাধারণ রোগ, ডায়াবেটিস ও জ্বর',
+      count: '320+ Doctors',
+      icon: Activity,
+      bg: 'rgba(37, 99, 235, 0.1)',
+      color: '#2563EB',
     },
     {
-      key: 'AMBULANCE' as const,
-      nameEn: 'Ambulance',
-      nameBn: 'জরুরি অ্যাম্বুলেন্স',
-      descEn: 'Find emergency ambulance services',
-      descBn: 'আইসিইউ ও এসি অ্যাম্বুলেন্স সার্ভিস',
-      infoEn: '24/7 Immediate Dispatch',
-      infoBn: '২৪/৭ তাৎক্ষণিক ডিসপ্যাচ',
-      actionEn: 'Dispatch Now',
-      actionBn: 'কল করুন',
-      icon: Ambulance,
-      isEmergency: true,
+      key: 'Gynecologist',
+      nameEn: 'Gynecology & Obs',
+      nameBn: 'স্ত্রী ও প্রসূতি রোগ',
+      descEn: "Maternity, pregnancy & women's care",
+      descBn: 'মাতৃত্ব, গর্ভকালীন ও প্রসূতি সেবা',
+      count: '190+ Doctors',
+      icon: Sparkles,
+      bg: 'rgba(217, 70, 239, 0.1)',
+      color: '#C026D3',
     },
     {
-      key: 'HOME_CARE' as const,
-      nameEn: 'Home Healthcare',
-      nameBn: 'হোম হেলথকেয়ার',
-      descEn: 'Get healthcare at home',
-      descBn: 'বাসায় গিয়ে ল্যাব স্যাম্পল ও সেবা',
-      infoEn: 'Doorstep Phlebotomy & Vitals',
-      infoBn: 'বাসায় ল্যাব স্যাম্পল সংগ্রহ',
-      actionEn: 'Request Care',
-      actionBn: 'হোম কেয়ার নিন',
-      icon: Home,
+      key: 'Pediatrics',
+      nameEn: 'Pediatrics',
+      nameBn: 'শিশু রোগ বিশেষজ্ঞ',
+      descEn: 'Newborn, infant & child health',
+      descBn: 'নবজাতক ও শিশু বিশেষজ্ঞ চিকিৎসক',
+      count: '160+ Doctors',
+      icon: Baby,
+      bg: 'rgba(245, 158, 11, 0.1)',
+      color: '#D97706',
     },
     {
-      key: 'BLOOD_SERVICES' as const,
-      nameEn: 'Blood Bank',
-      nameBn: 'ব্লাড ব্যাংক',
-      descEn: 'Emergency blood donor network',
-      descBn: 'জরুরি রক্তের গ্রুপ ও ডোনার সংযোগ',
-      infoEn: 'All Blood Groups • Instant Match',
-      infoBn: 'সকল রক্তের গ্রুপ প্রস্তুত',
-      actionEn: 'Find Blood',
-      actionBn: 'রক্ত খুঁজুন',
-      icon: Droplet,
+      key: 'Orthopedics',
+      nameEn: 'Orthopedics',
+      nameBn: 'অর্থোপেডিকস (হাড়)',
+      descEn: 'Bones, joints, fractures & spine',
+      descBn: 'হাড়, জোড়া, বাত ও স্পাইন কেয়ার',
+      count: '110+ Doctors',
+      icon: Bone,
+      bg: 'rgba(13, 148, 136, 0.1)',
+      color: '#0D9488',
     },
     {
-      key: 'PACKAGES' as const,
-      nameEn: 'Health Packages',
-      nameBn: 'হেলথ প্যাকেজ',
-      descEn: 'Executive full body checkups',
-      descBn: 'সম্পূর্ণ শারীরিক স্বাস্থ্য স্ক্রিনিং',
-      infoEn: 'Special Discounts Included',
-      infoBn: 'প্যাকেজে বিশেষ মূল্যছাড়',
-      actionEn: 'View Packages',
-      actionBn: 'প্যাকেজ দেখুন',
-      icon: PackageCheck,
+      key: 'Dermatology',
+      nameEn: 'Dermatology',
+      nameBn: 'চর্ম ও যৌন রোগ',
+      descEn: 'Skin, hair, allergy & cosmetic care',
+      descBn: 'ত্বক, চুল, এলার্জি ও চর্মরোগ',
+      count: '95+ Doctors',
+      icon: Sparkles,
+      bg: 'rgba(168, 85, 247, 0.1)',
+      color: '#9333EA',
+    },
+    {
+      key: 'Dentist',
+      nameEn: 'Dentistry',
+      nameBn: 'দন্ত ও ডেন্টাল সার্জারি',
+      descEn: 'Teeth, gums, root canal & dental care',
+      descBn: 'দাঁত, মাড়ি ও রুট ক্যানেল সার্জারি',
+      count: '80+ Doctors',
+      icon: Smile,
+      bg: 'rgba(6, 182, 212, 0.1)',
+      color: '#0891B2',
     },
   ];
 
   return (
-    <section style={{ marginBottom: '40px' }} aria-labelledby="category-section-title">
+    <div style={{ width: '100%', marginBottom: '16px' }}>
       {/* Section Header */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
-          marginBottom: '20px',
+          marginBottom: '24px',
           flexWrap: 'wrap',
           gap: '12px',
         }}
       >
         <div>
           <div
+            className="glass-badge-teal"
             style={{
               fontSize: '11px',
-              fontWeight: 700,
-              color: BRAND_COLORS.primary,
+              fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              marginBottom: '4px',
+              marginBottom: '6px',
             }}
           >
-            {t.categoriesTitle}
+            {language === 'en' ? 'MEDICAL SPECIALTIES' : 'মেডিকেল স্পেশালিস্ট ক্যাটাগরি'}
           </div>
           <h2
-            id="category-section-title"
             style={{
-              fontSize: '22px',
+              fontSize: '24px',
               fontWeight: 800,
-              color: '#000000',
+              color: 'var(--color-text-primary)',
               letterSpacing: '-0.02em',
+              margin: 0,
             }}
           >
-            {language === 'en' ? 'Healthcare Services & Facilities' : 'স্বাস্থ্যসেবা ও ক্লিনিক্যাল ফ্যাসিলিটি'}
+            {language === 'en' ? 'Find by Medical Specialty' : 'বিভাগ অনুযায়ী বিশেষজ্ঞ ডাক্তার খুঁজুন'}
           </h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '13.5px', marginTop: '4px', margin: 0 }}>
+            {language === 'en'
+              ? 'Select a department to filter verified BMDC doctors and view available appointments.'
+              : 'বিভাগ নির্বাচন করে ভেরিফাইড ডাক্তারের চেম্বার ও আজকের সিরিয়াল দেখুন।'}
+          </p>
         </div>
-        <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>
-          {t.categoriesSubtitle}
-        </p>
+
+        <a
+          href="/doctors"
+          style={{
+            fontSize: '13px',
+            fontWeight: 700,
+            color: 'var(--color-primary)',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <span>{language === 'en' ? 'View All Doctors' : 'সব ডাক্তার দেখুন'}</span>
+          <ArrowRight size={14} />
+        </a>
       </div>
 
-      {/* Categories Grid */}
+      {/* Specialty Grid */}
       <div
         style={{
           display: 'grid',
@@ -222,156 +199,106 @@ export default function CategoryNavigator({
           gap: '16px',
         }}
       >
-        {categories.map((cat) => {
-          const isSelected =
-            activeCategory === cat.key ||
-            (cat.key === 'DOCTOR' && activeCategory === 'DOCTORS') ||
-            (cat.key === 'DIAGNOSTIC_TESTS' && activeCategory === 'TESTS');
-          const Icon = cat.icon;
+        {specialties.map((item) => {
+          const Icon = item.icon;
+          const isSelected = activeCategory.toLowerCase() === item.key.toLowerCase();
 
           return (
             <div
-              key={cat.key}
-              onClick={() => {
-                onSelectCategory(cat.key);
-                if (cat.key === 'AMBULANCE' && onOpenAmbulanceModal) {
-                  onOpenAmbulanceModal();
-                } else if (cat.key === 'HOME_CARE' && onOpenHomeCareModal) {
-                  onOpenHomeCareModal();
-                } else if (cat.key === 'BLOOD_SERVICES' && onOpenSupportModal) {
-                  onOpenSupportModal();
-                }
-              }}
-              className="service-card"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onSelectCategory(cat.key);
-                }
-              }}
+              key={item.key}
+              onClick={() => onSelectCategory(item.key)}
+              className="glass-card-interactive"
               style={{
-                backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.88)' : 'var(--glass-surface-card)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                borderRadius: '20px',
-                padding: '22px',
-                border: isSelected
-                  ? `2px solid ${BRAND_COLORS.primary}`
-                  : '1px solid var(--glass-border)',
+                padding: '20px',
+                borderRadius: '18px',
+                border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--glass-border)',
+                backgroundColor: isSelected ? 'rgba(221, 247, 240, 0.75)' : 'var(--glass-surface-card)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '14px',
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                position: 'relative',
-                boxShadow: isSelected
-                  ? 'var(--glass-shadow-hover)'
-                  : 'var(--glass-shadow-card)',
+                boxShadow: isSelected ? '0 8px 24px rgba(15, 118, 110, 0.2)' : 'var(--glass-shadow-sm)',
               }}
             >
-              {/* Top Row: Service Icon & Optional Status Badge */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
                 <div
-                  className="clay-bubble"
                   style={{
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '16px',
-                    backgroundColor: isSelected ? BRAND_COLORS.primary : BRAND_COLORS.primaryLight,
-                    color: isSelected ? '#FFFFFF' : BRAND_COLORS.primary,
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '14px',
+                    backgroundColor: item.bg,
+                    color: item.color,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     flexShrink: 0,
-                    boxShadow: isSelected ? 'var(--clay-btn-primary-shadow)' : 'var(--clay-pill-shadow)',
+                    border: `1px solid ${item.color}30`,
                   }}
                 >
-                  <Icon size={24} strokeWidth={2.2} />
+                  <Icon size={22} />
                 </div>
 
-                {cat.isEmergency && (
-                  <span
-                    className="clay-badge-rose"
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
                     style={{
-                      fontSize: '10px',
-                      padding: '3px 10px',
-                      borderRadius: '9999px',
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      color: 'var(--color-text-primary)',
+                      lineHeight: 1.25,
                     }}
                   >
-                    24/7 LIVE
-                  </span>
-                )}
-              </div>
-
-              {/* Service Info */}
-              <div>
-                <h3
-                  style={{
-                    fontSize: '16.5px',
-                    fontWeight: 800,
-                    color: '#10294F',
-                    lineHeight: 1.25,
-                    marginBottom: '5px',
-                  }}
-                >
-                  {language === 'en' ? cat.nameEn : cat.nameBn}
-                </h3>
-                <p
-                  style={{
-                    fontSize: '12.5px',
-                    color: '#576982',
-                    lineHeight: 1.45,
-                    marginBottom: '8px',
-                  }}
-                >
-                  {language === 'en' ? cat.descEn : cat.descBn}
-                </p>
-
-                {/* Location / Count info */}
-                <div
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#8FA2BA',
-                  }}
-                >
-                  {language === 'en' ? cat.infoEn : cat.infoBn}
+                    {language === 'en' ? item.nameEn : item.nameBn}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--color-text-secondary)',
+                      marginTop: '4px',
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {language === 'en' ? item.descEn : item.descBn}
+                  </div>
                 </div>
               </div>
 
-              {/* Clear Action Link */}
               <div
-                className="clay-pill"
                 style={{
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: isSelected ? '#1769F5' : '#10294F',
-                  width: 'fit-content',
-                  padding: '6px 14px',
-                  border: '1.5px solid rgba(255, 255, 255, 0.95)',
+                  justifyContent: 'space-between',
+                  paddingTop: '10px',
+                  borderTop: '1px solid rgba(226, 232, 240, 0.6)',
                 }}
               >
-                <span>{language === 'en' ? cat.actionEn : cat.actionBn}</span>
-                <ArrowRight size={13} color="#1769F5" />
+                <span
+                  style={{
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    color: isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                  }}
+                >
+                  {item.count}
+                </span>
+
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    color: 'var(--color-primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  {language === 'en' ? 'Find' : 'দেখুন'}
+                  <ArrowRight size={13} />
+                </span>
               </div>
             </div>
           );
         })}
       </div>
-
-      <style jsx>{`
-        .service-card:hover {
-          transform: translateY(-4px) scale(1.01);
-          border-color: rgba(23, 105, 245, 0.35);
-          box-shadow: var(--clay-card-hover-shadow);
-        }
-      `}</style>
-    </section>
+    </div>
   );
 }

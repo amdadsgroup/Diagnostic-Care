@@ -44,10 +44,10 @@ export default function ComprehensiveAdminConsole() {
 
   const fetchProviders = async () => {
     try {
-      const res = await fetch('/api/services/hospitals');
+      const res = await fetch('/api/admin/verify-provider');
       const data = await res.json();
-      if (data.success) {
-        setProviders(data.hospitals);
+      if (data.success && data.providers) {
+        setProviders(data.providers);
       }
     } catch {
       // Fallback

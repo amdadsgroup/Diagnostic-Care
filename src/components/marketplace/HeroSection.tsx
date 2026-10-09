@@ -43,14 +43,14 @@ export default function HeroSection({
   onSelectCategory,
 }: HeroSectionProps) {
   const t = TRANSLATIONS[language];
-  const [activeSearchTab, setActiveSearchTab] = useState<'ALL' | 'DOCTOR' | 'TEST' | 'CENTER' | 'HOSPITAL'>('ALL');
+  const [activeSearchTab, setActiveSearchTab] = useState<string>('ALL');
 
   const popularSearches = [
-    { labelEn: 'Cardiologist in Moulvibazar', labelBn: 'হৃদরোগ বিশেষজ্ঞ মৌলভীবাজার', query: 'Cardiologist' },
-    { labelEn: 'Complete Blood Count (CBC)', labelBn: 'সিবিসি টেস্ট (CBC with ESR)', query: 'CBC' },
-    { labelEn: 'Popular Diagnostic Center', labelBn: 'পপুলার ডায়াগনস্টিক সেন্টার', query: 'Popular' },
-    { labelEn: '4D Ultrasonography (USG)', labelBn: 'আল্ট্রাসনোগ্রাফি (USG)', query: 'Ultrasonography' },
-    { labelEn: 'Lipid Profile Fasting', labelBn: 'লিপিড প্রোফাইল টেস্ট', query: 'Lipid' },
+    { labelEn: 'Dr. Anisur Rahman (Cardiologist)', labelBn: 'ডাঃ আনিসুর রহমান (হৃদরোগ)', query: 'Anisur' },
+    { labelEn: 'Gynecologist in Moulvibazar', labelBn: 'স্ত্রী ও প্রসূতিরোগ বিশেষজ্ঞ', query: 'Gynecologist' },
+    { labelEn: 'Pediatrician (Child Specialist)', labelBn: 'শিশু রোগ বিশেষজ্ঞ', query: 'Pediatrics' },
+    { labelEn: 'Medicine & Diabetologist', labelBn: 'মেডিসিন ও ডায়াবেটিস বিশেষজ্ঞ', query: 'Medicine' },
+    { labelEn: 'Orthopedic Surgeon', labelBn: 'অর্থোপেডিক ও ট্রমা বিশেষজ্ঞ', query: 'Orthopedics' },
   ];
 
   return (
@@ -135,7 +135,7 @@ export default function HeroSection({
                 color: '#15313B',
               }}
             >
-              {language === 'en' ? 'Find the Right Doctor, With Confidence.' : 'সঠিক ডাক্তার খুঁজুন, সম্পূর্ণ আস্থার সাথে।'}
+              {language === 'en' ? 'Find the Right Doctor, Book Instant Chamber Serial.' : 'সঠিক ডাক্তার খুঁজুন, তাৎক্ষণিক চেম্বার সিরিয়াল বুক করুন।'}
             </h1>
 
             {/* Subheadline */}
@@ -149,7 +149,7 @@ export default function HeroSection({
               }}
             >
               {language === 'en' 
-                ? 'Discover healthcare professionals, compare available appointments, and book care through one trusted platform.'
+                ? 'Discover verified specialist doctors, check real-time chamber schedules, and confirm your appointment with guaranteed slot reservation.'
                 : 'অভিজ্ঞ ডাক্তার খুঁজুন, চেম্বারের সময়সূচী দেখুন এবং সহজে নির্ভরযোগ্য অ্যাপয়েন্টমেন্ট বুক করুন।'}
             </p>
 
@@ -169,9 +169,9 @@ export default function HeroSection({
               </a>
               <button
                 onClick={() => {
-                  const el = document.getElementById('marketplace-categories');
+                  const el = document.getElementById('doctor-discovery-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  else window.location.href = '/tests';
+                  else window.location.href = '/doctors';
                 }}
                 className="btn-outline"
                 style={{
@@ -179,8 +179,8 @@ export default function HeroSection({
                   fontSize: '14px',
                 }}
               >
-                <Building2 size={16} color="#0F766E" />
-                <span>{language === 'en' ? 'Explore Healthcare Services' : 'সকল স্বাস্থ্যসেবা দেখুন'}</span>
+                <Activity size={16} color="#0F766E" />
+                <span>{language === 'en' ? 'Chamber Schedules & Queue' : 'চেম্বার শিডিউল ও কিউ'}</span>
               </button>
             </div>
 
@@ -192,7 +192,7 @@ export default function HeroSection({
                 marginBottom: '20px',
               }}
             >
-              {/* Category Filter Tabs */}
+              {/* Category Filter Tabs: Doctor Specialties */}
               <div
                 style={{
                   display: 'flex',
@@ -203,16 +203,17 @@ export default function HeroSection({
                 }}
               >
                 {[
-                  { id: 'ALL', label: t.searchTypeUniversal },
-                  { id: 'DOCTOR', label: t.searchTypeDoctors },
-                  { id: 'TEST', label: t.searchTypeTests },
-                  { id: 'CENTER', label: t.searchTypeCenters },
-                  { id: 'HOSPITAL', label: t.searchTypeHospitals },
+                  { id: 'ALL', label: language === 'en' ? 'All Specialties' : 'সকল বিভাগ' },
+                  { id: 'Cardiology', label: language === 'en' ? 'Cardiology' : 'কার্ডিওলজি (হৃদরোগ)' },
+                  { id: 'Medicine', label: language === 'en' ? 'Medicine' : 'মেডিসিন' },
+                  { id: 'Gynecologist', label: language === 'en' ? 'Gynecology' : 'স্ত্রী ও প্রসূতিরোগ' },
+                  { id: 'Pediatrics', label: language === 'en' ? 'Pediatrics' : 'শিশু রোগ' },
+                  { id: 'Orthopedics', label: language === 'en' ? 'Orthopedics' : 'অর্থোপেডিকস' },
                 ].map((item) => (
                   <button
                     key={item.id}
                     onClick={() => {
-                      setActiveSearchTab(item.id as any);
+                      setActiveSearchTab(item.id);
                       if (onSelectCategory && item.id !== 'ALL') {
                         onSelectCategory(item.id);
                       }

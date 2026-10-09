@@ -289,121 +289,63 @@ export const Header: React.FC<HeaderProps> = ({
               transition: 'all 0.15s ease',
             }}
           >
-            {language === 'en' ? 'Find Doctors' : 'ডাক্তার'}
+            {language === 'en' ? 'Find Doctors' : 'ডাক্তার খুঁজুন'}
           </Link>
 
-          {/* 3. Diagnostic Tests */}
-          <Link
-            href="/tests"
+          {/* 3. Live Chamber Queue */}
+          <button
+            onClick={() => handleNavClick('queue')}
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: activeTab === 'tests' || activeTab === 'DIAGNOSTIC_TESTS' ? 700 : 500,
-              color: activeTab === 'tests' || activeTab === 'DIAGNOSTIC_TESTS' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'tests' || activeTab === 'DIAGNOSTIC_TESTS' ? BRAND_COLORS.primaryLight : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {language === 'en' ? 'Diagnostic Tests' : 'ডায়াগনস্টিক টেস্ট'}
-          </Link>
-
-          {/* 4. Diagnostic Centers */}
-          <Link
-            href="/diagnostic-centers"
-            style={{
-              padding: '8px 12px',
-              borderRadius: '8px',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'diagnostic-centers' || activeTab === 'DIAGNOSTIC_CENTER' ? 700 : 500,
-              color: activeTab === 'diagnostic-centers' || activeTab === 'DIAGNOSTIC_CENTER' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'diagnostic-centers' || activeTab === 'DIAGNOSTIC_CENTER' ? BRAND_COLORS.primaryLight : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {language === 'en' ? 'Diagnostic Centers' : 'ডায়াগনস্টিক সেন্টার'}
-          </Link>
-
-          {/* 5. Hospitals & Clinics */}
-          <Link
-            href="/hospitals"
-            style={{
-              padding: '8px 12px',
-              borderRadius: '8px',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'hospitals' || activeTab === 'HOSPITAL' ? 700 : 500,
-              color: activeTab === 'hospitals' || activeTab === 'HOSPITAL' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'hospitals' || activeTab === 'HOSPITAL' ? BRAND_COLORS.primaryLight : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}
-          </Link>
-
-          {/* 6. Pharmacies */}
-          <Link
-            href="/pharmacies"
-            style={{
-              padding: '8px 12px',
-              borderRadius: '8px',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'pharmacies' || activeTab === 'PHARMACY' ? 700 : 500,
-              color: activeTab === 'pharmacies' || activeTab === 'PHARMACY' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'pharmacies' || activeTab === 'PHARMACY' ? BRAND_COLORS.primaryLight : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {language === 'en' ? 'Pharmacies' : 'ফার্মেসি'}
-          </Link>
-
-          {/* 7. Ambulance */}
-          <Link
-            href="/ambulance"
-            style={{
-              padding: '8px 12px',
-              borderRadius: '8px',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'ambulance' || activeTab === 'AMBULANCE' ? 700 : 500,
-              color: activeTab === 'ambulance' || activeTab === 'AMBULANCE' ? '#DC4545' : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'ambulance' || activeTab === 'AMBULANCE' ? '#FDF2F2' : 'transparent',
-              textDecoration: 'none',
+              fontWeight: activeTab === 'queue' ? 700 : 500,
+              color: activeTab === 'queue' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'queue' ? BRAND_COLORS.primaryLight : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               transition: 'all 0.15s ease',
             }}
           >
-            <span>{language === 'en' ? 'Ambulance' : 'অ্যাম্বুলেন্স'}</span>
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: '#DC4545',
-                boxShadow: '0 0 6px #DC4545',
-              }}
-            />
-          </Link>
+            <Activity size={14} color={activeTab === 'queue' ? BRAND_COLORS.primary : '#0F766E'} />
+            <span>{language === 'en' ? 'Chamber Queue' : 'সিরিয়াল কিউ'}</span>
+          </button>
 
-          {/* 8. Home Healthcare */}
+          {/* 4. My Appointments */}
           <Link
-            href="/home-care"
+            href="/appointments"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: activeTab === 'homecare' || activeTab === 'home-care' || activeTab === 'HOME_CARE' ? 700 : 500,
-              color: activeTab === 'homecare' || activeTab === 'home-care' || activeTab === 'HOME_CARE' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'homecare' || activeTab === 'home-care' || activeTab === 'HOME_CARE' ? BRAND_COLORS.primaryLight : 'transparent',
+              fontWeight: activeTab === 'appointments' ? 700 : 500,
+              color: activeTab === 'appointments' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'appointments' ? BRAND_COLORS.primaryLight : 'transparent',
               textDecoration: 'none',
               transition: 'all 0.15s ease',
             }}
           >
-            {language === 'en' ? 'Home Healthcare' : 'হোম হেলথকেয়ার'}
+            {language === 'en' ? 'My Appointments' : 'আমার অ্যাপয়েন্টমেন্ট'}
+          </Link>
+
+          {/* 5. Doctor Portal */}
+          <Link
+            href="/doctor/portal"
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: activeTab === 'portal' ? 700 : 500,
+              color: activeTab === 'portal' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'portal' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {language === 'en' ? 'Doctor Portal' : 'ডাক্তার পোর্টাল'}
           </Link>
         </nav>
 
@@ -701,12 +643,12 @@ export const Header: React.FC<HeaderProps> = ({
                 textDecoration: 'none',
               }}
             >
-              <Stethoscope size={18} color="#64748B" />
+              <Stethoscope size={18} color={BRAND_COLORS.primary} />
               <span>{language === 'en' ? 'Find Doctors' : 'ডাক্তার খুঁজুন'}</span>
             </Link>
 
             <Link
-              href="/tests"
+              href="/appointments"
               onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
@@ -720,12 +662,12 @@ export const Header: React.FC<HeaderProps> = ({
                 textDecoration: 'none',
               }}
             >
-              <TestTube2 size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Diagnostic Tests' : 'ডায়াগনস্টিক টেস্ট'}</span>
+              <FileText size={18} color="#64748B" />
+              <span>{language === 'en' ? 'My Appointments' : 'আমার অ্যাপয়েন্টমেন্ট'}</span>
             </Link>
 
             <Link
-              href="/diagnostic-centers"
+              href="/doctor/portal"
               onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
@@ -739,84 +681,8 @@ export const Header: React.FC<HeaderProps> = ({
                 textDecoration: 'none',
               }}
             >
-              <Building2 size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Diagnostic Centers' : 'ডায়াগনস্টিক সেন্টার'}</span>
-            </Link>
-
-            <Link
-              href="/hospitals"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                color: 'var(--brand-text-dark)',
-                fontWeight: 600,
-                fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              <HeartPulse size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}</span>
-            </Link>
-
-            <Link
-              href="/pharmacies"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                color: 'var(--brand-text-dark)',
-                fontWeight: 600,
-                fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              <Pill size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Pharmacies & Medicines' : 'ফার্মেসি ও ঔষধ'}</span>
-            </Link>
-
-            <Link
-              href="/ambulance"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                color: '#DC2626',
-                fontWeight: 700,
-                fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              <Ambulance size={18} color="#DC2626" />
-              <span>{language === 'en' ? 'Emergency Ambulance 24/7' : 'জরুরি অ্যাম্বুলেন্স ২৪/৭'}</span>
-            </Link>
-
-            <Link
-              href="/home-care"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                color: 'var(--brand-text-dark)',
-                fontWeight: 600,
-                fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              <Home size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Home Healthcare' : 'হোম হেলথকেয়ার'}</span>
+              <User size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Doctor Chamber Portal' : 'ডাক্তার চেম্বার পোর্টাল'}</span>
             </Link>
 
             <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '8px 0' }} />

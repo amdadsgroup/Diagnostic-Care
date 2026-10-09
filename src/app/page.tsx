@@ -5,22 +5,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
-import { UserRole, ScheduleSlot, DoctorAssociation, Appointment, DiagnosticTest } from '@/types';
+import { UserRole, ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
 import { INITIAL_APP_STATE } from '@/lib/store';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SlotBookingModal } from '@/components/SlotBookingModal';
 import { LiveQueueCard } from '@/components/LiveQueueCard';
 import { DoctorAssistantView } from '@/components/DoctorAssistantView';
-import { DiagnosticAdminView } from '@/components/DiagnosticAdminView';
 import { SuperAdminView } from '@/components/SuperAdminView';
 import AuthModal from '@/components/auth/AuthModal';
 import ProviderOnboardingModal from '@/components/provider/ProviderOnboardingModal';
 import DoctorPortal from '@/components/doctor/DoctorPortal';
 import PatientDashboard from '@/components/patient/PatientDashboard';
 import LiveQueueTracker from '@/components/queue/LiveQueueTracker';
-import TestBookingModal from '@/components/diagnostic/TestBookingModal';
-import SecureReportViewer from '@/components/diagnostic/SecureReportViewer';
 import PrescriptionSlipModal from '@/components/prescription/PrescriptionSlipModal';
 import PaymentModal from '@/components/payment/PaymentModal';
 import LedgerViewer from '@/components/finance/LedgerViewer';
@@ -29,13 +26,10 @@ import VerifiedReviewsModal from '@/components/reviews/VerifiedReviewsModal';
 import ProviderAnalyticsDashboard from '@/components/analytics/ProviderAnalyticsDashboard';
 import HelplineBookingConsole from '@/components/support/HelplineBookingConsole';
 import CategoryNavigator, { HealthcareCategoryKey } from '@/components/marketplace/CategoryNavigator';
-import AmbulanceDispatcher from '@/components/ambulance/AmbulanceDispatcher';
-import HomeCareBookingModal from '@/components/homecare/HomeCareBookingModal';
 import SupportTicketModal from '@/components/support/SupportTicketModal';
 import ComprehensiveAdminConsole from '@/components/admin/ComprehensiveAdminConsole';
 import HeroSection from '@/components/marketplace/HeroSection';
 import TrustSection from '@/components/marketplace/TrustSection';
-import HomeSampleCollectionSection from '@/components/marketplace/HomeSampleCollectionSection';
 import MapDiscovery from '@/components/marketplace/MapDiscovery';
 import MobileNavigation, { ActiveNavTab } from '@/components/navigation/MobileNavigation';
 import MobileAppointmentsView from '@/components/patient/MobileAppointmentsView';
@@ -44,10 +38,8 @@ import MobileProfileView from '@/components/patient/MobileProfileView';
 import MobileSearchView from '@/components/search/MobileSearchView';
 import LocationModal from '@/components/location/LocationModal';
 import NotificationSettingsModal from '@/components/notifications/NotificationSettingsModal';
-import { servicesEngine } from '@/lib/services-engine';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { DoctorService } from '@/services/doctor.service';
-import { DiagnosticService } from '@/services/diagnostic.service';
 import { AppointmentService } from '@/services/appointment.service';
 
 import {
@@ -57,7 +49,6 @@ import {
   Calendar,
   Clock,
   Award,
-  TestTube2,
   Stethoscope,
   Building2,
   ShieldCheck,
@@ -74,7 +65,6 @@ import {
   ChevronRight,
   Activity,
   Layers,
-  Pill,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -98,15 +88,12 @@ export default function HomePage() {
   const [onboardingNotice, setOnboardingNotice] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProviderOnboardOpen, setIsProviderOnboardOpen] = useState(false);
-  const [selectedBookingTest, setSelectedBookingTest] = useState<DiagnosticTest | null>(null);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [activePaymentPayload, setActivePaymentPayload] = useState<{ bookingCode: string; amount: number; name: string; org: string } | null>(null);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [isHelplineOpen, setIsHelplineOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<HealthcareCategoryKey>('ALL');
-  const [isAmbulanceModalOpen, setIsAmbulanceModalOpen] = useState(false);
-  const [isHomeCareModalOpen, setIsHomeCareModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
@@ -138,20 +125,16 @@ export default function HomePage() {
         }
       });
 
-      // Load doctors and diagnostic tests from Supabase
-      Promise.all([
-        DoctorService.getDoctors(),
-        DiagnosticService.getLabTests(),
-        DiagnosticService.getDiagnosticCenters(),
-      ]).then(([docs, tests, orgs]) => {
-        setAppState((prev) => ({
-          ...prev,
-          doctors: docs.length > 0 ? docs : prev.doctors,
-          diagnosticTests: tests.length > 0 ? tests : prev.diagnosticTests,
-          organizations: orgs.length > 0 ? orgs : prev.organizations,
-        }));
+      // Load doctors from Supabase
+      DoctorService.getDoctors().then((docs) => {
+        if (docs.length > 0) {
+          setAppState((prev) => ({
+            ...prev,
+            doctors: docs,
+          }));
+        }
       }).catch((err) => {
-        console.warn('Initial data load notice:', err);
+        console.warn('Initial doctor data load notice:', err);
       });
 
       // Detect PWA App Shortcuts in URL
@@ -160,18 +143,19 @@ export default function HomePage() {
       const tab = params.get('tab');
       const category = params.get('category');
 
-      if (category && ['DOCTOR', 'DIAGNOSTIC_CENTER', 'HOSPITAL', 'PHARMACY', 'AMBULANCE', 'HOME_CARE', 'BLOOD', 'PACKAGE'].includes(category)) {
+      if (category) {
         setActiveCategory(category as HealthcareCategoryKey);
+        setSelectedSpecialty(category);
       }
 
-      if (action === 'find-doctor' || action === 'book-test') {
+      if (action === 'find-doctor') {
         setActiveTab('search');
       } else if (action === 'appointments') {
         setActiveTab('appointments');
-      } else if (action === 'vault') {
-        setActiveTab('reports');
-      } else if (action === 'emergency') {
-        setIsAmbulanceModalOpen(true);
+      } else if (action === 'queue') {
+        setActiveTab('queue');
+      } else if (action === 'prescriptions') {
+        setActiveTab('prescriptions');
       } else if (tab && ['marketplace', 'search', 'appointments', 'queue', 'reports', 'prescriptions', 'portal', 'profile'].includes(tab)) {
         setActiveTab(tab as ActiveNavTab);
       }
@@ -356,70 +340,32 @@ export default function HomePage() {
     return matchesQuery && matchesDistrict && matchesSpecialty;
   });
 
-  // Filter diagnostic tests
-  const filteredTests = appState.diagnosticTests.filter((test) => {
-    return (
-      test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      test.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      test.organizationName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-
   // Category navigation handler across Header & CategoryNavigator
-  const handleCategorySelection = (category: HealthcareCategoryKey) => {
-    setActiveCategory(category);
-    if (category === 'AMBULANCE') {
-      setIsAmbulanceModalOpen(true);
-    } else if (category === 'HOME_CARE' || category === 'NURSING') {
-      setIsHomeCareModalOpen(true);
-    } else if (category === 'EMERGENCY' || category === 'BLOOD_SERVICES') {
-      setIsHelplineOpen(true);
-    } else if (category === 'DOCTOR' || category === 'DOCTORS') {
-      const el = document.getElementById('doctor-discovery-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else if (category === 'DIAGNOSTIC_CENTER') {
-      const el = document.getElementById('diagnostic-centers-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else if (category === 'DIAGNOSTIC_TESTS' || category === 'TESTS') {
-      const el = document.getElementById('diagnostic-tests-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else if (category === 'HOSPITAL' || category === 'HOSPITALS') {
-      const el = document.getElementById('hospitals-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else if (category === 'PHARMACY' || category === 'PHARMACIES') {
-      const el = document.getElementById('pharmacies-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handleCategorySelection = (category: string) => {
+    setActiveCategory(category as HealthcareCategoryKey);
+    setSelectedSpecialty(category);
+    const el = document.getElementById('doctor-discovery-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Advanced search result click handler
   const handleSearchSelectResult = (item: any) => {
-    if (item.type === 'DOCTOR') {
-      const assoc =
-        appState.doctorAssociations.find((a) => a.doctorId === item.id || a.doctor?.fullName.includes(item.name)) ||
-        appState.doctorAssociations[0];
-      const todayStr = new Date().toISOString().split('T')[0];
-      const firstSlot = (appState.slots[`${assoc.id}_${todayStr}`] || []).find((s) => s.status === 'AVAILABLE') || {
-        id: `slot-${assoc.id}-search-sel`,
-        doctorScheduleId: `sched-${assoc.id}`,
-        doctorAssociationId: assoc.id,
-        branchId: assoc.branchId,
-        slotDate: todayStr,
-        startTime: '16:30',
-        endTime: '16:45',
-        tokenNumber: 3,
-        status: 'AVAILABLE' as const,
-      };
-      handleSelectSlot(firstSlot, assoc);
-    } else if (item.type === 'TEST') {
-      const test =
-        appState.diagnosticTests.find((t) => t.id === item.id || t.name.includes(item.name)) ||
-        appState.diagnosticTests[0];
-      setSelectedBookingTest(test);
-    } else {
-      const el = document.getElementById('diagnostic-centers-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
+    const assoc =
+      appState.doctorAssociations.find((a) => a.doctorId === item.id || a.doctor?.fullName.includes(item.name)) ||
+      appState.doctorAssociations[0];
+    const todayStr = new Date().toISOString().split('T')[0];
+    const firstSlot = (appState.slots[`${assoc.id}_${todayStr}`] || []).find((s) => s.status === 'AVAILABLE') || {
+      id: `slot-${assoc.id}-search-sel`,
+      doctorScheduleId: `sched-${assoc.id}`,
+      doctorAssociationId: assoc.id,
+      branchId: assoc.branchId,
+      slotDate: todayStr,
+      startTime: '16:30',
+      endTime: '16:45',
+      tokenNumber: 3,
+      status: 'AVAILABLE' as const,
+    };
+    handleSelectSlot(firstSlot, assoc);
   };
 
   return (
@@ -572,16 +518,14 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* SEARCH VIEW (UNIVERSAL MOBILE HEALTHCARE SEARCH) */}
+        {/* SEARCH VIEW (MOBILE DOCTOR SEARCH) */}
         {activeTab === 'search' && (
           <div className="container" style={{ padding: '24px 16px', maxWidth: '820px' }}>
             <MobileSearchView
               language={language}
               doctorAssociations={appState.doctorAssociations}
-              diagnosticTests={appState.diagnosticTests}
               selectedLocation={selectedLocation}
               onSelectSlot={handleSelectSlot}
-              onSelectTest={(test) => setSelectedBookingTest(test)}
               onNavigateHome={() => setActiveTab('marketplace')}
             />
           </div>
@@ -663,21 +607,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {activeTab === 'portal' && currentRole === 'DIAGNOSTIC_ADMIN' && (
-          <div className="container" style={{ padding: '36px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <DiagnosticAdminView
-              organization={appState.organizations[0]}
-              tests={appState.diagnosticTests}
-              associations={appState.doctorAssociations}
-              subscriptionPlans={appState.subscriptionPlans}
-              language={language}
-            />
-            <HelplineBookingConsole />
-            <ProviderAnalyticsDashboard />
-            <LedgerViewer />
-          </div>
-        )}
-
         {activeTab === 'portal' && currentRole === 'SUPER_ADMIN' && (
           <div className="container" style={{ padding: '36px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <SuperAdminView
@@ -717,51 +646,10 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* SECURE HEALTH VAULT: REPORTS TAB */}
+        {/* SECURE HEALTH VAULT: REPORTS & PRESCRIPTIONS TAB */}
         {activeTab === 'reports' && (
           <div className="container" style={{ padding: '24px 16px', maxWidth: '1060px' }}>
-            <div className="d-mobile-only">
-              <MobileHealthVaultView language={language} />
-            </div>
-
-            <div className="d-desktop-only">
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%)',
-                  color: '#FFFFFF',
-                  borderRadius: '16px',
-                  padding: '24px 28px',
-                  marginBottom: '28px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '16px',
-                  border: '1px solid rgba(6, 182, 212, 0.3)',
-                  boxShadow: 'var(--shadow-md)',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(6, 182, 212, 0.2)', padding: '4px 10px', borderRadius: '12px', color: '#67E8F9', fontSize: '11px', fontWeight: 700, marginBottom: '8px' }}>
-                    <Lock size={12} />
-                    <span>{t.vaultPrivacyBadge}</span>
-                  </div>
-                  <h1 style={{ fontSize: '26px', fontWeight: 800 }}>{t.vaultTitle}</h1>
-                  <p style={{ fontSize: '14px', color: '#94A3B8', marginTop: '4px' }}>
-                    {t.vaultSubtitle}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setIsSupportModalOpen(true)}
-                  className="btn-cyan"
-                  style={{ padding: '10px 18px', fontSize: '13px' }}
-                >
-                  <span>Upload New Health File</span>
-                </button>
-              </div>
-              <SecureReportViewer />
-            </div>
+            <MobileHealthVaultView language={language} />
           </div>
         )}
 
@@ -957,14 +845,12 @@ export default function HomePage() {
             {/* TRUST & VERIFICATION METRICS STRIP */}
             <TrustSection language={language} />
 
-            {/* 10 HEALTHCARE VERTICALS CATEGORY NAVIGATOR */}
+            {/* DOCTOR SPECIALTIES NAVIGATOR */}
             <section className="container" style={{ padding: '36px 24px 0 24px' }}>
               <CategoryNavigator
                 language={language}
                 activeCategory={activeCategory}
                 onSelectCategory={(cat) => handleCategorySelection(cat)}
-                onOpenAmbulanceModal={() => setIsAmbulanceModalOpen(true)}
-                onOpenHomeCareModal={() => setIsHomeCareModalOpen(true)}
                 onOpenSupportModal={() => setIsSupportModalOpen(true)}
               />
             </section>
@@ -1207,453 +1093,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* DIAGNOSTIC TESTS & PATHOLOGY SECTION */}
-            <section id="diagnostic-tests-section" style={{ backgroundColor: '#F7FAFE', padding: '64px 0', borderTop: '1px solid var(--brand-border)', borderBottom: '1px solid var(--brand-border)' }}>
-              <div className="container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
-                  <div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                      CLINICAL PATHOLOGY & IMAGING
-                    </div>
-                    <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                      {t.sectionDiagnosticsTitle}
-                    </h2>
-                    <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
-                      {t.sectionDiagnosticsSubtitle}
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/tests"
-                    style={{
-                      padding: '8px 18px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      backgroundColor: 'var(--brand-primary)',
-                      color: '#FFFFFF',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <span>{language === 'en' ? 'Explore Test Catalog' : 'সকল টেস্ট ক্যাটালগ'}</span>
-                    <ArrowRight size={13} />
-                  </Link>
-                </div>
-
-                <div className="grid-cards">
-                  {filteredTests.map((test) => (
-                    <div
-                      key={test.id}
-                      className="futuristic-card"
-                      style={{
-                        padding: '24px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                          <span style={{ backgroundColor: 'var(--cyan-50)', color: '#0891B2', padding: '3px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(6, 182, 212, 0.3)' }}>
-                            {test.category}
-                          </span>
-                          {test.homeCollectionAvailable && (
-                            <span style={{ backgroundColor: 'var(--emerald-50)', color: '#065F46', padding: '3px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                              ✓ Home Collection
-                            </span>
-                          )}
-                        </div>
-
-                        <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--navy-900)', marginBottom: '4px' }}>
-                          {test.name}
-                        </h3>
-                        <div style={{ fontSize: '12.5px', color: 'var(--slate-500)', marginBottom: '14px' }}>
-                          {test.organizationName}
-                        </div>
-
-                        {/* Test preparation guidelines */}
-                        <div style={{ backgroundColor: 'var(--slate-50)', padding: '12px 14px', borderRadius: '10px', fontSize: '12.5px', color: 'var(--slate-700)', marginBottom: '18px', border: '1px solid var(--slate-200)' }}>
-                          <div style={{ fontWeight: 700, color: 'var(--navy-900)', marginBottom: '3px' }}>
-                            {t.testPreparation}:
-                          </div>
-                          <div>{test.preparationInstructions}</div>
-                          <div style={{ marginTop: '8px', fontSize: '11.5px', color: 'var(--slate-500)', display: 'flex', gap: '12px' }}>
-                            <span>Sample: <strong>{test.sampleType}</strong></span>
-                            <span>Turnaround: <strong>{test.expectedDeliveryHours} hrs</strong></span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--slate-100)' }}>
-                        <div>
-                          <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                            ৳{test.discountPrice || test.price}
-                          </div>
-                          {test.discountPrice && (
-                            <div style={{ fontSize: '11.5px', color: 'var(--slate-400)', textDecoration: 'line-through' }}>
-                              ৳{test.price}
-                            </div>
-                          )}
-                        </div>
-
-                        <button
-                          onClick={() => setSelectedBookingTest(test)}
-                          className="btn-primary"
-                          style={{
-                            padding: '9px 18px',
-                            fontSize: '12.5px',
-                            borderRadius: '8px',
-                          }}
-                        >
-                          {t.bookTestButton}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* 4-STEP DOORSTEP HOME SAMPLE COLLECTION */}
-            <div className="container">
-              <HomeSampleCollectionSection
-                language={language}
-                onRequestHomeCare={() => setIsHomeCareModalOpen(true)}
-              />
-            </div>
-
-            {/* PARTNER DIAGNOSTIC CENTERS SECTION */}
-            <section id="diagnostic-centers-section" className="container" style={{ padding: '56px 24px 20px 24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
-                <div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                    CERTIFIED INSTITUTIONS
-                  </div>
-                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                    {t.sectionCentersTitle}
-                  </h2>
-                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
-                    {t.sectionCentersSubtitle}
-                  </p>
-                </div>
-
-                <Link
-                  href="/diagnostic-centers"
-                  style={{
-                    padding: '8px 18px',
-                    borderRadius: '20px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    backgroundColor: 'var(--brand-primary)',
-                    color: '#FFFFFF',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span>{language === 'en' ? 'All Diagnostic Centers' : 'সকল ডায়াগনস্টিক সেন্টার'}</span>
-                  <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
-                {appState.organizations.map((org) => (
-                  <div
-                    key={org.id}
-                    className="futuristic-card"
-                    style={{
-                      padding: '24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                        <div
-                          style={{
-                            width: '46px',
-                            height: '46px',
-                            borderRadius: '12px',
-                            background: 'var(--cyan-50)',
-                            color: '#0891B2',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Building2 size={24} />
-                        </div>
-                        <div>
-                          <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                            {org.name}
-                          </h3>
-                          <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <CheckCircle2 size={12} />
-                            <span>ACCREDITED DIAGNOSTIC LAB & CLINIC</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style={{ fontSize: '13px', color: 'var(--slate-600)', marginBottom: '14px', lineHeight: 1.5 }}>
-                        Branches: <strong>{org.branches.map((b) => b.name).join(', ')}</strong>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--slate-500)', paddingTop: '14px', borderTop: '1px solid var(--slate-100)' }}>
-                      <span>Trade Lic: {org.tradeLicenseNumber}</span>
-                      <a
-                        href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
-                        style={{ color: '#0891B2', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                      >
-                        <Phone size={13} />
-                        <span>Helpline: {BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</span>
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* HOSPITALS & CLINICS SECTION */}
-            <section id="hospitals-section" className="container" style={{ padding: '56px 24px 20px 24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
-                <div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                    TERTIARY HOSPITALS & INPATIENT FACILITIES
-                  </div>
-                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                    {language === 'en' ? 'Hospitals & Specialized Clinics' : 'হাসপাতাল ও বিশেষায়িত ক্লিনিক'}
-                  </h2>
-                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
-                    {language === 'en' ? 'Verified tertiary healthcare facilities with ICU, 24/7 trauma emergency, and specialist admissions.' : 'আইসিইউ, ২৪/৭ জরুরি সেবা এবং বিশেষজ্ঞ ডাক্তার সমন্বিত ভেরিফাইড হাসপাতাল।'}
-                  </p>
-                </div>
-
-                <Link
-                  href="/hospitals"
-                  style={{
-                    padding: '8px 18px',
-                    borderRadius: '20px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    backgroundColor: 'var(--brand-primary)',
-                    color: '#FFFFFF',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span>{language === 'en' ? 'All Hospitals & Clinics' : 'সকল হাসপাতাল ও ক্লিনিক'}</span>
-                  <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
-                {servicesEngine.getOrganizations('HOSPITAL').map((hosp) => {
-                  const details = servicesEngine.getHospitalDetails(hosp.id);
-                  return (
-                    <div
-                      key={hosp.id}
-                      className="futuristic-card"
-                      style={{
-                        padding: '24px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '16px',
-                        border: '1px solid #E2E8F0',
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                          <div
-                            style={{
-                              width: '46px',
-                              height: '46px',
-                              borderRadius: '12px',
-                              background: '#EFF6FF',
-                              color: '#0057FF',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <HeartPulse size={24} />
-                          </div>
-                          <div>
-                            <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A' }}>
-                              {hosp.name}
-                            </h3>
-                            <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <CheckCircle2 size={12} />
-                              <span>24/7 EMERGENCY & ADMISSION OPEN</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {details && (
-                          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                            <span style={{ backgroundColor: '#EFF6FF', color: '#0057FF', padding: '3px 8px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 700 }}>
-                              Total Beds: {details.totalBeds}
-                            </span>
-                            <span style={{ backgroundColor: '#FEF2F2', color: '#B91C1C', padding: '3px 8px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 700 }}>
-                              ICU Beds: {details.icuBeds}
-                            </span>
-                            <span style={{ backgroundColor: '#ECFDF5', color: '#065F46', padding: '3px 8px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 700 }}>
-                              Specialists: {details.specialistCount}+
-                            </span>
-                          </div>
-                        )}
-
-                        {details?.featuredDepartments && (
-                          <div style={{ fontSize: '12px', color: '#475569', marginBottom: '14px' }}>
-                            Departments: <strong>{details.featuredDepartments.join(', ')}</strong>
-                          </div>
-                        )}
-
-                        <div style={{ fontSize: '12.5px', color: '#64748B', marginBottom: '12px' }}>
-                          Location: <strong>{hosp.branches[0]?.addressLine}</strong>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', paddingTop: '14px', borderTop: '1px solid #F1F5F9' }}>
-                        <a
-                          href={`tel:${hosp.contactPhone}`}
-                          style={{ color: '#0057FF', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                        >
-                          <Phone size={13} />
-                          <span>Admission Hotline: {hosp.contactPhone}</span>
-                        </a>
-
-                        <button
-                          onClick={() => {
-                            const el = document.getElementById('doctor-discovery-section');
-                            if (el) el.scrollIntoView({ behavior: 'smooth' });
-                          }}
-                          style={{ backgroundColor: '#0057FF', color: '#FFFFFF', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, border: 'none', cursor: 'pointer' }}
-                        >
-                          View Doctors
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* PHARMACIES & GENUINE MEDICINE SECTION */}
-            <section id="pharmacies-section" className="container" style={{ padding: '56px 24px 20px 24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
-                <div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#15976A', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                    LICENSED RETAIL PHARMACIES
-                  </div>
-                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                    {language === 'en' ? 'Verified Pharmacies & Genuine Medicines' : 'ভেরিফাইড ফার্মেসি ও জেনুইন ঔষধ'}
-                  </h2>
-                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
-                    {language === 'en' ? 'Order authentic prescription drugs with DGDA verification and fast 2-4 hour doorstep delivery.' : '১০০% জেনুইন ঔষধ প্রেসক্রিপশন আপলোড করে ২-৪ ঘণ্টার মধ্যে ঘরে বসেই সংগ্রহ করুন।'}
-                  </p>
-                </div>
-
-                <Link
-                  href="/pharmacies"
-                  style={{
-                    padding: '8px 18px',
-                    borderRadius: '20px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    backgroundColor: '#15976A',
-                    color: '#FFFFFF',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span>{language === 'en' ? 'All Pharmacies' : 'সকল ফার্মেসি'}</span>
-                  <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
-                {servicesEngine.getOrganizations('PHARMACY').map((pharma) => (
-                  <div
-                    key={pharma.id}
-                    className="futuristic-card"
-                    style={{
-                      padding: '24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E2E8F0',
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                        <div
-                          style={{
-                            width: '46px',
-                            height: '46px',
-                            borderRadius: '12px',
-                            background: '#ECFDF5',
-                            color: '#059669',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Pill size={24} />
-                        </div>
-                        <div>
-                          <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A' }}>
-                            {pharma.name}
-                          </h3>
-                          <div style={{ fontSize: '11px', color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <CheckCircle2 size={12} />
-                            <span>100% GENUINE • DGDA LICENSED</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style={{ fontSize: '12.5px', color: '#475569', marginBottom: '10px' }}>
-                        Hub Address: <strong>{pharma.branches[0]?.addressLine}</strong>
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#64748B', marginBottom: '14px' }}>
-                        Delivery Time: <strong>2 - 4 Hours (Express Delivery)</strong> • Drug Lic: {pharma.tradeLicenseNumber}
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', borderTop: '1px solid #F1F5F9' }}>
-                      <a
-                        href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
-                        style={{ color: '#059669', fontWeight: 700, fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                      >
-                        <Phone size={13} />
-                        <span>Order Hotline: {BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</span>
-                      </a>
-
-                      <button
-                        onClick={() => setIsPrescriptionModalOpen(true)}
-                        style={{ backgroundColor: '#059669', color: '#FFFFFF', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, border: 'none', cursor: 'pointer' }}
-                      >
-                        Upload Prescription
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {/* INTERACTIVE GEOGRAPHIC COVERAGE & FACILITY MAP */}
             <div className="container">
               <MapDiscovery
@@ -1713,14 +1152,6 @@ export default function HomePage() {
         }}
       />
 
-      {/* DIAGNOSTIC TEST BOOKING MODAL */}
-      <TestBookingModal
-        test={selectedBookingTest}
-        isOpen={Boolean(selectedBookingTest)}
-        onClose={() => setSelectedBookingTest(null)}
-        onBookingSuccess={() => {}}
-      />
-
       {/* DIGITAL PRESCRIPTION SLIP MODAL */}
       <PrescriptionSlipModal
         isOpen={isPrescriptionModalOpen}
@@ -1743,7 +1174,7 @@ export default function HomePage() {
         />
       )}
 
-      {/* VERIFIED PATIENT REVIEWS MODAL */}
+      {/* VERIFIED DOCTOR REVIEWS MODAL */}
       <VerifiedReviewsModal
         isOpen={isReviewsModalOpen}
         onClose={() => setIsReviewsModalOpen(false)}
@@ -1793,18 +1224,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-
-      {/* EMERGENCY AMBULANCE DISPATCHER MODAL */}
-      <AmbulanceDispatcher
-        isOpen={isAmbulanceModalOpen}
-        onClose={() => setIsAmbulanceModalOpen(false)}
-      />
-
-      {/* HOME HEALTHCARE REQUEST MODAL */}
-      <HomeCareBookingModal
-        isOpen={isHomeCareModalOpen}
-        onClose={() => setIsHomeCareModalOpen(false)}
-      />
 
       {/* CUSTOMER SUPPORT & GRIEVANCE MODAL */}
       <SupportTicketModal

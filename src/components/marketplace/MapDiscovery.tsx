@@ -20,7 +20,7 @@ import {
 interface FacilityPin {
   id: string;
   name: string;
-  type: 'HOSPITAL' | 'DIAGNOSTIC_CENTER' | 'PHARMACY' | 'AMBULANCE';
+  type: 'DOCTOR_CHAMBER' | 'HOSPITAL_OPD';
   location: string;
   upazila: string;
   district: string;
@@ -36,8 +36,8 @@ interface FacilityPin {
 const SAMPLE_FACILITIES: FacilityPin[] = [
   {
     id: 'fac-1',
-    name: 'Popular Diagnostic Center (Moulvibazar)',
-    type: 'DIAGNOSTIC_CENTER',
+    name: 'Popular Diagnostic Center — Specialist Doctor Chambers',
+    type: 'DOCTOR_CHAMBER',
     location: 'Court Road, Moulvibazar Sadar',
     upazila: 'Moulvibazar Sadar',
     district: 'Moulvibazar',
@@ -46,13 +46,13 @@ const SAMPLE_FACILITIES: FacilityPin[] = [
     reviewCount: 142,
     distanceKm: 0.8,
     coordinates: { x: 50, y: 48 },
-    features: ['Biochemistry', 'Digital X-Ray', '4D USG', 'Specialist Chambers'],
-    openStatus: 'Open Now (7:30 AM - 10:30 PM)',
+    features: ['Cardiology Chambers', 'Medicine Specialists', 'Gynecology OPD', 'Real-time Queue'],
+    openStatus: 'Doctor Chambers Active (4:00 PM - 10:00 PM)',
   },
   {
     id: 'fac-2',
-    name: 'Moulvibazar 250 Bed District Sadar Hospital',
-    type: 'HOSPITAL',
+    name: 'Moulvibazar 250 Bed District Sadar Hospital — Specialist Wing',
+    type: 'HOSPITAL_OPD',
     location: 'Hospital Road, Moulvibazar',
     upazila: 'Moulvibazar Sadar',
     district: 'Moulvibazar',
@@ -61,13 +61,13 @@ const SAMPLE_FACILITIES: FacilityPin[] = [
     reviewCount: 218,
     distanceKm: 1.2,
     coordinates: { x: 42, y: 40 },
-    features: ['24/7 Emergency', 'ICU / CCU', 'Blood Bank', 'Burn Unit'],
-    openStatus: 'Emergency Open 24/7',
+    features: ['General Medicine OPD', 'Pediatrics Wing', 'Orthopedics & Trauma', 'Consultant OPD'],
+    openStatus: 'OPD Consultations (8:00 AM - 2:30 PM)',
   },
   {
     id: 'fac-3',
-    name: 'Sreemangal Health Complex & Diagnostic Lab',
-    type: 'DIAGNOSTIC_CENTER',
+    name: 'Sreemangal Specialist Doctor Consultation Chambers',
+    type: 'DOCTOR_CHAMBER',
     location: 'College Road, Sreemangal',
     upazila: 'Sreemangal',
     district: 'Moulvibazar',
@@ -76,13 +76,13 @@ const SAMPLE_FACILITIES: FacilityPin[] = [
     reviewCount: 89,
     distanceKm: 19.5,
     coordinates: { x: 38, y: 72 },
-    features: ['Routine Pathology', 'Sample Collection', 'Doctor Chambers'],
-    openStatus: 'Open (8:00 AM - 9:00 PM)',
+    features: ['Visiting Specialists', 'Pediatric Care', 'Diabetology Chamber', 'Digital Booking'],
+    openStatus: 'Open (4:30 PM - 9:30 PM)',
   },
   {
     id: 'fac-4',
-    name: 'Central 24/7 Model Pharmacy (Moulvibazar)',
-    type: 'PHARMACY',
+    name: 'Central Clinic & Doctor Chambers Complex',
+    type: 'DOCTOR_CHAMBER',
     location: 'Chowmuhani Point, Moulvibazar',
     upazila: 'Moulvibazar Sadar',
     district: 'Moulvibazar',
@@ -91,23 +91,23 @@ const SAMPLE_FACILITIES: FacilityPin[] = [
     reviewCount: 64,
     distanceKm: 0.5,
     coordinates: { x: 54, y: 55 },
-    features: ['Prescription Medicines', 'Cold-Chain Insulin', 'Surgicals'],
-    openStatus: 'Open 24/7',
+    features: ['Cardiology OPD', 'Dermatology Chamber', 'ENT Specialist', 'BMDC Registered'],
+    openStatus: 'Evening Chambers (5:00 PM - 10:00 PM)',
   },
   {
     id: 'fac-5',
-    name: 'Sylhet Division Emergency Dispatch Hub',
-    type: 'AMBULANCE',
-    location: 'Kulaura Road Ambulance Depot',
-    upazila: 'Moulvibazar',
+    name: 'Kulaura Specialist Medical Chambers',
+    type: 'DOCTOR_CHAMBER',
+    location: 'Main Road, Kulaura Upazila',
+    upazila: 'Kulaura',
     district: 'Moulvibazar',
     phone: BRAND_CONSTANTS.CUSTOMER_CARE_PHONE,
     rating: 4.9,
     reviewCount: 110,
-    distanceKm: 2.1,
+    distanceKm: 28.1,
     coordinates: { x: 62, y: 35 },
-    features: ['ICU Support', 'Oxygen Cylinder', 'Trained Paramedic'],
-    openStatus: '24/7 Fast Response (Avg 12 Mins)',
+    features: ['Visiting Professor Chambers', 'Child Specialists', 'Medicine & Heart', 'Digital Serial'],
+    openStatus: 'Consultation Open (3:00 PM - 9:00 PM)',
   },
 ];
 
@@ -119,11 +119,11 @@ export default function MapDiscovery({
   onSelectFacility?: (facility: FacilityPin) => void;
 }) {
   const t = TRANSLATIONS[language];
-  const [filterType, setFilterType] = useState<'ALL' | 'HOSPITAL' | 'DIAGNOSTIC_CENTER' | 'PHARMACY' | 'AMBULANCE'>('ALL');
+  const [filterType, setFilterType] = useState<string>('ALL');
   const [selectedFacility, setSelectedFacility] = useState<FacilityPin>(SAMPLE_FACILITIES[0]);
 
   const filteredFacilities = SAMPLE_FACILITIES.filter(
-    (f) => filterType === 'ALL' || f.type === filterType
+    (f) => filterType === 'ALL' || f.upazila.includes(filterType) || f.type === filterType
   );
 
   return (
@@ -150,28 +150,27 @@ export default function MapDiscovery({
               marginBottom: '4px',
             }}
           >
-            GEOGRAPHIC COVERAGE
+            CHAMBER NETWORK MAP
           </div>
           <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)' }}>
-            {t.mapTitle}
+            {language === 'en' ? 'Specialist Doctor Chambers Across Moulvibazar' : 'মৌলভীবাজারের বিশেষজ্ঞ ডাক্তার চেম্বার নেটওয়ার্ক'}
           </h2>
           <p style={{ fontSize: '13.5px', color: 'var(--slate-500)', marginTop: '2px' }}>
-            {t.mapSubtitle}
+            {language === 'en' ? 'Locate verified medical consultation chambers with real-time queue tracking' : 'রিয়েল-টাইম সিরিয়াল ট্র্যাকিং সুবিধাসহ ভেরিফায়েড বিশেষজ্ঞ চেম্বার ও ক্লিনিক'}
           </p>
         </div>
 
         {/* Filter Pills */}
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {[
-            { id: 'ALL', label: t.mapFilterAll },
-            { id: 'DIAGNOSTIC_CENTER', label: t.mapFilterCenters },
-            { id: 'HOSPITAL', label: t.mapFilterHospitals },
-            { id: 'PHARMACY', label: t.mapFilterPharmacies },
-            { id: 'AMBULANCE', label: t.mapFilterAmbulance },
+            { id: 'ALL', label: language === 'en' ? 'All Chambers' : 'সকল চেম্বার' },
+            { id: 'Sadar', label: language === 'en' ? 'Moulvibazar Sadar' : 'মৌলভীবাজার সদর' },
+            { id: 'Sreemangal', label: language === 'en' ? 'Sreemangal' : 'শ্রীমঙ্গল' },
+            { id: 'Kulaura', label: language === 'en' ? 'Kulaura' : 'কুলাউড়া' },
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setFilterType(item.id as any)}
+              onClick={() => setFilterType(item.id)}
               style={{
                 padding: '6px 14px',
                 borderRadius: '20px',
@@ -257,18 +256,8 @@ export default function MapDiscovery({
           <div style={{ position: 'absolute', inset: '40px 30px', zIndex: 4 }}>
             {filteredFacilities.map((fac) => {
               const isSelected = selectedFacility.id === fac.id;
-              const isCenter = fac.type === 'DIAGNOSTIC_CENTER';
-              const isHospital = fac.type === 'HOSPITAL';
-              const isPharmacy = fac.type === 'PHARMACY';
-              const isAmbulance = fac.type === 'AMBULANCE';
-
-              const pinColor = isHospital
-                ? '#3B82F6'
-                : isCenter
-                ? '#06B6D4'
-                : isAmbulance
-                ? '#EF4444'
-                : '#10B981';
+              const isHospitalOpd = fac.type === 'HOSPITAL_OPD';
+              const pinColor = isHospitalOpd ? '#0284C7' : '#0F766E';
 
               return (
                 <div
@@ -305,10 +294,7 @@ export default function MapDiscovery({
                       transition: 'all 0.2s ease',
                     }}
                   >
-                    {isHospital && <Building2 size={isSelected ? 20 : 16} />}
-                    {isCenter && <TestTube2 size={isSelected ? 20 : 16} />}
-                    {isPharmacy && <Pill size={isSelected ? 20 : 16} />}
-                    {isAmbulance && <Ambulance size={isSelected ? 20 : 16} />}
+                    <Building2 size={isSelected ? 20 : 16} />
                   </div>
 
                   {/* Pin Tooltip */}

@@ -19,7 +19,7 @@ export default function AdvancedSearchFilter({
   onSelectResult?: (result: SearchResult) => void;
 }) {
   const [query, setQuery] = useState('');
-  const [selectedType, setSelectedType] = useState<'ALL' | 'DOCTOR' | 'DIAGNOSTIC_CENTER' | 'TEST'>('ALL');
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('ALL');
   const [selectedUpazila, setSelectedUpazila] = useState('ALL');
   const [availableToday, setAvailableToday] = useState(false);
   const [maxPrice, setMaxPrice] = useState(1500);
@@ -30,8 +30,9 @@ export default function AdvancedSearchFilter({
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (query) params.append('query', query);
-      if (selectedType !== 'ALL') params.append('type', selectedType);
+      const combinedQuery = [query, selectedSpecialty !== 'ALL' ? selectedSpecialty : ''].filter(Boolean).join(' ');
+      if (combinedQuery) params.append('query', combinedQuery);
+      params.append('type', 'DOCTOR');
       if (availableToday) params.append('availableToday', 'true');
       if (maxPrice < 1500) params.append('maxPrice', maxPrice.toString());
 
@@ -49,7 +50,7 @@ export default function AdvancedSearchFilter({
 
   useEffect(() => {
     fetchResults();
-  }, [query, selectedType, selectedUpazila, availableToday, maxPrice]);
+  }, [query, selectedSpecialty, selectedUpazila, availableToday, maxPrice]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -62,7 +63,7 @@ export default function AdvancedSearchFilter({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="ডাক্তারের নাম, বিশেষজ্ঞ বিভাগ, বা ডায়াগনস্টিক টেস্টের নাম লিখুন (যেমন: হৃদরোগ, CBC, আনিসুর)..."
+              placeholder="ডাক্তারের নাম বা বিশেষজ্ঞ বিভাগ লিখুন (যেমন: ডাঃ আনিসুর রহমান, হৃদরোগ, মেডিসিন)..."
               style={{
                 width: '100%',
                 padding: '12px 16px',
@@ -82,26 +83,28 @@ export default function AdvancedSearchFilter({
           </button>
         </div>
 
-        {/* Type Filter Tabs */}
+        {/* Type Filter Tabs: Doctor Specialties */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
           {[
-            { id: 'ALL', label: 'সকল সেবা (All)' },
-            { id: 'DOCTOR', label: '👨‍⚕️ বিশেষজ্ঞ ডাক্তার' },
-            { id: 'DIAGNOSTIC_CENTER', label: '🏥 ডায়াগনস্টিক সেন্টার' },
-            { id: 'TEST', label: '🧪 ল্যাব টেস্ট' },
+            { id: 'ALL', label: 'সকল ডাক্তার (All Doctors)' },
+            { id: 'Cardiology', label: '❤️ কার্ডিওলজি (হৃদরোগ)' },
+            { id: 'Medicine', label: '🩺 মেডিসিন ও ডায়াবেটিস' },
+            { id: 'Gynecologist', label: '🤰 স্ত্রী ও প্রসূতিরোগ' },
+            { id: 'Pediatrics', label: '👶 শিশু বিশেষজ্ঞ' },
+            { id: 'Orthopedics', label: '🦴 অর্থোপেডিকস' },
           ].map((t) => (
             <button
               key={t.id}
-              onClick={() => setSelectedType(t.id as any)}
+              onClick={() => setSelectedSpecialty(t.id)}
               style={{
                 padding: '8px 14px',
                 borderRadius: '20px',
                 fontSize: '0.85rem',
                 fontWeight: 600,
                 border: '1px solid',
-                borderColor: selectedType === t.id ? 'var(--brand-teal-600)' : 'var(--slate-300)',
-                background: selectedType === t.id ? 'var(--brand-teal-50)' : 'white',
-                color: selectedType === t.id ? 'var(--brand-teal-600)' : 'var(--slate-700)',
+                borderColor: selectedSpecialty === t.id ? 'var(--brand-teal-600)' : 'var(--slate-300)',
+                background: selectedSpecialty === t.id ? 'var(--brand-teal-50)' : 'white',
+                color: selectedSpecialty === t.id ? 'var(--brand-teal-600)' : 'var(--slate-700)',
                 cursor: 'pointer',
               }}
             >

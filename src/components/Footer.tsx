@@ -160,7 +160,7 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
           </div>
 
           <p style={{ color: '#94A3B8', fontSize: '13.5px', lineHeight: 1.65, marginBottom: '20px' }}>
-            Bangladesh&apos;s digital healthcare marketplace connecting patients with verified diagnostic centers, specialist doctors, hospitals, clinics, pharmacies and 24/7 emergency ambulance services.
+            Bangladesh&apos;s digital doctor appointment booking platform connecting patients with verified specialist physicians, real-time chamber serial queues, and accredited medical chambers.
           </p>
 
           <div
@@ -266,7 +266,7 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
           </div>
         </div>
 
-        {/* Column 2: Healthcare Services */}
+        {/* Column 2: Doctor Specialties */}
         <div>
           <h4
             style={{
@@ -278,7 +278,7 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               letterSpacing: '0.06em',
             }}
           >
-            Healthcare Services
+            Doctor Specialties
           </h4>
           <ul
             style={{
@@ -292,37 +292,42 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
           >
             <li>
               <Link href="/doctors" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Find Doctors
+                All Doctors Directory
               </Link>
             </li>
             <li>
-              <Link href="/tests" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Diagnostic Tests
+              <Link href="/doctors?specialty=Cardiology" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Cardiology (Heart Care)
               </Link>
             </li>
             <li>
-              <Link href="/diagnostic-centers" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Diagnostic Centers
+              <Link href="/doctors?specialty=Medicine" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Medicine & Diabetology
               </Link>
             </li>
             <li>
-              <Link href="/hospitals" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Hospitals & Clinics
+              <Link href="/doctors?specialty=Gynecologist" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Gynecology & Obstetrics
               </Link>
             </li>
             <li>
-              <Link href="/pharmacies" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Pharmacies & Medicines
+              <Link href="/doctors?specialty=Pediatrics" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Pediatrics (Child Specialists)
               </Link>
             </li>
             <li>
-              <Link href="/ambulance" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Ambulance Dispatch 24/7
+              <Link href="/doctors?specialty=Orthopedics" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Orthopedics & Trauma
               </Link>
             </li>
             <li>
-              <Link href="/home-care" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Home Healthcare & Phlebotomy
+              <Link href="/appointments" style={{ color: 'inherit', textDecoration: 'none' }}>
+                My Appointments Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link href="/doctor/portal" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Doctor Chamber Portal
               </Link>
             </li>
           </ul>
