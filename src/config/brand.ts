@@ -15,6 +15,7 @@ export const BRAND_CONSTANTS = {
   TAGLINE: 'Your Healthcare Marketplace',
   CUSTOMER_CARE_PHONE: '01886748564',
   CUSTOMER_CARE_DISPLAY: '01886-748564',
+  COMPANY_EMAIL: 'diagonosticcare@gmail.com',
   COUNTRY: 'Bangladesh',
   INITIAL_LAUNCH_LOCATION: 'Moulvibazar',
   INITIAL_LAUNCH_DISTRICT: 'Moulvibazar',

@@ -1,7 +1,8 @@
 # Diagnostic Care — Role-Based Access Control (RBAC) Specification
 
 **Brand:** Diagnostic Care | Your Healthcare Marketplace  
-**Helpline:** 01886748564  
+**Helpline:** 01886748564 | **Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Security Standard:** Strict Server-Side Contextual Authorization (Never Trust Frontend Role Hiding)  
 
 ---

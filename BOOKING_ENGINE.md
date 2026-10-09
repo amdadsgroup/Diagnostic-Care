@@ -1,7 +1,8 @@
 # Diagnostic Care — Real-Time Booking Engine Specification
 
 **Brand:** Diagnostic Care | Your Healthcare Marketplace  
-**Helpline:** 01886748564  
+**Helpline:** 01886748564 | **Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Engine Domain:** Ultra-Low Latency Slot Generation, 5-Minute Atomic Hold, Concurrency Lock & Live Queue  
 
 ---

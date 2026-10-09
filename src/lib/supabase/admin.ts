@@ -24,6 +24,16 @@ export function getAdminClient(): SupabaseClient {
         autoRefreshToken: false,
         persistSession: false,
       },
+      global: {
+        fetch: (input, init) => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 1200);
+          if (init?.signal) {
+            init.signal.addEventListener('abort', () => controller.abort());
+          }
+          return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timeoutId));
+        },
+      },
     });
   }
 

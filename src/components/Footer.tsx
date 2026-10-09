@@ -357,7 +357,12 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
             </li>
             <li>
               <a href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`} style={{ color: 'inherit' }}>
-                Contact Support (24/7)
+                Contact Support (24/7): {BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${BRAND_CONSTANTS.COMPANY_EMAIL}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Mail size={13} color="#60A5FA" /> {BRAND_CONSTANTS.COMPANY_EMAIL}
               </a>
             </li>
             <li>

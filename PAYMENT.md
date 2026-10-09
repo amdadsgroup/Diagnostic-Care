@@ -1,7 +1,8 @@
 # Diagnostic Care — Payment Architecture & Financial Ledger Specification
 
 **Brand:** Diagnostic Care | Your Healthcare Marketplace  
-**Helpline:** 01886748564  
+**Helpline:** 01886748564 | **Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Currency:** Bangladeshi Taka (BDT / ৳)  
 **Supported Payment Providers:** bKash, Nagad, Rocket, SSLCommerz/Cards, Cash-at-Chamber  
 

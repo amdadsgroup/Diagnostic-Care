@@ -1,7 +1,8 @@
 # Diagnostic Care — Business Rules & Configuration Specification
 
 **Brand:** Diagnostic Care | Your Healthcare Marketplace  
-**Helpline:** 01886748564  
+**Helpline:** 01886748564 | **Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Primary Currency:** Bangladeshi Taka (BDT / ৳)  
 **Configuration Principle:** Zero Hardcoded Business Logic; Dynamic Config via Admin Engine  
 

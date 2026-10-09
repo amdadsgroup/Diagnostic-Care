@@ -3,6 +3,8 @@
 **Brand:** Diagnostic Care  
 **Tagline:** Your Healthcare Marketplace  
 **Helpline:** 01886748564  
+**Company Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Design Philosophy:** Trust, Clarity, Clinical Professionalism, Speed, and Accessibility  
 
 ---

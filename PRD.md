@@ -3,7 +3,9 @@
 **Brand Name:** Diagnostic Care  
 **Tagline:** Your Healthcare Marketplace  
 **Customer Care:** 01886748564  
-**Primary Market:** Bangladesh
+**Company Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
+**Primary Market:** Bangladesh  
 **Document Version:** 1.0.0  
 **Status:** Approved Architecture Specification  
 

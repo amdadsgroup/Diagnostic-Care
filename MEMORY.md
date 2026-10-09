@@ -3,6 +3,8 @@
 **Brand:** Diagnostic Care  
 **Tagline:** Your Healthcare Marketplace  
 **Helpline / Customer Care Phone:** 01886748564  
+**Company Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Country:** Bangladesh  
 **Initial Launch Location:** Moulvibazar, Sylhet Division  
 **Default Languages:** Bangla (বাংলা), English (EN)  

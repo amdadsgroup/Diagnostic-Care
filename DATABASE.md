@@ -2,7 +2,9 @@
 
 **Platform:** PostgreSQL 16+  
 **Architecture:** Normalized, Multi-Tenant, Row-Isolated, High-Concurrency  
-**Brand:** Diagnostic Care | Your Healthcare Marketplace (Helpline: 01886748564)  
+**Brand:** Diagnostic Care | Your Healthcare Marketplace  
+**Helpline:** 01886748564 | **Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 
 ---
 

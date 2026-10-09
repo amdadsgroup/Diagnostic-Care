@@ -1,7 +1,8 @@
 # Diagnostic Care — Quality Assurance & Testing Specification
 
 **Brand:** Diagnostic Care | Your Healthcare Marketplace  
-**Helpline:** 01886748564  
+**Helpline:** 01886748564 | **Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Quality Philosophy:** In Healthcare Systems, Bugs Aren't Just Inconveniences—They Impact Patient Care  
 
 ---

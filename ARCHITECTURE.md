@@ -2,6 +2,8 @@
 
 **Brand:** Diagnostic Care | Your Healthcare Marketplace  
 **Customer Care:** 01886748564  
+**Company Email:** diagonosticcare@gmail.com  
+**Primary B2B Customer:** Diagnostic Centers  
 **Initial Deployment Focus:** Moulvibazar, Sylhet Division, Bangladesh  
 **Architecture Style:** High-Performance Modular Domain Monolith with Cloud-Native Event Extension  
 
