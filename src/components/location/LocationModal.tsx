@@ -7,7 +7,8 @@ import { MapPin, Navigation, Check, X, Search } from 'lucide-react';
 interface LocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedLocation: string;
+  selectedLocation?: string;
+  currentLocation?: string;
   onSelectLocation: (loc: string) => void;
   language: SupportedLanguage;
 }
@@ -29,9 +30,11 @@ export default function LocationModal({
   isOpen,
   onClose,
   selectedLocation,
+  currentLocation,
   onSelectLocation,
   language,
 }: LocationModalProps) {
+  const activeLocation = selectedLocation || currentLocation || 'Moulvibazar';
   const [searchQuery, setSearchQuery] = useState('');
   const [isLocating, setIsLocating] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
@@ -220,8 +223,8 @@ export default function LocationModal({
         {/* Location List */}
         <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '42vh' }}>
           {filteredLocations.map((loc) => {
-            const isSelected = selectedLocation.toLowerCase().includes(loc.nameEn.toLowerCase()) ||
-              selectedLocation.includes(loc.nameBn);
+            const isSelected = activeLocation.toLowerCase().includes(loc.nameEn.toLowerCase()) ||
+              activeLocation.includes(loc.nameBn);
 
             return (
               <button

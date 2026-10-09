@@ -38,7 +38,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#F8F7F4', // Porcelain brand background
+        backgroundColor: '#F7FAFE',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
@@ -49,7 +49,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
         style={{
           height: '68px',
           backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #E5E7EB',
+          borderBottom: '1px solid #E2EAF4',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -85,11 +85,11 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               gap: '6px',
               fontSize: '13px',
               fontWeight: 600,
-              color: '#475569',
+              color: '#64748B',
               textDecoration: 'none',
-              padding: '6px 12px',
+              padding: '6px 14px',
               borderRadius: '8px',
-              border: '1px solid #E2E8F0',
+              border: '1px solid #E2EAF4',
               backgroundColor: '#FFFFFF',
               transition: 'all 0.15s ease',
             }}
@@ -117,8 +117,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
             backgroundColor: '#FFFFFF',
             borderRadius: '20px',
             boxShadow:
-              '0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
-            border: '1px solid #E2E8F0',
+              '0 20px 40px -15px rgba(16, 41, 79, 0.08), 0 1px 3px rgba(16, 41, 79, 0.04)',
+            border: '1px solid #E2EAF4',
             overflow: 'hidden',
             display: 'grid',
             gridTemplateColumns: 'minmax(0, 1fr)',
@@ -129,9 +129,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           <div
             className="d-desktop-only"
             style={{
-              backgroundColor: '#0F172A',
+              backgroundColor: '#10294F',
               backgroundImage:
-                'radial-gradient(circle at 20% 20%, rgba(0, 87, 255, 0.25) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 50%)',
+                'radial-gradient(circle at 20% 20%, rgba(23, 105, 245, 0.3) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(17, 184, 165, 0.2) 0%, transparent 50%)',
               color: '#FFFFFF',
               padding: '48px 40px',
               display: 'flex',
@@ -335,10 +335,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 <div
                   style={{
                     display: 'inline-block',
-                    padding: '3px 10px',
+                    padding: '4px 12px',
                     borderRadius: '6px',
-                    backgroundColor: '#EFF6FF',
-                    color: '#0057FF',
+                    backgroundColor: '#EAF2FF',
+                    color: '#1769F5',
                     fontSize: '11.5px',
                     fontWeight: 700,
                     textTransform: 'uppercase',
@@ -354,7 +354,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 style={{
                   fontSize: '24px',
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: '#14243D',
                   letterSpacing: '-0.02em',
                   marginBottom: '6px',
                   lineHeight: 1.25,

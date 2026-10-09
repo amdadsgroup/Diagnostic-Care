@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { UserRole, ScheduleSlot, DoctorAssociation, Appointment, DiagnosticTest } from '@/types';
@@ -997,8 +998,8 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                {/* Filter tags */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {/* Actions & Filter tags */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   {['ALL', 'Cardiologist', 'Gynecologist', 'Medicine'].map((spec) => (
                     <button
                       key={spec}
@@ -1017,6 +1018,24 @@ export default function HomePage() {
                       {spec === 'ALL' ? t.filterAllSpecialties : spec}
                     </button>
                   ))}
+                  <Link
+                    href="/doctors"
+                    style={{
+                      padding: '7px 16px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      backgroundColor: 'var(--brand-primary)',
+                      color: '#FFFFFF',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <span>{language === 'en' ? 'All Doctors' : 'সব ডাক্তার'}</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
               </div>
 
@@ -1189,11 +1208,11 @@ export default function HomePage() {
             </section>
 
             {/* DIAGNOSTIC TESTS & PATHOLOGY SECTION */}
-            <section id="diagnostic-tests-section" style={{ backgroundColor: 'var(--slate-100)', padding: '64px 0', borderTop: '1px solid var(--slate-200)', borderBottom: '1px solid var(--slate-200)' }}>
+            <section id="diagnostic-tests-section" style={{ backgroundColor: '#F7FAFE', padding: '64px 0', borderTop: '1px solid var(--brand-border)', borderBottom: '1px solid var(--brand-border)' }}>
               <div className="container">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
                   <div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#0891B2', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
                       CLINICAL PATHOLOGY & IMAGING
                     </div>
                     <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
@@ -1203,6 +1222,25 @@ export default function HomePage() {
                       {t.sectionDiagnosticsSubtitle}
                     </p>
                   </div>
+
+                  <Link
+                    href="/tests"
+                    style={{
+                      padding: '8px 18px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      backgroundColor: 'var(--brand-primary)',
+                      color: '#FFFFFF',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <span>{language === 'en' ? 'Explore Test Catalog' : 'সকল টেস্ট ক্যাটালগ'}</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
 
                 <div className="grid-cards">
@@ -1289,16 +1327,37 @@ export default function HomePage() {
 
             {/* PARTNER DIAGNOSTIC CENTERS SECTION */}
             <section id="diagnostic-centers-section" className="container" style={{ padding: '56px 24px 20px 24px' }}>
-              <div style={{ marginBottom: '28px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#0891B2', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                  CERTIFIED INSTITUTIONS
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
+                    CERTIFIED INSTITUTIONS
+                  </div>
+                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
+                    {t.sectionCentersTitle}
+                  </h2>
+                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
+                    {t.sectionCentersSubtitle}
+                  </p>
                 </div>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                  {t.sectionCentersTitle}
-                </h2>
-                <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
-                  {t.sectionCentersSubtitle}
-                </p>
+
+                <Link
+                  href="/diagnostic-centers"
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    backgroundColor: 'var(--brand-primary)',
+                    color: '#FFFFFF',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span>{language === 'en' ? 'All Diagnostic Centers' : 'সকল ডায়াগনস্টিক সেন্টার'}</span>
+                  <ArrowRight size={13} />
+                </Link>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
@@ -1362,16 +1421,37 @@ export default function HomePage() {
 
             {/* HOSPITALS & CLINICS SECTION */}
             <section id="hospitals-section" className="container" style={{ padding: '56px 24px 20px 24px' }}>
-              <div style={{ marginBottom: '28px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#0057FF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                  TERTIARY HOSPITALS & INPATIENT FACILITIES
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
+                    TERTIARY HOSPITALS & INPATIENT FACILITIES
+                  </div>
+                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
+                    {language === 'en' ? 'Hospitals & Specialized Clinics' : 'হাসপাতাল ও বিশেষায়িত ক্লিনিক'}
+                  </h2>
+                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
+                    {language === 'en' ? 'Verified tertiary healthcare facilities with ICU, 24/7 trauma emergency, and specialist admissions.' : 'আইসিইউ, ২৪/৭ জরুরি সেবা এবং বিশেষজ্ঞ ডাক্তার সমন্বিত ভেরিফাইড হাসপাতাল।'}
+                  </p>
                 </div>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A' }}>
-                  {language === 'en' ? 'Hospitals & Specialized Clinics' : 'হাসপাতাল ও বিশেষায়িত ক্লিনিক'}
-                </h2>
-                <p style={{ color: '#64748B', fontSize: '14px', marginTop: '3px' }}>
-                  {language === 'en' ? 'Verified tertiary healthcare facilities with ICU, 24/7 trauma emergency, and specialist admissions.' : 'আইসিইউ, ২৪/৭ জরুরি সেবা এবং বিশেষজ্ঞ ডাক্তার সমন্বিত ভেরিফাইড হাসপাতাল।'}
-                </p>
+
+                <Link
+                  href="/hospitals"
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    backgroundColor: 'var(--brand-primary)',
+                    color: '#FFFFFF',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span>{language === 'en' ? 'All Hospitals & Clinics' : 'সকল হাসপাতাল ও ক্লিনিক'}</span>
+                  <ArrowRight size={13} />
+                </Link>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
@@ -1470,16 +1550,37 @@ export default function HomePage() {
 
             {/* PHARMACIES & GENUINE MEDICINE SECTION */}
             <section id="pharmacies-section" className="container" style={{ padding: '56px 24px 20px 24px' }}>
-              <div style={{ marginBottom: '28px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                  LICENSED RETAIL PHARMACIES
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#15976A', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
+                    LICENSED RETAIL PHARMACIES
+                  </div>
+                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)' }}>
+                    {language === 'en' ? 'Verified Pharmacies & Genuine Medicines' : 'ভেরিফাইড ফার্মেসি ও জেনুইন ঔষধ'}
+                  </h2>
+                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
+                    {language === 'en' ? 'Order authentic prescription drugs with DGDA verification and fast 2-4 hour doorstep delivery.' : '১০০% জেনুইন ঔষধ প্রেসক্রিপশন আপলোড করে ২-৪ ঘণ্টার মধ্যে ঘরে বসেই সংগ্রহ করুন।'}
+                  </p>
                 </div>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A' }}>
-                  {language === 'en' ? 'Verified Pharmacies & Genuine Medicines' : 'ভেরিফাইড ফার্মেসি ও জেনুইন ঔষধ'}
-                </h2>
-                <p style={{ color: '#64748B', fontSize: '14px', marginTop: '3px' }}>
-                  {language === 'en' ? 'Order authentic prescription drugs with DGDA verification and fast 2-4 hour doorstep delivery.' : '১০০% জেনুইন ঔষধ প্রেসক্রিপশন আপলোড করে ২-৪ ঘণ্টার মধ্যে ঘরে বসেই সংগ্রহ করুন।'}
-                </p>
+
+                <Link
+                  href="/pharmacies"
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    backgroundColor: '#15976A',
+                    color: '#FFFFFF',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span>{language === 'en' ? 'All Pharmacies' : 'সকল ফার্মেসি'}</span>
+                  <ArrowRight size={13} />
+                </Link>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>

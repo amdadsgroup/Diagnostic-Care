@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { UserRole } from '@/types';
@@ -264,88 +265,122 @@ export const Header: React.FC<HeaderProps> = ({
           }}
         >
           {/* 1. Home */}
-          <button
-            onClick={() => handleNavClick('marketplace')}
+          <Link
+            href="/"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: activeTab === 'marketplace' ? 700 : 500,
-              color: activeTab === 'marketplace' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
-              backgroundColor: activeTab === 'marketplace' ? BRAND_COLORS.primaryLight : 'transparent',
+              fontWeight: activeTab === 'marketplace' || activeTab === 'home' ? 700 : 500,
+              color: activeTab === 'marketplace' || activeTab === 'home' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'marketplace' || activeTab === 'home' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
             {language === 'en' ? 'Home' : 'হোম'}
-          </button>
+          </Link>
 
           {/* 2. Find Doctors */}
-          <button
-            onClick={() => handleNavClick('marketplace', 'DOCTOR')}
+          <Link
+            href="/doctors"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: 500,
-              color: BRAND_COLORS.textDark,
+              fontWeight: activeTab === 'doctors' || activeTab === 'DOCTOR' ? 700 : 500,
+              color: activeTab === 'doctors' || activeTab === 'DOCTOR' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'doctors' || activeTab === 'DOCTOR' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
             {language === 'en' ? 'Find Doctors' : 'ডাক্তার'}
-          </button>
+          </Link>
 
-          {/* 3. Diagnostic Centers */}
-          <button
-            onClick={() => handleNavClick('marketplace', 'DIAGNOSTIC_CENTER')}
+          {/* 3. Diagnostic Tests */}
+          <Link
+            href="/tests"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: 500,
-              color: BRAND_COLORS.textDark,
+              fontWeight: activeTab === 'tests' || activeTab === 'DIAGNOSTIC_TESTS' ? 700 : 500,
+              color: activeTab === 'tests' || activeTab === 'DIAGNOSTIC_TESTS' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'tests' || activeTab === 'DIAGNOSTIC_TESTS' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {language === 'en' ? 'Diagnostic Tests' : 'ডায়াগনস্টিক টেস্ট'}
+          </Link>
+
+          {/* 4. Diagnostic Centers */}
+          <Link
+            href="/diagnostic-centers"
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              fontSize: '13.5px',
+              fontWeight: activeTab === 'diagnostic-centers' || activeTab === 'DIAGNOSTIC_CENTER' ? 700 : 500,
+              color: activeTab === 'diagnostic-centers' || activeTab === 'DIAGNOSTIC_CENTER' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'diagnostic-centers' || activeTab === 'DIAGNOSTIC_CENTER' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
             {language === 'en' ? 'Diagnostic Centers' : 'ডায়াগনস্টিক সেন্টার'}
-          </button>
+          </Link>
 
-          {/* 4. Hospitals & Clinics */}
-          <button
-            onClick={() => handleNavClick('marketplace', 'HOSPITAL')}
+          {/* 5. Hospitals & Clinics */}
+          <Link
+            href="/hospitals"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: 500,
-              color: BRAND_COLORS.textDark,
+              fontWeight: activeTab === 'hospitals' || activeTab === 'HOSPITAL' ? 700 : 500,
+              color: activeTab === 'hospitals' || activeTab === 'HOSPITAL' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'hospitals' || activeTab === 'HOSPITAL' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
             {language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}
-          </button>
+          </Link>
 
-          {/* 5. Pharmacies */}
-          <button
-            onClick={() => handleNavClick('marketplace', 'PHARMACY')}
+          {/* 6. Pharmacies */}
+          <Link
+            href="/pharmacies"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: 500,
-              color: BRAND_COLORS.textDark,
+              fontWeight: activeTab === 'pharmacies' || activeTab === 'PHARMACY' ? 700 : 500,
+              color: activeTab === 'pharmacies' || activeTab === 'PHARMACY' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'pharmacies' || activeTab === 'PHARMACY' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
             {language === 'en' ? 'Pharmacies' : 'ফার্মেসি'}
-          </button>
+          </Link>
 
-          {/* 6. Ambulance */}
-          <button
-            onClick={() => handleNavClick('marketplace', 'AMBULANCE')}
+          {/* 7. Ambulance */}
+          <Link
+            href="/ambulance"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: 500,
-              color: BRAND_COLORS.textDark,
+              fontWeight: activeTab === 'ambulance' || activeTab === 'AMBULANCE' ? 700 : 500,
+              color: activeTab === 'ambulance' || activeTab === 'AMBULANCE' ? '#DC4545' : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'ambulance' || activeTab === 'AMBULANCE' ? '#FDF2F2' : 'transparent',
+              textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
+              transition: 'all 0.15s ease',
             }}
           >
             <span>{language === 'en' ? 'Ambulance' : 'অ্যাম্বুলেন্স'}</span>
@@ -354,25 +389,28 @@ export const Header: React.FC<HeaderProps> = ({
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#EF4444',
-                boxShadow: '0 0 6px #EF4444',
+                backgroundColor: '#DC4545',
+                boxShadow: '0 0 6px #DC4545',
               }}
             />
-          </button>
+          </Link>
 
-          {/* 7. Home Healthcare */}
-          <button
-            onClick={() => handleNavClick('marketplace', 'HOME_CARE')}
+          {/* 8. Home Healthcare */}
+          <Link
+            href="/home-care"
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
               fontSize: '13.5px',
-              fontWeight: 500,
-              color: BRAND_COLORS.textDark,
+              fontWeight: activeTab === 'homecare' || activeTab === 'home-care' || activeTab === 'HOME_CARE' ? 700 : 500,
+              color: activeTab === 'homecare' || activeTab === 'home-care' || activeTab === 'HOME_CARE' ? BRAND_COLORS.primary : BRAND_COLORS.textDark,
+              backgroundColor: activeTab === 'homecare' || activeTab === 'home-care' || activeTab === 'HOME_CARE' ? BRAND_COLORS.primaryLight : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
             {language === 'en' ? 'Home Healthcare' : 'হোম হেলথকেয়ার'}
-          </button>
+          </Link>
         </nav>
 
         {/* Right Side Actions */}
@@ -654,27 +692,29 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button
-              onClick={() => handleNavClick('marketplace')}
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 padding: '10px 12px',
                 borderRadius: '10px',
-                backgroundColor: activeTab === 'marketplace' ? BRAND_COLORS.primaryLight : 'transparent',
-                color: activeTab === 'marketplace' ? BRAND_COLORS.primary : 'var(--brand-text-dark)',
+                backgroundColor: activeTab === 'marketplace' || activeTab === 'home' ? BRAND_COLORS.primaryLight : 'transparent',
+                color: activeTab === 'marketplace' || activeTab === 'home' ? BRAND_COLORS.primary : 'var(--brand-text-dark)',
                 fontWeight: 600,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
-              <Home size={18} color={activeTab === 'marketplace' ? BRAND_COLORS.primary : '#64748B'} />
+              <Home size={18} color={activeTab === 'marketplace' || activeTab === 'home' ? BRAND_COLORS.primary : '#64748B'} />
               <span>{language === 'en' ? 'Home' : 'হোম'}</span>
-            </button>
+            </Link>
 
-            <button
-              onClick={() => handleNavClick('marketplace', 'DOCTOR')}
+            <Link
+              href="/doctors"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -684,15 +724,16 @@ export const Header: React.FC<HeaderProps> = ({
                 color: 'var(--brand-text-dark)',
                 fontWeight: 600,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
               <Stethoscope size={18} color="#64748B" />
               <span>{language === 'en' ? 'Find Doctors' : 'ডাক্তার খুঁজুন'}</span>
-            </button>
+            </Link>
 
-            <button
-              onClick={() => handleNavClick('marketplace', 'DIAGNOSTIC_CENTER')}
+            <Link
+              href="/tests"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -702,15 +743,16 @@ export const Header: React.FC<HeaderProps> = ({
                 color: 'var(--brand-text-dark)',
                 fontWeight: 600,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
               <TestTube2 size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Diagnostic Centers & Tests' : 'ডায়াগনস্টিক সেন্টার ও টেস্ট'}</span>
-            </button>
+              <span>{language === 'en' ? 'Diagnostic Tests' : 'ডায়াগনস্টিক টেস্ট'}</span>
+            </Link>
 
-            <button
-              onClick={() => handleNavClick('marketplace', 'HOSPITAL')}
+            <Link
+              href="/diagnostic-centers"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -720,15 +762,16 @@ export const Header: React.FC<HeaderProps> = ({
                 color: 'var(--brand-text-dark)',
                 fontWeight: 600,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
               <Building2 size={18} color="#64748B" />
-              <span>{language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}</span>
-            </button>
+              <span>{language === 'en' ? 'Diagnostic Centers' : 'ডায়াগনস্টিক সেন্টার'}</span>
+            </Link>
 
-            <button
-              onClick={() => handleNavClick('marketplace', 'PHARMACY')}
+            <Link
+              href="/hospitals"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -738,15 +781,35 @@ export const Header: React.FC<HeaderProps> = ({
                 color: 'var(--brand-text-dark)',
                 fontWeight: 600,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
+              }}
+            >
+              <HeartPulse size={18} color="#64748B" />
+              <span>{language === 'en' ? 'Hospitals & Clinics' : 'হাসপাতাল ও ক্লিনিক'}</span>
+            </Link>
+
+            <Link
+              href="/pharmacies"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                color: 'var(--brand-text-dark)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textDecoration: 'none',
               }}
             >
               <Pill size={18} color="#64748B" />
               <span>{language === 'en' ? 'Pharmacies & Medicines' : 'ফার্মেসি ও ঔষধ'}</span>
-            </button>
+            </Link>
 
-            <button
-              onClick={() => handleNavClick('marketplace', 'AMBULANCE')}
+            <Link
+              href="/ambulance"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -756,15 +819,16 @@ export const Header: React.FC<HeaderProps> = ({
                 color: '#DC2626',
                 fontWeight: 700,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
               <Ambulance size={18} color="#DC2626" />
               <span>{language === 'en' ? 'Emergency Ambulance 24/7' : 'জরুরি অ্যাম্বুলেন্স ২৪/৭'}</span>
-            </button>
+            </Link>
 
-            <button
-              onClick={() => handleNavClick('marketplace', 'HOME_CARE')}
+            <Link
+              href="/home-care"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -774,12 +838,12 @@ export const Header: React.FC<HeaderProps> = ({
                 color: 'var(--brand-text-dark)',
                 fontWeight: 600,
                 fontSize: '14px',
-                textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
-              <HeartPulse size={18} color="#64748B" />
+              <Home size={18} color="#64748B" />
               <span>{language === 'en' ? 'Home Healthcare' : 'হোম হেলথকেয়ার'}</span>
-            </button>
+            </Link>
 
             <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '8px 0' }} />
 

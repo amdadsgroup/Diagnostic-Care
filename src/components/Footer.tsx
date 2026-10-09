@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { BrandLogo } from '@/components/brand/BrandLogo';
@@ -36,10 +37,10 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
   return (
     <footer
       style={{
-        backgroundColor: '#0F172A',
+        backgroundColor: '#10294F',
         color: '#FFFFFF',
         marginTop: '80px',
-        borderTop: '3px solid #0057FF',
+        borderTop: '3px solid #1769F5',
         position: 'relative',
       }}
     >
@@ -290,52 +291,39 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
             }}
           >
             <li>
-              <button
-                onClick={() => handleLinkClick('marketplace', 'DOCTOR')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
-              >
+              <Link href="/doctors" style={{ color: 'inherit', textDecoration: 'none' }}>
                 Find Doctors
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => handleLinkClick('marketplace', 'DIAGNOSTIC_CENTER')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
-              >
+              <Link href="/tests" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Diagnostic Tests
+              </Link>
+            </li>
+            <li>
+              <Link href="/diagnostic-centers" style={{ color: 'inherit', textDecoration: 'none' }}>
                 Diagnostic Centers
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => handleLinkClick('marketplace', 'HOSPITAL')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
-              >
+              <Link href="/hospitals" style={{ color: 'inherit', textDecoration: 'none' }}>
                 Hospitals & Clinics
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => handleLinkClick('marketplace', 'PHARMACY')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
-              >
+              <Link href="/pharmacies" style={{ color: 'inherit', textDecoration: 'none' }}>
                 Pharmacies & Medicines
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => handleLinkClick('marketplace', 'AMBULANCE')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
-              >
+              <Link href="/ambulance" style={{ color: 'inherit', textDecoration: 'none' }}>
                 Ambulance Dispatch 24/7
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => handleLinkClick('marketplace', 'HOME_CARE')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
-              >
+              <Link href="/home-care" style={{ color: 'inherit', textDecoration: 'none' }}>
                 Home Healthcare & Phlebotomy
-              </button>
+              </Link>
             </li>
           </ul>
         </div>

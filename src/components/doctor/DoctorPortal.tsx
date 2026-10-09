@@ -132,7 +132,7 @@ export default function DoctorPortal({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Top Banner */}
-      <div className="portal-card" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)', color: 'white', border: '1px solid rgba(0, 87, 255, 0.3)' }}>
+      <div className="portal-card" style={{ background: 'linear-gradient(135deg, #10294F 0%, #1769F5 100%)', color: 'white', border: '1px solid rgba(23, 105, 245, 0.3)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', flexShrink: 0 }}>

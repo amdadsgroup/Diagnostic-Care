@@ -18,6 +18,8 @@ interface AuthModalProps {
   onClose: () => void;
   initialMode?: AuthMode;
   onAuthSuccess?: (user: AuthUserProfile) => void;
+  onLoginSuccess?: (user: any) => void;
+  language?: any;
 }
 
 export default function AuthModal({
@@ -25,6 +27,8 @@ export default function AuthModal({
   onClose,
   initialMode = 'login',
   onAuthSuccess,
+  onLoginSuccess,
+  language,
 }: AuthModalProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const { t } = useLanguage();
@@ -34,6 +38,9 @@ export default function AuthModal({
   const handleSuccess = (profile: AuthUserProfile) => {
     if (onAuthSuccess) {
       onAuthSuccess(profile);
+    }
+    if (onLoginSuccess) {
+      onLoginSuccess(profile);
     }
     onClose();
   };

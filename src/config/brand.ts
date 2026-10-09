@@ -30,44 +30,49 @@ export const BRAND_CONSTANTS = {
 
 export const BRAND_COLORS = {
   // Primary brand color
-  primary: '#0057FF', // Signal Blue
-  primaryHover: '#0047D4',
-  primaryActive: '#003BB0',
-  primaryLight: '#EBF1FF',
-  primaryFaint: 'rgba(0, 87, 255, 0.06)',
+  primary: '#1769F5', // Healthcare Primary Blue
+  primaryHover: '#0F56D2',
+  primaryActive: '#0B45AD',
+  primaryLight: '#EAF2FF',
+  primaryFaint: 'rgba(23, 105, 245, 0.08)',
+
+  // Deep Navy & Secondary Accent
+  deepNavy: '#10294F',
+  secondaryBlue: '#EAF2FF',
+  healthcareTeal: '#11B8A5',
 
   // Secondary & surfaces
-  background: '#F8F7F4', // Porcelain
-  surface: '#FFFFFF', // White
-  surfaceSubtle: '#F1EFEA', // Deeper porcelain for muted areas
+  background: '#F7FAFE', // Soft clean healthcare canvas
+  surface: '#FFFFFF', // Clean White
+  surfaceSubtle: '#F0F5FD', // Soft subtle tint
   surfaceElevated: '#FFFFFF',
 
   // Typography & Neutrals
-  text: '#000000', // Black
-  textDark: '#0F172A', // Slate 900
-  textSecondary: '#4B5563', // Slate 600
-  textMuted: '#6B7280', // Slate 500
-  textLight: '#9CA3AF',
+  text: '#14243D', // Primary Navy Text
+  textDark: '#10294F', // Deep Navy
+  textSecondary: '#64748B', // Neutral Slate 600
+  textMuted: '#94A3B8', // Neutral Slate 400
+  textLight: '#CBD5E1',
 
   // Contrast & borders
-  border: '#E5E7EB', // Neutral light border
-  borderSubtle: '#F3F4F6',
+  border: '#E2EAF4', // Soft healthcare border
+  borderSubtle: '#EDF3F9',
   borderStrong: '#CBD5E1',
-  borderBrand: 'rgba(0, 87, 255, 0.25)',
+  borderBrand: 'rgba(23, 105, 245, 0.25)',
 
   // Fixed colors
   white: '#FFFFFF',
-  black: '#000000',
+  black: '#10294F',
 
   // Semantic Status Tokens (Clinically accurate & accessible)
-  success: '#10B981',
-  successBg: '#ECFDF5',
-  warning: '#F59E0B',
-  warningBg: '#FFFBEB',
-  danger: '#EF4444',
-  dangerBg: '#FEF2F2',
-  info: '#0057FF',
-  infoBg: '#EBF1FF',
+  success: '#15976A',
+  successBg: '#E8F8F1',
+  warning: '#D99116',
+  warningBg: '#FEF8EA',
+  danger: '#DC4545',
+  dangerBg: '#FDF2F2',
+  info: '#1769F5',
+  infoBg: '#EAF2FF',
 } as const;
 
 export const BRAND_LOGOS = {
