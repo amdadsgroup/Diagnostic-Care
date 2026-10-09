@@ -564,8 +564,93 @@ export const Header: React.FC<HeaderProps> = ({
           className="d-mobile-only"
         >
           {/* Logo in drawer header */}
-          <div style={{ marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid #F1F5F9' }}>
+          <div style={{ marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid #F1F5F9' }}>
             <BrandLogo variant="horizontal" size={32} />
+          </div>
+
+          {/* User Account / Auth Bar in Mobile Drawer */}
+          <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+            {currentUser ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: BRAND_COLORS.primary, color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px' }}>
+                    {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+                      {currentUser.fullName}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#64748B' }}>
+                      {currentUser.phone || currentUser.email}
+                    </div>
+                  </div>
+                </div>
+                {onLogout && (
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    style={{
+                      padding: '6px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#FEF2F2',
+                      border: '1px solid #FCA5A5',
+                      color: '#DC2626',
+                      fontSize: '11.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {language === 'en' ? 'Sign Out' : 'লগআউট'}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (onOpenAuth) onOpenAuth();
+                    else window.location.href = '/login';
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: '#0057FF',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '12.5px',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                  }}
+                >
+                  {language === 'en' ? 'Sign In' : 'লগইন'}
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    window.location.href = '/register';
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FFFFFF',
+                    color: '#0F172A',
+                    border: '1px solid #CBD5E1',
+                    fontWeight: 700,
+                    fontSize: '12.5px',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                  }}
+                >
+                  {language === 'en' ? 'Register' : 'রেজিস্ট্রেশন'}
+                </button>
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>

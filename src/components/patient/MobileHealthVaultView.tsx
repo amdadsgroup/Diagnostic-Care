@@ -31,54 +31,7 @@ interface HealthDocument {
   fileSize: string;
 }
 
-const INITIAL_DOCS: HealthDocument[] = [
-  {
-    id: 'doc-001',
-    title: 'Complete Blood Count (CBC) with ESR',
-    type: 'REPORT',
-    date: '26 Sep 2026',
-    facility: 'Popular Diagnostic Center (Moulvibazar)',
-    patientName: 'Tanvir Ahmed',
-    summary: 'Hemoglobin: 14.2 g/dL, Platelets: 240,000 /mcL, ESR: 12 mm/1st hr (Normal clinical range).',
-    verified: true,
-    fileSize: '1.4 MB',
-  },
-  {
-    id: 'doc-002',
-    title: 'Digital Consultation Prescription Slip',
-    type: 'PRESCRIPTION',
-    date: '25 Sep 2026',
-    doctorName: 'Dr. Anisur Rahman',
-    facility: 'Popular Diagnostic Center (Chamber 204)',
-    patientName: 'Tanvir Ahmed',
-    summary: 'Diagnosis: Grade 1 Essential Hypertension. Rx: Tab. Concor 2.5mg (1+0+0), Tab. Rosuva 10mg (0+0+1).',
-    verified: true,
-    fileSize: '820 KB',
-  },
-  {
-    id: 'doc-003',
-    title: 'Serum Lipid Profile (Fasting)',
-    type: 'REPORT',
-    date: '18 Aug 2026',
-    facility: 'Moulvibazar Digital Diagnostic Complex',
-    patientName: 'Tanvir Ahmed',
-    summary: 'Total Cholesterol: 195 mg/dL, HDL: 48 mg/dL, LDL: 118 mg/dL, Triglycerides: 145 mg/dL.',
-    verified: true,
-    fileSize: '1.1 MB',
-  },
-  {
-    id: 'doc-004',
-    title: 'Digital Electrocardiogram (ECG 12-Lead)',
-    type: 'REPORT',
-    date: '15 Jul 2026',
-    doctorName: 'Dr. Anisur Rahman',
-    facility: 'Popular Diagnostic Center',
-    patientName: 'Tanvir Ahmed',
-    summary: 'Normal Sinus Rhythm. Heart Rate: 72 bpm. No acute ST-T wave abnormalities detected.',
-    verified: true,
-    fileSize: '2.6 MB',
-  },
-];
+
 
 interface MobileHealthVaultViewProps {
   language: SupportedLanguage;

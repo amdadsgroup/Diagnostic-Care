@@ -37,7 +37,6 @@ import TrustSection from '@/components/marketplace/TrustSection';
 import HomeSampleCollectionSection from '@/components/marketplace/HomeSampleCollectionSection';
 import MapDiscovery from '@/components/marketplace/MapDiscovery';
 import MobileNavigation, { ActiveNavTab } from '@/components/navigation/MobileNavigation';
-import PatientMobileHome from '@/components/patient/PatientMobileHome';
 import MobileAppointmentsView from '@/components/patient/MobileAppointmentsView';
 import MobileHealthVaultView from '@/components/patient/MobileHealthVaultView';
 import MobileProfileView from '@/components/patient/MobileProfileView';
@@ -845,7 +844,7 @@ export default function HomePage() {
                   gap: '10px',
                 }}
               >
-                <div>Patient: <strong>Kamrul Hassan</strong> (34 yrs, Male)</div>
+                <div>Patient: <strong>{currentUser?.fullName || (language === 'en' ? 'Verified Patient' : 'সম্মানিত রোগী')}</strong> {currentUser?.phone ? `(${currentUser.phone})` : ''}</div>
                 <div>Date: <strong>Today</strong></div>
                 <div>Rx ID: <strong>RX-MB-2026-891</strong></div>
               </div>
@@ -934,37 +933,10 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* PRIMARY MARKETPLACE TAB */}
+        {/* PRIMARY MARKETPLACE TAB (Fully Synchronized Across Mobile & Desktop) */}
         {activeTab === 'marketplace' && (
           <div>
-            {currentRole === 'PATIENT' && (
-              <div className="d-mobile-only container" style={{ padding: '16px 16px 28px 16px' }}>
-                <PatientMobileHome
-                  language={language}
-                  selectedLocation={selectedLocation}
-                  onOpenLocationModal={() => setIsLocationModalOpen(true)}
-                  onOpenNotificationsModal={() => setIsNotificationsModalOpen(true)}
-                  onNavigateTab={(tab) => setActiveTab(tab)}
-                  onSelectCategory={(cat) => {
-                    setActiveCategory(cat);
-                    setActiveTab('search');
-                  }}
-                  onOpenAmbulance={() => setIsAmbulanceModalOpen(true)}
-                  onOpenHomeCare={() => setIsHomeCareModalOpen(true)}
-                  onOpenHelpline={() => setIsHelplineOpen(true)}
-                  upcomingAppointment={appState.appointments.find((a) => a.status === 'CONFIRMED')}
-                  activeQueue={activeQueue}
-                  doctorAssociations={appState.doctorAssociations}
-                  diagnosticTests={appState.diagnosticTests}
-                  onSelectSlot={handleSelectSlot}
-                  onSelectTest={(test) => setSelectedBookingTest(test)}
-                  currentUser={currentUser}
-                />
-              </div>
-            )}
-
-            <div className={currentRole === 'PATIENT' ? 'd-desktop-only' : ''}>
-              {/* HERO SECTION WITH AI SEARCH COMMAND & REAL-TIME MEDICAL TELEMETRY */}
+            {/* HERO SECTION WITH AI SEARCH COMMAND & REAL-TIME MEDICAL TELEMETRY */}
               <HeroSection
                 language={language}
                 searchQuery={searchQuery}
@@ -1588,7 +1560,6 @@ export default function HomePage() {
                 onSelectFacility={() => setIsHelplineOpen(true)}
               />
             </div>
-            </div>
           </div>
         )}
       </main>
@@ -1599,6 +1570,7 @@ export default function HomePage() {
           slot={selectedSlot}
           association={selectedAssociation}
           language={language}
+          currentUser={currentUser}
           onClose={() => {
             setSelectedSlot(null);
             setSelectedAssociation(null);
@@ -1761,6 +1733,7 @@ export default function HomePage() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currentRole={currentRole}
+        currentUser={currentUser}
         onOpenAuth={() => setIsAuthModalOpen(true)}
       />
 

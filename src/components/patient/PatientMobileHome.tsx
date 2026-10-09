@@ -26,6 +26,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Sparkles,
+  User as LucideUser,
 } from 'lucide-react';
 
 interface PatientMobileHomeProps {
@@ -174,19 +175,21 @@ export default function PatientMobileHome({
               width: '40px',
               height: '40px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--navy-900) 0%, var(--cyan-600) 100%)',
-              color: '#FFFFFF',
+              background: currentUser
+                ? 'linear-gradient(135deg, var(--navy-900) 0%, var(--cyan-600) 100%)'
+                : '#F1F5F9',
+              color: currentUser ? '#FFFFFF' : '#475569',
+              border: currentUser ? 'none' : '1px solid #CBD5E1',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 800,
               fontSize: '15px',
-              border: 'none',
               cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(10, 22, 40, 0.2)',
+              boxShadow: currentUser ? '0 2px 8px rgba(10, 22, 40, 0.2)' : 'none',
             }}
           >
-            T
+            {currentUser?.fullName ? currentUser.fullName.charAt(0).toUpperCase() : <LucideUser size={18} />}
           </button>
         </div>
       </div>

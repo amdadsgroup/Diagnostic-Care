@@ -52,95 +52,20 @@ INITIAL_DOCTOR_ASSOCIATIONS.forEach((assoc) => {
     maxCapacity: 16,
   });
 
-  // Mark first 3 slots as booked to demonstrate active chamber
-  if (generated.length >= 3) {
-    generated[0].status = 'CONFIRMED';
-    generated[1].status = 'CONFIRMED';
-    generated[2].status = 'CONFIRMED';
-  }
-
+  // All schedule slots start AVAILABLE without simulated bookings
   defaultSlots[key] = generated;
 
   defaultQueues[key] = {
     doctorAssociationId: assoc.id,
     queueDate: TODAY,
-    currentTokenServing: 2,
-    totalTokensIssued: 3,
+    currentTokenServing: 0,
+    totalTokensIssued: 0,
     avgConsultationMinutes: 15,
   };
 });
 
-const initialAppointments: Appointment[] = [
-  {
-    id: 'app-001',
-    bookingCode: 'DC-2026-1001',
-    scheduleSlotId: 'slot-assoc-anisur-popular-default-0',
-    doctorAssociationId: 'assoc-anisur-popular',
-    branchId: 'branch-popular-sadar',
-    doctorName: 'Dr. Anisur Rahman',
-    specialization: 'Cardiologist',
-    organizationName: 'Popular Diagnostic Center (Moulvibazar)',
-    branchName: 'Moulvibazar Main Branch',
-    patientUserId: 'patient-kawsar',
-    patientName: 'Kawsar Ahmed',
-    patientPhone: '01712000001',
-    patientAge: 48,
-    patientGender: 'MALE',
-    appointmentDate: TODAY,
-    startTime: '16:00',
-    consultationFee: 800,
-    tokenNumber: 1,
-    status: 'COMPLETED',
-    paymentStatus: 'PAID',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'app-002',
-    bookingCode: 'DC-2026-1002',
-    scheduleSlotId: 'slot-assoc-anisur-popular-default-1',
-    doctorAssociationId: 'assoc-anisur-popular',
-    branchId: 'branch-popular-sadar',
-    doctorName: 'Dr. Anisur Rahman',
-    specialization: 'Cardiologist',
-    organizationName: 'Popular Diagnostic Center (Moulvibazar)',
-    branchName: 'Moulvibazar Main Branch',
-    patientUserId: 'patient-nasreen',
-    patientName: 'Nasreen Begum',
-    patientPhone: '01819000002',
-    patientAge: 42,
-    patientGender: 'FEMALE',
-    appointmentDate: TODAY,
-    startTime: '16:15',
-    consultationFee: 800,
-    tokenNumber: 2,
-    status: 'IN_PROGRESS',
-    paymentStatus: 'PAID',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'app-003',
-    bookingCode: 'DC-2026-1003',
-    scheduleSlotId: 'slot-assoc-anisur-popular-default-2',
-    doctorAssociationId: 'assoc-anisur-popular',
-    branchId: 'branch-popular-sadar',
-    doctorName: 'Dr. Anisur Rahman',
-    specialization: 'Cardiologist',
-    organizationName: 'Popular Diagnostic Center (Moulvibazar)',
-    branchName: 'Moulvibazar Main Branch',
-    patientUserId: 'patient-tarek',
-    patientName: 'Tarek Chowdhury',
-    patientPhone: '01911000003',
-    patientAge: 35,
-    patientGender: 'MALE',
-    appointmentDate: TODAY,
-    startTime: '16:30',
-    consultationFee: 800,
-    tokenNumber: 3,
-    status: 'CHECKED_IN',
-    paymentStatus: 'CASH_AT_DESK',
-    createdAt: new Date().toISOString(),
-  },
-];
+// Production clean: Zero seed appointments
+const initialAppointments: Appointment[] = [];
 
 export const INITIAL_APP_STATE: AppState = {
   organizations: INITIAL_ORGANIZATIONS,

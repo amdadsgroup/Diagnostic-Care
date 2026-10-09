@@ -7,16 +7,22 @@ interface LiveQueueTrackerProps {
   doctorName?: string;
   specialization?: string;
   chamberName?: string;
+  initialCurrentServing?: number;
+  initialTotalTokens?: number;
+  userToken?: number | null;
 }
 
 export default function LiveQueueTracker({
   doctorName = 'ডাঃ আনিসুর রহমান (Dr. Anisur Rahman)',
   specialization = 'এমবিবিএস, এফসিপিএস (কার্ডিওলজি) - হৃদরোগ বিশেষজ্ঞ',
   chamberName = 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার মেইন ব্রাঞ্চ) - রুম ২০২',
+  initialCurrentServing = 0,
+  initialTotalTokens = 0,
+  userToken = null,
 }: LiveQueueTrackerProps) {
-  const [currentServing, setCurrentServing] = useState(2);
-  const [totalTokens, setTotalTokens] = useState(14);
-  const [myToken, setMyToken] = useState<number | null>(6);
+  const [currentServing, setCurrentServing] = useState(initialCurrentServing);
+  const [totalTokens, setTotalTokens] = useState(initialTotalTokens);
+  const [myToken, setMyToken] = useState<number | null>(userToken);
   const [avgMinutes, setAvgMinutes] = useState(15);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [smsAlertEnabled, setSmsAlertEnabled] = useState(true);

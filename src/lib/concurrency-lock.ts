@@ -88,17 +88,17 @@ class ConcurrencyEngine {
         slotDate: today,
         startTime: t,
         endTime: times[idx + 1] || '20:00',
-        status: idx === 0 ? 'CONFIRMED' : 'AVAILABLE',
+        status: 'AVAILABLE',
       });
     });
 
-    // Seed Queue
+    // Initialize clean Queue
     const queueKey = `assoc-anisur-popular_${today}`;
     this.queues.set(queueKey, {
       doctorAssociationId: 'assoc-anisur-popular',
       queueDate: today,
-      currentTokenServing: 1,
-      totalTokensIssued: 4,
+      currentTokenServing: 0,
+      totalTokensIssued: 0,
       avgConsultationMinutes: 15,
     });
   }

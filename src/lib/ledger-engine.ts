@@ -58,30 +58,7 @@ class LedgerEngine {
   private subscriptions: Map<string, B2BSubscription> = new Map();
 
   constructor() {
-    this.seedInitialLedger();
-  }
-
-  private seedInitialLedger() {
-    // Initial Verified Diagnostic Center Subscription
-    this.subscriptions.set('org-pop-mb', {
-      organizationId: 'org-pop-mb',
-      organizationName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার)',
-      tier: 'STANDARD',
-      monthlyFee: 500,
-      status: 'ACTIVE',
-      expiresAt: '2026-11-05T00:00:00Z',
-    });
-
-    // Seed sample transactions with balanced double-entry ledger entries
-    this.processPayment({
-      bookingCode: 'DC-2026-9021',
-      gateway: 'BKASH',
-      amount: 800,
-      patientPhone: '01712-345678',
-      organizationId: 'org-pop-mb',
-      organizationName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার)',
-      gatewayTransactionId: 'BKH98210398',
-    });
+    // Production clean: Zero seed ledger transactions. Entries are generated from live payments.
   }
 
   /**

@@ -112,74 +112,159 @@ export default function MobileProfileView({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '36px' }}>
-      {/* Patient Profile Card */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, var(--navy-900) 0%, #142B4E 100%)',
-          color: '#FFFFFF',
-          borderRadius: '20px',
-          padding: '24px 20px',
-          boxShadow: '0 8px 24px rgba(10, 22, 40, 0.15)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--cyan-500) 0%, var(--cyan-600) 100%)',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '24px',
-              fontWeight: 800,
-              boxShadow: '0 4px 12px rgba(6, 182, 212, 0.35)',
-              flexShrink: 0,
-            }}
-          >
-            {currentUser?.fullName ? currentUser.fullName.charAt(0).toUpperCase() : (language === 'en' ? 'P' : 'র')}
-          </div>
-
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', color: '#6EE7B7', fontWeight: 700, marginBottom: '4px' }}>
-              <CheckCircle2 size={12} />
-              <span>{currentUser ? (language === 'en' ? 'Verified Account' : 'ভেরিফাইড অ্যাকাউন্ট') : (language === 'en' ? 'Guest Visitor' : 'অতিথি ব্যবহারকারী')}</span>
-            </div>
-            <h1 style={{ fontSize: '18px', fontWeight: 800 }}>{currentUser?.fullName || (language === 'en' ? 'Healthcare Patient' : 'সম্মানিত রোগী')}</h1>
-            <div style={{ fontSize: '12.5px', color: '#94A3B8', marginTop: '2px' }}>
-              {currentUser?.phone || '01886748564'} • {selectedLocation}
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Stats Grid */}
+      {/* Patient Profile Card (Dynamic Real User or Clean Guest State) */}
+      {currentUser ? (
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '8px',
-            marginTop: '20px',
-            paddingTop: '16px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.12)',
-            textAlign: 'center',
+            background: 'linear-gradient(135deg, var(--navy-900) 0%, #142B4E 100%)',
+            color: '#FFFFFF',
+            borderRadius: '20px',
+            padding: '24px 20px',
+            boxShadow: '0 8px 24px rgba(10, 22, 40, 0.15)',
           }}
         >
-          <div onClick={() => onNavigateTab('appointments')} style={{ cursor: 'pointer' }}>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#38BDF8' }}>{appointmentsCount}</div>
-            <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Appointments' : 'বুকিং'}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--cyan-500) 0%, var(--cyan-600) 100%)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                fontWeight: 800,
+                boxShadow: '0 4px 12px rgba(6, 182, 212, 0.35)',
+                flexShrink: 0,
+              }}
+            >
+              {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : 'U'}
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', color: '#6EE7B7', fontWeight: 700, marginBottom: '4px' }}>
+                <CheckCircle2 size={12} />
+                <span>{language === 'en' ? 'Verified Account' : 'ভেরিফাইড অ্যাকাউন্ট'}</span>
+              </div>
+              <h1 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>{currentUser.fullName}</h1>
+              <div style={{ fontSize: '12.5px', color: '#94A3B8', marginTop: '2px' }}>
+                {currentUser.phone || currentUser.email} • {selectedLocation}
+              </div>
+            </div>
           </div>
-          <div onClick={() => onNavigateTab('reports')} style={{ cursor: 'pointer' }}>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>0</div>
-            <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Health Records' : 'রিপোর্ট'}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#FBBF24' }}>0</div>
-            <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Family Members' : 'পরিবার'}</div>
+
+          {/* Quick Stats Grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              marginTop: '20px',
+              paddingTop: '16px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+              textAlign: 'center',
+            }}
+          >
+            <div onClick={() => onNavigateTab('appointments')} style={{ cursor: 'pointer' }}>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#38BDF8' }}>{appointmentsCount}</div>
+              <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Appointments' : 'বুকিং'}</div>
+            </div>
+            <div onClick={() => onNavigateTab('reports')} style={{ cursor: 'pointer' }}>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>0</div>
+              <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Health Records' : 'রিপোর্ট'}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#FBBF24' }}>0</div>
+              <div style={{ fontSize: '11px', color: '#94A3B8' }}>{language === 'en' ? 'Family Members' : 'পরিবার'}</div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+            color: '#FFFFFF',
+            borderRadius: '20px',
+            padding: '24px 20px',
+            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '14px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#93C5FD',
+                flexShrink: 0,
+              }}
+            >
+              <User size={26} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: '#FFFFFF' }}>
+                {language === 'en' ? 'Welcome to Diagnostic Care' : 'স্বাগতম ডায়াগনস্টিক কেয়ারে'}
+              </h2>
+              <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '3px', margin: 0, lineHeight: 1.4 }}>
+                {language === 'en'
+                  ? 'Sign in to access your doctor appointments, health reports and prescriptions.'
+                  : 'ডাক্তারের অ্যাপয়েন্টমেন্ট বুকিং, প্রেসক্রিপশন ও রিপোর্ট দেখতে লগইন করুন।'}
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/login';
+                }
+              }}
+              style={{
+                backgroundColor: '#0057FF',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '11px 14px',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textAlign: 'center',
+                boxShadow: '0 2px 8px rgba(0, 87, 255, 0.3)',
+              }}
+            >
+              {language === 'en' ? 'Sign In' : 'লগইন'}
+            </button>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/register';
+                }
+              }}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                color: '#FFFFFF',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                padding: '11px 14px',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textAlign: 'center',
+              }}
+            >
+              {language === 'en' ? 'Register' : 'রেজিস্ট্রেশন'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* PWA & Application Center Section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

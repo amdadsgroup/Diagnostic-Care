@@ -178,7 +178,7 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
           <div style={{ padding: '10px 12px', backgroundColor: 'var(--slate-50)', borderRadius: '6px', border: '1px solid var(--slate-200)', display: 'flex', justifyContent: 'space-between' }}>
-            <span><strong>DIAGNOSTIC_REPORT_RELEASED:</strong> CBC report for Kawsar Ahmed verified by Consultant Pathologist. Signed 15-min token generated.</span>
+            <span><strong>DIAGNOSTIC_REPORT_RELEASED:</strong> Complete Blood Count report verified by Consultant Pathologist. Signed 15-min token generated.</span>
             <span style={{ color: 'var(--slate-500)' }}>2 mins ago • IP: 103.205.71.14 (Moulvibazar)</span>
           </div>
           <div style={{ padding: '10px 12px', backgroundColor: 'var(--slate-50)', borderRadius: '6px', border: '1px solid var(--slate-200)', display: 'flex', justifyContent: 'space-between' }}>

@@ -87,7 +87,13 @@ const INITIAL_CLINICAL_REPORTS: ClinicalReport[] = [
   },
 ];
 
-export default function SecureReportViewer() {
+export default function SecureReportViewer({
+  patientName,
+  currentUser,
+}: {
+  patientName?: string;
+  currentUser?: any;
+} = {}) {
   const [reportList, setReportList] = useState<ClinicalReport[]>(INITIAL_CLINICAL_REPORTS);
   const [selectedReport, setSelectedReport] = useState<ClinicalReport>(INITIAL_CLINICAL_REPORTS[0]);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -409,7 +415,7 @@ export default function SecureReportViewer() {
             </div>
 
             <div style={{ fontSize: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px', background: '#F8FAFC', padding: '12px', borderRadius: '8px' }}>
-              <div>Patient: <strong>তানভীর আহমেদ (Tanvir Ahmed)</strong></div>
+              <div>Patient: <strong>{patientName || currentUser?.fullName || 'সম্মানিত রোগী (Verified Patient)'}</strong></div>
               <div>Age/Gender: <strong>34 yrs / Male</strong></div>
               <div>Test: <strong>{selectedReport.testName}</strong></div>
               <div>Verified By: <strong>{selectedReport.verifiedBy}</strong></div>

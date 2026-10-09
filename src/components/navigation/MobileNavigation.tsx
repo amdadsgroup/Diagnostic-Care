@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SupportedLanguage, BRAND_COLORS } from '@/config/brand';
+import { SupportedLanguage, BRAND_COLORS, BRAND_CONSTANTS } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { UserRole } from '@/types';
 import {
@@ -37,22 +37,9 @@ interface MobileNavigationProps {
   onOpenSearch?: () => void;
   onOpenAuth?: () => void;
   unreadCount?: number;
+  currentUser?: any;
 }
 
-/**
- * Diagnostic Care — Official Mobile PWA Bottom Navigation
- * 
- * 5 Canonical Tabs:
- * 1. Home
- * 2. Discover
- * 3. Bookings
- * 4. Messages
- * 5. Profile
- * 
- * Consistent outline icon family.
- * Active: Signal Blue #0057FF
- * Inactive: Neutral gray / black #64748B
- */
 export default function MobileNavigation({
   language,
   activeTab,
@@ -61,6 +48,7 @@ export default function MobileNavigation({
   onOpenSearch,
   onOpenAuth,
   unreadCount = 0,
+  currentUser,
 }: MobileNavigationProps) {
   const isPatient = currentRole === 'PATIENT';
 
@@ -206,7 +194,7 @@ export default function MobileNavigation({
             if (el) {
               el.scrollIntoView({ behavior: 'smooth' });
             } else {
-              window.location.href = `tel:${BRAND_COLORS.primary}`;
+              window.location.href = `tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`;
             }
           }
         }}
@@ -254,14 +242,10 @@ export default function MobileNavigation({
         </span>
       </button>
 
-      {/* 5. Profile */}
+      {/* 5. Profile / Account */}
       <button
         onClick={() => {
-          if (onOpenAuth && !isProfileActive) {
-            onOpenAuth();
-          } else {
-            setActiveTab(isPatient ? 'profile' : 'portal');
-          }
+          setActiveTab(isPatient ? 'profile' : 'portal');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         className={`mobile-dock-item ${isProfileActive ? 'active' : ''}`}
@@ -288,7 +272,9 @@ export default function MobileNavigation({
           strokeWidth={isProfileActive ? 2.3 : 1.8}
         />
         <span style={{ fontSize: '10.5px', fontWeight: isProfileActive ? 800 : 500 }}>
-          {language === 'en' ? 'Profile' : 'প্রোফাইল'}
+          {currentUser
+            ? (language === 'en' ? 'Profile' : 'প্রোফাইল')
+            : (language === 'en' ? 'Account' : 'অ্যাকাউন্ট')}
         </span>
       </button>
     </nav>

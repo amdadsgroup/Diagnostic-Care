@@ -33,7 +33,7 @@ interface PatientAppointment {
 
 export default function PatientDashboard({
   patientName = 'সম্মানিত রোগী',
-  phone = '01886748564',
+  phone = '',
   patientId,
 }: {
   patientName?: string;
@@ -113,7 +113,7 @@ export default function PatientDashboard({
               </div>
               <h1 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{patientName}</h1>
               <p style={{ opacity: 0.85, fontSize: '0.85rem' }}>
-                ফোন: {phone} • জেলা: মৌলভীবাজার • রক্তের গ্রুপ: A+
+                {phone ? `মোবাইল: ${phone}` : 'মোবাইল নম্বর যুক্ত করুন'} • সুরক্ষিত স্বাস্থ্য প্রোফাইল
               </p>
             </div>
           </div>

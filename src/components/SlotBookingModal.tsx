@@ -11,6 +11,7 @@ interface SlotBookingModalProps {
   association: DoctorAssociation;
   language: SupportedLanguage;
   onClose: () => void;
+  currentUser?: any;
   onConfirmBooking: (appointmentData: {
     patientName: string;
     patientPhone: string;
@@ -25,12 +26,13 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
   association,
   language,
   onClose,
+  currentUser,
   onConfirmBooking,
 }) => {
   const t = TRANSLATIONS[language];
   const [secondsRemaining, setSecondsRemaining] = useState<number>(300); // 5 minutes = 300s
-  const [patientName, setPatientName] = useState('');
-  const [patientPhone, setPatientPhone] = useState('');
+  const [patientName, setPatientName] = useState(currentUser?.fullName || '');
+  const [patientPhone, setPatientPhone] = useState(currentUser?.phone || '');
   const [patientAge, setPatientAge] = useState<string>('');
   const [patientGender, setPatientGender] = useState<'MALE' | 'FEMALE' | 'OTHER'>('MALE');
   const [patientProblem, setPatientProblem] = useState('');
@@ -38,29 +40,20 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Quick fill helper
+  // Quick fill relationship helper (no fake names)
   const handleQuickFill = (relation: 'SELF' | 'MOTHER' | 'FATHER' | 'CHILD') => {
-    const defaultPhone = patientPhone.trim() || '01712345678';
     if (relation === 'SELF') {
-      setPatientName('Tanvir Ahmed');
-      setPatientPhone(defaultPhone);
-      setPatientAge('34');
+      if (currentUser?.fullName) setPatientName(currentUser.fullName);
+      if (currentUser?.phone) setPatientPhone(currentUser.phone);
       setPatientGender('MALE');
     } else if (relation === 'MOTHER') {
-      setPatientName('Rahima Begum');
-      setPatientPhone(defaultPhone);
-      setPatientAge('58');
       setPatientGender('FEMALE');
+      if (currentUser?.phone && !patientPhone) setPatientPhone(currentUser.phone);
     } else if (relation === 'FATHER') {
-      setPatientName('Abdul Latif');
-      setPatientPhone(defaultPhone);
-      setPatientAge('65');
       setPatientGender('MALE');
+      if (currentUser?.phone && !patientPhone) setPatientPhone(currentUser.phone);
     } else if (relation === 'CHILD') {
-      setPatientName('Arian Ahmed');
-      setPatientPhone(defaultPhone);
-      setPatientAge('6');
-      setPatientGender('MALE');
+      if (currentUser?.phone && !patientPhone) setPatientPhone(currentUser.phone);
     }
     setErrorMessage(null);
   };
@@ -337,7 +330,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 required
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
-                placeholder="e.g. Tanvir Ahmed / তানভীর আহমেদ"
+                placeholder={language === 'en' ? 'Full Name of the Patient' : 'রোগীর পুরো নাম'}
                 style={{
                   width: '100%',
                   padding: '10px 12px',

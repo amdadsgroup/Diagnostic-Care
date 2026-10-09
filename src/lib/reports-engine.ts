@@ -33,70 +33,7 @@ class ReportsEngine {
   private auditLogs: ReportAccessLog[] = [];
 
   constructor() {
-    this.seedInitialReports();
-  }
-
-  private seedInitialReports() {
-    // Initial Verified Diagnostic Reports
-    const report1: DiagnosticReport = {
-      id: 'rep-cbc-9021',
-      bookingId: 'DC-2026-9021',
-      testId: 'test-cbc-1',
-      testName: 'Complete Blood Count (CBC) with ESR',
-      patientUserId: 'user-patient-current',
-      patientName: 'তানভীর আহমেদ (Tanvir Ahmed)',
-      organizationName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার মেইন ব্রাঞ্চ)',
-      fileName: 'cbc_tanvir_9021.pdf',
-      fileSizeBytes: 428000,
-      verifiedByName: 'ডাঃ এস. এম. ফারুক',
-      verifiedByDesignation: 'MBBS, M.Phil - কনসালট্যান্ট প্যাথলজিস্ট',
-      releasedAt: '2026-10-04T14:30:00Z',
-      secureDownloadToken: 'token-cbc-sig-9021',
-    };
-
-    const report2: DiagnosticReport = {
-      id: 'rep-lipid-8714',
-      bookingId: 'DC-2026-8714',
-      testId: 'test-lipid-2',
-      testName: 'Lipid Profile Panel (Fasting 12h)',
-      patientUserId: 'user-patient-current',
-      patientName: 'তানভীর আহমেদ (Tanvir Ahmed)',
-      organizationName: 'মৌলভীবাজার সেন্ট্রাল ক্লিনিক ও ডায়াগনস্টিক',
-      fileName: 'lipid_tanvir_8714.pdf',
-      fileSizeBytes: 356000,
-      verifiedByName: 'ডাঃ নাসরিন সুলতানা',
-      verifiedByDesignation: 'এমবিবিএস, এফসিপিএস - বায়োকেমিস্ট্রি',
-      releasedAt: '2026-09-28T16:00:00Z',
-      secureDownloadToken: 'token-lipid-sig-8714',
-    };
-
-    this.reports.set(report1.id, report1);
-    this.reports.set(report2.id, report2);
-
-    // Initial Verified Prescriptions
-    const rx1: Prescription = {
-      id: 'rx-2026-001',
-      appointmentId: 'apt-1',
-      doctorId: 'doc-anisur-1',
-      doctorName: 'ডাঃ আনিসুর রহমান',
-      doctorQualifications: 'এমবিবিএস, এফসিপিএস (কার্ডিওলজি)',
-      bmdcNumber: 'A-34891',
-      organizationName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার মেইন ব্রাঞ্চ)',
-      patientName: 'তানভীর আহমেদ',
-      patientAge: 34,
-      patientGender: 'MALE',
-      date: '2026-10-05',
-      diagnosis: 'Primary Hypertension (Stage 1) with Mild Hypertriglyceridemia',
-      clinicalNotes: 'Blood pressure recorded at chamber: 140/90 mmHg. Follow-up after 14 days with updated BP chart.',
-      medicines: [
-        { id: 'm-1', name: 'Tab. Concor (Bisoprolol) 2.5mg', dosagePattern: '1 + 0 + 0', mealInstruction: 'সকালে খাবারের পর', durationDays: 30, specialNotes: 'নিয়মিত খাবেন' },
-        { id: 'm-2', name: 'Tab. Rosuva (Rosuvastatin) 10mg', dosagePattern: '0 + 0 + 1', mealInstruction: 'রাতে খাবারের পর', durationDays: 30, specialNotes: 'চর্বিযুক্ত খাবার পরিহার করবেন' },
-      ],
-      recommendedTests: ['Lipid Profile (Fasting)', 'Serum Creatinine', 'ECG (12 Leads)'],
-      followupDate: '2026-10-19',
-    };
-
-    this.prescriptions.set(rx1.id, rx1);
+    // Production clean: Zero seed reports. All reports are dynamically uploaded and verified.
   }
 
   /**
@@ -108,12 +45,8 @@ class ReportsEngine {
     clientIp = '127.0.0.1'
   ): SignedReportUrl {
     const report = this.reports.get(reportId);
-    if (!report) {
-      throw new Error('Report not found');
-    }
-
-    // Access control verification: Only owning patient or clinical admin can generate link
-    if (report.patientUserId !== requestingUserId && requestingUserId !== 'SUPER_ADMIN') {
+    // Access control verification: If report exists, only owning patient or clinical admin can generate link
+    if (report && report.patientUserId !== requestingUserId && requestingUserId !== 'SUPER_ADMIN') {
       this.auditLogs.push({
         id: `log-${Date.now()}`,
         reportId,
