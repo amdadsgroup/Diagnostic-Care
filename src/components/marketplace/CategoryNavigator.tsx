@@ -251,54 +251,52 @@ export default function CategoryNavigator({
                 }
               }}
               style={{
-                backgroundColor: isSelected ? '#FFFFFF' : '#FFFFFF',
-                borderRadius: '16px',
-                padding: '20px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '24px',
+                padding: '22px',
                 border: isSelected
                   ? `2px solid ${BRAND_COLORS.primary}`
-                  : '1px solid #E5E7EB',
+                  : '1.5px solid rgba(255, 255, 255, 0.95)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '14px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
+                transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 position: 'relative',
                 boxShadow: isSelected
-                  ? '0 8px 24px -4px rgba(0, 87, 255, 0.16)'
-                  : '0 2px 8px rgba(0, 0, 0, 0.04)',
+                  ? 'var(--clay-card-hover-shadow)'
+                  : 'var(--clay-card-shadow)',
               }}
             >
               {/* Top Row: Service Icon & Optional Status Badge */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div
+                  className="clay-bubble"
                   style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '12px',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '16px',
                     backgroundColor: isSelected ? BRAND_COLORS.primary : BRAND_COLORS.primaryLight,
                     color: isSelected ? '#FFFFFF' : BRAND_COLORS.primary,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     flexShrink: 0,
+                    boxShadow: isSelected ? 'var(--clay-btn-primary-shadow)' : 'var(--clay-pill-shadow)',
                   }}
                 >
-                  <Icon size={24} strokeWidth={2} />
+                  <Icon size={24} strokeWidth={2.2} />
                 </div>
 
                 {cat.isEmergency && (
                   <span
+                    className="clay-badge-rose"
                     style={{
-                      backgroundColor: '#FEF2F2',
-                      color: '#EF4444',
-                      border: '1px solid #FECACA',
                       fontSize: '10px',
-                      fontWeight: 800,
-                      padding: '2px 8px',
-                      borderRadius: '12px',
-                      letterSpacing: '0.04em',
+                      padding: '3px 10px',
+                      borderRadius: '9999px',
                     }}
                   >
                     24/7 LIVE
@@ -310,11 +308,11 @@ export default function CategoryNavigator({
               <div>
                 <h3
                   style={{
-                    fontSize: '16px',
+                    fontSize: '16.5px',
                     fontWeight: 800,
-                    color: '#000000',
+                    color: '#10294F',
                     lineHeight: 1.25,
-                    marginBottom: '4px',
+                    marginBottom: '5px',
                   }}
                 >
                   {language === 'en' ? cat.nameEn : cat.nameBn}
@@ -322,7 +320,7 @@ export default function CategoryNavigator({
                 <p
                   style={{
                     fontSize: '12.5px',
-                    color: '#4B5563',
+                    color: '#576982',
                     lineHeight: 1.45,
                     marginBottom: '8px',
                   }}
@@ -334,8 +332,8 @@ export default function CategoryNavigator({
                 <div
                   style={{
                     fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#6B7280',
+                    fontWeight: 700,
+                    color: '#8FA2BA',
                   }}
                 >
                   {language === 'en' ? cat.infoEn : cat.infoBn}
@@ -344,19 +342,21 @@ export default function CategoryNavigator({
 
               {/* Clear Action Link */}
               <div
+                className="clay-pill"
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '12.5px',
+                  gap: '6px',
+                  fontSize: '12px',
                   fontWeight: 700,
-                  color: BRAND_COLORS.primary,
-                  paddingTop: '10px',
-                  borderTop: '1px solid #F3F4F6',
+                  color: isSelected ? '#1769F5' : '#10294F',
+                  width: 'fit-content',
+                  padding: '6px 14px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.95)',
                 }}
               >
                 <span>{language === 'en' ? cat.actionEn : cat.actionBn}</span>
-                <ArrowRight size={13} />
+                <ArrowRight size={13} color="#1769F5" />
               </div>
             </div>
           );
@@ -365,9 +365,9 @@ export default function CategoryNavigator({
 
       <style jsx>{`
         .service-card:hover {
-          transform: translateY(-2px);
-          border-color: #0057FF;
-          box-shadow: 0 8px 20px -2px rgba(0, 87, 255, 0.12);
+          transform: translateY(-4px) scale(1.01);
+          border-color: rgba(23, 105, 245, 0.35);
+          box-shadow: var(--clay-card-hover-shadow);
         }
       `}</style>
     </section>

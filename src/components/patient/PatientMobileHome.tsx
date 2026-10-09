@@ -213,26 +213,27 @@ export default function PatientMobileHome({
           onFocus={() => {
             // Optional: navigate directly to search
           }}
+          className="clay-inset"
           style={{
             width: '100%',
             padding: '14px 16px 14px 44px',
-            borderRadius: '16px',
-            border: '1.5px solid var(--slate-300)',
+            borderRadius: '20px',
+            border: '1.5px solid rgba(226, 234, 244, 0.8)',
             fontSize: '13.5px',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--clay-surface-sunken)',
             outline: 'none',
-            boxShadow: '0 2px 8px rgba(10, 22, 40, 0.04)',
+            boxShadow: 'var(--clay-input-shadow)',
           }}
         />
       </form>
 
       {/* 3. QUICK ACTIONS GRID (8 KEY ACTIONS) */}
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <h2 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--navy-900)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: '14.5px', fontWeight: 800, color: 'var(--brand-text-dark)' }}>
             {language === 'en' ? 'Quick Healthcare Services' : 'দ্রুত স্বাস্থ্যসেবাসমূহ'}
           </h2>
-          <span style={{ fontSize: '11px', color: 'var(--cyan-600)', fontWeight: 700 }}>
+          <span className="clay-badge-teal" style={{ fontSize: '10.5px', fontWeight: 800, padding: '3px 10px' }}>
             {language === 'en' ? 'Verified Hub' : 'ভেরিফাইড হাব'}
           </span>
         </div>
@@ -241,7 +242,7 @@ export default function PatientMobileHome({
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '10px',
+            gap: '12px',
           }}
         >
           {/* Action 1: Find Doctor */}
@@ -250,24 +251,25 @@ export default function PatientMobileHome({
               onSelectCategory('DOCTORS');
               onNavigateTab('search');
             }}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--cyan-50)', color: 'var(--cyan-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'var(--cyan-50)', color: 'var(--cyan-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Stethoscope size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Find Doctor' : 'ডাক্তার'}
             </span>
           </button>
@@ -278,24 +280,25 @@ export default function PatientMobileHome({
               onSelectCategory('TESTS');
               onNavigateTab('search');
             }}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--emerald-50)', color: 'var(--emerald-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'var(--emerald-50)', color: 'var(--emerald-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <TestTube2 size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Book Test' : 'ল্যাব টেস্ট'}
             </span>
           </button>
@@ -306,24 +309,25 @@ export default function PatientMobileHome({
               onSelectCategory('HOSPITALS');
               onNavigateTab('search');
             }}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--blue-50)', color: 'var(--blue-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'var(--blue-50)', color: 'var(--blue-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Building2 size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Hospitals' : 'হাসপাতাল'}
             </span>
           </button>
@@ -334,24 +338,25 @@ export default function PatientMobileHome({
               onSelectCategory('PHARMACIES');
               onNavigateTab('search');
             }}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#FFFBEB', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: '#FFFBEB', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Pill size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Pharmacy' : 'ফার্মেসি'}
             </span>
           </button>
@@ -359,24 +364,25 @@ export default function PatientMobileHome({
           {/* Action 5: 24/7 Ambulance */}
           <button
             onClick={onOpenAmbulance}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--rose-50)', color: 'var(--rose-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'var(--rose-50)', color: 'var(--rose-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Truck size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Ambulance' : 'অ্যাম্বুলেন্স'}
             </span>
           </button>
@@ -384,24 +390,25 @@ export default function PatientMobileHome({
           {/* Action 6: Home Healthcare */}
           <button
             onClick={onOpenHomeCare}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <HeartHandshake size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Home Care' : 'হোম কেয়ার'}
             </span>
           </button>
@@ -409,24 +416,25 @@ export default function PatientMobileHome({
           {/* Action 7: Upload Report */}
           <button
             onClick={() => onNavigateTab('reports')}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--cyan-50)', color: 'var(--cyan-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'var(--cyan-50)', color: 'var(--cyan-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Upload size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Upload Slip' : 'রিপোর্ট আপলোড'}
             </span>
           </button>
@@ -434,24 +442,25 @@ export default function PatientMobileHome({
           {/* Action 8: Health Vault */}
           <button
             onClick={() => onNavigateTab('reports')}
+            className="clay-card-interactive"
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1px solid var(--slate-200)',
-              borderRadius: '14px',
+              border: '1.5px solid rgba(255, 255, 255, 0.95)',
+              borderRadius: '18px',
               padding: '12px 6px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               cursor: 'pointer',
-              minHeight: '74px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+              minHeight: '80px',
+              boxShadow: 'var(--clay-pill-shadow)',
             }}
           >
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#F8FAFC', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="clay-bubble" style={{ width: '42px', height: '42px', borderRadius: '14px', background: '#F8FAFC', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Lock size={20} />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--navy-900)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-text-dark)', textAlign: 'center', lineHeight: 1.2 }}>
               {language === 'en' ? 'Health Vault' : 'হেলথ ভল্ট'}
             </span>
           </button>

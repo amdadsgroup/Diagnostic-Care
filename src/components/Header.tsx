@@ -86,16 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       id="main-header"
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 9950,
-        backgroundColor: '#FFFFFF',
-        transition: 'all 0.2s ease',
-        boxShadow: isScrolled
-          ? '0 4px 20px -2px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)'
-          : '0 1px 0 #E5E7EB',
-      }}
+      className="header-glass"
     >
       {/* Top Utility Bar (Desktop only) */}
       <div
@@ -419,17 +410,13 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenSearch || (() => handleNavClick('search'))}
             aria-label="Search Healthcare Services"
+            className="clay-pill"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
               gap: '6px',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--brand-bg)',
-              border: '1px solid var(--brand-border)',
-              color: 'var(--brand-text-secondary)',
+              padding: '7px 14px',
+              color: 'var(--brand-text-dark)',
               fontSize: '13px',
-              fontWeight: 500,
+              fontWeight: 600,
               cursor: 'pointer',
             }}
           >
@@ -441,17 +428,13 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenLocation}
             aria-label="Select Location Hub"
+            className="clay-pill"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--brand-bg)',
-              border: '1px solid var(--brand-border)',
+              gap: '6px',
+              padding: '7px 14px',
               color: 'var(--brand-text-dark)',
               fontSize: '13px',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: 'pointer',
             }}
           >
@@ -466,14 +449,10 @@ export const Header: React.FC<HeaderProps> = ({
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <button
                 onClick={() => handleNavClick('profile')}
+                className="clay-pill"
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
                   gap: '6px',
-                  padding: '7px 12px',
-                  borderRadius: '8px',
-                  backgroundColor: '#F1F5F9',
-                  border: '1px solid #CBD5E1',
+                  padding: '7px 14px',
                   color: '#0F172A',
                   fontSize: '13px',
                   fontWeight: 700,
@@ -497,15 +476,12 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={onLogout}
                   title={language === 'en' ? 'Sign Out' : 'লগআউট'}
                   aria-label={language === 'en' ? 'Sign Out' : 'লগআউট'}
+                  className="clay-bubble"
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '34px',
-                    height: '34px',
-                    borderRadius: '8px',
+                    width: '36px',
+                    height: '36px',
                     backgroundColor: '#FEF2F2',
-                    border: '1px solid #FCA5A5',
+                    border: '1.5px solid #FCA5A5',
                     color: '#DC2626',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
@@ -519,21 +495,15 @@ export const Header: React.FC<HeaderProps> = ({
             onOpenAuth && (
               <button
                 onClick={onOpenAuth}
+                className="btn-secondary"
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
                   gap: '6px',
-                  padding: '8px 14px',
-                  borderRadius: '8px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--brand-border)',
-                  color: 'var(--brand-text-dark)',
+                  padding: '8px 18px',
                   fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
+                  fontWeight: 700,
                 }}
               >
-                <User size={14} color={BRAND_COLORS.textDark} />
+                <User size={14} color={BRAND_COLORS.primary} />
                 <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
               </button>
             )
@@ -545,8 +515,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenOnboard}
               className="btn-primary"
               style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
+                padding: '9px 20px',
                 fontSize: '13px',
                 fontWeight: 700,
               }}
@@ -559,8 +528,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => handleNavClick('marketplace')}
               className="btn-primary"
               style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
+                padding: '9px 20px',
                 fontSize: '13px',
                 fontWeight: 700,
               }}

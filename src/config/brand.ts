@@ -43,10 +43,15 @@ export const BRAND_COLORS = {
   healthcareTeal: '#11B8A5',
 
   // Secondary & surfaces
-  background: '#F7FAFE', // Soft clean healthcare canvas
-  surface: '#FFFFFF', // Clean White
-  surfaceSubtle: '#F0F5FD', // Soft subtle tint
+  background: '#EBF2F9', // Tactile Soft Clay Canvas Background
+  surface: '#FFFFFF', // Pure White Clay Surface
+  surfaceSubtle: '#F4F8FD', // Soft Blue-tinted Clay Surface
   surfaceElevated: '#FFFFFF',
+  clayBg: '#EBF2F9',
+  claySurface: '#FFFFFF',
+  clayCardShadow: '10px 14px 28px rgba(16, 41, 79, 0.08), -8px -8px 20px rgba(255, 255, 255, 0.95), inset 3px 3px 6px rgba(255, 255, 255, 0.85), inset -3px -3px 8px rgba(16, 41, 79, 0.04)',
+  clayBtnPrimaryShadow: '0 8px 18px rgba(23, 105, 245, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.5), inset 0 -3px 6px rgba(0, 0, 0, 0.22)',
+  clayPillShadow: '4px 6px 14px rgba(16, 41, 79, 0.06), -3px -3px 8px rgba(255, 255, 255, 0.9), inset 2px 2px 4px rgba(255, 255, 255, 0.8), inset -2px -2px 4px rgba(16, 41, 79, 0.04)',
 
   // Typography & Neutrals
   text: '#14243D', // Primary Navy Text
@@ -106,8 +111,8 @@ export const BRAND_PWA = {
   name: 'Diagnostic Care',
   shortName: 'Diagnostic Care',
   description: 'Your Healthcare Marketplace',
-  themeColor: '#0057FF', // Signal Blue
-  backgroundColor: '#F8F7F4', // Porcelain
+  themeColor: '#1769F5', // Healthcare Primary Blue
+  backgroundColor: '#EBF2F9', // Tactile Porcelain Clay Canvas
   icon192: '/icons/icon-192x192.png',
   icon512: '/icons/icon-512x512.png',
   maskable512: '/icons/maskable-icon-512x512.png',

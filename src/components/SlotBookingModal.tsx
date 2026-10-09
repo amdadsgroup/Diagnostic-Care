@@ -136,26 +136,27 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
         className="animate-slide-down"
         style={{
           backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
+          borderRadius: '26px',
           maxWidth: '560px',
           width: '100%',
           maxHeight: '90vh',
           overflowY: 'auto',
-          boxShadow: 'var(--shadow-xl)',
-          border: '1px solid var(--slate-200)',
+          boxShadow: 'var(--clay-modal-shadow)',
+          border: '2px solid rgba(255, 255, 255, 0.95)',
         }}
       >
         {/* Modal Header */}
         <div
           style={{
-            backgroundColor: 'var(--brand-navy-900)',
+            background: 'linear-gradient(135deg, #10294F 0%, #1A3258 100%)',
             color: '#FFFFFF',
-            padding: '18px 24px',
-            borderTopLeftRadius: '16px',
-            borderTopRightRadius: '16px',
+            padding: '20px 26px',
+            borderTopLeftRadius: '24px',
+            borderTopRightRadius: '24px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            boxShadow: 'inset 0 -2px 6px rgba(0, 0, 0, 0.15)',
           }}
         >
           <div>
@@ -497,20 +498,13 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
               type="submit"
               id="confirm-booking-btn"
               disabled={isSubmitting || secondsRemaining === 0}
+              className="btn-primary"
               style={{
-                backgroundColor: '#0057FF',
-                color: '#FFFFFF',
-                padding: '13px 20px',
-                borderRadius: '8px',
-                fontWeight: 700,
+                width: '100%',
+                padding: '14px 22px',
                 fontSize: '15px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                border: 'none',
+                fontWeight: 700,
                 cursor: secondsRemaining === 0 ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 14px rgba(0, 87, 255, 0.28)',
               }}
             >
               <CheckCircle size={18} />

@@ -37,33 +37,32 @@ export const LiveQueueCard: React.FC<LiveQueueCardProps> = ({
 
   return (
     <div
+      className="clay-card"
       style={{
-        backgroundColor: '#FFFFFF',
-        borderRadius: '16px',
-        border: '1px solid var(--slate-200)',
-        boxShadow: 'var(--shadow-md)',
+        borderRadius: '24px',
         overflow: 'hidden',
       }}
     >
       {/* Header */}
       <div
         style={{
-          backgroundColor: 'var(--brand-navy-900)',
+          background: 'linear-gradient(135deg, #10294F 0%, #1A3258 100%)',
           color: '#FFFFFF',
-          padding: '16px 20px',
+          padding: '18px 24px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '10px',
+          boxShadow: 'inset 0 -2px 6px rgba(0, 0, 0, 0.15)',
         }}
       >
         <div>
-          <div style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
+          <div style={{ fontSize: '16px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block', boxShadow: '0 0 8px #10B981' }} />
             {t.queueTitle}
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--slate-300)', marginTop: '2px' }}>
+          <div style={{ fontSize: '12.5px', color: '#93C5FD', marginTop: '2px', fontWeight: 500 }}>
             {doctorName} ({specialization}) • {chamberName}
           </div>
         </div>
@@ -72,17 +71,14 @@ export const LiveQueueCard: React.FC<LiveQueueCardProps> = ({
           <button
             onClick={onCallNext}
             id="call-next-patient-btn"
+            className="btn-emerald"
             style={{
-              backgroundColor: '#10B981',
-              color: '#FFFFFF',
-              padding: '8px 16px',
-              borderRadius: '8px',
+              padding: '9px 20px',
               fontSize: '13px',
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 2px 6px rgba(16, 185, 129, 0.4)',
             }}
           >
             <span>{t.actionCallNext}</span>
@@ -98,111 +94,114 @@ export const LiveQueueCard: React.FC<LiveQueueCardProps> = ({
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: '18px',
-          borderBottom: '1px solid var(--slate-200)',
-          backgroundColor: 'var(--slate-50)',
+          borderBottom: '1.5px solid rgba(226, 234, 244, 0.8)',
+          backgroundColor: 'var(--clay-surface-subtle)',
         }}
       >
         {/* Now Serving Card */}
         <div
+          className="clay-card-sm"
           style={{
             backgroundColor: '#FFFFFF',
-            padding: '16px',
-            borderRadius: '12px',
-            border: '2px solid var(--brand-teal-600)',
+            padding: '18px',
+            borderRadius: '20px',
+            border: '2px solid rgba(17, 184, 165, 0.35)',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--brand-teal-600)', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand-teal-600)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             {t.nowServing}
           </div>
-          <div style={{ fontSize: '36px', fontWeight: 900, color: 'var(--brand-navy-900)', margin: '4px 0' }}>
+          <div style={{ fontSize: '38px', fontWeight: 900, color: 'var(--brand-navy-900)', margin: '4px 0', textShadow: '0 2px 4px rgba(17, 184, 165, 0.12)' }}>
             Token {queue.currentTokenServing.toString().padStart(2, '0')}
           </div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--slate-700)' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--slate-700)' }}>
             {currentApp ? currentApp.patientName : 'Chamber in Session'}
           </div>
         </div>
 
         {/* Total Tokens Issued */}
         <div
+          className="clay-card-sm"
           style={{
             backgroundColor: '#FFFFFF',
-            padding: '16px',
-            borderRadius: '12px',
-            border: '1px solid var(--slate-200)',
+            padding: '18px',
+            borderRadius: '20px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Total Booked Tokens
           </div>
-          <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--slate-800)', margin: '4px 0' }}>
+          <div style={{ fontSize: '38px', fontWeight: 900, color: 'var(--slate-800)', margin: '4px 0' }}>
             {queue.totalTokensIssued}
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--slate-500)' }}>
+          <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>
             Max Daily Capacity: 16 Patients
           </div>
         </div>
 
         {/* Average Consultation / Wait Time */}
         <div
+          className="clay-card-sm"
           style={{
             backgroundColor: '#FFFFFF',
-            padding: '16px',
-            borderRadius: '12px',
-            border: '1px solid var(--slate-200)',
+            padding: '18px',
+            borderRadius: '20px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             {t.estimatedWaitLabel}
           </div>
-          <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--brand-navy-700)', margin: '4px 0' }}>
+          <div style={{ fontSize: '38px', fontWeight: 900, color: 'var(--brand-navy-700)', margin: '4px 0' }}>
             ~15 min
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--slate-500)' }}>
+          <div style={{ fontSize: '12px', color: 'var(--slate-500)', fontWeight: 600 }}>
             Per Patient Consultation
           </div>
         </div>
       </div>
 
       {/* Waiting Queue List */}
-      <div style={{ padding: '20px' }}>
-        <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--brand-navy-900)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Users size={16} />
+      <div style={{ padding: '24px' }}>
+        <h4 style={{ fontSize: '14.5px', fontWeight: 800, color: 'var(--brand-text-dark)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Users size={17} color="#1769F5" />
           {t.upcomingTokens}
         </h4>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {appointments.map((app) => {
             const isServing = app.tokenNumber === queue.currentTokenServing;
             return (
               <div
                 key={app.id}
+                className={isServing ? 'clay-card-sm' : 'clay-pill'}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '10px 14px',
-                  borderRadius: '8px',
-                  backgroundColor: isServing ? 'var(--brand-teal-50)' : '#FFFFFF',
-                  border: `1px solid ${isServing ? 'var(--brand-teal-600)' : 'var(--slate-200)'}`,
+                  padding: '12px 18px',
+                  borderRadius: '18px',
+                  backgroundColor: isServing ? '#E6FBF8' : '#FFFFFF',
+                  border: `1.5px solid ${isServing ? 'rgba(17, 184, 165, 0.4)' : 'rgba(255, 255, 255, 0.95)'}`,
                   fontSize: '13px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <span
+                    className="clay-sphere"
                     style={{
-                      width: '38px',
-                      height: '38px',
-                      borderRadius: '8px',
-                      backgroundColor: isServing ? 'var(--brand-teal-600)' : 'var(--slate-100)',
-                      color: isServing ? '#FFFFFF' : 'var(--slate-800)',
+                      width: '42px',
+                      height: '42px',
+                      backgroundColor: isServing ? 'var(--brand-teal-600)' : '#EAF2FF',
+                      color: isServing ? '#FFFFFF' : 'var(--brand-primary)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontWeight: 800,
                       fontSize: '14px',
+                      flexShrink: 0,
                     }}
                   >
                     #{app.tokenNumber.toString().padStart(2, '0')}
