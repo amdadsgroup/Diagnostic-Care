@@ -251,22 +251,24 @@ export default function CategoryNavigator({
                 }
               }}
               style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
+                backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.88)' : 'var(--glass-surface-card)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                borderRadius: '20px',
                 padding: '22px',
                 border: isSelected
                   ? `2px solid ${BRAND_COLORS.primary}`
-                  : '1.5px solid rgba(255, 255, 255, 0.95)',
+                  : '1px solid var(--glass-border)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '14px',
                 cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 position: 'relative',
                 boxShadow: isSelected
-                  ? 'var(--clay-card-hover-shadow)'
-                  : 'var(--clay-card-shadow)',
+                  ? 'var(--glass-shadow-hover)'
+                  : 'var(--glass-shadow-card)',
               }}
             >
               {/* Top Row: Service Icon & Optional Status Badge */}

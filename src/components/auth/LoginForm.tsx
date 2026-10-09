@@ -153,21 +153,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               if (fieldErrors.identifier) setFieldErrors((prev) => ({ ...prev, identifier: undefined }));
             }}
             disabled={loading}
+            className="glass-input"
             style={{
               width: '100%',
               height: '46px',
               padding: '10px 14px',
               fontSize: '14px',
-              color: '#0F172A',
-              backgroundColor: loading ? '#F1F5F9' : '#FFFFFF',
-              border: fieldErrors.identifier ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
-              borderRadius: '10px',
-              outline: 'none',
+              color: 'var(--color-text-primary)',
+              border: fieldErrors.identifier ? '1.5px solid #EF4444' : '1px solid var(--glass-border)',
+              borderRadius: '12px',
               boxSizing: 'border-box',
-              transition: 'border-color 0.2s',
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = '#0057FF')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors.identifier ? '#EF4444' : '#E2E8F0')}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = BRAND_COLORS.primary;
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = fieldErrors.identifier ? '#EF4444' : 'var(--glass-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
         </div>
       </FormField>
@@ -205,7 +209,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            color: '#475569',
+            color: 'var(--color-text-secondary)',
             cursor: 'pointer',
             userSelect: 'none',
           }}
@@ -218,7 +222,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             style={{
               width: '16px',
               height: '16px',
-              accentColor: '#0057FF',
+              accentColor: BRAND_COLORS.primary,
               cursor: 'pointer',
             }}
           />
@@ -232,8 +236,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#0057FF',
-              fontWeight: 600,
+              color: BRAND_COLORS.primary,
+              fontWeight: 700,
               cursor: 'pointer',
               padding: 0,
               fontSize: '13px',
@@ -245,8 +249,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <a
             href="/forgot-password"
             style={{
-              color: '#0057FF',
-              fontWeight: 600,
+              color: BRAND_COLORS.primary,
+              fontWeight: 700,
               textDecoration: 'none',
             }}
           >
@@ -270,7 +274,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           marginTop: '20px',
           textAlign: 'center',
           fontSize: '13.5px',
-          color: '#64748B',
+          color: 'var(--color-text-secondary)',
         }}
       >
         <span>{t.authLoginNoAccount} </span>
@@ -281,8 +285,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#0057FF',
-              fontWeight: 700,
+              color: BRAND_COLORS.primary,
+              fontWeight: 800,
               cursor: 'pointer',
               padding: '0 4px',
             }}
@@ -293,8 +297,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <a
             href="/register"
             style={{
-              color: '#0057FF',
-              fontWeight: 700,
+              color: BRAND_COLORS.primary,
+              fontWeight: 800,
               textDecoration: 'none',
             }}
           >
@@ -305,12 +309,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       {/* Provider Onboarding Notice */}
       <div
+        className="glass-inset"
         style={{
           marginTop: '24px',
           padding: '12px 14px',
-          borderRadius: '10px',
-          backgroundColor: '#F8FAFC',
-          border: '1px solid #E2E8F0',
+          borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import { BRAND_COLORS } from '@/config/brand';
 
 interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
@@ -22,14 +23,14 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
 }) => {
   const getBackgroundColor = () => {
     if (disabled || loading) return '#94A3B8';
-    if (variant === 'secondary') return '#F1F5F9';
+    if (variant === 'secondary') return 'rgba(241, 245, 249, 0.85)';
     if (variant === 'outline') return 'transparent';
-    return '#0057FF';
+    return BRAND_COLORS.primary;
   };
 
   const getTextColor = () => {
-    if (variant === 'secondary') return '#0F172A';
-    if (variant === 'outline') return '#0057FF';
+    if (variant === 'secondary') return 'var(--color-text-primary)';
+    if (variant === 'outline') return BRAND_COLORS.primary;
     return '#FFFFFF';
   };
 
@@ -47,15 +48,18 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
         padding: '0 20px',
         fontSize: '15px',
         fontWeight: 700,
-        borderRadius: '10px',
+        borderRadius: '12px',
         backgroundColor: getBackgroundColor(),
+        backgroundImage: variant === 'primary' && !disabled && !loading
+          ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)'
+          : undefined,
         color: getTextColor(),
-        border: variant === 'outline' ? '1.5px solid #0057FF' : 'none',
+        border: variant === 'outline' ? `1.5px solid ${BRAND_COLORS.primary}` : 'none',
         cursor: disabled || loading ? 'not-allowed' : 'pointer',
-        transition: 'all 0.15s ease',
+        transition: 'all 0.2s ease',
         boxShadow:
           variant === 'primary' && !disabled && !loading
-            ? '0 4px 14px rgba(0, 87, 255, 0.28)'
+            ? '0 6px 16px rgba(15, 118, 110, 0.25)'
             : 'none',
         ...style,
       }}
@@ -74,3 +78,4 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
 
 export const AuthButton = LoadingButton;
 export default LoadingButton;
+

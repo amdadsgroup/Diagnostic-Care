@@ -58,15 +58,15 @@ export default function HeroSection({
       id="hero-section"
       style={{
         position: 'relative',
-        backgroundColor: 'var(--clay-bg)',
+        backgroundColor: 'var(--brand-bg)',
         backgroundImage:
-          'radial-gradient(circle at 10% 20%, rgba(23, 105, 245, 0.08) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(17, 184, 165, 0.08) 0%, transparent 40%)',
+          'radial-gradient(circle at 10% 20%, rgba(15, 118, 110, 0.09) 0%, transparent 45%), radial-gradient(circle at 90% 80%, rgba(221, 247, 240, 0.7) 0%, transparent 45%)',
         padding: '56px 0 64px 0',
-        borderBottom: '1.5px solid rgba(226, 234, 244, 0.85)',
+        borderBottom: '1px solid var(--glass-border)',
         overflow: 'hidden',
       }}
     >
-      {/* Soft Subtle Background Accents */}
+      {/* Soft Ambient Glow Elements */}
       <div
         style={{
           position: 'absolute',
@@ -75,7 +75,7 @@ export default function HeroSection({
           width: '450px',
           height: '450px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(23, 105, 245, 0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(15, 118, 110, 0.1) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -87,7 +87,7 @@ export default function HeroSection({
           width: '380px',
           height: '380px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(17, 184, 165, 0.05) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(221, 247, 240, 0.8) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -106,18 +106,20 @@ export default function HeroSection({
           <div>
             {/* National Healthcare Infrastructure Pill */}
             <div
-              className="clay-pill"
+              className="glass-pill"
               style={{
                 marginBottom: '18px',
                 padding: '8px 18px',
                 fontSize: '12px',
-                color: '#1769F5',
+                color: '#0F766E',
+                background: 'var(--brand-fresh-mint)',
+                borderColor: 'rgba(15, 118, 110, 0.25)',
               }}
             >
-              <Sparkles size={14} color="#1769F5" />
+              <Sparkles size={14} color="#0F766E" />
               <span>{t.heroBadge}</span>
-              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#1769F5' }} />
-              <span style={{ color: '#10294F', fontWeight: 600 }}>
+              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#0F766E' }} />
+              <span style={{ color: '#15313B', fontWeight: 600 }}>
                 {BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Hub • Bangladesh
               </span>
             </div>
@@ -130,28 +132,61 @@ export default function HeroSection({
                 lineHeight: 1.18,
                 letterSpacing: '-0.03em',
                 marginBottom: '16px',
-                color: '#10294F',
+                color: '#15313B',
               }}
             >
-              {t.heroHeadline}
+              {language === 'en' ? 'Find the Right Doctor, With Confidence.' : 'সঠিক ডাক্তার খুঁজুন, সম্পূর্ণ আস্থার সাথে।'}
             </h1>
 
             {/* Subheadline */}
             <p
               style={{
                 fontSize: '16px',
-                color: '#576982',
+                color: '#627680',
                 lineHeight: 1.65,
                 maxWidth: '620px',
                 marginBottom: '28px',
               }}
             >
-              {t.heroSubheadline}
+              {language === 'en' 
+                ? 'Discover healthcare professionals, compare available appointments, and book care through one trusted platform.'
+                : 'অভিজ্ঞ ডাক্তার খুঁজুন, চেম্বারের সময়সূচী দেখুন এবং সহজে নির্ভরযোগ্য অ্যাপয়েন্টমেন্ট বুক করুন।'}
             </p>
 
-            {/* Clean Healthcare Claymorphic Search Card */}
+            {/* Quick Action CTAs */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+              <a
+                href="/doctors"
+                className="btn-primary"
+                style={{
+                  padding: '12px 24px',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                }}
+              >
+                <Stethoscope size={16} />
+                <span>{language === 'en' ? 'Find a Doctor' : 'ডাক্তার খুঁজুন'}</span>
+              </a>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('marketplace-categories');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  else window.location.href = '/tests';
+                }}
+                className="btn-outline"
+                style={{
+                  padding: '12px 22px',
+                  fontSize: '14px',
+                }}
+              >
+                <Building2 size={16} color="#0F766E" />
+                <span>{language === 'en' ? 'Explore Healthcare Services' : 'সকল স্বাস্থ্যসেবা দেখুন'}</span>
+              </button>
+            </div>
+
+            {/* Clean Healthcare Glassmorphic Search Card */}
             <div
-              className="clay-card"
+              className="glass-card"
               style={{
                 padding: '16px',
                 marginBottom: '20px',
@@ -187,12 +222,12 @@ export default function HeroSection({
                       borderRadius: '9999px',
                       fontSize: '12.5px',
                       fontWeight: 700,
-                      background: activeSearchTab === item.id ? 'linear-gradient(145deg, #2563EB 0%, #1769F5 100%)' : '#FFFFFF',
-                      color: activeSearchTab === item.id ? '#FFFFFF' : '#475569',
-                      border: activeSearchTab === item.id ? '1px solid rgba(255, 255, 255, 0.45)' : '1.5px solid rgba(255, 255, 255, 0.95)',
-                      boxShadow: activeSearchTab === item.id ? 'var(--clay-btn-primary-shadow)' : 'var(--clay-pill-shadow)',
+                      background: activeSearchTab === item.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(255, 255, 255, 0.85)',
+                      color: activeSearchTab === item.id ? '#FFFFFF' : '#627680',
+                      border: activeSearchTab === item.id ? '1px solid rgba(255, 255, 255, 0.45)' : '1px solid var(--glass-border)',
+                      boxShadow: activeSearchTab === item.id ? '0 4px 12px rgba(15, 118, 110, 0.3)' : 'var(--glass-shadow-sm)',
                       whiteSpace: 'nowrap',
-                      transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       cursor: 'pointer',
                     }}
                   >
@@ -213,16 +248,17 @@ export default function HeroSection({
               >
                 {/* Location Filter Selector */}
                 <div
-                  className="clay-inset"
+                  className="glass-inset"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
                     padding: '10px 14px',
                     minWidth: '150px',
+                    borderRadius: '12px',
                   }}
                 >
-                  <MapPin size={16} color="#1769F5" />
+                  <MapPin size={16} color="#0F766E" />
                   <select
                     id="hero-district-select"
                     value={selectedDistrict}
@@ -230,7 +266,7 @@ export default function HeroSection({
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: '#10294F',
+                      color: '#15313B',
                       fontSize: '13px',
                       fontWeight: 700,
                       outline: 'none',
@@ -247,7 +283,7 @@ export default function HeroSection({
 
                 {/* Primary Query Input */}
                 <div
-                  className="clay-inset"
+                  className="glass-inset"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -255,9 +291,10 @@ export default function HeroSection({
                     flex: 1,
                     minWidth: '220px',
                     padding: '10px 16px',
+                    borderRadius: '12px',
                   }}
                 >
-                  <Search size={17} color="#1769F5" />
+                  <Search size={17} color="#0F766E" />
                   <input
                     type="text"
                     id="hero-universal-search-input"
@@ -270,7 +307,7 @@ export default function HeroSection({
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: '#14243D',
+                      color: '#15313B',
                       fontSize: '13.5px',
                       fontWeight: 500,
                     }}
@@ -278,7 +315,7 @@ export default function HeroSection({
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      style={{ color: '#94A3B8', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                      style={{ color: '#8FA0AA', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                     >
                       ✕
                     </button>
@@ -306,7 +343,7 @@ export default function HeroSection({
               <span
                 style={{
                   fontSize: '12px',
-                  color: '#1769F5',
+                  color: '#0F766E',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -320,12 +357,12 @@ export default function HeroSection({
                 <button
                   key={idx}
                   onClick={() => setSearchQuery(item.query)}
-                  className="clay-pill"
+                  className="glass-pill"
                   style={{
                     fontSize: '11.5px',
                     padding: '5px 12px',
                     cursor: 'pointer',
-                    color: '#10294F',
+                    color: '#15313B',
                   }}
                 >
                   {language === 'en' ? item.labelEn : item.labelBn}
@@ -337,7 +374,7 @@ export default function HeroSection({
           {/* Right Column: Clean, Reassuring Healthcare Telemetry & Trust Card */}
           <div style={{ position: 'relative' }}>
             <div
-              className="clay-card"
+              className="glass-card"
               style={{
                 padding: '24px',
                 position: 'relative',
@@ -350,21 +387,22 @@ export default function HeroSection({
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   paddingBottom: '16px',
-                  borderBottom: '1.5px solid rgba(226, 234, 244, 0.7)',
+                  borderBottom: '1px solid var(--glass-border)',
                   marginBottom: '18px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <BrandSymbol size={26} altText="Diagnostic Care" />
-                  <span style={{ fontSize: '14.5px', fontWeight: 800, color: '#10294F', letterSpacing: '-0.01em' }}>
+                  <span style={{ fontSize: '14.5px', fontWeight: 800, color: '#15313B', letterSpacing: '-0.01em' }}>
                     {t.telemetryTitle}
                   </span>
                 </div>
                 <div
-                  className="clay-badge-emerald"
+                  className="glass-badge-teal"
                   style={{
                     padding: '5px 12px',
                     borderRadius: '9999px',
+                    border: '1px solid rgba(15, 118, 110, 0.25)',
                   }}
                 >
                   <span
@@ -372,9 +410,9 @@ export default function HeroSection({
                       width: '7px',
                       height: '7px',
                       borderRadius: '50%',
-                      backgroundColor: '#15976A',
+                      backgroundColor: '#15803D',
                       display: 'inline-block',
-                      boxShadow: '0 0 6px #15976A',
+                      boxShadow: '0 0 6px #15803D',
                     }}
                   />
                   <span style={{ fontSize: '11px', fontWeight: 800 }}>LIVE NETWORK</span>
@@ -385,7 +423,7 @@ export default function HeroSection({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {/* Node 1: Active Doctor Chamber */}
                 <div
-                  className="clay-card-sm"
+                  className="glass-card-sm"
                   style={{
                     padding: '14px 18px',
                     display: 'flex',
@@ -396,37 +434,42 @@ export default function HeroSection({
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div
-                      className="clay-bubble"
                       style={{
                         width: '42px',
                         height: '42px',
-                        backgroundColor: '#EAF2FF',
-                        color: '#1769F5',
+                        borderRadius: '12px',
+                        backgroundColor: 'var(--brand-fresh-mint)',
+                        color: '#0F766E',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid rgba(15, 118, 110, 0.2)',
                         flexShrink: 0,
                       }}
                     >
                       <Stethoscope size={20} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#10294F' }}>
+                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#15313B' }}>
                         Dr. Anisur Rahman • Room 204
                       </div>
-                      <div style={{ fontSize: '11.5px', color: '#576982', fontWeight: 500 }}>
+                      <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
                         Cardiologist • Popular Diagnostic Center
                       </div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span
-                      className="clay-badge-emerald"
+                      className="glass-badge-teal"
                       style={{
                         fontSize: '10.5px',
                         padding: '4px 10px',
+                        borderRadius: '9999px',
                       }}
                     >
                       CHAMBER ACTIVE
                     </span>
-                    <div style={{ fontSize: '11px', color: '#1769F5', marginTop: '3px', fontWeight: 700 }}>
+                    <div style={{ fontSize: '11px', color: '#0F766E', marginTop: '3px', fontWeight: 700 }}>
                       Live Queue Token #02
                     </div>
                   </div>
@@ -434,7 +477,7 @@ export default function HeroSection({
 
                 {/* Node 2: Live Queue Chamber Status */}
                 <div
-                  className="clay-card-sm"
+                  className="glass-card-sm"
                   style={{
                     padding: '14px 18px',
                     display: 'flex',
@@ -445,31 +488,35 @@ export default function HeroSection({
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div
-                      className="clay-bubble"
                       style={{
                         width: '42px',
                         height: '42px',
-                        backgroundColor: '#FEF8EA',
-                        color: '#D99116',
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(180, 83, 9, 0.1)',
+                        color: '#B45309',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid rgba(180, 83, 9, 0.2)',
                         flexShrink: 0,
                       }}
                     >
                       <Clock size={20} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#10294F' }}>
+                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#15313B' }}>
                         Live Chamber Queue Engine
                       </div>
-                      <div style={{ fontSize: '11.5px', color: '#576982', fontWeight: 500 }}>
+                      <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
                         4 Patients in Waiting Room • ~15m Wait
                       </div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '14.5px', fontWeight: 800, color: '#D99116' }}>
+                    <div style={{ fontSize: '14.5px', fontWeight: 800, color: '#B45309' }}>
                       Token #03 Next
                     </div>
-                    <div style={{ fontSize: '10.5px', color: '#576982', fontWeight: 600 }}>5-Min Atomic Slot Lock</div>
+                    <div style={{ fontSize: '10.5px', color: '#627680', fontWeight: 600 }}>5-Min Atomic Slot Lock</div>
                   </div>
                 </div>
 
@@ -483,32 +530,32 @@ export default function HeroSection({
                 >
                   {/* Lab Telemetry */}
                   <div
-                    className="clay-card-sm"
+                    className="glass-card-sm"
                     style={{
                       padding: '14px 16px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1769F5', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0F766E', marginBottom: '6px' }}>
                       <TestTube2 size={16} />
                       <span style={{ fontSize: '12px', fontWeight: 800 }}>Pathology Lab</span>
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#10294F' }}>4 Hours</div>
-                    <div style={{ fontSize: '11px', color: '#576982', fontWeight: 500 }}>Avg. CBC & Urine Delivery</div>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>4 Hours</div>
+                    <div style={{ fontSize: '11px', color: '#627680', fontWeight: 500 }}>Avg. CBC & Urine Delivery</div>
                   </div>
 
                   {/* Ambulance Readiness */}
                   <div
-                    className="clay-card-sm"
+                    className="glass-card-sm"
                     style={{
                       padding: '14px 16px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#DC4545', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#B91C1C', marginBottom: '6px' }}>
                       <Ambulance size={16} />
                       <span style={{ fontSize: '12px', fontWeight: 800 }}>Ambulance 24/7</span>
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#10294F' }}>12 Mins</div>
-                    <div style={{ fontSize: '11px', color: '#576982', fontWeight: 500 }}>Avg. Response in Moulvibazar</div>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>12 Mins</div>
+                    <div style={{ fontSize: '11px', color: '#627680', fontWeight: 500 }}>Avg. Response in Moulvibazar</div>
                   </div>
                 </div>
               </div>
@@ -518,23 +565,23 @@ export default function HeroSection({
                 style={{
                   marginTop: '18px',
                   paddingTop: '16px',
-                  borderTop: '1.5px solid rgba(226, 234, 244, 0.7)',
+                  borderTop: '1px solid var(--glass-border)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   fontSize: '11.5px',
-                  color: '#576982',
+                  color: '#627680',
                 }}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ShieldCheck size={16} color="#15976A" />
-                  <span style={{ fontWeight: 700, color: '#10294F' }}>BMDC Registered & DGHS Verified</span>
+                  <ShieldCheck size={16} color="#15803D" />
+                  <span style={{ fontWeight: 700, color: '#15313B' }}>BMDC Registered & DGHS Verified</span>
                 </span>
                 <button
                   onClick={onOpenHelpline}
-                  className="clay-pill"
+                  className="glass-pill"
                   style={{
-                    color: '#1769F5',
+                    color: '#0F766E',
                     fontWeight: 700,
                     fontSize: '11.5px',
                     padding: '5px 12px',

@@ -102,50 +102,34 @@ export default function NotificationSettingsModal({
     <div
       role="dialog"
       aria-modal="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(5, 12, 22, 0.65)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 99990,
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        padding: 0,
-      }}
+      className="modal-overlay"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="modal-container animate-slide-up"
         style={{
-          backgroundColor: '#FFFFFF',
           width: '100%',
           maxWidth: '540px',
-          borderTopLeftRadius: '24px',
-          borderTopRightRadius: '24px',
-          padding: '24px 20px',
+          padding: '24px 22px',
           paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
-          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.25)',
-          animation: 'slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-          maxHeight: '88vh',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
         }}
       >
         {/* Drag handle */}
-        <div style={{ width: '40px', height: '4px', background: '#E2E8F0', borderRadius: '2px', margin: '0 auto -6px auto' }} />
+        <div style={{ width: '40px', height: '4px', background: 'rgba(203, 213, 225, 0.8)', borderRadius: '2px', margin: '0 auto -4px auto' }} />
 
         {/* Status Message */}
         {statusMessage && (
           <div
             style={{
               padding: '10px 14px',
-              backgroundColor: '#FEF2F2',
+              backgroundColor: 'rgba(254, 242, 242, 0.85)',
               color: '#B91C1C',
-              border: '1px solid #FCA5A5',
-              borderRadius: '10px',
+              border: '1px solid rgba(252, 165, 165, 0.8)',
+              borderRadius: '12px',
               fontSize: '12.5px',
               fontWeight: 600,
             }}
@@ -156,25 +140,27 @@ export default function NotificationSettingsModal({
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                background: 'var(--cyan-50)',
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'rgba(15, 118, 110, 0.1)',
+                border: '1px solid rgba(15, 118, 110, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                color: 'var(--color-primary)',
               }}
             >
-              <BellRing size={20} color="var(--cyan-600)" />
+              <BellRing size={20} color="var(--color-primary)" />
             </div>
             <div>
-              <h2 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--navy-900)' }}>
+              <h2 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)' }}>
                 {language === 'en' ? 'Healthcare Notifications' : 'স্বাস্থ্যসেবা নোটিফিকেশন সেটিংস'}
               </h2>
-              <p style={{ fontSize: '11.5px', color: 'var(--slate-500)' }}>
+              <p style={{ fontSize: '11.5px', color: 'var(--color-text-secondary)', margin: 0 }}>
                 {language === 'en'
                   ? 'Real-time alerts for appointments, serial tokens & reports'
                   : 'সিরিয়াল টোকেন, ডাক্তারের শিডিউল ও রিপোর্ট আপডেট'}
@@ -185,16 +171,17 @@ export default function NotificationSettingsModal({
             onClick={onClose}
             aria-label="Close"
             style={{
-              background: '#F1F5F9',
-              border: 'none',
+              background: 'rgba(241, 245, 249, 0.8)',
+              border: '1px solid var(--glass-border)',
               borderRadius: '50%',
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--slate-500)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
             <X size={18} />
@@ -204,14 +191,15 @@ export default function NotificationSettingsModal({
         {/* Permission Banner */}
         {permission !== 'granted' && (
           <div
+            className="glass-inset"
             style={{
-              backgroundColor: '#EFF6FF',
-              border: '1px solid #93C5FD',
-              borderRadius: '12px',
-              padding: '14px',
+              borderRadius: '14px',
+              padding: '14px 16px',
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
+              backgroundColor: 'rgba(239, 246, 255, 0.7)',
+              border: '1px solid rgba(191, 219, 254, 0.8)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -226,14 +214,12 @@ export default function NotificationSettingsModal({
             <button
               onClick={handleRequestPermission}
               disabled={isRequesting}
+              className="btn-primary"
               style={{
-                backgroundColor: '#2563EB',
-                color: '#FFFFFF',
                 padding: '9px 16px',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 fontWeight: 700,
                 fontSize: '12.5px',
-                border: 'none',
                 cursor: 'pointer',
                 textAlign: 'center',
               }}
@@ -246,14 +232,14 @@ export default function NotificationSettingsModal({
         )}
 
         {/* Preferences Toggle List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: '46vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '46vh' }}>
           {/* Item 1 */}
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#F8FAFC', borderRadius: '10px', cursor: 'pointer' }}>
+          <label className="glass-inset" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '12px', cursor: 'pointer' }}>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 {language === 'en' ? 'Appointment Token Reminders' : 'অ্যাপয়েন্টমেন্ট ও সিরিয়াল অ্যালার্ট'}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                 {language === 'en' ? 'Countdown updates when doctor starts chamber' : 'ডাক্তার চেম্বারে আসলে ও টোকেন এগিয়ে আসলে বার্তা'}
               </div>
             </div>
@@ -261,17 +247,17 @@ export default function NotificationSettingsModal({
               type="checkbox"
               checked={appointmentsAlert}
               onChange={(e) => setAppointmentsAlert(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--cyan-600)' }}
+              style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
             />
           </label>
 
           {/* Item 2 */}
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#F8FAFC', borderRadius: '10px', cursor: 'pointer' }}>
+          <label className="glass-inset" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '12px', cursor: 'pointer' }}>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 {language === 'en' ? 'Diagnostic Lab Report Ready' : 'ল্যাব টেস্ট রিপোর্ট তৈরি হলে বার্তা'}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                 {language === 'en' ? 'Instant alert when pathology test is published' : 'প্যাথলজি রিপোর্ট রেডি হলে তাৎক্ষণিক ভল্ট লিঙ্ক'}
               </div>
             </div>
@@ -279,17 +265,17 @@ export default function NotificationSettingsModal({
               type="checkbox"
               checked={reportsAlert}
               onChange={(e) => setReportsAlert(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--cyan-600)' }}
+              style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
             />
           </label>
 
           {/* Item 3 */}
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#F8FAFC', borderRadius: '10px', cursor: 'pointer' }}>
+          <label className="glass-inset" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '12px', cursor: 'pointer' }}>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 {language === 'en' ? 'Chamber Schedule & Delay Updates' : 'চেম্বার শিডিউল ও বিলম্ব সংক্রান্ত বার্তা'}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                 {language === 'en' ? 'Notified immediately if doctor has emergency delay' : 'ডাক্তারের জরুরি অপারেশন বা বিলম্ব ঘটলে নোটিফিকেশন'}
               </div>
             </div>
@@ -297,17 +283,17 @@ export default function NotificationSettingsModal({
               type="checkbox"
               checked={chamberDelayAlert}
               onChange={(e) => setChamberDelayAlert(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--cyan-600)' }}
+              style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
             />
           </label>
 
           {/* Item 4 */}
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#F8FAFC', borderRadius: '10px', cursor: 'pointer' }}>
+          <label className="glass-inset" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '12px', cursor: 'pointer' }}>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 {language === 'en' ? 'Emergency & Ambulance Dispatch Alerts' : 'জরুরি সেবা ও অ্যাম্বুলেন্স ট্র্যাকিং'}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                 {language === 'en' ? 'Driver arrival time and direct hotline status' : 'ড্রাইভার আগমন ও হেল্পলাইনের সরাসরি যোগাযোগ'}
               </div>
             </div>
@@ -315,17 +301,17 @@ export default function NotificationSettingsModal({
               type="checkbox"
               checked={emergencyAlert}
               onChange={(e) => setEmergencyAlert(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--cyan-600)' }}
+              style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
             />
           </label>
 
           {/* Item 5 */}
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#F8FAFC', borderRadius: '10px', cursor: 'pointer' }}>
+          <label className="glass-inset" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '12px', cursor: 'pointer' }}>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 {language === 'en' ? 'Health Packages & Seasonal Offers' : 'স্বাস্থ্য সচেতনতা ও প্যাকেজ অফার'}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--slate-500)', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                 {language === 'en' ? 'Non-intrusive discounts on health checkups' : 'ডায়াবেটিস বা কার্ডিয়াক চেকআপ প্যাকেজ'}
               </div>
             </div>
@@ -333,7 +319,7 @@ export default function NotificationSettingsModal({
               type="checkbox"
               checked={promotionsAlert}
               onChange={(e) => setPromotionsAlert(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--cyan-600)' }}
+              style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
             />
           </label>
         </div>
@@ -341,14 +327,12 @@ export default function NotificationSettingsModal({
         {/* Save button */}
         <button
           onClick={handleSavePreferences}
+          className="btn-primary"
           style={{
-            backgroundColor: 'var(--cyan-600)',
-            color: '#FFFFFF',
             padding: '12px',
-            borderRadius: '10px',
+            borderRadius: '12px',
             fontWeight: 700,
             fontSize: '13.5px',
-            border: 'none',
             cursor: 'pointer',
             textAlign: 'center',
           }}

@@ -9,6 +9,7 @@ import FormField from './FormField';
 import { AuthError, AuthSuccess } from './AuthAlerts';
 import LoadingButton from './LoadingButton';
 import { Check, ShieldCheck, PhoneCall } from 'lucide-react';
+import { BRAND_COLORS } from '@/config/brand';
 
 interface RegisterFormProps {
   onSuccess?: (user: AuthUserProfile) => void;
@@ -190,8 +191,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             outline: 'none',
             boxSizing: 'border-box',
           }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = '#0057FF')}
-          onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors.fullName ? '#EF4444' : '#E2E8F0')}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = BRAND_COLORS.primary;
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = fieldErrors.fullName ? '#EF4444' : '#E2E8F0';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
       </FormField>
 
@@ -245,8 +252,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               outline: 'none',
               boxSizing: 'border-box',
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = '#0057FF')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors.phone ? '#EF4444' : '#E2E8F0')}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = BRAND_COLORS.primary;
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = fieldErrors.phone ? '#EF4444' : '#E2E8F0';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
         </div>
       </FormField>
@@ -280,8 +293,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             outline: 'none',
             boxSizing: 'border-box',
           }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = '#0057FF')}
-          onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors.email ? '#EF4444' : '#E2E8F0')}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = BRAND_COLORS.primary;
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = fieldErrors.email ? '#EF4444' : '#E2E8F0';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
       </FormField>
 
@@ -500,7 +519,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               width: '17px',
               height: '17px',
               marginTop: '2px',
-              accentColor: '#0057FF',
+              accentColor: BRAND_COLORS.primary,
               cursor: 'pointer',
               flexShrink: 0,
             }}
@@ -531,7 +550,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           marginTop: '20px',
           textAlign: 'center',
           fontSize: '13.5px',
-          color: '#64748B',
+          color: 'var(--color-text-secondary)',
         }}
       >
         <span>{t.authRegisterAlreadyHaveAccount} </span>
@@ -542,8 +561,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#0057FF',
-              fontWeight: 700,
+              color: BRAND_COLORS.primary,
+              fontWeight: 800,
               cursor: 'pointer',
               padding: '0 4px',
             }}
@@ -554,8 +573,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           <a
             href="/login"
             style={{
-              color: '#0057FF',
-              fontWeight: 700,
+              color: BRAND_COLORS.primary,
+              fontWeight: 800,
               textDecoration: 'none',
             }}
           >

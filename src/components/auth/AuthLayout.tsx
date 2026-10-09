@@ -38,18 +38,19 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#F7FAFE',
+        backgroundColor: 'var(--color-bg-soft)',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
       }}
     >
-      {/* Top Navbar */}
+      {/* Top Frosted Navbar */}
       <header
         style={{
           height: '68px',
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #E2EAF4',
+          backgroundColor: 'rgba(255, 255, 255, 0.78)',
+          backdropFilter: 'var(--blur-nav)',
+          WebkitBackdropFilter: 'var(--blur-nav)',
+          borderBottom: '1px solid var(--glass-border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -84,13 +85,14 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               alignItems: 'center',
               gap: '6px',
               fontSize: '13px',
-              fontWeight: 600,
-              color: '#64748B',
+              fontWeight: 700,
+              color: 'var(--color-text-secondary)',
               textDecoration: 'none',
-              padding: '6px 14px',
-              borderRadius: '8px',
-              border: '1px solid #E2EAF4',
-              backgroundColor: '#FFFFFF',
+              padding: '8px 16px',
+              borderRadius: '12px',
+              border: '1px solid var(--glass-border)',
+              backgroundColor: 'rgba(255, 255, 255, 0.75)',
+              backdropFilter: 'var(--blur-card)',
               transition: 'all 0.15s ease',
             }}
           >
@@ -107,21 +109,19 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '32px 16px',
+          padding: '36px 16px',
         }}
       >
         <div
           style={{
             width: '100%',
             maxWidth: '1060px',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            boxShadow:
-              '0 20px 40px -15px rgba(16, 41, 79, 0.08), 0 1px 3px rgba(16, 41, 79, 0.04)',
-            border: '1px solid #E2EAF4',
+            borderRadius: '24px',
+            border: '1px solid var(--glass-border)',
             overflow: 'hidden',
             display: 'grid',
             gridTemplateColumns: 'minmax(0, 1fr)',
+            boxShadow: 'var(--glass-shadow-lg)',
           }}
           className="auth-grid-container"
         >
@@ -129,9 +129,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           <div
             className="d-desktop-only"
             style={{
-              backgroundColor: '#10294F',
-              backgroundImage:
-                'radial-gradient(circle at 20% 20%, rgba(23, 105, 245, 0.3) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(17, 184, 165, 0.2) 0%, transparent 50%)',
+              background: 'linear-gradient(145deg, #115E59 0%, #0F766E 55%, #15313B 100%)',
               color: '#FFFFFF',
               padding: '48px 40px',
               display: 'flex',
@@ -147,8 +145,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 position: 'absolute',
                 inset: 0,
                 backgroundImage:
-                  'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
-                backgroundSize: '32px 32px',
+                  'radial-gradient(circle at 10% 10%, rgba(221, 247, 240, 0.15) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(15, 118, 110, 0.4) 0%, transparent 60%)',
                 pointerEvents: 'none',
               }}
             />
@@ -160,23 +157,24 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  backgroundColor: 'rgba(0, 87, 255, 0.2)',
-                  border: '1px solid rgba(0, 87, 255, 0.4)',
-                  padding: '4px 12px',
+                  backgroundColor: 'rgba(221, 247, 240, 0.15)',
+                  border: '1px solid rgba(221, 247, 240, 0.3)',
+                  padding: '5px 14px',
                   borderRadius: '100px',
                   fontSize: '12px',
-                  fontWeight: 600,
-                  color: '#93C5FD',
+                  fontWeight: 700,
+                  color: '#DDF7F0',
                   marginBottom: '24px',
+                  backdropFilter: 'var(--blur-card)',
                 }}
               >
-                <Activity size={14} color="#60A5FA" />
+                <Activity size={14} color="#DDF7F0" />
                 <span>{language === 'bn' ? 'জাতীয় স্বাস্থ্যসেবা অবকাঠামো' : 'National Healthcare Infrastructure'}</span>
               </div>
 
               <h2
                 style={{
-                  fontSize: '30px',
+                  fontSize: '32px',
                   fontWeight: 800,
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
@@ -184,13 +182,13 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                   color: '#FFFFFF',
                 }}
               >
-                Diagnostic <span style={{ color: '#60A5FA' }}>Care</span>
+                Diagnostic <span style={{ color: '#DDF7F0' }}>Care</span>
               </h2>
 
               <p
                 style={{
                   fontSize: '15px',
-                  color: '#94A3B8',
+                  color: 'rgba(255, 255, 255, 0.85)',
                   lineHeight: 1.6,
                   maxWidth: '380px',
                 }}
@@ -215,25 +213,25 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                 <div
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(0, 87, 255, 0.15)',
-                    border: '1px solid rgba(0, 87, 255, 0.3)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#60A5FA',
+                    color: '#DDF7F0',
                     flexShrink: 0,
                   }}
                 >
                   <Lock size={16} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8FAFC' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
                     {language === 'bn' ? '২৫৬-বিট এনক্রিপ্টেড হেলথ ভল্ট' : '256-Bit Encrypted Health Vault'}
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#94A3B8', marginTop: '2px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.75)', marginTop: '2px' }}>
                     {language === 'bn'
                       ? 'আপনার মেডিকেল প্রেসক্রিপশন ও ল্যাব টেস্ট রিপোর্ট সম্পূর্ণ নিরাপদ।'
                       : 'Military-grade encryption for all prescriptions and lab reports.'}
@@ -244,11 +242,11 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                 <div
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -259,10 +257,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                   <Award size={16} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8FAFC' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
                     {language === 'bn' ? 'বিএমডিসি ও ডিজিএইচএস সার্টিফাইড' : 'BMDC & DGHS Standards'}
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#94A3B8', marginTop: '2px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.75)', marginTop: '2px' }}>
                     {language === 'bn'
                       ? 'শুধুমাত্র অনুমোদিত ডাক্তার ও বিশ্বস্ত ক্লিনিক্যাল প্রতিষ্ঠান।'
                       : 'Direct access to verified medical practitioners and certified labs.'}
@@ -273,11 +271,11 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                 <div
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -288,10 +286,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                   <PhoneCall size={16} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8FAFC' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
                     {language === 'bn' ? '২৪/৭ পেশাদার হেল্পলাইন' : '24/7 Dedicated Care Helpline'}
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#94A3B8', marginTop: '2px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.75)', marginTop: '2px' }}>
                     {language === 'bn'
                       ? 'যে কোনো সহায়তায় কল করুন: ০১৮৮৬-৭৪৮৫৬৪'
                       : `Immediate booking & emergency care: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`}
@@ -306,12 +304,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 position: 'relative',
                 zIndex: 2,
                 paddingTop: '20px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 fontSize: '11.5px',
-                color: '#64748B',
+                color: 'rgba(255, 255, 255, 0.7)',
               }}
             >
               <span>{BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Sadar • Sylhet</span>
@@ -326,19 +324,19 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'rgba(255, 255, 255, 0.92)',
+              backdropFilter: 'var(--blur-card)',
             }}
           >
             {/* Header / Title */}
             <div style={{ marginBottom: '24px' }}>
               {badge && (
                 <div
+                  className="glass-badge-teal"
                   style={{
                     display: 'inline-block',
                     padding: '4px 12px',
-                    borderRadius: '6px',
-                    backgroundColor: '#EAF2FF',
-                    color: '#1769F5',
+                    borderRadius: '8px',
                     fontSize: '11.5px',
                     fontWeight: 700,
                     textTransform: 'uppercase',
@@ -354,7 +352,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 style={{
                   fontSize: '24px',
                   fontWeight: 800,
-                  color: '#14243D',
+                  color: 'var(--color-text-primary)',
                   letterSpacing: '-0.02em',
                   marginBottom: '6px',
                   lineHeight: 1.25,
@@ -366,7 +364,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               <p
                 style={{
                   fontSize: '14px',
-                  color: '#64748B',
+                  color: 'var(--color-text-secondary)',
                   lineHeight: 1.5,
                   margin: 0,
                 }}

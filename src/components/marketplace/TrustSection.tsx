@@ -75,8 +75,10 @@ export default function TrustSection({ language }: { language: SupportedLanguage
   return (
     <section
       style={{
-        background: '#FFFFFF',
-        borderBottom: '1px solid var(--slate-200)',
+        background: 'rgba(255, 255, 255, 0.65)',
+        backdropFilter: 'var(--blur-card)',
+        WebkitBackdropFilter: 'var(--blur-card)',
+        borderBottom: '1px solid var(--glass-border)',
         padding: '36px 0 32px 0',
       }}
     >
@@ -87,7 +89,7 @@ export default function TrustSection({ language }: { language: SupportedLanguage
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '20px',
-            marginBottom: '32px',
+            marginBottom: '28px',
           }}
         >
           {metrics.map((m, idx) => {
@@ -95,29 +97,28 @@ export default function TrustSection({ language }: { language: SupportedLanguage
             return (
               <div
                 key={idx}
+                className="glass-card-sm"
                 style={{
-                  background: 'var(--slate-50)',
-                  border: '1px solid var(--slate-200)',
-                  borderRadius: '14px',
-                  padding: '18px 20px',
+                  borderRadius: '16px',
+                  padding: '20px 22px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '16px',
-                  boxShadow: 'var(--shadow-sm)',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               >
                 <div
                   style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '12px',
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
                     background: m.bg,
                     color: m.color,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
+                    boxShadow: '0 4px 12px rgba(15, 118, 110, 0.1)',
                   }}
                 >
                   <Icon size={24} />
@@ -127,7 +128,7 @@ export default function TrustSection({ language }: { language: SupportedLanguage
                     style={{
                       fontSize: '24px',
                       fontWeight: 800,
-                      color: 'var(--navy-900)',
+                      color: 'var(--color-text-primary)',
                       lineHeight: 1.1,
                       letterSpacing: '-0.02em',
                     }}
@@ -137,7 +138,7 @@ export default function TrustSection({ language }: { language: SupportedLanguage
                   <div
                     style={{
                       fontSize: '12.5px',
-                      color: 'var(--slate-600)',
+                      color: 'var(--color-text-secondary)',
                       fontWeight: 600,
                       marginTop: '3px',
                     }}
@@ -152,11 +153,10 @@ export default function TrustSection({ language }: { language: SupportedLanguage
 
         {/* Verification Guarantee Strip */}
         <div
+          className="glass-inset"
           style={{
-            background: 'linear-gradient(90deg, #F8FAFC 0%, #F1F5F9 100%)',
-            border: '1px solid var(--slate-200)',
-            borderRadius: '12px',
-            padding: '16px 20px',
+            borderRadius: '16px',
+            padding: '16px 22px',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '16px',
@@ -171,16 +171,17 @@ export default function TrustSection({ language }: { language: SupportedLanguage
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
+                  gap: '12px',
                 }}
               >
                 <div
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: 'var(--cyan-50)',
-                    color: '#0891B2',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'rgba(15, 118, 110, 0.1)',
+                    color: 'var(--color-primary)',
+                    border: '1px solid rgba(15, 118, 110, 0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -190,10 +191,10 @@ export default function TrustSection({ language }: { language: SupportedLanguage
                   <Icon size={18} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {b.title}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--slate-500)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
                     {b.subtitle}
                   </div>
                 </div>

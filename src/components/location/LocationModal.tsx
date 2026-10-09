@@ -87,48 +87,32 @@ export default function LocationModal({
     <div
       role="dialog"
       aria-modal="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(5, 12, 22, 0.65)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 99990,
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        padding: 0,
-      }}
+      className="modal-overlay"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="modal-container animate-slide-up"
         style={{
-          backgroundColor: '#FFFFFF',
           width: '100%',
           maxWidth: '560px',
-          borderTopLeftRadius: '24px',
-          borderTopRightRadius: '24px',
-          padding: '24px 20px',
+          padding: '24px 22px',
           paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
-          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.25)',
-          animation: 'slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-          maxHeight: '85vh',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
         }}
       >
         {/* Drag handle */}
-        <div style={{ width: '40px', height: '4px', background: '#E2E8F0', borderRadius: '2px', margin: '0 auto -6px auto' }} />
+        <div style={{ width: '40px', height: '4px', background: 'rgba(203, 213, 225, 0.8)', borderRadius: '2px', margin: '0 auto -4px auto' }} />
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)' }}>
               {language === 'en' ? 'Select Healthcare Location' : 'স্বাস্থ্যসেবা লোকেশন নির্বাচন'}
             </h2>
-            <p style={{ fontSize: '12px', color: 'var(--slate-500)', marginTop: '2px' }}>
+            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
               {language === 'en'
                 ? 'Showing doctors, labs, and hospitals near you'
                 : 'আপনার নিকটস্থ ডাক্তার, ডায়াগনস্টিক ও হাসপাতাল দেখাচ্ছে'}
@@ -138,16 +122,17 @@ export default function LocationModal({
             onClick={onClose}
             aria-label="Close"
             style={{
-              background: '#F1F5F9',
-              border: 'none',
+              background: 'rgba(241, 245, 249, 0.8)',
+              border: '1px solid var(--glass-border)',
               borderRadius: '50%',
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--slate-500)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
             <X size={18} />
@@ -158,15 +143,16 @@ export default function LocationModal({
         <button
           onClick={handleUseCurrentLocation}
           disabled={isLocating}
+          className="glass-card-sm"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            backgroundColor: 'var(--cyan-50)',
-            border: '1.5px solid var(--cyan-500)',
+            backgroundColor: 'rgba(221, 247, 240, 0.65)',
+            border: '1.5px solid rgba(15, 118, 110, 0.35)',
             padding: '12px 16px',
-            borderRadius: '12px',
-            color: 'var(--cyan-600)',
+            borderRadius: '14px',
+            color: 'var(--color-primary)',
             fontWeight: 700,
             fontSize: '13.5px',
             cursor: 'pointer',
@@ -182,40 +168,41 @@ export default function LocationModal({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 6px rgba(8, 145, 178, 0.15)',
+              boxShadow: '0 2px 8px rgba(15, 118, 110, 0.15)',
             }}
           >
-            <Navigation size={18} color="var(--cyan-600)" className={isLocating ? 'spin-slow' : ''} />
+            <Navigation size={18} color="var(--color-primary)" className={isLocating ? 'spin-slow' : ''} />
           </div>
           <div style={{ flex: 1 }}>
-            <div>{language === 'en' ? 'Use Current GPS Location' : 'বর্তমান জিপিএস লোকেশন ব্যবহার করুন'}</div>
-            <div style={{ fontSize: '11px', color: 'var(--slate-500)', fontWeight: 500 }}>
+            <div style={{ color: 'var(--color-primary)', fontWeight: 800 }}>
+              {language === 'en' ? 'Use Current GPS Location' : 'বর্তমান জিপিএস লোকেশন ব্যবহার করুন'}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
               {language === 'en' ? 'Fast automated nearby search' : 'নিকটস্থ চেম্বার ও ডায়াগনস্টিক অটো-ডিটেক্ট'}
             </div>
           </div>
         </button>
 
         {locationStatus && (
-          <div style={{ fontSize: '12px', color: '#D97706', background: '#FFFBEB', padding: '8px 12px', borderRadius: '8px' }}>
+          <div style={{ fontSize: '12px', color: '#B45309', background: 'rgba(254, 243, 199, 0.8)', border: '1px solid rgba(245, 158, 11, 0.4)', padding: '8px 12px', borderRadius: '10px' }}>
             {locationStatus}
           </div>
         )}
 
         {/* Search Input */}
         <div style={{ position: 'relative' }}>
-          <Search size={16} color="var(--slate-400)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
+          <Search size={16} color="var(--color-text-secondary)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             placeholder={language === 'en' ? 'Search district or upazila...' : 'উপজেলা বা জেলা খুঁজুন...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="glass-input"
             style={{
               width: '100%',
               padding: '10px 14px 10px 38px',
-              borderRadius: '10px',
-              border: '1px solid var(--slate-300)',
-              fontSize: '13px',
-              outline: 'none',
+              borderRadius: '12px',
+              boxSizing: 'border-box',
             }}
           />
         </div>
@@ -236,33 +223,35 @@ export default function LocationModal({
                   }
                   onClose();
                 }}
+                className={isSelected ? 'glass-card-sm' : 'glass-inset'}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '12px 14px',
-                  borderRadius: '10px',
-                  border: isSelected ? '1.5px solid var(--cyan-600)' : '1px solid var(--slate-200)',
-                  backgroundColor: isSelected ? 'var(--cyan-50)' : '#FFFFFF',
+                  borderRadius: '12px',
+                  border: isSelected ? '1.5px solid var(--color-primary)' : '1px solid var(--glass-border)',
+                  backgroundColor: isSelected ? 'rgba(221, 247, 240, 0.6)' : 'rgba(255, 255, 255, 0.7)',
                   cursor: 'pointer',
                   textAlign: 'left',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <MapPin size={16} color={isSelected ? 'var(--cyan-600)' : 'var(--slate-400)'} />
+                  <MapPin size={16} color={isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)'} />
                   <div>
-                    <div style={{ fontSize: '13.5px', fontWeight: isSelected ? 800 : 600, color: 'var(--navy-900)' }}>
+                    <div style={{ fontSize: '13.5px', fontWeight: isSelected ? 800 : 600, color: 'var(--color-text-primary)' }}>
                       {language === 'en' ? loc.nameEn : loc.nameBn}
                     </div>
                     {loc.hub && (
-                      <span style={{ fontSize: '10px', color: '#0891B2', background: 'rgba(8, 145, 178, 0.1)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                      <span className="glass-badge-teal" style={{ fontSize: '10px', padding: '1px 8px', borderRadius: '4px', fontWeight: 700 }}>
                         {language === 'en' ? 'Active Healthcare Hub' : 'সক্রিয় স্বাস্থ্য হাব'}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {isSelected && <Check size={18} color="var(--cyan-600)" />}
+                {isSelected && <Check size={18} color="var(--color-primary)" />}
               </button>
             );
           })}

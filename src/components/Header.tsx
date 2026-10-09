@@ -92,11 +92,13 @@ export const Header: React.FC<HeaderProps> = ({
       <div
         className="d-desktop-only"
         style={{
-          backgroundColor: '#0F172A',
-          color: '#F8FAFC',
+          backgroundColor: 'rgba(21, 49, 59, 0.95)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          color: '#F4F8FA',
           padding: '6px 0',
           fontSize: '11.5px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
         <div
@@ -116,17 +118,17 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                color: '#93C5FD',
+                background: 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.22)',
+                padding: '2px 10px',
+                borderRadius: '9999px',
+                color: '#DDF7F0',
                 fontSize: '11px',
                 fontWeight: 600,
                 cursor: 'pointer',
               }}
             >
-              <MapPin size={11} color="#60A5FA" />
+              <MapPin size={11} color="#5EEAD4" />
               <span>Location: <strong>{selectedLocation}</strong></span>
               <ChevronDown size={10} color="#94A3B8" />
             </button>
@@ -140,16 +142,16 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                color: '#60A5FA',
+                color: '#DDF7F0',
                 fontWeight: 700,
                 textDecoration: 'none',
-                background: 'rgba(0, 87, 255, 0.15)',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                border: '1px solid rgba(0, 87, 255, 0.3)',
+                background: 'rgba(15, 118, 110, 0.35)',
+                padding: '2px 10px',
+                borderRadius: '9999px',
+                border: '1px solid rgba(94, 234, 212, 0.35)',
               }}
             >
-              <Phone size={11} />
+              <Phone size={11} color="#5EEAD4" />
               <span>24/7 Helpline: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong></span>
             </a>
 
@@ -159,24 +161,25 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '2px',
-                background: 'rgba(255, 255, 255, 0.1)',
+                background: 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
                 padding: '2px 4px',
-                borderRadius: '6px',
+                borderRadius: '9999px',
               }}
             >
-              <Globe size={11} color="#93C5FD" style={{ marginRight: '2px' }} />
+              <Globe size={11} color="#5EEAD4" style={{ margin: '0 2px' }} />
               <button
                 onClick={() => {
                   setLanguage('en');
                   if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'en');
                 }}
                 style={{
-                  color: language === 'en' ? '#0F172A' : '#FFFFFF',
-                  background: language === 'en' ? '#60A5FA' : 'transparent',
+                  color: language === 'en' ? '#FFFFFF' : '#DDF7F0',
+                  background: language === 'en' ? '#0F766E' : 'transparent',
                   fontWeight: 700,
                   fontSize: '10.5px',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
+                  padding: '2px 7px',
+                  borderRadius: '9999px',
                   lineHeight: 1.2,
                 }}
               >
@@ -188,12 +191,12 @@ export const Header: React.FC<HeaderProps> = ({
                   if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'bn');
                 }}
                 style={{
-                  color: language === 'bn' ? '#0F172A' : '#FFFFFF',
-                  background: language === 'bn' ? '#60A5FA' : 'transparent',
+                  color: language === 'bn' ? '#FFFFFF' : '#DDF7F0',
+                  background: language === 'bn' ? '#0F766E' : 'transparent',
                   fontWeight: 700,
                   fontSize: '10.5px',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
+                  padding: '2px 7px',
+                  borderRadius: '9999px',
                   lineHeight: 1.2,
                 }}
               >
@@ -561,21 +564,23 @@ export const Header: React.FC<HeaderProps> = ({
         <div
           id="mobile-drawer"
           style={{
-            borderTop: '1px solid var(--brand-border)',
-            backgroundColor: '#FFFFFF',
+            borderTop: '1px solid var(--glass-border)',
+            backgroundColor: 'rgba(255, 255, 255, 0.94)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             padding: '20px 24px 28px',
-            boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+            boxShadow: '0 16px 36px rgba(15, 118, 110, 0.12)',
             animation: 'slideDown 0.2s ease-out',
           }}
           className="d-mobile-only"
         >
           {/* Logo in drawer header */}
-          <div style={{ marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid #F1F5F9' }}>
+          <div style={{ marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(15, 118, 110, 0.12)' }}>
             <BrandLogo variant="horizontal" size={32} />
           </div>
 
           {/* User Account / Auth Bar in Mobile Drawer */}
-          <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+          <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: 'rgba(244, 248, 250, 0.85)', borderRadius: '14px', border: '1px solid var(--glass-border)' }}>
             {currentUser ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -583,10 +588,10 @@ export const Header: React.FC<HeaderProps> = ({
                     {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#15313B' }}>
                       {currentUser.fullName}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#64748B' }}>
+                    <div style={{ fontSize: '11px', color: '#627680' }}>
                       {currentUser.phone || currentUser.email}
                     </div>
                   </div>
@@ -599,10 +604,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     style={{
                       padding: '6px 10px',
-                      borderRadius: '6px',
-                      backgroundColor: '#FEF2F2',
-                      border: '1px solid #FCA5A5',
-                      color: '#DC2626',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(185, 28, 28, 0.1)',
+                      border: '1px solid rgba(185, 28, 28, 0.25)',
+                      color: '#B91C1C',
                       fontSize: '11.5px',
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -623,14 +628,15 @@ export const Header: React.FC<HeaderProps> = ({
                   style={{
                     flex: 1,
                     padding: '8px 12px',
-                    borderRadius: '8px',
-                    backgroundColor: '#0057FF',
+                    borderRadius: '9999px',
+                    backgroundColor: BRAND_COLORS.primary,
                     color: '#FFFFFF',
                     border: 'none',
                     fontWeight: 700,
                     fontSize: '12.5px',
                     cursor: 'pointer',
                     textAlign: 'center',
+                    boxShadow: '0 4px 12px rgba(15, 118, 110, 0.25)',
                   }}
                 >
                   {language === 'en' ? 'Sign In' : 'লগইন'}
@@ -643,10 +649,10 @@ export const Header: React.FC<HeaderProps> = ({
                   style={{
                     flex: 1,
                     padding: '8px 12px',
-                    borderRadius: '8px',
-                    backgroundColor: '#FFFFFF',
-                    color: '#0F172A',
-                    border: '1px solid #CBD5E1',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    color: '#15313B',
+                    border: '1px solid var(--glass-border)',
                     fontWeight: 700,
                     fontSize: '12.5px',
                     cursor: 'pointer',

@@ -30,55 +30,58 @@ export const BRAND_CONSTANTS = {
 } as const;
 
 export const BRAND_COLORS = {
-  // Primary brand color
-  primary: '#1769F5', // Healthcare Primary Blue
-  primaryHover: '#0F56D2',
-  primaryActive: '#0B45AD',
-  primaryLight: '#EAF2FF',
-  primaryFaint: 'rgba(23, 105, 245, 0.08)',
+  // Primary Glassmorphism Healthcare Palette
+  primary: '#0F766E', // Primary Healthcare Teal
+  primaryHover: '#115E59', // Deep Teal
+  primaryActive: '#0B4E4A',
+  primaryLight: '#DDF7F0', // Fresh Mint
+  primaryFaint: 'rgba(15, 118, 110, 0.08)',
 
-  // Deep Navy & Secondary Accent
-  deepNavy: '#10294F',
-  secondaryBlue: '#EAF2FF',
-  healthcareTeal: '#11B8A5',
+  // Deep Teal & Accents
+  deepTeal: '#115E59',
+  deepNavy: '#15313B', // Primary Dark Slate
+  freshMint: '#DDF7F0', // Fresh Mint
+  secondaryBlue: '#E0F2FE',
+  healthcareTeal: '#0F766E',
 
-  // Secondary & surfaces
-  background: '#EBF2F9', // Tactile Soft Clay Canvas Background
-  surface: '#FFFFFF', // Pure White Clay Surface
-  surfaceSubtle: '#F4F8FD', // Soft Blue-tinted Clay Surface
-  surfaceElevated: '#FFFFFF',
-  clayBg: '#EBF2F9',
-  claySurface: '#FFFFFF',
-  clayCardShadow: '10px 14px 28px rgba(16, 41, 79, 0.08), -8px -8px 20px rgba(255, 255, 255, 0.95), inset 3px 3px 6px rgba(255, 255, 255, 0.85), inset -3px -3px 8px rgba(16, 41, 79, 0.04)',
-  clayBtnPrimaryShadow: '0 8px 18px rgba(23, 105, 245, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.5), inset 0 -3px 6px rgba(0, 0, 0, 0.22)',
-  clayPillShadow: '4px 6px 14px rgba(16, 41, 79, 0.06), -3px -3px 8px rgba(255, 255, 255, 0.9), inset 2px 2px 4px rgba(255, 255, 255, 0.8), inset -2px -2px 4px rgba(16, 41, 79, 0.04)',
+  // Glassmorphism Surfaces & Canvas
+  background: '#F4F8FA', // Soft Healthcare Canvas Background
+  surface: 'rgba(255, 255, 255, 0.68)', // Translucent Glass Surface
+  surfaceSubtle: 'rgba(255, 255, 255, 0.52)',
+  surfaceElevated: 'rgba(255, 255, 255, 0.85)',
+  glassSurface: 'rgba(255, 255, 255, 0.68)',
+  glassBorder: 'rgba(255, 255, 255, 0.78)',
+  glassCardShadow: '0 10px 30px -4px rgba(15, 118, 110, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9)',
+  glassBtnPrimaryShadow: '0 8px 20px -2px rgba(15, 118, 110, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5)',
+  glassPillShadow: '0 4px 12px rgba(15, 118, 110, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
 
-  // Typography & Neutrals
-  text: '#14243D', // Primary Navy Text
-  textDark: '#10294F', // Deep Navy
-  textSecondary: '#64748B', // Neutral Slate 600
-  textMuted: '#94A3B8', // Neutral Slate 400
+  // Typography & Neutrals (High Contrast WCAG AA)
+  text: '#15313B', // Primary Text
+  textDark: '#15313B', // Deep Heading
+  textSecondary: '#627680', // Secondary Text
+  textMuted: '#8FA0AA',
   textLight: '#CBD5E1',
 
-  // Contrast & borders
-  border: '#E2EAF4', // Soft healthcare border
-  borderSubtle: '#EDF3F9',
-  borderStrong: '#CBD5E1',
-  borderBrand: 'rgba(23, 105, 245, 0.25)',
+  // Glass Borders
+  border: 'rgba(255, 255, 255, 0.78)',
+  borderSubtle: 'rgba(255, 255, 255, 0.55)',
+  borderStrong: 'rgba(15, 118, 110, 0.22)',
+  borderBrand: 'rgba(15, 118, 110, 0.35)',
 
   // Fixed colors
   white: '#FFFFFF',
-  black: '#10294F',
+  black: '#15313B',
 
-  // Semantic Status Tokens (Clinically accurate & accessible)
-  success: '#15976A',
-  successBg: '#E8F8F1',
-  warning: '#D99116',
-  warningBg: '#FEF8EA',
-  danger: '#DC4545',
-  dangerBg: '#FDF2F2',
-  info: '#1769F5',
-  infoBg: '#EAF2FF',
+  // Semantic Status Tokens
+  success: '#15803D',
+  successBg: 'rgba(21, 128, 61, 0.12)',
+  warning: '#B45309',
+  warningBg: 'rgba(180, 83, 9, 0.12)',
+  danger: '#B91C1C',
+  dangerBg: 'rgba(185, 28, 28, 0.12)',
+  error: '#B91C1C',
+  info: '#0F766E',
+  infoBg: 'rgba(15, 118, 110, 0.1)',
 } as const;
 
 export const BRAND_LOGOS = {

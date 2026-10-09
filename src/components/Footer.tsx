@@ -37,17 +37,17 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
   return (
     <footer
       style={{
-        backgroundColor: '#10294F',
+        backgroundColor: '#15313B',
         color: '#FFFFFF',
         marginTop: '80px',
-        borderTop: '3px solid #1769F5',
+        borderTop: '3px solid #0F766E',
         position: 'relative',
       }}
     >
       {/* 24/7 Helpline Ribbon Banner */}
       <div
         style={{
-          background: 'linear-gradient(90deg, #0A1220 0%, #111E36 50%, #0A1220 100%)',
+          background: 'linear-gradient(90deg, #0F2027 0%, #15313B 50%, #0F2027 100%)',
           padding: '24px 0',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         }}
@@ -68,13 +68,13 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               style={{
                 width: '46px',
                 height: '46px',
-                borderRadius: '12px',
-                background: 'rgba(0, 87, 255, 0.2)',
-                border: '1px solid rgba(0, 87, 255, 0.4)',
+                borderRadius: '14px',
+                background: 'rgba(15, 118, 110, 0.25)',
+                border: '1px solid rgba(94, 234, 212, 0.35)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#60A5FA',
+                color: '#5EEAD4',
                 flexShrink: 0,
               }}
             >

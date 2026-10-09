@@ -50,31 +50,15 @@ export default function AuthModal({
       role="dialog"
       aria-modal="true"
       aria-label="Diagnostic Care Authentication"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.7)',
-        backdropFilter: 'blur(4px)',
-        zIndex: 10000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '16px',
-        animation: 'fadeIn 0.2s ease-out',
-      }}
+      className="modal-overlay"
       onClick={onClose}
     >
       <div
+        className="modal-container animate-slide-down"
         style={{
-          width: '100%',
           maxWidth: '480px',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          backgroundColor: '#FFFFFF',
-          borderRadius: '20px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          border: '1px solid #E2E8F0',
-          position: 'relative',
+          padding: 0,
+          overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -84,8 +68,9 @@ export default function AuthModal({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '18px 24px',
-            borderBottom: '1px solid #F1F5F9',
+            padding: '20px 24px',
+            borderBottom: '1px solid var(--glass-border)',
+            background: 'rgba(255, 255, 255, 0.4)',
           }}
         >
           <BrandLogo variant="horizontal" size={28} />
@@ -97,16 +82,16 @@ export default function AuthModal({
               onClick={onClose}
               aria-label={t.commonClose || 'Close'}
               style={{
-                width: '32px',
-                height: '32px',
+                width: '34px',
+                height: '34px',
                 borderRadius: '50%',
-                backgroundColor: '#F1F5F9',
-                border: 'none',
+                backgroundColor: 'rgba(241, 245, 249, 0.8)',
+                border: '1px solid var(--glass-border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                color: '#64748B',
+                color: 'var(--color-text-secondary)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -120,8 +105,8 @@ export default function AuthModal({
           <div
             style={{
               display: 'flex',
-              borderBottom: '1px solid #E2E8F0',
-              backgroundColor: '#F8FAFC',
+              borderBottom: '1px solid var(--glass-border)',
+              backgroundColor: 'rgba(244, 248, 250, 0.65)',
             }}
           >
             <button
@@ -132,8 +117,8 @@ export default function AuthModal({
                 padding: '14px',
                 fontSize: '14px',
                 fontWeight: 700,
-                color: mode === 'login' ? BRAND_COLORS.primary : '#64748B',
-                backgroundColor: mode === 'login' ? '#FFFFFF' : 'transparent',
+                color: mode === 'login' ? BRAND_COLORS.primary : 'var(--color-text-secondary)',
+                backgroundColor: mode === 'login' ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
                 border: 'none',
                 borderBottom: mode === 'login' ? `2.5px solid ${BRAND_COLORS.primary}` : 'none',
                 cursor: 'pointer',
@@ -151,8 +136,8 @@ export default function AuthModal({
                 padding: '14px',
                 fontSize: '14px',
                 fontWeight: 700,
-                color: mode === 'register' ? BRAND_COLORS.primary : '#64748B',
-                backgroundColor: mode === 'register' ? '#FFFFFF' : 'transparent',
+                color: mode === 'register' ? BRAND_COLORS.primary : 'var(--color-text-secondary)',
+                backgroundColor: mode === 'register' ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
                 border: 'none',
                 borderBottom: mode === 'register' ? `2.5px solid ${BRAND_COLORS.primary}` : 'none',
                 cursor: 'pointer',

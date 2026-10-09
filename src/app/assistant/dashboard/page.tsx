@@ -184,11 +184,12 @@ export default function DoctorAssistantDashboardPage() {
           {/* Toast Notice */}
           {toastMessage && (
             <div
+              className="glass-card-sm animate-scale-in"
               style={{
-                backgroundColor: '#ECFDF5',
-                border: '1px solid #10B981',
+                backgroundColor: 'rgba(236, 253, 245, 0.9)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
                 color: '#065F46',
-                borderRadius: '12px',
+                borderRadius: '16px',
                 padding: '14px 20px',
                 marginBottom: '24px',
                 fontSize: '14px',
@@ -196,7 +197,7 @@ export default function DoctorAssistantDashboardPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15)',
+                boxShadow: '0 8px 24px rgba(16, 185, 129, 0.12)',
               }}
             >
               <CheckCircle2 size={20} color="#059669" />
@@ -206,14 +207,10 @@ export default function DoctorAssistantDashboardPage() {
 
           {/* Assistant Sandbox & Security Isolation Card */}
           <div
-            className="portal-card"
+            className="glass-card"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
               padding: '28px 32px',
-              border: '1px solid #E2E8F0',
               marginBottom: '28px',
-              boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -227,8 +224,9 @@ export default function DoctorAssistantDashboardPage() {
                   width: '64px',
                   height: '64px',
                   borderRadius: '18px',
-                  backgroundColor: '#ECFDF5',
-                  color: '#059669',
+                  backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid rgba(15, 118, 110, 0.2)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -237,19 +235,33 @@ export default function DoctorAssistantDashboardPage() {
                   flexShrink: 0,
                 }}
               >
-                <UserCheck size={36} color="#059669" />
+                <UserCheck size={36} color="var(--color-primary)" />
               </div>
 
               <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#EFF6FF', color: '#1D4ED8', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
+                <div
+                  className="glass-pill"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: 'rgba(239, 246, 255, 0.85)',
+                    color: '#1D4ED8',
+                    border: '1px solid rgba(191, 219, 254, 0.8)',
+                    padding: '3px 12px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    marginBottom: '8px',
+                  }}
+                >
                   <ShieldCheck size={13} color="#2563EB" />
                   DOCTOR ASSISTANT SANDBOX • ACTIVE SESSION
                 </div>
-                <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
+                <h1 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
                   Md. Shofiqul Islam (Doctor Assistant)
                 </h1>
-                <p style={{ margin: 0, fontSize: '13.5px', color: '#64748B' }}>
-                  Assigned Doctor: <strong>Dr. Anisur Rahman (Cardiologist)</strong> • Popular Diagnostic Center, Moulvibazar
+                <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--color-text-secondary)' }}>
+                  Assigned Doctor: <strong style={{ color: 'var(--color-text-primary)' }}>Dr. Anisur Rahman (Cardiologist)</strong> • Popular Diagnostic Center, Moulvibazar
                 </p>
               </div>
             </div>
@@ -257,19 +269,16 @@ export default function DoctorAssistantDashboardPage() {
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={handleCallNext}
+                className="btn-primary"
                 style={{
-                  backgroundColor: '#10B981',
-                  color: '#FFFFFF',
-                  padding: '12px 22px',
-                  borderRadius: '12px',
+                  padding: '12px 24px',
+                  borderRadius: '14px',
                   fontSize: '14px',
                   fontWeight: 800,
-                  border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
                 }}
               >
                 <span>{language === 'en' ? 'Call Next' : 'পরবর্তী রোগী ডাকুন'}</span>
@@ -280,26 +289,26 @@ export default function DoctorAssistantDashboardPage() {
 
           {/* Server-Side Privacy Sandbox Notice */}
           <div
+            className="glass-inset"
             style={{
-              backgroundColor: '#EFF6FF',
-              border: '1px solid #BFDBFE',
-              borderRadius: '14px',
+              borderRadius: '16px',
               padding: '16px 20px',
               marginBottom: '28px',
               display: 'flex',
               alignItems: 'flex-start',
               gap: '14px',
               fontSize: '13px',
-              color: '#1E40AF',
-              lineHeight: 1.5,
+              backgroundColor: 'rgba(239, 246, 255, 0.65)',
+              border: '1px solid rgba(191, 219, 254, 0.6)',
+              lineHeight: 1.55,
             }}
           >
             <Lock size={20} color="#2563EB" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <div style={{ fontWeight: 800, marginBottom: '2px' }}>
+              <div style={{ fontWeight: 800, marginBottom: '2px', color: '#1E3A8A' }}>
                 {language === 'en' ? 'Server-Side Access Boundary Active' : 'সার্ভার-সাইড নিরাপত্তা বাউন্ডারি সক্রিয়'}
               </div>
-              <span>
+              <span style={{ color: '#2563EB' }}>
                 {language === 'en'
                   ? 'Your assistant account is restricted strictly to assigned doctor queue management. Financial ledgers, patient medical history, prescriptions, and organization administrative settings are strictly protected.'
                   : 'আপনার সহকারী অ্যাকাউন্ট শুধুমাত্র নির্ধারিত ডাক্তারের সিরিয়াল ও চেক-ইন পরিচালনার জন্য সীমাবদ্ধ। রোগীর পূর্ববর্তী চিকিৎসা রেকর্ড বা অর্থনৈতিক তথ্যে প্রবেশাধিকার নিয়ন্ত্রিত।'}
@@ -309,12 +318,14 @@ export default function DoctorAssistantDashboardPage() {
 
           {/* Sub-Tabs */}
           <div
+            className="glass-panel"
             style={{
               display: 'flex',
-              gap: '8px',
-              borderBottom: '1px solid #E2E8F0',
-              paddingBottom: '12px',
+              gap: '10px',
+              padding: '8px',
+              borderRadius: '16px',
               marginBottom: '28px',
+              width: 'fit-content',
             }}
           >
             <button
@@ -323,14 +334,16 @@ export default function DoctorAssistantDashboardPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '10px 18px',
-                borderRadius: '10px',
+                padding: '10px 20px',
+                borderRadius: '12px',
                 border: 'none',
-                backgroundColor: activeTab === 'queue' ? '#10294F' : 'transparent',
-                color: activeTab === 'queue' ? '#FFFFFF' : '#64748B',
+                background: activeTab === 'queue' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                color: activeTab === 'queue' ? '#FFFFFF' : 'var(--color-text-secondary)',
                 fontWeight: 700,
                 fontSize: '13.5px',
                 cursor: 'pointer',
+                boxShadow: activeTab === 'queue' ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
+                transition: 'all 0.2s ease',
               }}
             >
               <Users size={16} />
@@ -343,14 +356,16 @@ export default function DoctorAssistantDashboardPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '10px 18px',
-                borderRadius: '10px',
+                padding: '10px 20px',
+                borderRadius: '12px',
                 border: 'none',
-                backgroundColor: activeTab === 'invitations' ? '#10294F' : 'transparent',
-                color: activeTab === 'invitations' ? '#FFFFFF' : '#64748B',
+                background: activeTab === 'invitations' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                color: activeTab === 'invitations' ? '#FFFFFF' : 'var(--color-text-secondary)',
                 fontWeight: 700,
                 fontSize: '13.5px',
                 cursor: 'pointer',
+                boxShadow: activeTab === 'invitations' ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
+                transition: 'all 0.2s ease',
               }}
             >
               <UserPlus size={16} />
@@ -361,56 +376,55 @@ export default function DoctorAssistantDashboardPage() {
           {/* TAB 1: LIVE QUEUE & CHECK-IN */}
           {activeTab === 'queue' && (
             <div
-              className="portal-card"
+              className="glass-card"
               style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '20px',
-                padding: '24px',
-                border: '1px solid #E2E8F0',
-                boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)',
+                padding: '28px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                   {language === 'en' ? "Today's Appointment Queue" : 'আজকের রোগীর সিরিয়াল'}
                 </h3>
-                <span style={{ fontSize: '13px', color: '#059669', fontWeight: 700 }}>
+                <span className="glass-badge-teal" style={{ fontSize: '13px', fontWeight: 700 }}>
                   Active Chamber: Room 204
                 </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {queue.map((p) => {
                   const isCurrent = inRoomPatient?.id === p.id;
                   return (
                     <div
                       key={p.id}
+                      className={isCurrent ? 'glass-card-sm' : 'glass-inset'}
                       style={{
-                        padding: '16px 20px',
-                        borderRadius: '14px',
-                        border: isCurrent ? '2px solid #10B981' : '1px solid #E2E8F0',
-                        backgroundColor: isCurrent ? '#F0FDF4' : '#FFFFFF',
+                        padding: '18px 22px',
+                        borderRadius: '16px',
+                        border: isCurrent ? '2px solid var(--color-primary)' : '1px solid var(--glass-border)',
+                        backgroundColor: isCurrent ? 'rgba(240, 253, 244, 0.92)' : 'rgba(255, 255, 255, 0.72)',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         flexWrap: 'wrap',
                         gap: '16px',
+                        transition: 'all 0.2s ease',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                         <span
                           style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '12px',
-                            backgroundColor: isCurrent ? '#10B981' : '#F1F5F9',
-                            color: isCurrent ? '#FFFFFF' : '#0F172A',
+                            width: '46px',
+                            height: '46px',
+                            borderRadius: '14px',
+                            background: isCurrent ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(241, 245, 249, 0.85)',
+                            color: isCurrent ? '#FFFFFF' : 'var(--color-text-primary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontWeight: 900,
                             fontSize: '18px',
                             flexShrink: 0,
+                            boxShadow: isCurrent ? '0 4px 12px rgba(15, 118, 110, 0.3)' : 'none',
                           }}
                         >
                           #{p.token}
@@ -418,50 +432,51 @@ export default function DoctorAssistantDashboardPage() {
 
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontWeight: 800, fontSize: '15px', color: '#0F172A' }}>
+                            <span style={{ fontWeight: 800, fontSize: '15.5px', color: 'var(--color-text-primary)' }}>
                               {p.name}
                             </span>
                             {p.status === 'IN_ROOM' && (
-                              <span style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                              <span style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                                 IN ROOM
                               </span>
                             )}
                             {p.status === 'CHECKED_IN' && (
-                              <span style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                              <span style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                                 CHECKED IN
                               </span>
                             )}
                             {p.status === 'COMPLETED' && (
-                              <span style={{ backgroundColor: '#F1F5F9', color: '#64748B', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                              <span style={{ backgroundColor: '#F1F5F9', color: '#64748B', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                                 COMPLETED
                               </span>
                             )}
                             {p.status === 'NO_SHOW' && (
-                              <span style={{ backgroundColor: '#FEF2F2', color: '#DC2626', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                              <span style={{ backgroundColor: '#FEF2F2', color: '#DC2626', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                                 NO SHOW
                               </span>
                             )}
                           </div>
 
-                          <div style={{ fontSize: '13px', color: '#64748B', marginTop: '3px' }}>
-                            {p.age}y • Mobile: <strong>{p.phone}</strong> • Scheduled: {p.time}
+                          <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                            {p.age}y • Mobile: <strong style={{ color: 'var(--color-text-primary)' }}>{p.phone}</strong> • Scheduled: {p.time}
                           </div>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '10px' }}>
                         {p.status === 'WAITING' && (
                           <button
                             onClick={() => handleCheckIn(p.id)}
                             style={{
-                              backgroundColor: '#EFF6FF',
+                              backgroundColor: 'rgba(239, 246, 255, 0.9)',
                               color: '#1D4ED8',
-                              border: '1px solid #BFDBFE',
-                              padding: '8px 14px',
-                              borderRadius: '8px',
-                              fontSize: '12.5px',
+                              border: '1px solid rgba(191, 219, 254, 0.8)',
+                              padding: '8px 16px',
+                              borderRadius: '10px',
+                              fontSize: '13px',
                               fontWeight: 700,
                               cursor: 'pointer',
+                              transition: 'all 0.15s ease',
                             }}
                           >
                             Check-In
@@ -472,14 +487,15 @@ export default function DoctorAssistantDashboardPage() {
                           <button
                             onClick={() => handleNoShow(p.id)}
                             style={{
-                              backgroundColor: '#FEF2F2',
+                              backgroundColor: 'rgba(254, 242, 242, 0.9)',
                               color: '#DC2626',
-                              border: '1px solid #FECACA',
-                              padding: '8px 12px',
-                              borderRadius: '8px',
-                              fontSize: '12.5px',
+                              border: '1px solid rgba(254, 202, 202, 0.8)',
+                              padding: '8px 14px',
+                              borderRadius: '10px',
+                              fontSize: '13px',
                               fontWeight: 700,
                               cursor: 'pointer',
+                              transition: 'all 0.15s ease',
                             }}
                           >
                             No-Show
@@ -498,10 +514,10 @@ export default function DoctorAssistantDashboardPage() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                     {language === 'en' ? 'Authorized Doctor Assistants' : 'অনুমোদিত ডাক্তার সহকারী'}
                   </h3>
-                  <p style={{ fontSize: '13px', color: '#64748B', margin: '2px 0 0 0' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
                     {language === 'en'
                       ? 'Secure workflow for inviting assistants with branch-isolated permissions.'
                       : 'শাখা-ভিত্তিক সীমিত পারমিশন সহ নতুন সহকারীকে আমন্ত্রণ জানান।'}
@@ -510,17 +526,15 @@ export default function DoctorAssistantDashboardPage() {
 
                 <button
                   onClick={() => setIsInviteOpen(true)}
+                  className="btn-primary"
                   style={{
-                    backgroundColor: '#10294F',
-                    color: '#FFFFFF',
-                    padding: '9px 16px',
-                    borderRadius: '8px',
+                    padding: '10px 18px',
+                    borderRadius: '12px',
                     fontSize: '13px',
                     fontWeight: 700,
-                    border: 'none',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    gap: '8px',
                     cursor: 'pointer',
                   }}
                 >
@@ -533,12 +547,9 @@ export default function DoctorAssistantDashboardPage() {
                 {invitations.map((inv) => (
                   <div
                     key={inv.id}
-                    className="portal-card"
+                    className="glass-card-sm"
                     style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '16px',
                       padding: '20px 24px',
-                      border: '1px solid #E2E8F0',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -547,16 +558,17 @@ export default function DoctorAssistantDashboardPage() {
                     }}
                   >
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 800, fontSize: '15px', color: '#0F172A' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                        <span style={{ fontWeight: 800, fontSize: '15.5px', color: 'var(--color-text-primary)' }}>
                           {inv.name}
                         </span>
                         <span
                           style={{
-                            backgroundColor: inv.status === 'ACCEPTED' ? '#ECFDF5' : (inv.status === 'PENDING' ? '#FEF3C7' : '#FEF2F2'),
+                            backgroundColor: inv.status === 'ACCEPTED' ? 'rgba(236, 253, 245, 0.9)' : (inv.status === 'PENDING' ? 'rgba(254, 243, 199, 0.9)' : 'rgba(254, 242, 242, 0.9)'),
                             color: inv.status === 'ACCEPTED' ? '#059669' : (inv.status === 'PENDING' ? '#B45309' : '#DC2626'),
-                            padding: '2px 8px',
-                            borderRadius: '4px',
+                            border: `1px solid ${inv.status === 'ACCEPTED' ? 'rgba(16, 185, 129, 0.3)' : (inv.status === 'PENDING' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)')}`,
+                            padding: '3px 10px',
+                            borderRadius: '6px',
                             fontSize: '11px',
                             fontWeight: 800,
                           }}
@@ -564,10 +576,10 @@ export default function DoctorAssistantDashboardPage() {
                           {inv.status}
                         </span>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#64748B' }}>
-                        {inv.email} • Assigned to: {inv.branch}
+                      <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                        {inv.email} • Assigned to: <strong style={{ color: 'var(--color-text-primary)' }}>{inv.branch}</strong>
                       </div>
-                      <div style={{ fontSize: '12px', color: '#0284C7', marginTop: '4px' }}>
+                      <div style={{ fontSize: '12px', color: '#0F766E', marginTop: '6px', fontWeight: 600 }}>
                         Permissions: Manage Queue ({inv.canManageQueue ? '✓' : '✗'}), Check-in Patients ({inv.canCheckIn ? '✓' : '✗'}), Medical History (Strictly Blocked)
                       </div>
                     </div>
@@ -577,14 +589,15 @@ export default function DoctorAssistantDashboardPage() {
                         <button
                           onClick={() => handleRevoke(inv.id)}
                           style={{
-                            backgroundColor: '#FEF2F2',
+                            backgroundColor: 'rgba(254, 242, 242, 0.9)',
                             color: '#DC2626',
-                            border: '1px solid #FECACA',
+                            border: '1px solid rgba(254, 202, 202, 0.8)',
                             padding: '8px 14px',
-                            borderRadius: '8px',
+                            borderRadius: '10px',
                             fontSize: '12.5px',
                             fontWeight: 700,
                             cursor: 'pointer',
+                            transition: 'all 0.15s ease',
                           }}
                         >
                           Revoke Access
@@ -602,44 +615,45 @@ export default function DoctorAssistantDashboardPage() {
       {/* Invite Modal */}
       {isInviteOpen && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(4px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '16px',
-          }}
+          className="modal-overlay"
+          onClick={() => setIsInviteOpen(false)}
         >
           <div
-            className="portal-card"
+            className="modal-container animate-slide-down"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              maxWidth: '440px',
-              width: '100%',
+              maxWidth: '460px',
               padding: '28px',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                 {language === 'en' ? 'Invite Doctor Assistant' : 'সহকারী আমন্ত্রণ জানান'}
               </h3>
               <button
                 onClick={() => setIsInviteOpen(false)}
-                style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(241, 245, 249, 0.8)',
+                  border: 'none',
+                  color: 'var(--color-text-secondary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                }}
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSendInvite} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleSendInvite} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--color-text-primary)', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Assistant Full Name' : 'পূর্ণ নাম'} *
                 </label>
                 <input
@@ -648,12 +662,13 @@ export default function DoctorAssistantDashboardPage() {
                   value={inviteName}
                   onChange={(e) => setInviteName(e.target.value)}
                   placeholder="e.g. Md. Shofiqul Islam"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  className="glass-input"
+                  style={{ width: '100%', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--color-text-primary)', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Assistant Email or Mobile' : 'ইমেইল অথবা মোবাইল'} *
                 </label>
                 <input
@@ -662,21 +677,38 @@ export default function DoctorAssistantDashboardPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="e.g. assistant@gmail.com"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  className="glass-input"
+                  style={{ width: '100%', boxSizing: 'border-box' }}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '12px' }}>
                 <button
                   type="button"
                   onClick={() => setIsInviteOpen(false)}
-                  style={{ backgroundColor: '#F1F5F9', border: 'none', color: '#475569', padding: '10px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{
+                    backgroundColor: 'rgba(241, 245, 249, 0.8)',
+                    border: '1px solid var(--glass-border)',
+                    color: 'var(--color-text-secondary)',
+                    padding: '10px 18px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
                 >
                   {language === 'en' ? 'Cancel' : 'বাতিল'}
                 </button>
                 <button
                   type="submit"
-                  style={{ backgroundColor: '#10294F', border: 'none', color: '#FFFFFF', padding: '10px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                  className="btn-primary"
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
                 >
                   {language === 'en' ? 'Send Invitation' : 'আমন্ত্রণ পাঠান'}
                 </button>

@@ -7,6 +7,7 @@ import FormField from './FormField';
 import { AuthError, AuthSuccess } from './AuthAlerts';
 import LoadingButton from './LoadingButton';
 import { ArrowLeft, MailCheck, PhoneCall } from 'lucide-react';
+import { BRAND_COLORS } from '@/config/brand';
 
 interface ForgotPasswordFormProps {
   onBackToLogin?: () => void;
@@ -72,8 +73,8 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               gap: '6px',
               background: 'none',
               border: 'none',
-              color: '#0057FF',
-              fontWeight: 600,
+              color: BRAND_COLORS.primary,
+              fontWeight: 700,
               fontSize: '13px',
               cursor: 'pointer',
               padding: 0,
@@ -89,8 +90,8 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              color: '#0057FF',
-              fontWeight: 600,
+              color: BRAND_COLORS.primary,
+              fontWeight: 700,
               fontSize: '13px',
               textDecoration: 'none',
             }}
@@ -129,20 +130,26 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               disabled={loading}
+              className="glass-input"
               style={{
                 width: '100%',
                 height: '46px',
                 padding: '10px 14px',
                 fontSize: '14px',
-                color: '#0F172A',
-                backgroundColor: loading ? '#F1F5F9' : '#FFFFFF',
-                border: '1.5px solid #E2E8F0',
-                borderRadius: '10px',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '12px',
                 outline: 'none',
                 boxSizing: 'border-box',
               }}
-              onFocus={(e) => (e.currentTarget.style.borderColor = '#0057FF')}
-              onBlur={(e) => (e.currentTarget.style.borderColor = '#E2E8F0')}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = BRAND_COLORS.primary;
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--glass-border)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
           </FormField>
 
@@ -166,12 +173,12 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               width: '56px',
               height: '56px',
               borderRadius: '50%',
-              backgroundColor: '#EFF6FF',
+              backgroundColor: 'rgba(221, 247, 240, 0.7)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
-              color: '#0057FF',
+              color: BRAND_COLORS.primary,
             }}
           >
             <MailCheck size={28} />

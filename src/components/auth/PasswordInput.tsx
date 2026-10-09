@@ -60,10 +60,10 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             height: '46px',
             padding: '10px 44px 10px 14px',
             fontSize: '14px',
-            color: '#0F172A',
-            backgroundColor: disabled ? '#F1F5F9' : '#FFFFFF',
-            border: error ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
-            borderRadius: '10px',
+            color: 'var(--color-text-primary)',
+            backgroundColor: disabled ? 'rgba(241, 245, 249, 0.7)' : 'rgba(255, 255, 255, 0.85)',
+            border: error ? '1.5px solid #EF4444' : '1px solid var(--glass-border)',
+            borderRadius: '12px',
             outline: 'none',
             boxSizing: 'border-box',
             transition: 'border-color 0.2s, box-shadow 0.2s',
@@ -71,11 +71,11 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             letterSpacing: showPassword ? 'normal' : '0.12em',
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#0057FF';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 87, 255, 0.12)';
+            e.currentTarget.style.borderColor = '#0F766E';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = error ? '#EF4444' : '#E2E8F0';
+            e.currentTarget.style.borderColor = error ? '#EF4444' : 'var(--glass-border)';
             e.currentTarget.style.boxShadow = 'none';
           }}
         />

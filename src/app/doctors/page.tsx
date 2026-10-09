@@ -247,7 +247,7 @@ export default function DoctorsPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F7FAFE' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--brand-bg)' }}>
       <Header
         language={language}
         setLanguage={setLanguage}
@@ -267,19 +267,21 @@ export default function DoctorsPage() {
         {/* Breadcrumb & Header Hero Banner */}
         <section
           style={{
-            backgroundColor: '#FFFFFF',
-            borderBottom: '1px solid #E2EAF4',
+            backgroundColor: 'var(--glass-surface-card)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            borderBottom: '1px solid var(--glass-border)',
             padding: '36px 0 32px 0',
           }}
         >
           <div className="container">
             {/* Breadcrumb */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#64748B', marginBottom: '12px' }}>
-              <Link href="/" style={{ color: '#1769F5', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#627680', marginBottom: '12px' }}>
+              <Link href="/" style={{ color: '#0F766E', fontWeight: 600 }}>
                 {language === 'en' ? 'Home' : 'হোম'}
               </Link>
-              <ChevronRight size={14} color="#94A3B8" />
-              <span style={{ color: '#10294F', fontWeight: 700 }}>
+              <ChevronRight size={14} color="#8FA0AA" />
+              <span style={{ color: '#15313B', fontWeight: 700 }}>
                 {language === 'en' ? 'Specialist Doctors' : 'বিশেষজ্ঞ ডাক্তার'}
               </span>
             </div>
@@ -291,12 +293,13 @@ export default function DoctorsPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    backgroundColor: '#EAF2FF',
-                    color: '#1769F5',
+                    backgroundColor: 'var(--brand-fresh-mint)',
+                    color: '#0F766E',
                     fontSize: '12px',
                     fontWeight: 700,
-                    padding: '4px 12px',
+                    padding: '4px 14px',
                     borderRadius: '20px',
+                    border: '1px solid rgba(15, 118, 110, 0.25)',
                     marginBottom: '10px',
                   }}
                 >
@@ -307,7 +310,7 @@ export default function DoctorsPage() {
                   style={{
                     fontSize: 'clamp(26px, 3.2vw, 36px)',
                     fontWeight: 800,
-                    color: '#10294F',
+                    color: '#15313B',
                     letterSpacing: '-0.02em',
                     lineHeight: 1.2,
                     marginBottom: '8px',
@@ -315,7 +318,7 @@ export default function DoctorsPage() {
                 >
                   {language === 'en' ? 'Find & Book Specialist Doctors' : 'বিশেষজ্ঞ ডাক্তার খুঁজুন ও অ্যাপয়েন্টমেন্ট নিন'}
                 </h1>
-                <p style={{ fontSize: '15px', color: '#64748B', maxWidth: '640px' }}>
+                <p style={{ fontSize: '15px', color: '#627680', maxWidth: '640px' }}>
                   {language === 'en'
                     ? 'Connect with certified consultants across Bangladesh. Book evening chamber slots with 5-minute atomic reservation and real-time live queue tracking.'
                     : 'বাংলাদেশ জুড়ে অভিজ্ঞ ও বিএমডিসি নিবন্ধিত বিশেষজ্ঞ ডাক্তারদের চেম্বার অ্যাপয়েন্টমেন্ট নিশ্চিত করুন রিয়েল-টাইম লাইভ কিউ ট্র্যাকিং সহ।'}
@@ -324,10 +327,8 @@ export default function DoctorsPage() {
 
               {/* Verified Count Banner */}
               <div
+                className="glass-card-sm"
                 style={{
-                  backgroundColor: '#F0F5FD',
-                  border: '1px solid #E2EAF4',
-                  borderRadius: '12px',
                   padding: '12px 18px',
                   display: 'flex',
                   alignItems: 'center',
@@ -339,7 +340,7 @@ export default function DoctorsPage() {
                     width: '38px',
                     height: '38px',
                     borderRadius: '10px',
-                    backgroundColor: '#1769F5',
+                    backgroundColor: '#0F766E',
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
@@ -349,10 +350,10 @@ export default function DoctorsPage() {
                   <Stethoscope size={20} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#10294F' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>
                     {filteredDoctors.length} {language === 'en' ? 'Doctors' : 'জন ডাক্তার'}
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B' }}>
+                  <div style={{ fontSize: '11.5px', color: '#627680' }}>
                     {language === 'en' ? 'Available for Consultation' : 'সিরিয়ালের জন্য প্রস্তুত'}
                   </div>
                 </div>
@@ -362,7 +363,7 @@ export default function DoctorsPage() {
         </section>
 
         {/* Search & Filter Toolbar */}
-        <section style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2EAF4', padding: '16px 0' }}>
+        <section style={{ backgroundColor: 'var(--glass-surface-subtle)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--glass-border)', padding: '16px 0' }}>
           <div className="container">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'center' }}>
               {/* Search input */}
@@ -676,17 +677,13 @@ export default function DoctorsPage() {
                 return (
                   <div
                     key={doc.id}
-                    className="healthcare-card"
+                    className="glass-card"
                     style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E2EAF4',
-                      padding: '22px',
+                      padding: '24px',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      boxShadow: '0 2px 8px rgba(16, 41, 79, 0.04)',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.25s ease',
                     }}
                   >
                     <div>
@@ -696,13 +693,13 @@ export default function DoctorsPage() {
                           style={{
                             width: '64px',
                             height: '64px',
-                            borderRadius: '14px',
-                            backgroundColor: '#EAF2FF',
-                            border: '1px solid #D0E1FD',
+                            borderRadius: '16px',
+                            backgroundColor: 'var(--brand-fresh-mint)',
+                            border: '1px solid rgba(15, 118, 110, 0.25)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#1769F5',
+                            color: '#0F766E',
                             flexShrink: 0,
                             overflow: 'hidden',
                           }}
@@ -714,20 +711,20 @@ export default function DoctorsPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                             <Link
                               href={`/doctors/${doc.id}`}
-                              style={{ textDecoration: 'none', color: '#10294F' }}
+                              style={{ textDecoration: 'none', color: '#15313B' }}
                             >
                               <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>
                                 {doc.fullName}
                               </h2>
                             </Link>
-                            <ShieldCheck size={16} color="#15976A" />
+                            <ShieldCheck size={16} color="#15803D" />
                           </div>
 
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#1769F5', marginBottom: '3px' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F766E', marginBottom: '3px' }}>
                             {doc.specialization}
                           </div>
 
-                          <div style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
+                          <div style={{ fontSize: '12px', color: '#627680', lineHeight: 1.4 }}>
                             {doc.qualifications}
                           </div>
                         </div>
@@ -735,10 +732,8 @@ export default function DoctorsPage() {
 
                       {/* Credentials & Chamber Info */}
                       <div
+                        className="glass-inset"
                         style={{
-                          backgroundColor: '#F8FAFC',
-                          borderRadius: '10px',
-                          border: '1px solid #EDF3F9',
                           padding: '12px 14px',
                           marginBottom: '16px',
                           display: 'flex',
@@ -747,24 +742,24 @@ export default function DoctorsPage() {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                          <span style={{ color: '#64748B' }}>BMDC Reg:</span>
-                          <span style={{ fontWeight: 700, color: '#10294F' }}>
+                          <span style={{ color: '#627680' }}>BMDC Reg:</span>
+                          <span style={{ fontWeight: 700, color: '#15313B' }}>
                             {doc.bmdcNumber || 'A-12345'}
                           </span>
                         </div>
 
                         {assoc && (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                            <span style={{ color: '#64748B' }}>Chamber:</span>
-                            <span style={{ fontWeight: 600, color: '#10294F' }}>
+                            <span style={{ color: '#627680' }}>Chamber:</span>
+                            <span style={{ fontWeight: 600, color: '#15313B' }}>
                               {assoc.branchName || 'Popular Diagnostic Center'}
                             </span>
                           </div>
                         )}
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                          <span style={{ color: '#64748B' }}>Consultation Fee:</span>
-                          <span style={{ fontWeight: 800, color: '#1769F5', fontSize: '13px' }}>
+                          <span style={{ color: '#627680' }}>Consultation Fee:</span>
+                          <span style={{ fontWeight: 800, color: '#0F766E', fontSize: '13.5px' }}>
                             ৳ {assoc?.consultationFee || 700}
                           </span>
                         </div>
@@ -772,9 +767,9 @@ export default function DoctorsPage() {
 
                       {/* Available Slots Preview */}
                       <div style={{ marginBottom: '18px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#10294F', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <Clock size={13} color="#1769F5" />
-                          <span>{language === 'en' ? 'Available Today (5-Min Reservation):' : 'আজকের সময়সূচী:'}</span>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Clock size={13} color="#0F766E" />
+                          <span>{language === 'en' ? 'Available Today (5-Min Hold):' : 'আজকের সময়সূচী:'}</span>
                         </div>
 
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -789,25 +784,26 @@ export default function DoctorsPage() {
                                   onClick={() => assoc && handleSlotSelect(slot, assoc)}
                                   style={{
                                     padding: '6px 12px',
-                                    borderRadius: '8px',
+                                    borderRadius: '9999px',
                                     fontSize: '12px',
                                     fontWeight: 700,
                                     border: isBooked
-                                      ? '1px solid #E2E8F0'
+                                      ? '1px solid rgba(143, 160, 170, 0.3)'
                                       : isHeld
-                                      ? '1px solid #F59E0B'
-                                      : '1px solid #D0E1FD',
+                                      ? '1px solid #B45309'
+                                      : '1px solid rgba(15, 118, 110, 0.3)',
                                     backgroundColor: isBooked
-                                      ? '#F1F5F9'
+                                      ? 'rgba(244, 248, 250, 0.7)'
                                       : isHeld
-                                      ? '#FEF8EA'
-                                      : '#EAF2FF',
+                                      ? 'rgba(180, 83, 9, 0.12)'
+                                      : 'rgba(255, 255, 255, 0.9)',
                                     color: isBooked
-                                      ? '#94A3B8'
+                                      ? '#8FA0AA'
                                       : isHeld
-                                      ? '#D99116'
-                                      : '#1769F5',
+                                      ? '#B45309'
+                                      : '#0F766E',
                                     cursor: isBooked ? 'not-allowed' : 'pointer',
+                                    boxShadow: isBooked ? 'none' : '0 2px 6px rgba(15, 118, 110, 0.08)',
                                     transition: 'all 0.15s ease',
                                   }}
                                 >
@@ -816,7 +812,7 @@ export default function DoctorsPage() {
                               );
                             })
                           ) : (
-                            <span style={{ fontSize: '12px', color: '#94A3B8' }}>
+                            <span style={{ fontSize: '12px', color: '#8FA0AA' }}>
                               {language === 'en' ? 'Schedule updated daily at 4 PM' : 'প্রতিদিন বিকাল ৪টায় চেম্বার শুরু'}
                             </span>
                           )}
@@ -825,26 +821,18 @@ export default function DoctorsPage() {
                     </div>
 
                     {/* Action Buttons: View Profile + Book */}
-                    <div style={{ display: 'flex', gap: '10px', paddingTop: '14px', borderTop: '1px solid #EDF3F9' }}>
+                    <div style={{ display: 'flex', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
                       <Link
                         href={`/doctors/${doc.id}`}
+                        className="btn-outline"
                         style={{
                           flex: 1,
-                          backgroundColor: '#F0F5FD',
-                          border: '1px solid #D0E1FD',
-                          color: '#1769F5',
                           padding: '10px',
-                          borderRadius: '10px',
                           fontSize: '13px',
-                          fontWeight: 700,
                           textDecoration: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px',
                         }}
                       >
-                        <User size={14} />
+                        <User size={14} color="#0F766E" />
                         <span>{language === 'en' ? 'View Profile' : 'প্রোফাইল ও স্লট'}</span>
                       </Link>
 
@@ -856,40 +844,30 @@ export default function DoctorsPage() {
                             router.push(`/doctors/${doc.id}`);
                           }
                         }}
+                        className="btn-primary"
                         style={{
                           flex: 1,
-                          backgroundColor: '#1769F5',
-                          color: '#FFFFFF',
                           padding: '10px',
-                          borderRadius: '10px',
-                          border: 'none',
                           fontSize: '13px',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px',
-                          boxShadow: '0 4px 12px rgba(23, 105, 245, 0.2)',
                         }}
                       >
-                        <Calendar size={14} />
-                        <span>{language === 'en' ? 'Book Now' : 'সিরিয়াল নিন'}</span>
+                        <span>{language === 'en' ? 'Book Slot' : 'বুক করুন'}</span>
+                        <ArrowRight size={14} />
                       </button>
 
                       <a
                         href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
                         title="Helpline Booking"
+                        className="btn-outline"
                         style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '10px',
-                          backgroundColor: '#F0F5FD',
-                          border: '1px solid #E2EAF4',
+                          width: '42px',
+                          height: '42px',
+                          padding: 0,
+                          borderRadius: '12px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#1769F5',
+                          color: '#0F766E',
                           textDecoration: 'none',
                           flexShrink: 0,
                         }}

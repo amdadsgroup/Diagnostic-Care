@@ -233,14 +233,17 @@ export default function DoctorDashboardPage() {
 
           {/* Top Banner: Doctor Credentials & Live Status */}
           <div
-            className="portal-card"
+            className="glass-card"
             style={{
-              background: 'linear-gradient(135deg, #10294F 0%, #1A365D 100%)',
+              background: 'linear-gradient(135deg, rgba(15, 118, 110, 0.95) 0%, rgba(17, 94, 89, 0.95) 100%)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               color: '#FFFFFF',
               borderRadius: '24px',
               padding: '28px 32px',
               marginBottom: '28px',
-              boxShadow: '0 10px 25px rgba(16, 41, 79, 0.12)',
+              boxShadow: '0 16px 36px -10px rgba(15, 118, 110, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -254,25 +257,25 @@ export default function DoctorDashboardPage() {
                   width: '68px',
                   height: '68px',
                   borderRadius: '20px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#10294F',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  color: '#0F766E',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 800,
                   fontSize: '28px',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+                  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
                   flexShrink: 0,
                 }}
               >
-                <Stethoscope size={38} color="#10294F" />
+                <Stethoscope size={38} color="#0F766E" />
               </div>
               <div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255, 255, 255, 0.18)', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
-                  <ShieldCheck size={13} color="#6EE7B7" />
+                  <ShieldCheck size={13} color="#DDF7F0" />
                   BMDC REG: A-45892 (VERIFIED)
                 </div>
-                <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 4px 0' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
                   Dr. Anisur Rahman (ডাঃ আনিসুর রহমান)
                 </h1>
                 <p style={{ margin: 0, fontSize: '13.5px', opacity: 0.9 }}>
@@ -285,9 +288,9 @@ export default function DoctorDashboardPage() {
               <button
                 onClick={handleCallNext}
                 style={{
-                  backgroundColor: '#10B981',
+                  background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
                   color: '#FFFFFF',
-                  padding: '12px 22px',
+                  padding: '12px 24px',
                   borderRadius: '12px',
                   fontSize: '14px',
                   fontWeight: 800,
@@ -296,7 +299,8 @@ export default function DoctorDashboardPage() {
                   alignItems: 'center',
                   gap: '8px',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
+                  boxShadow: '0 8px 20px rgba(21, 128, 61, 0.35)',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <span>{language === 'en' ? 'Call Next Patient' : 'পরবর্তী রোগী ডাকুন'}</span>
@@ -314,38 +318,38 @@ export default function DoctorDashboardPage() {
               marginBottom: '28px',
             }}
           >
-            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '20px', border: '1px solid #E2E8F0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+            <div className="glass-card-sm" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? "Today's Total Patients" : 'আজকের মোট সিরিয়াল'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#0F172A', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#15313B', marginTop: '4px' }}>
                 {totalPatients}
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '20px', border: '1px solid #E2E8F0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+            <div className="glass-card-sm" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? 'Currently In-Room' : 'বর্তমানে চেম্বারে'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#2563EB', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#0F766E', marginTop: '4px' }}>
                 {inRoomPatient ? `Token #${inRoomPatient.token}` : 'None'}
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '20px', border: '1px solid #E2E8F0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+            <div className="glass-card-sm" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? 'Completed Patients' : 'সম্পন্ন হয়েছে'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#059669', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#15803D', marginTop: '4px' }}>
                 {completedCount} / {totalPatients}
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '20px', border: '1px solid #E2E8F0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+            <div className="glass-card-sm" style={{ padding: '20px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? 'Chamber Fees Collected' : 'মোট ফি সংগ্রহ'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#0F172A', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#15313B', marginTop: '4px' }}>
                 {formatCurrency(revenueTotal)}
               </div>
             </div>
@@ -355,9 +359,9 @@ export default function DoctorDashboardPage() {
           <div
             style={{
               display: 'flex',
-              gap: '8px',
-              borderBottom: '1px solid #E2E8F0',
-              paddingBottom: '12px',
+              gap: '10px',
+              borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+              paddingBottom: '14px',
               marginBottom: '28px',
               overflowX: 'auto',
             }}
@@ -379,15 +383,17 @@ export default function DoctorDashboardPage() {
                     alignItems: 'center',
                     gap: '8px',
                     padding: '10px 18px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    backgroundColor: isActive ? '#10294F' : 'transparent',
-                    color: isActive ? '#FFFFFF' : '#64748B',
+                    borderRadius: '12px',
+                    border: isActive ? 'none' : '1px solid rgba(226, 232, 240, 0.8)',
+                    background: isActive ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(255, 255, 255, 0.65)',
+                    backdropFilter: 'blur(8px)',
+                    color: isActive ? '#FFFFFF' : '#627680',
                     fontWeight: 700,
                     fontSize: '13.5px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                     whiteSpace: 'nowrap',
+                    boxShadow: isActive ? '0 4px 14px rgba(15, 118, 110, 0.22)' : 'none',
                   }}
                 >
                   <Icon size={16} />
@@ -402,20 +408,16 @@ export default function DoctorDashboardPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '28px' }}>
               {/* Queue List Table */}
               <div
-                className="portal-card"
+                className="glass-card"
                 style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
                   padding: '24px',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#15313B', margin: 0 }}>
                     {language === 'en' ? "Today's Patient Queue" : 'আজকের সিরিয়াল তালিকা'}
                   </h3>
-                  <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>
+                  <span style={{ fontSize: '12px', color: '#627680', fontWeight: 600 }}>
                     Moulvibazar Main Branch • Room 204
                   </span>
                 </div>
@@ -428,13 +430,15 @@ export default function DoctorDashboardPage() {
                         key={p.id}
                         style={{
                           padding: '14px 16px',
-                          borderRadius: '12px',
-                          border: isCurrent ? '2px solid #2563EB' : '1px solid #E2E8F0',
-                          backgroundColor: isCurrent ? '#EFF6FF' : '#FFFFFF',
+                          borderRadius: '14px',
+                          border: isCurrent ? '2px solid #0F766E' : '1px solid rgba(226, 232, 240, 0.8)',
+                          background: isCurrent ? 'linear-gradient(135deg, rgba(221, 247, 240, 0.45) 0%, rgba(255, 255, 255, 0.85) 100%)' : 'rgba(255, 255, 255, 0.6)',
+                          backdropFilter: 'blur(8px)',
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
                           transition: 'all 0.15s ease',
+                          boxShadow: isCurrent ? '0 6px 16px rgba(15, 118, 110, 0.12)' : 'none',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -443,13 +447,14 @@ export default function DoctorDashboardPage() {
                               width: '38px',
                               height: '38px',
                               borderRadius: '10px',
-                              backgroundColor: isCurrent ? '#2563EB' : '#F1F5F9',
-                              color: isCurrent ? '#FFFFFF' : '#0F172A',
+                              backgroundColor: isCurrent ? '#0F766E' : 'rgba(221, 247, 240, 0.5)',
+                              color: isCurrent ? '#FFFFFF' : '#0F766E',
+                              border: isCurrent ? 'none' : '1px solid rgba(15, 118, 110, 0.2)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontWeight: 800,
-                              fontSize: '16px',
+                              fontSize: '15px',
                               flexShrink: 0,
                             }}
                           >
@@ -457,10 +462,10 @@ export default function DoctorDashboardPage() {
                           </span>
 
                           <div>
-                            <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#0F172A' }}>
+                            <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#15313B' }}>
                               {p.name}
                             </div>
-                            <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+                            <div style={{ fontSize: '12px', color: '#627680', marginTop: '2px' }}>
                               {p.age}y, {p.gender} • {p.phone} • {p.time}
                             </div>
                           </div>
@@ -468,12 +473,12 @@ export default function DoctorDashboardPage() {
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           {p.status === 'IN_ROOM' && (
-                            <span style={{ backgroundColor: '#DBEAFE', color: '#1E40AF', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                            <span style={{ backgroundColor: 'rgba(15, 118, 110, 0.12)', color: '#0F766E', border: '1px solid rgba(15, 118, 110, 0.25)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                               IN ROOM
                             </span>
                           )}
                           {p.status === 'COMPLETED' && (
-                            <span style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                            <span style={{ backgroundColor: 'rgba(21, 128, 61, 0.1)', color: '#15803D', border: '1px solid rgba(21, 128, 61, 0.25)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                               DONE
                             </span>
                           )}
@@ -483,11 +488,10 @@ export default function DoctorDashboardPage() {
                                 setQueue(queue.map((q) => (q.id === p.id ? { ...q, status: 'IN_ROOM' } : q)));
                                 setActivePatient(p);
                               }}
+                              className="btn-outline"
                               style={{
-                                backgroundColor: '#F1F5F9',
-                                border: '1px solid #CBD5E1',
-                                padding: '4px 10px',
-                                borderRadius: '6px',
+                                padding: '4px 12px',
+                                borderRadius: '8px',
                                 fontSize: '11.5px',
                                 fontWeight: 700,
                                 cursor: 'pointer',
@@ -505,21 +509,17 @@ export default function DoctorDashboardPage() {
 
               {/* In-Room Patient Consultation Box */}
               <div
-                className="portal-card"
+                className="glass-card"
                 style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
                   padding: '24px',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#15313B', margin: 0 }}>
                     {language === 'en' ? 'Active Consultation' : 'বর্তমান রোগী কনসালটেশন'}
                   </h3>
                   {activePatient && (
-                    <span style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', padding: '3px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 700 }}>
+                    <span className="glass-badge-teal" style={{ padding: '3px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}>
                       Token #{activePatient.token}
                     </span>
                   )}
@@ -527,17 +527,17 @@ export default function DoctorDashboardPage() {
 
                 {activePatient ? (
                   <div>
-                    <div style={{ backgroundColor: '#F8FAFC', padding: '16px', borderRadius: '12px', marginBottom: '18px', border: '1px solid #E2E8F0' }}>
-                      <div style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>
+                    <div className="glass-inset" style={{ padding: '16px', marginBottom: '18px' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 800, color: '#15313B' }}>
                         {activePatient.name}
                       </div>
-                      <div style={{ fontSize: '13px', color: '#64748B', marginTop: '2px' }}>
+                      <div style={{ fontSize: '13px', color: '#627680', marginTop: '2px' }}>
                         Age: {activePatient.age} • Gender: {activePatient.gender} • Phone: {activePatient.phone}
                       </div>
                     </div>
 
                     <div style={{ marginBottom: '14px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
                         {language === 'en' ? 'Clinical Diagnosis' : 'রোগের প্রাথমিক নির্ণয়'}
                       </label>
                       <input
@@ -545,12 +545,13 @@ export default function DoctorDashboardPage() {
                         value={diagnosis}
                         onChange={(e) => setDiagnosis(e.target.value)}
                         placeholder="e.g. Essential Hypertension Grade II, Hyperlipidemia"
-                        style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                        className="glass-input"
+                        style={{ width: '100%', fontSize: '13.5px' }}
                       />
                     </div>
 
                     <div style={{ marginBottom: '18px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
                         {language === 'en' ? 'Clinical Notes & Advice' : 'ডাক্তারের পরামর্শ ও পর্যবেক্ষণ'}
                       </label>
                       <textarea
@@ -558,20 +559,19 @@ export default function DoctorDashboardPage() {
                         value={clinicalNotes}
                         onChange={(e) => setClinicalNotes(e.target.value)}
                         placeholder="e.g. Low sodium diet, 30 min daily walking, follow-up in 2 weeks"
-                        style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                        className="glass-input"
+                        style={{ width: '100%', fontSize: '13.5px' }}
                       />
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <button
                         onClick={handleSavePrescription}
+                        className="btn-outline"
                         style={{
                           flex: 1,
-                          backgroundColor: '#10294F',
-                          color: '#FFFFFF',
                           padding: '10px',
-                          borderRadius: '8px',
-                          border: 'none',
+                          borderRadius: '10px',
                           fontSize: '13px',
                           fontWeight: 700,
                           cursor: 'pointer',
@@ -582,12 +582,10 @@ export default function DoctorDashboardPage() {
 
                       <button
                         onClick={() => handleUpdateStatus(activePatient.id, 'COMPLETED')}
+                        className="btn-primary"
                         style={{
-                          backgroundColor: '#10B981',
-                          color: '#FFFFFF',
-                          padding: '10px 18px',
-                          borderRadius: '8px',
-                          border: 'none',
+                          padding: '10px 20px',
+                          borderRadius: '10px',
                           fontSize: '13px',
                           fontWeight: 700,
                           cursor: 'pointer',
@@ -612,16 +610,13 @@ export default function DoctorDashboardPage() {
           {/* TAB 2: DIGITAL PRESCRIPTIONS */}
           {activeTab === 'prescriptions' && (
             <div
-              className="portal-card"
+              className="glass-card"
               style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '20px',
                 padding: '28px',
-                border: '1px solid #E2E8F0',
                 maxWidth: '780px',
               }}
             >
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '18px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', marginBottom: '18px' }}>
                 {language === 'en' ? 'Digital Rx Prescription Writer' : 'ডিজিটাল প্রেসক্রিপশন তৈরি'}
               </h3>
 
@@ -632,48 +627,52 @@ export default function DoctorDashboardPage() {
                     value={newMedName}
                     onChange={(e) => setNewMedName(e.target.value)}
                     placeholder="Medicine Name (e.g. Tab. Napa 500mg)"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                    className="glass-input"
+                    style={{ fontSize: '13px', padding: '8px 12px' }}
                   />
                   <input
                     type="text"
                     value={newMedDose}
                     onChange={(e) => setNewMedDose(e.target.value)}
                     placeholder="Dose (e.g. 1+0+1)"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                    className="glass-input"
+                    style={{ fontSize: '13px', padding: '8px 12px' }}
                   />
                   <input
                     type="text"
                     value={newMedInstruction}
                     onChange={(e) => setNewMedInstruction(e.target.value)}
                     placeholder="Instruction (খাবারের পর)"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+                    className="glass-input"
+                    style={{ fontSize: '13px', padding: '8px 12px' }}
                   />
                   <button
                     onClick={handleAddMedicine}
-                    style={{ backgroundColor: '#10294F', color: '#FFFFFF', border: 'none', borderRadius: '8px', padding: '8px 14px', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
+                    className="btn-primary"
+                    style={{ padding: '8px 16px', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
                   >
                     + Add
                   </button>
                 </div>
 
                 {/* Medication List */}
-                <div style={{ border: '1px solid #E2E8F0', borderRadius: '12px', overflow: 'hidden' }}>
+                <div style={{ border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '14px', overflow: 'hidden', background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(8px)' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                    <thead style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+                    <thead style={{ background: 'rgba(244, 248, 250, 0.85)', borderBottom: '1px solid rgba(226, 232, 240, 0.8)' }}>
                       <tr>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700 }}>Medicine</th>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700 }}>Dosage</th>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700 }}>Instructions</th>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700 }}>Days</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Medicine</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Dosage</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Instructions</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Days</th>
                       </tr>
                     </thead>
                     <tbody>
                       {medicines.map((m, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                          <td style={{ padding: '10px 14px', fontWeight: 600 }}>{m.name}</td>
-                          <td style={{ padding: '10px 14px', color: '#2563EB', fontWeight: 700 }}>{m.dose}</td>
-                          <td style={{ padding: '10px 14px', color: '#475569' }}>{m.instruction}</td>
-                          <td style={{ padding: '10px 14px' }}>{m.days} days</td>
+                        <tr key={idx} style={{ borderBottom: '1px solid rgba(241, 245, 249, 0.8)' }}>
+                          <td style={{ padding: '10px 14px', fontWeight: 600, color: '#15313B' }}>{m.name}</td>
+                          <td style={{ padding: '10px 14px', color: '#0F766E', fontWeight: 700 }}>{m.dose}</td>
+                          <td style={{ padding: '10px 14px', color: '#627680' }}>{m.instruction}</td>
+                          <td style={{ padding: '10px 14px', color: '#627680' }}>{m.days} days</td>
                         </tr>
                       ))}
                     </tbody>
@@ -681,14 +680,15 @@ export default function DoctorDashboardPage() {
                 </div>
 
                 <div style={{ marginTop: '12px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
                     {language === 'en' ? 'Recommended Diagnostic Tests' : 'প্রস্তাবিত ল্যাব টেস্ট'}
                   </label>
                   <input
                     type="text"
                     value={recommendedTests}
                     onChange={(e) => setRecommendedTests(e.target.value)}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', boxSizing: 'border-box' }}
+                    className="glass-input"
+                    style={{ width: '100%', fontSize: '13px' }}
                   />
                 </div>
               </div>
@@ -698,33 +698,30 @@ export default function DoctorDashboardPage() {
           {/* TAB 3: WEEKLY SCHEDULE BUILDER */}
           {activeTab === 'schedule' && (
             <div
-              className="portal-card"
+              className="glass-card"
               style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '20px',
                 padding: '28px',
-                border: '1px solid #E2E8F0',
                 maxWidth: '780px',
               }}
             >
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '18px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', marginBottom: '18px' }}>
                 {language === 'en' ? 'Chamber Working Schedule' : 'চেম্বারের সাপ্তাহিক সময়সূচি'}
               </h3>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ backgroundColor: '#F8FAFC', padding: '18px', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+                <div className="glass-inset" style={{ padding: '18px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#0F172A' }}>
+                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#15313B' }}>
                       Popular Diagnostic Center (Moulvibazar Main Branch)
                     </div>
-                    <span style={{ backgroundColor: '#ECFDF5', color: '#059669', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
+                    <span style={{ backgroundColor: 'rgba(21, 128, 61, 0.1)', color: '#15803D', border: '1px solid rgba(21, 128, 61, 0.25)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
                       ACTIVE
                     </span>
                   </div>
-                  <div style={{ fontSize: '13px', color: '#64748B' }}>
-                    Days: <strong>Saturday to Thursday (শনিবার - বৃহস্পতিবার)</strong> • 16:00 to 20:00 (4:00 PM - 8:00 PM)
+                  <div style={{ fontSize: '13px', color: '#627680' }}>
+                    Days: <strong style={{ color: '#15313B' }}>Saturday to Thursday (শনিবার - বৃহস্পতিবার)</strong> • 16:00 to 20:00 (4:00 PM - 8:00 PM)
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#2563EB', fontWeight: 600, marginTop: '4px' }}>
+                  <div style={{ fontSize: '12.5px', color: '#0F766E', fontWeight: 600, marginTop: '4px' }}>
                     Slot Duration: 15 mins • Max 16 patients/day • Consultation Fee: ৳800
                   </div>
                 </div>
@@ -737,10 +734,10 @@ export default function DoctorDashboardPage() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
                     {language === 'en' ? 'Leave & Holiday Management' : 'ছুটি ও বন্ধ ব্যবস্থাপনা'}
                   </h3>
-                  <p style={{ fontSize: '13px', color: '#64748B', margin: '2px 0 0 0' }}>
+                  <p style={{ fontSize: '13px', color: '#627680', margin: '2px 0 0 0' }}>
                     {language === 'en'
                       ? 'Recorded leaves automatically block chamber slots and prevent bookings.'
                       : 'ছুটি নির্ধারণ করলে সংশ্লিষ্ট দিনগুলোর চেম্বার স্লট স্বয়ংক্রিয়ভাবে বন্ধ থাকবে।'}
@@ -749,14 +746,12 @@ export default function DoctorDashboardPage() {
 
                 <button
                   onClick={() => setIsAddLeaveOpen(true)}
+                  className="btn-primary"
                   style={{
-                    backgroundColor: '#10294F',
-                    color: '#FFFFFF',
-                    padding: '9px 16px',
-                    borderRadius: '8px',
+                    padding: '9px 18px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     fontWeight: 700,
-                    border: 'none',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
@@ -772,27 +767,24 @@ export default function DoctorDashboardPage() {
                 {leaves.map((l) => (
                   <div
                     key={l.id}
-                    className="portal-card"
+                    className="glass-card-sm"
                     style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '14px',
                       padding: '18px 22px',
-                      border: '1px solid #E2E8F0',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '15px', color: '#0F172A' }}>
+                      <div style={{ fontWeight: 800, fontSize: '15px', color: '#15313B' }}>
                         {l.reason}
                       </div>
-                      <div style={{ fontSize: '13px', color: '#64748B', marginTop: '2px' }}>
-                        Dates: <strong>{l.startDate}</strong> to <strong>{l.endDate}</strong>
+                      <div style={{ fontSize: '13px', color: '#627680', marginTop: '2px' }}>
+                        Dates: <strong style={{ color: '#15313B' }}>{l.startDate}</strong> to <strong style={{ color: '#15313B' }}>{l.endDate}</strong>
                       </div>
                     </div>
 
-                    <span style={{ backgroundColor: '#FEF3C7', color: '#B45309', padding: '3px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
+                    <span style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#B45309', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '3px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 800 }}>
                       SLOTS BLOCKED
                     </span>
                   </div>
@@ -806,11 +798,10 @@ export default function DoctorDashboardPage() {
       {/* Add Leave Modal */}
       {isAddLeaveOpen && (
         <div
+          className="modal-overlay"
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -819,23 +810,20 @@ export default function DoctorDashboardPage() {
           }}
         >
           <div
-            className="portal-card"
+            className="modal-container animate-slide-down"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
               maxWidth: '440px',
               width: '100%',
               padding: '28px',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
                 {language === 'en' ? 'Schedule Doctor Leave' : 'ডাক্তারের ছুটি নির্ধারণ'}
               </h3>
               <button
                 onClick={() => setIsAddLeaveOpen(false)}
-                style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}
+                style={{ background: 'none', border: 'none', color: '#627680', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}
               >
                 ✕
               </button>
@@ -843,7 +831,7 @@ export default function DoctorDashboardPage() {
 
             <form onSubmit={handleAddLeave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Start Date' : 'শুরুর তারিখ'} *
                 </label>
                 <input
@@ -851,12 +839,13 @@ export default function DoctorDashboardPage() {
                   required
                   value={leaveStartDate}
                   onChange={(e) => setLeaveStartDate(e.target.value)}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  className="glass-input"
+                  style={{ width: '100%', fontSize: '13.5px' }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'End Date' : 'শেষের তারিখ'} *
                 </label>
                 <input
@@ -864,12 +853,13 @@ export default function DoctorDashboardPage() {
                   required
                   value={leaveEndDate}
                   onChange={(e) => setLeaveEndDate(e.target.value)}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  className="glass-input"
+                  style={{ width: '100%', fontSize: '13.5px' }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Reason / Details' : 'ছুটির কারণ'}
                 </label>
                 <input
@@ -877,7 +867,8 @@ export default function DoctorDashboardPage() {
                   value={leaveReason}
                   onChange={(e) => setLeaveReason(e.target.value)}
                   placeholder="e.g. Medical Conference, Personal Vacation"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  className="glass-input"
+                  style={{ width: '100%', fontSize: '13.5px' }}
                 />
               </div>
 
@@ -885,13 +876,15 @@ export default function DoctorDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddLeaveOpen(false)}
-                  style={{ backgroundColor: '#F1F5F9', border: 'none', color: '#475569', padding: '10px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                  className="btn-outline"
+                  style={{ padding: '10px 18px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                 >
                   {language === 'en' ? 'Cancel' : 'বাতিল'}
                 </button>
                 <button
                   type="submit"
-                  style={{ backgroundColor: '#10294F', border: 'none', color: '#FFFFFF', padding: '10px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                  className="btn-primary"
+                  style={{ padding: '10px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                 >
                   {language === 'en' ? 'Confirm Leave' : 'ছুটি নিশ্চিত করুন'}
                 </button>
