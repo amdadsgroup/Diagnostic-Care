@@ -13,7 +13,6 @@ import {
   User,
   Phone,
   ChevronDown,
-  ArrowRight,
   LogOut,
 } from 'lucide-react';
 
@@ -345,22 +344,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
               </button>
             )
-          )}
-
-          {/* Get Started / Partner Button (Desktop only) */}
-          {onOpenOnboard && (
-            <button
-              onClick={onOpenOnboard}
-              className="btn-primary d-desktop-only"
-              style={{
-                padding: '8px 18px',
-                fontSize: '13px',
-                fontWeight: 700,
-              }}
-            >
-              <span>{language === 'en' ? 'Get Started' : 'শুরু করুন'}</span>
-              <ArrowRight size={13} />
-            </button>
           )}
 
         </div>
