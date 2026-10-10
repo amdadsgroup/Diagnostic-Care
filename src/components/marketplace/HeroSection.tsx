@@ -7,7 +7,6 @@ import { TRANSLATIONS } from '@/i18n/translations';
 import {
   Search,
   MapPin,
-  Sparkles,
   Stethoscope,
   TestTube2,
   Building2,
@@ -96,32 +95,6 @@ export default function HeroSection({
         <div className="hero-grid-responsive">
           {/* Left Column: Headline, Reassurance, Clean Search */}
           <div style={{ maxWidth: '100%', minWidth: 0 }}>
-            {/* National Healthcare Infrastructure Pill */}
-            <div
-              className="glass-pill"
-              style={{
-                marginBottom: '14px',
-                padding: '6px 14px',
-                fontSize: '11px',
-                color: '#0060FA',
-                background: 'var(--brand-fresh-mint)',
-                borderColor: 'rgba(0, 96, 250, 0.25)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                maxWidth: '100%',
-                flexWrap: 'wrap',
-                lineHeight: 1.4,
-              }}
-            >
-              <Sparkles size={13} color="#0060FA" />
-              <span>{t.heroBadge}</span>
-              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#0060FA' }} />
-              <span style={{ color: '#090D14', fontWeight: 600 }}>
-                {BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Hub • Bangladesh
-              </span>
-            </div>
-
             {/* Main Headline */}
             <h1
               style={{
