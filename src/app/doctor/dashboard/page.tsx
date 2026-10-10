@@ -94,16 +94,9 @@ export default function DoctorDashboardPage() {
   }, []);
 
   const loadDoctorQueue = () => {
-    // Load default doctor queue
-    const demoQueue: QueuePatient[] = [
-      { id: 'p-1', token: 1, name: 'আনিসুল হক (Anisul Hoque)', phone: '01886748564', age: 48, gender: 'MALE', status: 'IN_ROOM', time: '16:00', fee: 800 },
-      { id: 'p-2', token: 2, name: 'রাশেদা আক্তার (Rasheda Akter)', phone: '01712998811', age: 36, gender: 'FEMALE', status: 'WAITING', time: '16:15', fee: 800 },
-      { id: 'p-3', token: 3, name: 'তাহমিদুর রহমান (Tahmidur Rahman)', phone: '01911445566', age: 52, gender: 'MALE', status: 'WAITING', time: '16:30', fee: 800 },
-      { id: 'p-4', token: 4, name: 'ফরিদা পারভীন (Farida Parveen)', phone: '01822334455', age: 29, gender: 'FEMALE', status: 'WAITING', time: '16:45', fee: 800 },
-      { id: 'p-5', token: 5, name: 'কামাল হোসেন (Kamal Hossain)', phone: '01733667788', age: 61, gender: 'MALE', status: 'WAITING', time: '17:00', fee: 800 },
-    ];
-    setQueue(demoQueue);
-    setActivePatient(demoQueue[0]);
+    // Production ready: Clean empty queue
+    setQueue([]);
+    setActivePatient(null);
     setIsLoading(false);
   };
 
@@ -273,13 +266,13 @@ export default function DoctorDashboardPage() {
               <div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255, 255, 255, 0.18)', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
                   <ShieldCheck size={13} color="#EBF3FF" />
-                  BMDC REG: A-45892 (VERIFIED)
+                  BMDC VERIFIED PRACTITIONER
                 </div>
                 <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
-                  Dr. Anisur Rahman (ডাঃ আনিসুর রহমান)
+                  {currentUser?.fullName || (language === 'en' ? 'Doctor Clinical Console' : 'ডাক্তার চেম্বার কনসোল')}
                 </h1>
                 <p style={{ margin: 0, fontSize: '13.5px', opacity: 0.9 }}>
-                  Associate Professor & Cardiologist • Popular Diagnostic Center, Moulvibazar
+                  {language === 'en' ? 'Specialist Physician • Digital Chamber Portal' : 'বিশেষজ্ঞ চিকিৎসক • ডিজিটাল চেম্বার পোর্টাল'}
                 </p>
               </div>
             </div>
@@ -418,12 +411,17 @@ export default function DoctorDashboardPage() {
                     {language === 'en' ? "Today's Patient Queue" : 'আজকের সিরিয়াল তালিকা'}
                   </h3>
                   <span style={{ fontSize: '12px', color: '#627680', fontWeight: 600 }}>
-                    Moulvibazar Main Branch • Room 204
+                    {language === 'en' ? 'Live Chamber Serial Desk' : 'লাইভ চেম্বার সিরিয়াল ডেস্ক'}
                   </span>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {queue.map((p) => {
+                  {queue.length === 0 ? (
+                    <div style={{ padding: '32px 16px', textAlign: 'center', color: '#627680', fontSize: '13.5px' }}>
+                      {language === 'en' ? 'No patients in the queue for today.' : 'আজকের সিরিয়ালে কোনো রোগী অপেক্ষমান নেই।'}
+                    </div>
+                  ) : (
+                    queue.map((p) => {
                     const isCurrent = inRoomPatient?.id === p.id;
                     return (
                       <div
@@ -503,7 +501,8 @@ export default function DoctorDashboardPage() {
                         </div>
                       </div>
                     );
-                  })}
+                  })
+                )}
                 </div>
               </div>
 

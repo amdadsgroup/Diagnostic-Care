@@ -32,7 +32,7 @@ const POPULAR_DOCTOR_SEARCHES = [
   'Gynecology & Obs',
   'Pediatrics',
   'Orthopedics',
-  'Dr. Anisur Rahman',
+  'ENT Specialist',
   'Dermatology',
   'Neurology',
 ];
@@ -50,7 +50,6 @@ export default function MobileSearchView({
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([
     'Cardiology',
-    'Dr. Anisur Rahman',
     'General Medicine',
   ]);
 

@@ -55,11 +55,8 @@ export default function AppointmentsPatientDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'family' | 'saved' | 'settings'>('upcoming');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [familyMembers, setFamilyMembers] = useState<FamilyMemberItem[]>([
-    { id: 'fm-1', name: 'সুলতানা বেগম (Sultana Begum)', relationship: 'Mother', age: 58, gender: 'FEMALE', bloodGroup: 'B+' },
-    { id: 'fm-2', name: 'তাহমিদ আহমেদ (Tahmid Ahmed)', relationship: 'Child', age: 7, gender: 'MALE', bloodGroup: 'O+' },
-  ]);
-  const [savedDoctors, setSavedDoctors] = useState<Doctor[]>(INITIAL_DOCTORS);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMemberItem[]>([]);
+  const [savedDoctors, setSavedDoctors] = useState<Doctor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Cancellation Modal State
@@ -111,56 +108,17 @@ export default function AppointmentsPatientDashboardPage() {
   };
 
   const loadGuestAppointments = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const demoApts: Appointment[] = [
-      {
-        id: 'apt-demo-1',
-        bookingCode: 'DC-2026-8941',
-        scheduleSlotId: 'slot-1',
-        doctorAssociationId: 'assoc-1',
-        branchId: 'branch-1',
-        doctorName: 'Dr. Anisur Rahman',
-        specialization: 'Cardiologist (হৃদরোগ বিশেষজ্ঞ)',
-        organizationName: 'Popular Diagnostic Center (Moulvibazar)',
-        branchName: 'Main Branch (Chowmohana)',
-        patientUserId: 'user-demo',
-        patientName: 'আনিসুল হক (Anisul Hoque)',
-        patientPhone: '01886748564',
-        patientAge: 48,
-        patientGender: 'MALE',
-        appointmentDate: today,
-        startTime: '16:30',
-        consultationFee: 800,
-        tokenNumber: 3,
-        status: 'CONFIRMED',
-        paymentStatus: 'CASH_AT_DESK',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'apt-demo-2',
-        bookingCode: 'DC-2026-4412',
-        scheduleSlotId: 'slot-2',
-        doctorAssociationId: 'assoc-2',
-        branchId: 'branch-2',
-        doctorName: 'Dr. Fatema Khatun',
-        specialization: 'Gynecologist & Obstetrician',
-        organizationName: 'Ibn Sina Diagnostic Centre',
-        branchName: 'Court Road Branch',
-        patientUserId: 'user-demo',
-        patientName: 'সুলতানা বেগম (Sultana Begum)',
-        patientPhone: '01886748564',
-        patientAge: 58,
-        patientGender: 'FEMALE',
-        appointmentDate: '2026-09-28',
-        startTime: '17:15',
-        consultationFee: 700,
-        tokenNumber: 5,
-        status: 'COMPLETED',
-        paymentStatus: 'PAID',
-        createdAt: new Date(Date.now() - 86400000 * 12).toISOString(),
-      },
-    ];
-    setAppointments(demoApts);
+    // Production ready: Clean empty appointments for guest patients
+    try {
+      const localBookings = localStorage.getItem('dc_guest_appointments');
+      if (localBookings) {
+        setAppointments(JSON.parse(localBookings));
+      } else {
+        setAppointments([]);
+      }
+    } catch {
+      setAppointments([]);
+    }
     setIsLoading(false);
   };
 
@@ -670,7 +628,12 @@ export default function AppointmentsPatientDashboardPage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-                {familyMembers.map((fam) => (
+                {familyMembers.length === 0 ? (
+                  <div className="glass-card" style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: '#627680' }}>
+                    {language === 'en' ? 'No family members added yet. Click "Add Family Member" above.' : 'এখনও কোনো পরিবারের সদস্য যোগ করা হয়নি। উপরের বোতামে চাপুন।'}
+                  </div>
+                ) : (
+                  familyMembers.map((fam) => (
                   <div
                     key={fam.id}
                     className="glass-card-sm"
@@ -716,15 +679,21 @@ export default function AppointmentsPatientDashboardPage() {
                       <Trash2 size={16} />
                     </button>
                   </div>
-                ))}
+                ))
+              )}
               </div>
             </div>
           )}
 
           {/* TAB 4: SAVED DOCTORS */}
           {activeTab === 'saved' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '18px' }}>
-              {savedDoctors.map((doc) => (
+            savedDoctors.length === 0 ? (
+              <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: '#627680' }}>
+                {language === 'en' ? 'No saved doctors yet.' : 'এখনও কোনো ডাক্তার সংরক্ষিত নেই।'}
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '18px' }}>
+                {savedDoctors.map((doc) => (
                 <div
                   key={doc.id}
                   className="glass-card-sm"
@@ -769,6 +738,7 @@ export default function AppointmentsPatientDashboardPage() {
                 </div>
               ))}
             </div>
+            )
           )}
 
           {/* TAB 5: ACCOUNT SETTINGS */}

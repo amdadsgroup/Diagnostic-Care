@@ -46,7 +46,7 @@ export default function HeroSection({
   const [activeSearchTab, setActiveSearchTab] = useState<string>('ALL');
 
   const popularSearches = [
-    { labelEn: 'Dr. Anisur Rahman (Cardiologist)', labelBn: 'ডাঃ আনিসুর রহমান (হৃদরোগ)', query: 'Anisur' },
+    { labelEn: 'Cardiologist (Heart Specialist)', labelBn: 'হৃদরোগ বিশেষজ্ঞ (কার্ডিওলজিস্ট)', query: 'Cardiology' },
     { labelEn: 'Gynecologist in Moulvibazar', labelBn: 'স্ত্রী ও প্রসূতিরোগ বিশেষজ্ঞ', query: 'Gynecologist' },
     { labelEn: 'Pediatrician (Child Specialist)', labelBn: 'শিশু রোগ বিশেষজ্ঞ', query: 'Pediatrics' },
     { labelEn: 'Medicine & Diabetologist', labelBn: 'মেডিসিন ও ডায়াবেটিস বিশেষজ্ঞ', query: 'Medicine' },
@@ -441,10 +441,10 @@ export default function HeroSection({
                     </div>
                     <div>
                       <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#090D14' }}>
-                        Dr. Anisur Rahman • Room 204
+                        {language === 'en' ? 'Specialist Doctor Chambers' : 'বিশেষজ্ঞ ডাক্তার চেম্বার'}
                       </div>
                       <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
-                        Cardiologist • Popular Diagnostic Center
+                        {language === 'en' ? 'Verified BMDC Physicians • Live Queues' : 'ভেরিফাইড বিএমডিসি ডাক্তার • লাইভ কিউ'}
                       </div>
                     </div>
                   </div>
@@ -457,10 +457,10 @@ export default function HeroSection({
                         borderRadius: '9999px',
                       }}
                     >
-                      CHAMBER ACTIVE
+                      {language === 'en' ? 'LIVE PLATFORM' : 'সক্রিয় প্ল্যাটফর্ম'}
                     </span>
                     <div style={{ fontSize: '11px', color: '#0060FA', marginTop: '3px', fontWeight: 700 }}>
-                      Live Queue Token #02
+                      {language === 'en' ? 'Instant Booking' : 'তাৎক্ষণিক বুকিং'}
                     </div>
                   </div>
                 </div>

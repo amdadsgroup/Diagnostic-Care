@@ -57,6 +57,7 @@ import {
   Phone,
   Sparkles,
   HeartPulse,
+  User,
   UserCheck,
   AlertCircle,
   Lock,
@@ -354,6 +355,10 @@ export default function HomePage() {
     const assoc =
       appState.doctorAssociations.find((a) => a.doctorId === item.id || a.doctor?.fullName.includes(item.name)) ||
       appState.doctorAssociations[0];
+    if (!assoc) {
+      window.location.href = '/doctors';
+      return;
+    }
     const todayStr = new Date().toISOString().split('T')[0];
     const firstSlot = (appState.slots[`${assoc.id}_${todayStr}`] || []).find((s) => s.status === 'AVAILABLE') || {
       id: `slot-${assoc.id}-search-sel`,
@@ -578,12 +583,36 @@ export default function HomePage() {
         {/* ROLE BASED VIEWS (PROVIDER & PATIENT PORTAL) */}
         {activeTab === 'portal' && currentRole === 'DOCTOR' && (
           <div className="container" style={{ padding: '36px 20px' }}>
-            <DoctorPortal
-              doctorName={appState.doctors[0].fullName}
-              specialization={appState.doctors[0].specialization}
-              chamberName={`${appState.organizations[0].name} (${appState.organizations[0].branches[0].name})`}
-              doctorId={appState.doctors[0]?.id}
-            />
+            {appState.doctors.length > 0 ? (
+              <DoctorPortal
+                doctorName={appState.doctors[0]?.fullName || ''}
+                specialization={appState.doctors[0]?.specialization || ''}
+                chamberName={appState.organizations[0]?.name ? `${appState.organizations[0].name} (${appState.organizations[0].branches[0]?.name || ''})` : ''}
+                doctorId={appState.doctors[0]?.id}
+              />
+            ) : (
+              <div className="glass-card" style={{ padding: '40px', textAlign: 'center', maxWidth: '520px', margin: '40px auto' }}>
+                <User size={48} color="var(--brand-primary)" style={{ margin: '0 auto 16px' }} />
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#090D14', marginBottom: '8px' }}>
+                  {language === 'en' ? 'Doctor Portal Ready' : 'ডাক্তার পোর্টাল প্রস্তুত'}
+                </h3>
+                <p style={{ color: '#627680', fontSize: '14px', marginBottom: '20px' }}>
+                  {language === 'en'
+                    ? 'No doctor profile is linked yet. Sign in or register to configure your chambers and consultation slots.'
+                    : 'এখনো কোনো ডাক্তার প্রোফাইল যুক্ত করা হয়নি। চেম্বার ও স্লট পরিচালনা করতে লগইন করুন।'}
+                </p>
+                <button
+                  onClick={() => {
+                    setAuthModalMode('login');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="btn-primary"
+                  style={{ padding: '10px 22px' }}
+                >
+                  {language === 'en' ? 'Sign In as Doctor' : 'ডাক্তার লগইন'}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -599,18 +628,29 @@ export default function HomePage() {
 
         {activeTab === 'portal' && currentRole === 'DOCTOR_ASSISTANT' && (
           <div className="container" style={{ padding: '36px 20px' }}>
-            <DoctorAssistantView
-              assistant={appState.assistants[0]}
-              doctorName={appState.doctors[0].fullName}
-              specialization={appState.doctors[0].specialization}
-              organizationName={appState.organizations[0].name}
-              branchName={appState.organizations[0].branches[0].name}
-              appointments={appState.appointments}
-              queue={activeQueue}
-              language={language}
-              onCallNext={handleCallNext}
-              onUpdateStatus={handleUpdateAppointmentStatus}
-            />
+            {appState.assistants.length > 0 && appState.doctors.length > 0 ? (
+              <DoctorAssistantView
+                assistant={appState.assistants[0]}
+                doctorName={appState.doctors[0]?.fullName || ''}
+                specialization={appState.doctors[0]?.specialization || ''}
+                organizationName={appState.organizations[0]?.name || ''}
+                branchName={appState.organizations[0]?.branches[0]?.name || ''}
+                appointments={appState.appointments}
+                queue={activeQueue}
+                language={language}
+                onCallNext={handleCallNext}
+                onUpdateStatus={handleUpdateAppointmentStatus}
+              />
+            ) : (
+              <div className="glass-card" style={{ padding: '40px', textAlign: 'center', maxWidth: '520px', margin: '40px auto' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#090D14', marginBottom: '8px' }}>
+                  {language === 'en' ? 'Assistant Console Ready' : 'সহকারী কনসোল প্রস্তুত'}
+                </h3>
+                <p style={{ color: '#627680', fontSize: '14px' }}>
+                  {language === 'en' ? 'No chamber assistant linked yet.' : 'কোনো সহকারী প্রোফাইল এখনো যুক্ত করা হয়নি।'}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -637,19 +677,39 @@ export default function HomePage() {
                   {t.queueTitle}
                 </h1>
                 <p style={{ fontSize: '14px', color: 'var(--slate-500)', marginTop: '2px' }}>
-                  Real-time chamber serial tracking for Popular Diagnostic Center (Moulvibazar)
+                  {language === 'en'
+                    ? 'Real-time doctor chamber serial tracking'
+                    : 'রিয়েল-টাইম ডাক্তার চেম্বার সিরিয়াল ট্র্যাকিং'}
                 </p>
               </div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--emerald-50)', border: '1px solid var(--emerald-500)', padding: '6px 14px', borderRadius: '20px', color: '#065F46', fontWeight: 700, fontSize: '12px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10B981', padding: '6px 14px', borderRadius: '20px', color: '#065F46', fontWeight: 700, fontSize: '12px' }}>
                 <span className="beacon-dot green" />
                 <span>Live Chamber Engine Synced</span>
               </div>
             </div>
-            <LiveQueueTracker
-              doctorName={appState.doctors[0].fullName}
-              specialization={appState.doctors[0].specialization}
-              chamberName={`${appState.organizations[0].name} (${appState.organizations[0].branches[0].name})`}
-            />
+            {appState.doctors.length > 0 && appState.organizations.length > 0 ? (
+              <LiveQueueTracker
+                doctorName={appState.doctors[0]?.fullName || ''}
+                specialization={appState.doctors[0]?.specialization || ''}
+                chamberName={`${appState.organizations[0].name} (${appState.organizations[0].branches[0]?.name || ''})`}
+              />
+            ) : (
+              <div className="glass-card" style={{ padding: '48px', textAlign: 'center', margin: '20px 0' }}>
+                <Clock size={44} color="var(--brand-primary)" style={{ margin: '0 auto 16px', opacity: 0.8 }} />
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#090D14', marginBottom: '8px' }}>
+                  {language === 'en' ? 'No Active Chamber Queue at this Moment' : 'বর্তমানে কোনো সক্রিয় চেম্বার কিউ নেই'}
+                </h3>
+                <p style={{ color: '#627680', fontSize: '14px', maxWidth: '500px', margin: '0 auto 24px' }}>
+                  {language === 'en'
+                    ? 'Chamber serial queues go live when specialist doctors open consultations. Check back during scheduled chamber hours.'
+                    : 'ডাক্তার চেম্বারে রোগী দেখা শুরু করলে লাইভ সিরিয়াল কিউ এখানে সরাসরি প্রদর্শিত হবে।'}
+                </p>
+                <Link href="/doctors" className="btn-primary" style={{ padding: '10px 24px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                  <span>{language === 'en' ? 'Browse Doctor Directory' : 'ডাক্তার তালিকা দেখুন'}</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
@@ -708,20 +768,20 @@ export default function HomePage() {
                 }}
               >
                 <div>
-                  <h3 style={{ fontSize: '20px', fontWeight: 800 }}>Dr. Anisur Rahman</h3>
+                  <h3 style={{ fontSize: '20px', fontWeight: 800 }}>{language === 'en' ? 'Verified Specialist Physician' : 'নিবন্ধিত বিশেষজ্ঞ চিকিৎসক'}</h3>
                   <div style={{ fontSize: '13px', color: '#38BDF8', fontWeight: 600 }}>
-                    MBBS, FCPS (Cardiology), MD (Cardiovascular Diseases)
+                    {language === 'en' ? 'MBBS, FCPS / MD Registered Medical Practitioner' : 'এমবিবিএস, এফসিপিএস / এমডি নিবন্ধিত চিকিৎসক'}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--slate-300)', marginTop: '2px' }}>
-                    BMDC Reg No: <strong>A-45892</strong> • Associate Professor of Cardiology
+                    BMDC Reg: <strong>Verified</strong> • Clinical Consultation Chamber
                   </div>
                 </div>
 
                 <div style={{ textAlign: 'right', fontSize: '12px', color: 'var(--slate-300)' }}>
                   <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '14px' }}>
-                    Popular Diagnostic Center
+                    {BRAND_CONSTANTS.BRAND_NAME}
                   </div>
-                  <div>Moulvibazar Main Branch, Room 204</div>
+                  <div>{BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Hub • Bangladesh</div>
                   <div>Helpline: {BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}</div>
                 </div>
               </div>
@@ -1186,7 +1246,7 @@ export default function HomePage() {
       <VerifiedReviewsModal
         isOpen={isReviewsModalOpen}
         onClose={() => setIsReviewsModalOpen(false)}
-        doctorOrCenterName={language === 'en' ? 'Dr. Anisur Rahman' : 'ডাঃ আনিসুর রহমান'}
+        doctorOrCenterName={language === 'en' ? 'Diagnostic Care Healthcare Network' : 'ডায়াগনস্টিক কেয়ার নেটওয়ার্ক'}
       />
 
       {/* OPERATIONAL HELPLINE DISPATCHER MODAL */}

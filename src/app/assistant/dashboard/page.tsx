@@ -56,18 +56,8 @@ export default function DoctorAssistantDashboardPage() {
   const [selectedLocation, setSelectedLocation] = useState('Moulvibazar');
 
   const [activeTab, setActiveTab] = useState<'queue' | 'invitations'>('queue');
-  const [queue, setQueue] = useState<AssistantQueuePatient[]>([
-    { id: 'ap-1', token: 1, name: 'আনিসুল হক (Anisul Hoque)', phone: '01886748564', age: 48, gender: 'MALE', status: 'IN_ROOM', time: '16:00' },
-    { id: 'ap-2', token: 2, name: 'রাশেদা আক্তার (Rasheda Akter)', phone: '01712998811', age: 36, gender: 'FEMALE', status: 'CHECKED_IN', time: '16:15' },
-    { id: 'ap-3', token: 3, name: 'তাহমিদুর রহমান (Tahmidur Rahman)', phone: '01911445566', age: 52, gender: 'MALE', status: 'WAITING', time: '16:30' },
-    { id: 'ap-4', token: 4, name: 'ফরিদা পারভীন (Farida Parveen)', phone: '01822334455', age: 29, gender: 'FEMALE', status: 'WAITING', time: '16:45' },
-    { id: 'ap-5', token: 5, name: 'কামাল হোসেন (Kamal Hossain)', phone: '01733667788', age: 61, gender: 'MALE', status: 'WAITING', time: '17:00' },
-  ]);
-
-  const [invitations, setInvitations] = useState<AssistantInvitation[]>([
-    { id: 'inv-1', email: 'assistant.moulvibazar@gmail.com', name: 'Md. Shofiqul Islam', branch: 'Moulvibazar Main Branch', status: 'ACCEPTED', canManageQueue: true, canCheckIn: true },
-    { id: 'inv-2', email: 'chamber.desk@populardiagnostic.com', name: 'Nasrin Sultana', branch: 'Sreemangal Collection Branch', status: 'PENDING', canManageQueue: true, canCheckIn: true },
-  ]);
+  const [queue, setQueue] = useState<AssistantQueuePatient[]>([]);
+  const [invitations, setInvitations] = useState<AssistantInvitation[]>([]);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -258,10 +248,10 @@ export default function DoctorAssistantDashboardPage() {
                   DOCTOR ASSISTANT SANDBOX • ACTIVE SESSION
                 </div>
                 <h1 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
-                  Md. Shofiqul Islam (Doctor Assistant)
+                  {currentUser?.fullName || (language === 'en' ? 'Doctor Assistant Console' : 'ডাক্তার সহকারী কনসোল')}
                 </h1>
                 <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--color-text-secondary)' }}>
-                  Assigned Doctor: <strong style={{ color: 'var(--color-text-primary)' }}>Dr. Anisur Rahman (Cardiologist)</strong> • Popular Diagnostic Center, Moulvibazar
+                  {language === 'en' ? 'Chamber Serial Call Desk & Patient Vitals Intake System' : 'চেম্বার সিরিয়াল কল ডেস্ক ও রোগী ভাইটাল সংগ্রহ'}
                 </p>
               </div>
             </div>
@@ -386,12 +376,17 @@ export default function DoctorAssistantDashboardPage() {
                   {language === 'en' ? "Today's Appointment Queue" : 'আজকের রোগীর সিরিয়াল'}
                 </h3>
                 <span className="glass-badge-teal" style={{ fontSize: '13px', fontWeight: 700 }}>
-                  Active Chamber: Room 204
+                  {language === 'en' ? 'Chamber Reception Desk' : 'চেম্বার রিসেপশন ডেস্ক'}
                 </span>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {queue.map((p) => {
+                {queue.length === 0 ? (
+                  <div style={{ padding: '36px 16px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px' }}>
+                    {language === 'en' ? 'No patients currently queued for this chamber.' : 'এই চেম্বারের জন্য বর্তমানে কোনো রোগী সিরিয়ালে নেই।'}
+                  </div>
+                ) : (
+                  queue.map((p) => {
                   const isCurrent = inRoomPatient?.id === p.id;
                   return (
                     <div
@@ -504,7 +499,8 @@ export default function DoctorAssistantDashboardPage() {
                       </div>
                     </div>
                   );
-                })}
+                })
+              )}
               </div>
             </div>
           )}
@@ -544,7 +540,12 @@ export default function DoctorAssistantDashboardPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {invitations.map((inv) => (
+                {invitations.length === 0 ? (
+                  <div style={{ padding: '36px 16px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px' }}>
+                    {language === 'en' ? 'No staff invitations sent yet.' : 'এখনও কোনো সহকারীর আমন্ত্রণ পাঠানো হয়নি।'}
+                  </div>
+                ) : (
+                  invitations.map((inv) => (
                   <div
                     key={inv.id}
                     className="glass-card-sm"
@@ -605,7 +606,8 @@ export default function DoctorAssistantDashboardPage() {
                       )}
                     </div>
                   </div>
-                ))}
+                ))
+              )}
               </div>
             </div>
           )}

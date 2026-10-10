@@ -149,10 +149,10 @@ export class DoctorService {
 
       // Check fallback initial doctors
       const match = INITIAL_DOCTORS.find((d) => d.id === id || d.userId === id);
-      return match || INITIAL_DOCTORS[0];
+      return match || null;
     } catch {
       const match = INITIAL_DOCTORS.find((d) => d.id === id || d.userId === id);
-      return match || INITIAL_DOCTORS[0];
+      return match || null;
     }
   }
 

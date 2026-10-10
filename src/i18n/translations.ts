@@ -263,7 +263,7 @@ export const TRANSLATIONS = {
     authRegisterSubtitle: 'Join Diagnostic Care and access healthcare services easily.',
     authRegisterBadge: 'Patient Registration',
     authRegisterFullName: 'Full Name',
-    authRegisterFullNamePlaceholder: 'e.g. Md. Anisur Rahman',
+    authRegisterFullNamePlaceholder: 'e.g. Mohammad Ali',
     authRegisterMobile: 'Mobile Number',
     authRegisterMobilePlaceholder: '01XXXXXXXXX',
     authRegisterEmail: 'Email Address (Optional)',

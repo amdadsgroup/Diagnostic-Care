@@ -13,9 +13,9 @@ interface LiveQueueTrackerProps {
 }
 
 export default function LiveQueueTracker({
-  doctorName = 'ডাঃ আনিসুর রহমান (Dr. Anisur Rahman)',
-  specialization = 'এমবিবিএস, এফসিপিএস (কার্ডিওলজি) - হৃদরোগ বিশেষজ্ঞ',
-  chamberName = 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার মেইন ব্রাঞ্চ) - রুম ২০২',
+  doctorName = 'স্পেশালিস্ট চিকিৎসক (Specialist Physician)',
+  specialization = 'চেম্বার কনসালটেশন (Chamber Consultation)',
+  chamberName = 'নিবন্ধিত কনসালটেশন চেম্বার (Consultation Chamber)',
   initialCurrentServing = 0,
   initialTotalTokens = 0,
   userToken = null,

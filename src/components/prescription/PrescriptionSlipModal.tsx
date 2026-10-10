@@ -18,12 +18,12 @@ export default function PrescriptionSlipModal({
 
   const rx = prescription || {
     id: 'rx-2026-001',
-    doctorName: 'ডাঃ আনিসুর রহমান (Dr. Anisur Rahman)',
-    doctorQualifications: 'এমবিবিএস, বিসিএস (স্বাস্থ্য), এফসিপিএস (কার্ডিওলজি)',
-    doctorBmdc: 'BMDC Reg: A-34891',
-    doctorTitle: 'হৃদরোগ ও মেডিসিন বিশেষজ্ঞ',
-    centerName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার মেইন ব্রাঞ্চ)',
-    chamberAddress: 'সেন্ট্রাল রোড, চৌমোহনা, মৌলভীবাজার সদর • রুম ২০২',
+    doctorName: 'অনুমোদিত বিশেষজ্ঞ চিকিৎসক (Specialist Physician)',
+    doctorQualifications: 'এমবিবিএস, এফসিপিএস (মেডিসিন ও স্বাস্থ্য)',
+    doctorBmdc: 'BMDC Reg: Verified Practitioner',
+    doctorTitle: 'কনসালটেন্ট ফিজিশিয়ান',
+    centerName: 'নিবন্ধিত ডায়াগনস্টিক ও কনসালটেশন চেম্বার',
+    chamberAddress: 'স্পেশালিস্ট ডক্টরস চেম্বার, মৌলভীবাজার',
     patientName: 'তানভীর আহমেদ',
     patientAge: 34,
     patientGender: 'পুরুষ (M)',
@@ -181,7 +181,7 @@ export default function PrescriptionSlipModal({
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontStyle: 'italic', fontWeight: 700, color: 'var(--brand-navy-900)', borderBottom: '1px solid var(--slate-400)', paddingBottom: '2px', minWidth: '140px' }}>
-                Dr. Anisur Rahman
+                {rx.doctorName || 'Authorized Physician'}
               </div>
               <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)', marginTop: '2px' }}>
                 অনুমোদিত চিকিৎসকের ডিজিটাল স্বাক্ষর

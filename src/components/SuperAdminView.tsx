@@ -135,12 +135,12 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
                 <td style={{ padding: '10px 12px', fontWeight: 600 }}>GATEWAY_CLEARING (bKash)</td>
                 <td style={{ padding: '10px 12px', color: '#16A34A', fontWeight: 700 }}>DEBIT</td>
                 <td style={{ padding: '10px 12px', fontWeight: 700 }}>৳800.00</td>
-                <td style={{ padding: '10px 12px' }}>Dr. Anisur Rahman Consultation</td>
+                <td style={{ padding: '10px 12px' }}>Physician Consultation Booking</td>
                 <td style={{ padding: '10px 12px', color: 'var(--slate-500)' }}>Today 16:04</td>
               </tr>
               <tr style={{ borderBottom: '1px solid var(--slate-100)' }}>
                 <td style={{ padding: '10px 12px', fontFamily: 'monospace' }}>TXN-90812</td>
-                <td style={{ padding: '10px 12px', fontWeight: 600 }}>PROVIDER_PAYABLE (Popular DC)</td>
+                <td style={{ padding: '10px 12px', fontWeight: 600 }}>PROVIDER_PAYABLE (Chamber)</td>
                 <td style={{ padding: '10px 12px', color: '#DC2626', fontWeight: 700 }}>CREDIT</td>
                 <td style={{ padding: '10px 12px', fontWeight: 700 }}>৳760.00</td>
                 <td style={{ padding: '10px 12px' }}>Provider Payable (95%)</td>
@@ -186,7 +186,7 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
             <span style={{ color: 'var(--slate-500)' }}>8 mins ago • IP: 103.205.71.18</span>
           </div>
           <div style={{ padding: '10px 12px', backgroundColor: 'var(--slate-50)', borderRadius: '6px', border: '1px solid var(--slate-200)', display: 'flex', justifyContent: 'space-between' }}>
-            <span><strong>PROVIDER_VERIFICATION:</strong> Popular Diagnostic Center Moulvibazar Trade License TRAD/MB/2024/0981 verified.</span>
+            <span><strong>PROVIDER_VERIFICATION:</strong> Diagnostic & Consultation Chamber Trade License verified.</span>
             <span style={{ color: 'var(--slate-500)' }}>1 hour ago • Admin: super_admin</span>
           </div>
         </div>

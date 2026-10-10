@@ -21,8 +21,8 @@ interface ScheduleBuilderProps {
 }
 
 export default function ScheduleBuilder({
-  doctorName = 'ডাঃ রফিকুল ইসলাম (Dr. Rafiqul Islam)',
-  bmdcNumber = 'A-45892',
+  doctorName = 'বিশেষজ্ঞ চিকিৎসক (Specialist Physician)',
+  bmdcNumber = 'BMDC Verified',
   onSave,
   onClose,
 }: ScheduleBuilderProps) {

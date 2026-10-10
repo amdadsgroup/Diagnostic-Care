@@ -1,7 +1,7 @@
 {
   "name": "Diagnostic Care",
   "short_name": "Diagnostic Care",
-  "description": "Your Healthcare Marketplace — Doctor Discovery & Instant Chamber Booking",
+  "description": "Your Healthcare Marketplace",
   "id": "/",
   "start_url": "/",
   "scope": "/",
@@ -35,60 +35,6 @@
       "src": "/icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Find Doctors",
-      "short_name": "Doctors",
-      "description": "Search verified specialist doctors and chamber schedules across Bangladesh",
-      "url": "/?action=find-doctor",
-      "icons": [
-        {
-          "src": "/icons/shortcut-doctor.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Live Chamber Queue",
-      "short_name": "Queue",
-      "description": "Real-time doctor chamber serial tracker and consultation queue",
-      "url": "/?action=queue",
-      "icons": [
-        {
-          "src": "/icons/shortcut-doctor.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "My Appointments",
-      "short_name": "Appointments",
-      "description": "Check serial tokens, chamber queues, and doctor schedules",
-      "url": "/?action=appointments",
-      "icons": [
-        {
-          "src": "/icons/shortcut-appointments.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Customer Care Helpline",
-      "short_name": "Helpline",
-      "description": "Call 24/7 healthcare helpline for doctor chamber serial assistance",
-      "url": "/?action=emergency",
-      "icons": [
-        {
-          "src": "/icons/shortcut-appointments.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
     }
   ]
 }
