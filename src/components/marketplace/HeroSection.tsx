@@ -93,17 +93,9 @@ export default function HeroSection({
       />
 
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.28fr) minmax(0, 1fr)',
-            gap: '44px',
-            alignItems: 'center',
-          }}
-          className="hero-grid-responsive"
-        >
+        <div className="hero-grid-responsive">
           {/* Left Column: Headline, Reassurance, Clean Search */}
-          <div>
+          <div style={{ maxWidth: '100%', minWidth: 0 }}>
             {/* National Healthcare Infrastructure Pill */}
             <div
               className="glass-pill"
@@ -119,6 +111,7 @@ export default function HeroSection({
                 gap: '8px',
                 maxWidth: '100%',
                 flexWrap: 'wrap',
+                lineHeight: 1.4,
               }}
             >
               <Sparkles size={13} color="#0F766E" />
@@ -132,7 +125,7 @@ export default function HeroSection({
             {/* Main Headline */}
             <h1
               style={{
-                fontSize: 'clamp(22px, 5.2vw, 42px)',
+                fontSize: 'clamp(20px, 4.6vw, 38px)',
                 fontWeight: 800,
                 lineHeight: 1.25,
                 letterSpacing: '-0.02em',
@@ -140,6 +133,7 @@ export default function HeroSection({
                 color: '#15313B',
                 wordBreak: 'normal',
                 overflowWrap: 'break-word',
+                maxWidth: '100%',
               }}
             >
               {language === 'en' ? 'Find the Right Doctor, Book Instant Chamber Serial.' : 'সঠিক ডাক্তার খুঁজুন, তাৎক্ষণিক চেম্বার সিরিয়াল বুক করুন।'}
@@ -153,6 +147,7 @@ export default function HeroSection({
                 lineHeight: 1.6,
                 maxWidth: '620px',
                 marginBottom: '20px',
+                overflowWrap: 'break-word',
               }}
             >
               {language === 'en' 
@@ -161,18 +156,10 @@ export default function HeroSection({
             </p>
 
             {/* Quick Action CTAs */}
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <div className="hero-cta-group">
               <a
                 href="/doctors"
-                className="btn-primary"
-                style={{
-                  padding: '11px 20px',
-                  fontSize: '13.5px',
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
+                className="btn-primary hero-cta-btn"
               >
                 <Stethoscope size={15} />
                 <span>{language === 'en' ? 'Find a Doctor' : 'ডাক্তার খুঁজুন'}</span>
@@ -183,14 +170,7 @@ export default function HeroSection({
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                   else window.location.href = '/doctors';
                 }}
-                className="btn-outline"
-                style={{
-                  padding: '11px 18px',
-                  fontSize: '13.5px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
+                className="btn-outline hero-cta-btn"
               >
                 <Activity size={15} color="#0F766E" />
                 <span>{language === 'en' ? 'Chamber Schedules & Queue' : 'চেম্বার শিডিউল ও কিউ'}</span>
@@ -207,12 +187,15 @@ export default function HeroSection({
             >
               {/* Category Filter Tabs: Doctor Specialties */}
               <div
+                className="hero-tabs-scroll"
                 style={{
                   display: 'flex',
                   gap: '8px',
                   padding: '4px 4px 14px 4px',
                   borderBottom: '1.5px solid rgba(226, 234, 244, 0.7)',
                   overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  maxWidth: '100%',
                 }}
               >
                 {[
@@ -243,6 +226,7 @@ export default function HeroSection({
                       whiteSpace: 'nowrap',
                       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       cursor: 'pointer',
+                      flexShrink: 0,
                     }}
                   >
                     {item.label}
@@ -254,13 +238,12 @@ export default function HeroSection({
               <div className="hero-search-inputs-row">
                 {/* Location Filter Selector */}
                 <div
-                  className="glass-inset"
+                  className="glass-inset hero-input-district"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
                     padding: '10px 14px',
-                    minWidth: '150px',
                     borderRadius: '12px',
                   }}
                 >
@@ -289,15 +272,15 @@ export default function HeroSection({
 
                 {/* Primary Query Input */}
                 <div
-                  className="glass-inset"
+                  className="glass-inset hero-input-query"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
                     flex: 1,
-                    minWidth: '220px',
                     padding: '10px 16px',
                     borderRadius: '12px',
+                    minWidth: 0,
                   }}
                 >
                   <Search size={17} color="#0F766E" />
@@ -332,10 +315,11 @@ export default function HeroSection({
                 <button
                   id="hero-execute-search-btn"
                   onClick={onSearchSubmit}
-                  className="btn-primary"
+                  className="btn-primary hero-btn-search"
                   style={{
                     padding: '11px 24px',
                     fontSize: '13.5px',
+                    flexShrink: 0,
                   }}
                 >
                   <span>{t.searchButton}</span>
@@ -601,14 +585,6 @@ export default function HeroSection({
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 900px) {
-          .hero-grid-responsive {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

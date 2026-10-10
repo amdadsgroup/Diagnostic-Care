@@ -235,11 +235,11 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Side Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          {/* Search Trigger */}
+          {/* Search Trigger (Desktop only) */}
           <button
             onClick={onOpenSearch || (() => handleNavClick('search'))}
             aria-label="Search Healthcare Services"
-            className="clay-pill"
+            className="clay-pill d-desktop-flex"
             style={{
               gap: '6px',
               padding: '6px 10px',
@@ -275,7 +275,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Auth Button */}
           {currentUser ? (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '6px' }}>
               <button
                 onClick={() => handleNavClick('profile')}
                 className="clay-pill"
@@ -290,7 +290,6 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <User size={13} color={BRAND_COLORS.primary} />
                 <span
-                  className="d-desktop-inline"
                   style={{
                     maxWidth: '90px',
                     overflow: 'hidden',
@@ -306,7 +305,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={onLogout}
                   title={language === 'en' ? 'Sign Out' : 'লগআউট'}
                   aria-label={language === 'en' ? 'Sign Out' : 'লগআউট'}
-                  className="clay-bubble d-desktop-only"
+                  className="clay-bubble"
                   style={{
                     width: '32px',
                     height: '32px',
@@ -323,39 +322,19 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           ) : (
             onOpenAuth && (
-              <>
-                {/* Desktop Sign In Button */}
-                <button
-                  onClick={onOpenAuth}
-                  className="btn-secondary d-desktop-only"
-                  style={{
-                    gap: '6px',
-                    padding: '8px 16px',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                  }}
-                >
-                  <User size={14} color={BRAND_COLORS.primary} />
-                  <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
-                </button>
-                {/* Mobile compact user icon */}
-                <button
-                  onClick={onOpenAuth}
-                  aria-label="Sign In"
-                  className="clay-bubble d-mobile-only"
-                  style={{
-                    width: '34px',
-                    height: '34px',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <User size={15} color={BRAND_COLORS.primary} />
-                </button>
-              </>
+              <button
+                onClick={onOpenAuth}
+                className="btn-secondary d-desktop-only"
+                style={{
+                  gap: '6px',
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                }}
+              >
+                <User size={14} color={BRAND_COLORS.primary} />
+                <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
+              </button>
             )
           )}
 

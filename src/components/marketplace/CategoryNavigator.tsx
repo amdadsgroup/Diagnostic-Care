@@ -193,9 +193,9 @@ export default function CategoryNavigator({
 
       {/* Specialty Grid */}
       <div
+        className="category-navigator-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
           gap: '16px',
         }}
       >

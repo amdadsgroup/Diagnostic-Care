@@ -85,9 +85,9 @@ export default function TrustSection({ language }: { language: SupportedLanguage
       <div className="container">
         {/* Metric Cards Row */}
         <div
+          className="trust-metrics-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '20px',
             marginBottom: '28px',
           }}
@@ -153,12 +153,11 @@ export default function TrustSection({ language }: { language: SupportedLanguage
 
         {/* Verification Guarantee Strip */}
         <div
-          className="glass-inset"
+          className="glass-inset trust-badges-grid"
           style={{
             borderRadius: '16px',
             padding: '16px 22px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '16px',
             alignItems: 'center',
           }}

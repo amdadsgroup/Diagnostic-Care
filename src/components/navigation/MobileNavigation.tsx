@@ -67,12 +67,14 @@ export default function MobileNavigation({
       role="navigation"
       aria-label="Mobile Navigation Dock"
       style={{
-        display: 'flex',
         position: 'fixed',
         bottom: '10px',
         left: '12px',
         right: '12px',
-        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        maxWidth: 'calc(100vw - 24px)',
+        margin: '0 auto',
+        boxSizing: 'border-box',
+        backgroundColor: 'rgba(255, 255, 255, 0.88)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderRadius: '24px',
