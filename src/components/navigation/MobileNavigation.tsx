@@ -61,6 +61,15 @@ export default function MobileNavigation({
   const isMessagesActive = activeTab === 'messages';
   const isProfileActive = activeTab === 'profile' || activeTab === 'reports';
 
+  const handleNavigate = (targetTab: ActiveNavTab) => {
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.location.href = `/?tab=${targetTab}`;
+      return;
+    }
+    setActiveTab(targetTab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <nav
       className="mobile-bottom-dock"
@@ -74,7 +83,7 @@ export default function MobileNavigation({
         maxWidth: 'calc(100vw - 24px)',
         margin: '0 auto',
         boxSizing: 'border-box',
-        backgroundColor: 'rgba(255, 255, 255, 0.88)',
+        backgroundColor: 'rgba(255, 255, 255, 0.92)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderRadius: '24px',
@@ -91,10 +100,7 @@ export default function MobileNavigation({
     >
       {/* 1. Home */}
       <button
-        onClick={() => {
-          setActiveTab('marketplace');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onClick={() => handleNavigate('marketplace')}
         className={`mobile-dock-item ${isHomeActive ? 'active' : ''}`}
         aria-label="Home"
         style={{
@@ -126,9 +132,8 @@ export default function MobileNavigation({
       {/* 2. Discover */}
       <button
         onClick={() => {
-          setActiveTab('search');
+          handleNavigate('search');
           if (onOpenSearch) onOpenSearch();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         className={`mobile-dock-item ${isDiscoverActive ? 'active' : ''}`}
         aria-label="Discover"
@@ -160,10 +165,7 @@ export default function MobileNavigation({
 
       {/* 3. Bookings */}
       <button
-        onClick={() => {
-          setActiveTab(isPatient ? 'appointments' : 'queue');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onClick={() => handleNavigate(isPatient ? 'appointments' : 'queue')}
         className={`mobile-dock-item ${isBookingsActive ? 'active' : ''}`}
         aria-label="Bookings"
         style={{
@@ -194,18 +196,7 @@ export default function MobileNavigation({
 
       {/* 4. Messages / Helpline Support */}
       <button
-        onClick={() => {
-          if (onOpenHelpline) {
-            onOpenHelpline();
-          } else if (typeof window !== 'undefined') {
-            const el = document.getElementById('footer-call-helpline-cta');
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth' });
-            } else {
-              window.location.href = `tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`;
-            }
-          }
-        }}
+        onClick={() => handleNavigate('messages')}
         className={`mobile-dock-item ${isMessagesActive ? 'active' : ''}`}
         aria-label="Messages"
         style={{
@@ -252,10 +243,7 @@ export default function MobileNavigation({
 
       {/* 5. Profile / Account */}
       <button
-        onClick={() => {
-          setActiveTab(isPatient ? 'profile' : 'portal');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onClick={() => handleNavigate(isPatient ? 'profile' : 'portal')}
         className={`mobile-dock-item ${isProfileActive ? 'active' : ''}`}
         aria-label="Profile"
         style={{

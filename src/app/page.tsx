@@ -35,6 +35,7 @@ import MobileNavigation, { ActiveNavTab } from '@/components/navigation/MobileNa
 import MobileAppointmentsView from '@/components/patient/MobileAppointmentsView';
 import MobileHealthVaultView from '@/components/patient/MobileHealthVaultView';
 import MobileProfileView from '@/components/patient/MobileProfileView';
+import MobileMessagesView from '@/components/patient/MobileMessagesView';
 import MobileSearchView from '@/components/search/MobileSearchView';
 import LocationModal from '@/components/location/LocationModal';
 import NotificationSettingsModal from '@/components/notifications/NotificationSettingsModal';
@@ -127,7 +128,7 @@ export default function HomePage() {
         }
       });
 
-      // Load doctors from Supabase
+      // Load doctors & chamber associations from Supabase
       DoctorService.getDoctors().then((docs) => {
         if (docs.length > 0) {
           setAppState((prev) => ({
@@ -137,6 +138,17 @@ export default function HomePage() {
         }
       }).catch((err) => {
         console.warn('Initial doctor data load notice:', err);
+      });
+
+      DoctorService.getDoctorAssociations().then((assocs) => {
+        if (assocs.length > 0) {
+          setAppState((prev) => ({
+            ...prev,
+            doctorAssociations: assocs,
+          }));
+        }
+      }).catch((err) => {
+        console.warn('Initial doctor associations load notice:', err);
       });
 
       // Detect PWA App Shortcuts in URL
@@ -158,7 +170,9 @@ export default function HomePage() {
         setActiveTab('queue');
       } else if (action === 'prescriptions') {
         setActiveTab('prescriptions');
-      } else if (tab && ['marketplace', 'search', 'appointments', 'queue', 'reports', 'prescriptions', 'portal', 'profile'].includes(tab)) {
+      } else if (action === 'messages') {
+        setActiveTab('messages');
+      } else if (tab && ['marketplace', 'search', 'appointments', 'queue', 'reports', 'prescriptions', 'portal', 'profile', 'messages'].includes(tab)) {
         setActiveTab(tab as ActiveNavTab);
       }
     }
@@ -546,6 +560,7 @@ export default function HomePage() {
             <MobileAppointmentsView
               appointments={appState.appointments}
               language={language}
+              onNavigateTab={(tab) => setActiveTab(tab)}
               onCancelAppointment={(id) => {
                 AppointmentService.cancelAppointment(id);
                 setAppState((prev) => ({
@@ -555,6 +570,19 @@ export default function HomePage() {
                   ),
                 }));
               }}
+            />
+          </div>
+        )}
+
+        {/* MESSAGES & SUPPORT CENTER TAB */}
+        {activeTab === 'messages' && (
+          <div className="container" style={{ padding: '24px 16px', maxWidth: '820px' }}>
+            <MobileMessagesView
+              language={language}
+              currentUser={currentUser}
+              onNavigateTab={(tab) => setActiveTab(tab)}
+              onOpenSupportTicket={() => setIsSupportModalOpen(true)}
+              onOpenNotifications={() => setIsNotificationsModalOpen(true)}
             />
           </div>
         )}

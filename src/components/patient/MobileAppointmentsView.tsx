@@ -24,6 +24,7 @@ interface MobileAppointmentsViewProps {
   language: SupportedLanguage;
   onCancelAppointment?: (id: string) => void;
   onViewDetails?: (apt: Appointment) => void;
+  onNavigateTab?: (tab: any) => void;
 }
 
 export default function MobileAppointmentsView({
@@ -31,6 +32,7 @@ export default function MobileAppointmentsView({
   language,
   onCancelAppointment,
   onViewDetails,
+  onNavigateTab,
 }: MobileAppointmentsViewProps) {
   const [activeSubTab, setActiveSubTab] = useState<'upcoming' | 'completed' | 'cancelled'>('upcoming');
   const [selectedAptDetails, setSelectedAptDetails] = useState<Appointment | null>(null);
@@ -223,11 +225,58 @@ export default function MobileAppointmentsView({
               ? language === 'en' ? 'No Completed Consultations' : 'কোনো সম্পন্ন পরামর্শ নেই'
               : language === 'en' ? 'No Cancelled Bookings' : 'কোনো বাতিল বুকিং নেই'}
           </h3>
-          <p style={{ fontSize: '12.5px', color: 'var(--slate-500)', marginTop: '4px', maxWidth: '320px', margin: '4px auto 0 auto' }}>
+          <p style={{ fontSize: '12.5px', color: 'var(--slate-500)', marginTop: '4px', maxWidth: '320px', margin: '4px auto 16px auto' }}>
             {language === 'en'
               ? 'Find verified specialist doctors and book chamber serial slots in seconds.'
               : 'বিশেষজ্ঞ ডাক্তার খুঁজুন এবং কয়েক সেকেন্ডেই সিরিয়াল টোকেন বুক করুন।'}
           </p>
+
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => {
+                if (onNavigateTab) {
+                  onNavigateTab('search');
+                } else if (typeof window !== 'undefined') {
+                  window.location.href = '/doctors';
+                }
+              }}
+              style={{
+                backgroundColor: 'var(--brand-primary)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '10px 18px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(0, 96, 250, 0.25)',
+              }}
+            >
+              <span>{language === 'en' ? 'Find Doctors & Book' : 'ডাক্তার খুঁজুন ও বুক করুন'}</span>
+            </button>
+            <a
+              href="tel:01886748564"
+              style={{
+                backgroundColor: '#F1F5F9',
+                color: 'var(--navy-900)',
+                border: '1px solid #E2E8F0',
+                borderRadius: '10px',
+                padding: '10px 16px',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Phone size={14} color="var(--brand-primary)" />
+              <span>01886748564</span>
+            </a>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

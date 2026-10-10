@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import AuthModal from '@/components/auth/AuthModal';
 import LocationModal from '@/components/location/LocationModal';
+import MobileNavigation from '@/components/navigation/MobileNavigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { AppointmentService } from '@/services/appointment.service';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
@@ -47,6 +49,7 @@ interface FamilyMemberItem {
 }
 
 export default function AppointmentsPatientDashboardPage() {
+  const router = useRouter();
   const { language, setLanguage, formatCurrency } = useLanguage();
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -1083,6 +1086,18 @@ export default function AppointmentsPatientDashboardPage() {
           }}
         />
       )}
+
+      {/* Mobile Bottom Navigation Dock */}
+      <MobileNavigation
+        language={language}
+        activeTab="bookings"
+        setActiveTab={(tab) => {
+          if (tab === 'marketplace') router.push('/');
+          else router.push(`/?tab=${tab}`);
+        }}
+        currentUser={currentUser}
+        onOpenAuth={(mode = 'login') => setIsAuthModalOpen(true)}
+      />
 
       <Footer language={language} />
     </div>

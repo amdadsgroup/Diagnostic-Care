@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { SlotBookingModal } from '@/components/SlotBookingModal';
 import AuthModal from '@/components/auth/AuthModal';
 import LocationModal from '@/components/location/LocationModal';
+import MobileNavigation from '@/components/navigation/MobileNavigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { DoctorService } from '@/services/doctor.service';
 import { AppointmentService } from '@/services/appointment.service';
@@ -925,6 +926,18 @@ export default function DoctorsPage() {
           language={language}
         />
       )}
+
+      {/* Mobile Bottom Navigation Dock */}
+      <MobileNavigation
+        language={language}
+        activeTab="discover"
+        setActiveTab={(tab) => {
+          if (tab === 'marketplace') router.push('/');
+          else router.push(`/?tab=${tab}`);
+        }}
+        currentUser={currentUser}
+        onOpenAuth={(mode = 'login') => setIsAuthModalOpen(true)}
+      />
 
       <Footer language={language} setLanguage={setLanguage} />
     </div>

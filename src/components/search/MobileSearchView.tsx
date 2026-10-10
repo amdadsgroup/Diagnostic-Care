@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Clock,
   Calendar,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface MobileSearchViewProps {
@@ -88,7 +89,29 @@ export default function MobileSearchView({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '36px' }}>
       {/* Search Input Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {onNavigateHome && (
+          <button
+            onClick={onNavigateHome}
+            aria-label="Back to Home"
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid var(--slate-200)',
+              color: 'var(--navy-900)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+            }}
+          >
+            <ArrowLeft size={18} />
+          </button>
+        )}
         <div style={{ position: 'relative', flex: 1 }}>
           <Search size={18} color="var(--slate-400)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
