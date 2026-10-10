@@ -35,7 +35,7 @@ interface MobileNavigationProps {
   setActiveTab: (tab: any) => void;
   currentRole?: UserRole;
   onOpenSearch?: () => void;
-  onOpenAuth?: () => void;
+  onOpenAuth?: (mode?: 'login' | 'register') => void;
   onOpenHelpline?: () => void;
   unreadCount?: number;
   currentUser?: any;

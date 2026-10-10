@@ -31,7 +31,7 @@ interface MobileProfileViewProps {
   onOpenLocationModal: () => void;
   onOpenNotificationsModal: () => void;
   onNavigateTab: (tab: any) => void;
-  onOpenAuthModal?: () => void;
+  onOpenAuthModal?: (mode?: 'login' | 'register') => void;
   onLogout?: () => void;
   currentUser?: any;
   appointmentsCount?: number;
@@ -223,7 +223,9 @@ export default function MobileProfileView({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             <button
               onClick={() => {
-                if (typeof window !== 'undefined') {
+                if (onOpenAuthModal) {
+                  onOpenAuthModal('login');
+                } else if (typeof window !== 'undefined') {
                   window.location.href = '/login';
                 }
               }}
@@ -244,7 +246,9 @@ export default function MobileProfileView({
             </button>
             <button
               onClick={() => {
-                if (typeof window !== 'undefined') {
+                if (onOpenAuthModal) {
+                  onOpenAuthModal('register');
+                } else if (typeof window !== 'undefined') {
                   window.location.href = '/register';
                 }
               }}
@@ -597,7 +601,7 @@ export default function MobileProfileView({
           </button>
         ) : (
           <button
-            onClick={onOpenAuthModal}
+            onClick={() => onOpenAuthModal ? onOpenAuthModal('login') : undefined}
             style={{
               width: '100%',
               display: 'flex',

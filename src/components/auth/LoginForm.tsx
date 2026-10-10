@@ -17,6 +17,7 @@ interface LoginFormProps {
   onNavigateToForgot?: () => void;
   redirectTo?: string;
   isModal?: boolean;
+  onClose?: () => void;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
@@ -25,6 +26,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onNavigateToForgot,
   redirectTo,
   isModal = false,
+  onClose,
 }) => {
   const router = useRouter();
   const { t, language } = useLanguage();
@@ -267,6 +269,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       >
         {t.authLoginSubmit}
       </LoadingButton>
+
+      {/* Explicit Cancel / Close Action */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          id="login-cancel-btn"
+          style={{
+            width: '100%',
+            marginTop: '10px',
+            padding: '11px',
+            borderRadius: '12px',
+            border: '1.5px solid #CBD5E1',
+            backgroundColor: '#F8FAFC',
+            color: '#475569',
+            fontWeight: 700,
+            fontSize: '13.5px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+          }}
+        >
+          <span>✕ {language === 'bn' ? 'বাতিল করুন (Cancel)' : 'Cancel & Close'}</span>
+        </button>
+      )}
 
       {/* Switch to Register */}
       <div

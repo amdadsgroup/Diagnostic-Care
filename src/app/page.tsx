@@ -87,6 +87,7 @@ export default function HomePage() {
   const [confirmedBookingNotice, setConfirmedBookingNotice] = useState<Appointment | null>(null);
   const [onboardingNotice, setOnboardingNotice] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   const [isProviderOnboardOpen, setIsProviderOnboardOpen] = useState(false);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -378,7 +379,10 @@ export default function HomePage() {
         setCurrentRole={setCurrentRole}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAuth={(mode = 'login') => {
+          setAuthModalMode(mode);
+          setIsAuthModalOpen(true);
+        }}
         onOpenOnboard={() => setIsProviderOnboardOpen(true)}
         selectedLocation={selectedLocation}
         onOpenLocation={() => setIsLocationModalOpen(true)}
@@ -560,7 +564,10 @@ export default function HomePage() {
               onOpenLocationModal={() => setIsLocationModalOpen(true)}
               onOpenNotificationsModal={() => setIsNotificationsModalOpen(true)}
               onNavigateTab={(tab) => setActiveTab(tab)}
-              onOpenAuthModal={() => setIsAuthModalOpen(true)}
+              onOpenAuthModal={(mode = 'login') => {
+                setAuthModalMode(mode);
+                setIsAuthModalOpen(true);
+              }}
               onLogout={handleLogout}
               currentUser={currentUser}
               appointmentsCount={appState.appointments.length}
@@ -1122,6 +1129,7 @@ export default function HomePage() {
       {/* PATIENT AUTH MODAL (LOGIN / REGISTER / FORGOT) */}
       <AuthModal
         isOpen={isAuthModalOpen}
+        initialMode={authModalMode}
         onClose={() => setIsAuthModalOpen(false)}
         onAuthSuccess={(profile) => {
           setIsAuthModalOpen(false);
@@ -1254,7 +1262,10 @@ export default function HomePage() {
         setActiveTab={setActiveTab}
         currentRole={currentRole}
         currentUser={currentUser}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAuth={(mode = 'login') => {
+          setAuthModalMode(mode);
+          setIsAuthModalOpen(true);
+        }}
         onOpenSearch={() => setActiveTab('search')}
         onOpenHelpline={() => setIsHelplineOpen(true)}
       />

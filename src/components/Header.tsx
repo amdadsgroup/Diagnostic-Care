@@ -36,7 +36,7 @@ interface HeaderProps {
   setCurrentRole?: (role: UserRole) => void;
   activeTab: string;
   setActiveTab: (tab: any) => void;
-  onOpenAuth?: () => void;
+  onOpenAuth?: (mode?: 'login' | 'register') => void;
   onOpenOnboard?: () => void;
   onOpenSearch?: () => void;
   onOpenLocation?: () => void;
@@ -323,7 +323,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             onOpenAuth && (
               <button
-                onClick={onOpenAuth}
+                onClick={() => onOpenAuth('login')}
                 className="btn-secondary d-desktop-only"
                 style={{
                   gap: '6px',
@@ -440,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    if (onOpenAuth) onOpenAuth();
+                    if (onOpenAuth) onOpenAuth('login');
                     else window.location.href = '/login';
                   }}
                   style={{
@@ -454,7 +454,7 @@ export const Header: React.FC<HeaderProps> = ({
                     fontSize: '12.5px',
                     cursor: 'pointer',
                     textAlign: 'center',
-                    boxShadow: '0 4px 12px rgba(15, 118, 110, 0.25)',
+                    boxShadow: '0 4px 12px rgba(0, 118, 110, 0.25)',
                   }}
                 >
                   {language === 'en' ? 'Sign In' : 'লগইন'}
@@ -462,7 +462,8 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    window.location.href = '/register';
+                    if (onOpenAuth) onOpenAuth('register');
+                    else window.location.href = '/register';
                   }}
                   style={{
                     flex: 1,

@@ -11,10 +11,12 @@ import { BRAND_COLORS } from '@/config/brand';
 
 interface ForgotPasswordFormProps {
   onBackToLogin?: () => void;
+  onClose?: () => void;
 }
 
 export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   onBackToLogin,
+  onClose,
 }) => {
   const { t, language } = useLanguage();
 
@@ -160,6 +162,28 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
           >
             {t.authForgotSubmit}
           </LoadingButton>
+
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                width: '100%',
+                marginTop: '10px',
+                padding: '11px',
+                borderRadius: '12px',
+                border: '1.5px solid #CBD5E1',
+                backgroundColor: '#F8FAFC',
+                color: '#475569',
+                fontWeight: 700,
+                fontSize: '13.5px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              ✕ {language === 'bn' ? 'বাতিল করুন' : 'Cancel & Close'}
+            </button>
+          )}
         </form>
       ) : (
         <div

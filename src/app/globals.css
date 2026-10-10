@@ -480,15 +480,16 @@ input, select, textarea {
 .auth-overlay, .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(21, 49, 59, 0.45);
+  background: rgba(15, 23, 42, 0.72);
   backdrop-filter: var(--blur-modal);
   -webkit-backdrop-filter: var(--blur-modal);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 10000 !important;
   padding: 16px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .auth-modal, .modal-container {
@@ -503,6 +504,23 @@ input, select, textarea {
   overflow: hidden;
   animation: slideDown 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 640px) {
+  .auth-overlay, .modal-overlay {
+    align-items: flex-start !important;
+    padding: 10px 10px 40px 10px !important;
+  }
+
+  .auth-modal, .modal-container {
+    max-height: calc(100dvh - 20px) !important;
+    margin: 4px auto !important;
+    border-radius: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 .modal-container-wide {
@@ -510,10 +528,14 @@ input, select, textarea {
 }
 
 .auth-header, .modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 26px;
+  padding: 18px 22px;
   background: linear-gradient(135deg, #15313B 0%, #115E59 100%);
   color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -521,17 +543,43 @@ input, select, textarea {
 }
 
 .auth-close, .modal-close {
-  color: rgba(255, 255, 255, 0.85);
-  padding: 8px 12px;
+  color: #FFFFFF;
+  min-width: 36px;
+  min-height: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.12);
-  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 .auth-close:hover, .modal-close:hover {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
-  transform: scale(1.05);
+  background: #DC2626 !important;
+  border-color: #EF4444 !important;
+  color: #FFFFFF !important;
+  transform: scale(1.08);
+}
+
+.reg-demographics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 440px) {
+  .reg-demographics-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 
 .auth-tabs {

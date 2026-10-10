@@ -15,6 +15,7 @@ interface RegisterFormProps {
   onSuccess?: (user: AuthUserProfile) => void;
   onNavigateToLogin?: () => void;
   isModal?: boolean;
+  onClose?: () => void;
 }
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -23,6 +24,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onSuccess,
   onNavigateToLogin,
   isModal = false,
+  onClose,
 }) => {
   const router = useRouter();
   const { t, language } = useLanguage();
@@ -306,9 +308,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       {/* Row: Age, Gender, Blood Group */}
       <div
+        className="reg-demographics-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '12px',
           marginBottom: '16px',
         }}
@@ -543,6 +545,34 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       >
         {t.authRegisterSubmit}
       </LoadingButton>
+
+      {/* Explicit Cancel / Close Action */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          id="reg-cancel-btn"
+          style={{
+            width: '100%',
+            marginTop: '10px',
+            padding: '11px',
+            borderRadius: '12px',
+            border: '1.5px solid #CBD5E1',
+            backgroundColor: '#F8FAFC',
+            color: '#475569',
+            fontWeight: 700,
+            fontSize: '13.5px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+          }}
+        >
+          <span>✕ {language === 'bn' ? 'বাতিল করুন (Cancel)' : 'Cancel & Close'}</span>
+        </button>
+      )}
 
       {/* Switch to Login */}
       <div

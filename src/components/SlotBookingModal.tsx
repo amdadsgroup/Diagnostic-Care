@@ -121,36 +121,34 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
   return (
     <div
       className="modal-overlay"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '16px',
-      }}
+      onClick={onClose}
     >
       <div
         className="modal-container animate-slide-down"
         style={{
           maxWidth: '560px',
           width: '100%',
-          maxHeight: '92vh',
+          maxHeight: 'min(92dvh, 780px)',
           overflowY: 'auto',
+          margin: '0 auto',
         }}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
+        {/* Sticky Modal Header */}
         <div
           style={{
             background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
             color: '#FFFFFF',
-            padding: '20px 26px',
+            padding: '18px 22px',
             borderTopLeftRadius: '22px',
             borderTopRightRadius: '22px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
           }}
         >
           <div>
@@ -164,20 +162,24 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
           <button
             onClick={onClose}
             id="modal-close-btn"
+            aria-label={t.commonClose || 'Close'}
+            title={t.commonClose || 'Close'}
             style={{
               color: '#FFFFFF',
-              opacity: 0.85,
               cursor: 'pointer',
-              padding: '6px',
-              background: 'rgba(255, 255, 255, 0.12)',
-              border: 'none',
-              borderRadius: '8px',
+              width: '36px',
+              height: '36px',
+              background: 'rgba(255, 255, 255, 0.22)',
+              border: '1.5px solid rgba(255, 255, 255, 0.4)',
+              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              transition: 'all 0.15s ease',
+              flexShrink: 0,
             }}
           >
-            <X size={18} />
+            <X size={20} strokeWidth={2.5} />
           </button>
         </div>
 
