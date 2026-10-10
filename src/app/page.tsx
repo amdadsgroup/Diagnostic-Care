@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { UserRole, ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
@@ -68,6 +69,56 @@ import {
   Activity,
   Layers,
 } from 'lucide-react';
+
+function UrlSyncHandler({
+  onTabChange,
+  onCategoryChange,
+}: {
+  onTabChange: (tab: ActiveNavTab) => void;
+  onCategoryChange: (cat: HealthcareCategoryKey) => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!searchParams) return;
+    const action = searchParams.get('action');
+    const tab = searchParams.get('tab');
+    const category = searchParams.get('category');
+
+    if (category) {
+      onCategoryChange(category as HealthcareCategoryKey);
+    }
+
+    if (action === 'find-doctor') {
+      onTabChange('search');
+    } else if (action === 'appointments') {
+      onTabChange('appointments');
+    } else if (action === 'queue') {
+      onTabChange('queue');
+    } else if (action === 'prescriptions') {
+      onTabChange('prescriptions');
+    } else if (action === 'messages') {
+      onTabChange('messages');
+    } else if (
+      tab &&
+      [
+        'marketplace',
+        'search',
+        'appointments',
+        'queue',
+        'reports',
+        'prescriptions',
+        'portal',
+        'profile',
+        'messages',
+      ].includes(tab)
+    ) {
+      onTabChange(tab as ActiveNavTab);
+    }
+  }, [searchParams, onTabChange, onCategoryChange]);
+
+  return null;
+}
 
 export default function HomePage() {
   // English is the default language as strictly required
@@ -388,8 +439,27 @@ export default function HomePage() {
     handleSelectSlot(firstSlot, assoc);
   };
 
+  const handleTabNavigation = (tab: ActiveNavTab) => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      const targetUrl = tab === 'marketplace' ? '/' : `/?tab=${tab}`;
+      window.history.pushState(null, '', targetUrl);
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--canvas-bg)' }}>
+      {/* Reactive URL Sync for direct parameter navigation (?tab=appointments, etc.) */}
+      <Suspense fallback={null}>
+        <UrlSyncHandler
+          onTabChange={(t) => setActiveTab(t)}
+          onCategoryChange={(cat) => {
+            setActiveCategory(cat);
+            setSelectedSpecialty(cat);
+          }}
+        />
+      </Suspense>
+
       {/* Redesigned Futuristic Two-Tier Header */}
       <Header
         language={language}
@@ -397,7 +467,7 @@ export default function HomePage() {
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabNavigation}
         onOpenAuth={(mode = 'login') => {
           setAuthModalMode(mode);
           setIsAuthModalOpen(true);
@@ -541,9 +611,9 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* SEARCH VIEW (MOBILE DOCTOR SEARCH) */}
+        {/* SEARCH VIEW (DOCTOR SEARCH) */}
         {activeTab === 'search' && (
-          <div className="container" style={{ padding: '24px 16px', maxWidth: '820px' }}>
+          <div className="container" style={{ padding: '24px 16px', maxWidth: '1080px' }}>
             <MobileSearchView
               language={language}
               doctorAssociations={appState.doctorAssociations}
@@ -554,13 +624,13 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* APPOINTMENTS VIEW (MOBILE APPOINTMENTS CENTER) */}
+        {/* APPOINTMENTS VIEW (APPOINTMENTS CENTER) */}
         {activeTab === 'appointments' && (
-          <div className="container" style={{ padding: '24px 16px', maxWidth: '820px' }}>
+          <div className="container" style={{ padding: '24px 16px', maxWidth: '1080px' }}>
             <MobileAppointmentsView
               appointments={appState.appointments}
               language={language}
-              onNavigateTab={(tab) => setActiveTab(tab)}
+              onNavigateTab={(tab) => handleTabNavigation(tab)}
               onCancelAppointment={(id) => {
                 AppointmentService.cancelAppointment(id);
                 setAppState((prev) => ({
@@ -576,20 +646,20 @@ export default function HomePage() {
 
         {/* MESSAGES & SUPPORT CENTER TAB */}
         {activeTab === 'messages' && (
-          <div className="container" style={{ padding: '24px 16px', maxWidth: '820px' }}>
+          <div className="container" style={{ padding: '24px 16px', maxWidth: '1080px' }}>
             <MobileMessagesView
               language={language}
               currentUser={currentUser}
-              onNavigateTab={(tab) => setActiveTab(tab)}
+              onNavigateTab={(tab) => handleTabNavigation(tab)}
               onOpenSupportTicket={() => setIsSupportModalOpen(true)}
               onOpenNotifications={() => setIsNotificationsModalOpen(true)}
             />
           </div>
         )}
 
-        {/* PROFILE & PWA SETTINGS VIEW */}
+        {/* PROFILE & SETTINGS VIEW */}
         {activeTab === 'profile' && (
-          <div className="container" style={{ padding: '24px 16px', maxWidth: '820px' }}>
+          <div className="container" style={{ padding: '24px 16px', maxWidth: '1080px' }}>
             <MobileProfileView
               language={language}
               onLanguageChange={handleLanguageChange}
@@ -1347,14 +1417,14 @@ export default function HomePage() {
       <MobileNavigation
         language={language}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabNavigation}
         currentRole={currentRole}
         currentUser={currentUser}
         onOpenAuth={(mode = 'login') => {
           setAuthModalMode(mode);
           setIsAuthModalOpen(true);
         }}
-        onOpenSearch={() => setActiveTab('search')}
+        onOpenSearch={() => handleTabNavigation('search')}
         onOpenHelpline={() => setIsHelplineOpen(true)}
       />
 

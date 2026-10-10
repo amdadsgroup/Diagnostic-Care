@@ -115,7 +115,7 @@ export default function MobileAppointmentsView({
                 letterSpacing: '0.05em',
               }}
             >
-              {language === 'en' ? 'Mobile Healthcare Desk' : 'মোবাইল স্বাস্থ্যসেবা ডেস্ক'}
+              {language === 'en' ? 'Patient Healthcare Desk' : 'রোগী স্বাস্থ্যসেবা ডেস্ক'}
             </span>
             <h1 style={{ fontSize: '20px', fontWeight: 800, marginTop: '2px' }}>
               {language === 'en' ? 'My Appointments & Serials' : 'আমার অ্যাপয়েন্টমেন্ট ও সিরিয়াল'}

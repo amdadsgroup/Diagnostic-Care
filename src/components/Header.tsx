@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { UserRole } from '@/types';
@@ -14,6 +15,12 @@ import {
   Phone,
   ChevronDown,
   LogOut,
+  Home,
+  Stethoscope,
+  CalendarCheck,
+  Clock,
+  FileText,
+  MessageSquare,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -51,6 +58,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = TRANSLATIONS[language];
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,6 +70,10 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const handleNavClick = (tab: string, category?: string) => {
+    if (typeof window !== 'undefined' && pathname !== '/' && tab !== 'doctors') {
+      router.push(tab === 'marketplace' ? '/' : `/?tab=${tab}`);
+      return;
+    }
     setActiveTab(tab);
     if (category && onSelectCategory) {
       onSelectCategory(category);
@@ -217,6 +230,171 @@ export const Header: React.FC<HeaderProps> = ({
             />
           </div>
         </div>
+
+        {/* Center: Desktop Navigation Bar (All Platform Functions Visible in Web View) */}
+        <nav
+          className="d-desktop-flex"
+          style={{
+            alignItems: 'center',
+            gap: '4px',
+            backgroundColor: 'rgba(248, 250, 252, 0.8)',
+            padding: '4px 6px',
+            borderRadius: '14px',
+            border: '1px solid rgba(226, 232, 240, 0.9)',
+            backdropFilter: 'blur(8px)',
+          }}
+          aria-label="Desktop Primary Navigation"
+        >
+          {/* 1. Home */}
+          <Link
+            href="/"
+            onClick={() => handleNavClick('marketplace')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: (pathname === '/' && activeTab === 'marketplace') ? 800 : 600,
+              color: (pathname === '/' && activeTab === 'marketplace') ? '#FFFFFF' : '#334155',
+              backgroundColor: (pathname === '/' && activeTab === 'marketplace') ? BRAND_COLORS.primary : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Home size={14} />
+            <span>{language === 'en' ? 'Home' : 'হোম'}</span>
+          </Link>
+
+          {/* 2. Find Doctors */}
+          <Link
+            href="/doctors"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? 800 : 600,
+              color: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? '#FFFFFF' : '#334155',
+              backgroundColor: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? BRAND_COLORS.primary : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Stethoscope size={14} />
+            <span>{language === 'en' ? 'Doctors' : 'ডাক্তার'}</span>
+          </Link>
+
+          {/* 3. My Appointments / Bookings */}
+          <Link
+            href="/appointments"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? 800 : 600,
+              color: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? '#FFFFFF' : '#334155',
+              backgroundColor: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? BRAND_COLORS.primary : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <CalendarCheck size={14} />
+            <span>{language === 'en' ? 'Appointments' : 'অ্যাপয়েন্টমেন্ট'}</span>
+          </Link>
+
+          {/* 4. Live Chamber Queue */}
+          <button
+            onClick={() => handleNavClick('queue')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: activeTab === 'queue' ? 800 : 600,
+              color: activeTab === 'queue' ? '#FFFFFF' : '#334155',
+              backgroundColor: activeTab === 'queue' ? BRAND_COLORS.primary : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Clock size={14} />
+            <span>{language === 'en' ? 'Live Queue' : 'লাইভ কিউ'}</span>
+          </button>
+
+          {/* 5. Prescriptions Vault */}
+          <button
+            onClick={() => handleNavClick('prescriptions')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: (activeTab === 'prescriptions' || activeTab === 'reports') ? 800 : 600,
+              color: (activeTab === 'prescriptions' || activeTab === 'reports') ? '#FFFFFF' : '#334155',
+              backgroundColor: (activeTab === 'prescriptions' || activeTab === 'reports') ? BRAND_COLORS.primary : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <FileText size={14} />
+            <span>{language === 'en' ? 'Prescriptions' : 'প্রেসক্রিপশন'}</span>
+          </button>
+
+          {/* 6. Messages & Help Desk */}
+          <button
+            onClick={() => handleNavClick('messages')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: activeTab === 'messages' ? 800 : 600,
+              color: activeTab === 'messages' ? '#FFFFFF' : '#334155',
+              backgroundColor: activeTab === 'messages' ? BRAND_COLORS.primary : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <MessageSquare size={14} />
+            <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
+          </button>
+
+          {/* 7. Doctor Portal */}
+          <Link
+            href="/doctor/portal"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: (pathname?.startsWith('/doctor') || activeTab === 'portal' || activeTab === 'doctor-portal') ? 800 : 600,
+              color: (pathname?.startsWith('/doctor') || activeTab === 'portal' || activeTab === 'doctor-portal') ? '#FFFFFF' : '#334155',
+              backgroundColor: (pathname?.startsWith('/doctor') || activeTab === 'portal' || activeTab === 'doctor-portal') ? BRAND_COLORS.primary : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <span>{language === 'en' ? 'Doctor Portal' : 'ডাক্তার পোর্টাল'}</span>
+          </Link>
+        </nav>
 
         {/* Right Side Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>

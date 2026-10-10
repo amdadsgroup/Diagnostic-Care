@@ -18,6 +18,7 @@ import {
   ArrowRight,
   TrendingUp,
   CheckCircle2,
+  CalendarCheck,
 } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -148,6 +149,16 @@ export default function HeroSection({
                 <Activity size={15} color="#0060FA" />
                 <span>{language === 'en' ? 'Chamber Schedules & Queue' : 'চেম্বার শিডিউল ও কিউ'}</span>
               </button>
+              <a
+                href="/appointments"
+                className="btn-outline hero-cta-btn"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                }}
+              >
+                <CalendarCheck size={15} color="#0060FA" />
+                <span>{language === 'en' ? 'My Appointments' : 'অ্যাপয়েন্টমেন্ট'}</span>
+              </a>
             </div>
 
             {/* Clean Healthcare Glassmorphic Search Card */}
@@ -387,13 +398,17 @@ export default function HeroSection({
                 {/* Node 1: Active Doctor Chamber */}
                 <div
                   className="glass-card-sm"
+                  onClick={() => { window.location.href = '/doctors'; }}
                   style={{
                     padding: '14px 18px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
+                  title={language === 'en' ? 'Click to browse verified specialist doctors' : 'ডাক্তার তালিকা দেখতে ক্লিক করুন'}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div
@@ -433,7 +448,7 @@ export default function HeroSection({
                       {language === 'en' ? 'LIVE PLATFORM' : 'সক্রিয় প্ল্যাটফর্ম'}
                     </span>
                     <div style={{ fontSize: '11px', color: '#0060FA', marginTop: '3px', fontWeight: 700 }}>
-                      {language === 'en' ? 'Instant Booking' : 'তাৎক্ষণিক বুকিং'}
+                      {language === 'en' ? 'Instant Booking →' : 'তাৎক্ষণিক বুকিং →'}
                     </div>
                   </div>
                 </div>
@@ -441,13 +456,17 @@ export default function HeroSection({
                 {/* Node 2: Live Queue Chamber Status */}
                 <div
                   className="glass-card-sm"
+                  onClick={() => { window.location.href = '/?tab=queue'; }}
                   style={{
                     padding: '14px 18px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
+                  title={language === 'en' ? 'Click to view real-time chamber serial tracking' : 'লাইভ কিউ দেখতে ক্লিক করুন'}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div
