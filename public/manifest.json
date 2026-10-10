@@ -1,14 +1,14 @@
 {
   "name": "Diagnostic Care",
   "short_name": "Diagnostic Care",
-  "description": "Your Healthcare Marketplace",
+  "description": "Your Healthcare Marketplace — Doctor Discovery & Instant Chamber Booking",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F7FAFE",
-  "theme_color": "#1769F5",
+  "theme_color": "#0F766E",
   "lang": "en",
   "dir": "ltr",
   "categories": ["medical", "health", "lifestyle"],
@@ -52,13 +52,13 @@
       ]
     },
     {
-      "name": "Diagnostic Centers & Tests",
-      "short_name": "Tests",
-      "description": "Compare pathology, imaging and diagnostic laboratory test prices",
-      "url": "/?action=book-test",
+      "name": "Live Chamber Queue",
+      "short_name": "Queue",
+      "description": "Real-time doctor chamber serial tracker and consultation queue",
+      "url": "/?action=queue",
       "icons": [
         {
-          "src": "/icons/shortcut-test.png",
+          "src": "/icons/shortcut-doctor.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -78,26 +78,13 @@
       ]
     },
     {
-      "name": "Health Vault",
-      "short_name": "Health Vault",
-      "description": "Access encrypted lab reports and digital prescriptions anytime",
-      "url": "/?action=vault",
-      "icons": [
-        {
-          "src": "/icons/shortcut-vault.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Emergency Ambulance",
-      "short_name": "Emergency",
-      "description": "Call 24/7 healthcare helpline or dispatch emergency ambulance",
+      "name": "Customer Care Helpline",
+      "short_name": "Helpline",
+      "description": "Call 24/7 healthcare helpline for doctor chamber serial assistance",
       "url": "/?action=emergency",
       "icons": [
         {
-          "src": "/icons/shortcut-emergency.png",
+          "src": "/icons/shortcut-appointments.png",
           "sizes": "192x192",
           "type": "image/png"
         }

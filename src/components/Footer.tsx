@@ -104,8 +104,8 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               </div>
               <div style={{ color: '#94A3B8', fontSize: '13px', marginTop: '2px' }}>
                 {language === 'en'
-                  ? 'Doctor consultation, diagnostic bookings & emergency ambulance dispatch'
-                  : 'ডাক্তার অ্যাপয়েন্টমেন্ট, ল্যাব টেস্ট বুকিং ও জরুরি অ্যাম্বুলেন্স'}
+                  ? 'Doctor chamber serial booking, specialist consultations & queue support'
+                  : 'ডাক্তার চেম্বার সিরিয়াল বুকিং, বিশেষজ্ঞ পরামর্শ ও কিউ সাপোর্ট'}
               </div>
             </div>
           </div>

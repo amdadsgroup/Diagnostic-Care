@@ -1255,6 +1255,8 @@ export default function HomePage() {
         currentRole={currentRole}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenSearch={() => setActiveTab('search')}
+        onOpenHelpline={() => setIsHelplineOpen(true)}
       />
 
       {/* REDESIGNED FOOTER */}

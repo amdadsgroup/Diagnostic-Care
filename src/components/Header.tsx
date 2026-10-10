@@ -214,35 +214,19 @@ export const Header: React.FC<HeaderProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '12px 24px',
-          gap: '16px',
+          padding: '10px 16px',
+          gap: '10px',
         }}
       >
-        {/* Left: Horizontal Brand Logo on Desktop, Symbol on Mobile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Desktop & Tablet: Horizontal Logo */}
+        {/* Left: Brand Logo (never shrinks) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <div
-            className="d-mobile-none"
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
             onClick={() => handleNavClick('marketplace')}
           >
             <BrandLogo
               variant="horizontal"
-              size={36}
-              priority
-              altText="Diagnostic Care"
-            />
-          </div>
-
-          {/* Mobile: Compact Symbol */}
-          <div
-            className="d-mobile-flex"
-            style={{ cursor: 'pointer', display: 'none', alignItems: 'center' }}
-            onClick={() => handleNavClick('marketplace')}
-          >
-            <BrandLogo
-              variant="symbol"
-              size={34}
+              size={32}
               priority
               altText="Diagnostic Care"
             />
@@ -250,7 +234,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right Side Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           {/* Search Trigger */}
           <button
             onClick={onOpenSearch || (() => handleNavClick('search'))}
@@ -258,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="clay-pill"
             style={{
               gap: '6px',
-              padding: '7px 14px',
+              padding: '6px 10px',
               color: 'var(--brand-text-dark)',
               fontSize: '13px',
               fontWeight: 600,
@@ -269,27 +253,27 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="d-desktop-inline">{language === 'en' ? 'Search' : 'সার্চ'}</span>
           </button>
 
-          {/* Location Trigger (Desktop & Mobile) */}
+          {/* Location Trigger */}
           <button
             onClick={onOpenLocation}
             aria-label="Select Location Hub"
             className="clay-pill"
             style={{
-              gap: '6px',
-              padding: '7px 14px',
+              gap: '4px',
+              padding: '6px 10px',
               color: 'var(--brand-text-dark)',
-              fontSize: '13px',
+              fontSize: '12px',
               fontWeight: 700,
               cursor: 'pointer',
             }}
           >
-            <MapPin size={15} color={BRAND_COLORS.primary} />
-            <span style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <MapPin size={13} color={BRAND_COLORS.primary} />
+            <span style={{ maxWidth: '85px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {selectedLocation}
             </span>
           </button>
 
-          {/* Auth Button (User Profile if logged in, or Login button if guest) */}
+          {/* Auth Button */}
           {currentUser ? (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <button
@@ -297,17 +281,18 @@ export const Header: React.FC<HeaderProps> = ({
                 className="clay-pill"
                 style={{
                   gap: '6px',
-                  padding: '7px 14px',
+                  padding: '6px 10px',
                   color: '#0F172A',
-                  fontSize: '13px',
+                  fontSize: '12.5px',
                   fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >
-                <User size={14} color={BRAND_COLORS.primary} />
+                <User size={13} color={BRAND_COLORS.primary} />
                 <span
+                  className="d-desktop-inline"
                   style={{
-                    maxWidth: '110px',
+                    maxWidth: '90px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -321,10 +306,10 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={onLogout}
                   title={language === 'en' ? 'Sign Out' : 'লগআউট'}
                   aria-label={language === 'en' ? 'Sign Out' : 'লগআউট'}
-                  className="clay-bubble"
+                  className="clay-bubble d-desktop-only"
                   style={{
-                    width: '36px',
-                    height: '36px',
+                    width: '32px',
+                    height: '32px',
                     backgroundColor: '#FEF2F2',
                     border: '1.5px solid #FCA5A5',
                     color: '#DC2626',
@@ -332,53 +317,61 @@ export const Header: React.FC<HeaderProps> = ({
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <LogOut size={14} />
+                  <LogOut size={13} />
                 </button>
               )}
             </div>
           ) : (
             onOpenAuth && (
-              <button
-                onClick={onOpenAuth}
-                className="btn-secondary"
-                style={{
-                  gap: '6px',
-                  padding: '8px 18px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                }}
-              >
-                <User size={14} color={BRAND_COLORS.primary} />
-                <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
-              </button>
+              <>
+                {/* Desktop Sign In Button */}
+                <button
+                  onClick={onOpenAuth}
+                  className="btn-secondary d-desktop-only"
+                  style={{
+                    gap: '6px',
+                    padding: '8px 16px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                  }}
+                >
+                  <User size={14} color={BRAND_COLORS.primary} />
+                  <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
+                </button>
+                {/* Mobile compact user icon */}
+                <button
+                  onClick={onOpenAuth}
+                  aria-label="Sign In"
+                  className="clay-bubble d-mobile-only"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <User size={15} color={BRAND_COLORS.primary} />
+                </button>
+              </>
             )
           )}
 
-          {/* Get Started / Partner Button (Signal Blue #0057FF) */}
-          {onOpenOnboard ? (
+          {/* Get Started / Partner Button (Desktop only) */}
+          {onOpenOnboard && (
             <button
               onClick={onOpenOnboard}
-              className="btn-primary"
+              className="btn-primary d-desktop-only"
               style={{
-                padding: '9px 20px',
+                padding: '8px 18px',
                 fontSize: '13px',
                 fontWeight: 700,
               }}
             >
               <span>{language === 'en' ? 'Get Started' : 'শুরু করুন'}</span>
               <ArrowRight size={13} />
-            </button>
-          ) : (
-            <button
-              onClick={() => handleNavClick('marketplace')}
-              className="btn-primary"
-              style={{
-                padding: '9px 20px',
-                fontSize: '13px',
-                fontWeight: 700,
-              }}
-            >
-              <span>{language === 'en' ? 'Get Started' : 'শুরু করুন'}</span>
             </button>
           )}
 
@@ -388,15 +381,19 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             className="d-mobile-only"
             style={{
-              padding: '8px',
-              borderRadius: '8px',
+              padding: '7px',
+              borderRadius: '10px',
               border: '1px solid var(--brand-border)',
-              backgroundColor: 'var(--brand-bg)',
-              color: 'var(--brand-text-dark)',
+              backgroundColor: mobileMenuOpen ? 'var(--brand-primary)' : 'rgba(255, 255, 255, 0.9)',
+              color: mobileMenuOpen ? '#FFFFFF' : 'var(--brand-text-dark)',
               cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
             }}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>

@@ -927,6 +927,29 @@ input, select, textarea {
 .d-mobile-none { display: flex !important; }
 .d-mobile-flex { display: none !important; }
 
+/* Hero Responsive Grid & Mobile Layout */
+.hero-grid-responsive {
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(0, 1fr);
+  gap: 44px;
+  align-items: center;
+}
+
+.hero-search-inputs-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 992px) {
+  .hero-grid-responsive {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+}
+
 @media (max-width: 768px) {
   .d-mobile-only { display: block !important; }
   .d-desktop-only { display: none !important; }
@@ -934,6 +957,22 @@ input, select, textarea {
   .d-desktop-flex { display: none !important; }
   .d-mobile-none { display: none !important; }
   .d-mobile-flex { display: flex !important; }
+
+  .container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .hero-search-inputs-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .hero-search-inputs-row > div {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
 }
 
 @media (min-width: 769px) {

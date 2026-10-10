@@ -108,15 +108,20 @@ export default function HeroSection({
             <div
               className="glass-pill"
               style={{
-                marginBottom: '18px',
-                padding: '8px 18px',
-                fontSize: '12px',
+                marginBottom: '14px',
+                padding: '6px 14px',
+                fontSize: '11px',
                 color: '#0F766E',
                 background: 'var(--brand-fresh-mint)',
                 borderColor: 'rgba(15, 118, 110, 0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                maxWidth: '100%',
+                flexWrap: 'wrap',
               }}
             >
-              <Sparkles size={14} color="#0F766E" />
+              <Sparkles size={13} color="#0F766E" />
               <span>{t.heroBadge}</span>
               <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#0F766E' }} />
               <span style={{ color: '#15313B', fontWeight: 600 }}>
@@ -127,12 +132,14 @@ export default function HeroSection({
             {/* Main Headline */}
             <h1
               style={{
-                fontSize: 'clamp(32px, 3.8vw, 48px)',
+                fontSize: 'clamp(22px, 5.2vw, 42px)',
                 fontWeight: 800,
-                lineHeight: 1.18,
-                letterSpacing: '-0.03em',
-                marginBottom: '16px',
+                lineHeight: 1.25,
+                letterSpacing: '-0.02em',
+                marginBottom: '14px',
                 color: '#15313B',
+                wordBreak: 'normal',
+                overflowWrap: 'break-word',
               }}
             >
               {language === 'en' ? 'Find the Right Doctor, Book Instant Chamber Serial.' : 'সঠিক ডাক্তার খুঁজুন, তাৎক্ষণিক চেম্বার সিরিয়াল বুক করুন।'}
@@ -141,11 +148,11 @@ export default function HeroSection({
             {/* Subheadline */}
             <p
               style={{
-                fontSize: '16px',
+                fontSize: 'clamp(13px, 2.5vw, 15px)',
                 color: '#627680',
-                lineHeight: 1.65,
+                lineHeight: 1.6,
                 maxWidth: '620px',
-                marginBottom: '28px',
+                marginBottom: '20px',
               }}
             >
               {language === 'en' 
@@ -154,17 +161,20 @@ export default function HeroSection({
             </p>
 
             {/* Quick Action CTAs */}
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
               <a
                 href="/doctors"
                 className="btn-primary"
                 style={{
-                  padding: '12px 24px',
-                  fontSize: '14px',
+                  padding: '11px 20px',
+                  fontSize: '13.5px',
                   textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                <Stethoscope size={16} />
+                <Stethoscope size={15} />
                 <span>{language === 'en' ? 'Find a Doctor' : 'ডাক্তার খুঁজুন'}</span>
               </a>
               <button
@@ -175,11 +185,14 @@ export default function HeroSection({
                 }}
                 className="btn-outline"
                 style={{
-                  padding: '12px 22px',
-                  fontSize: '14px',
+                  padding: '11px 18px',
+                  fontSize: '13.5px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                <Activity size={16} color="#0F766E" />
+                <Activity size={15} color="#0F766E" />
                 <span>{language === 'en' ? 'Chamber Schedules & Queue' : 'চেম্বার শিডিউল ও কিউ'}</span>
               </button>
             </div>
@@ -238,15 +251,7 @@ export default function HeroSection({
               </div>
 
               {/* Input Row: Location Select + Search Input + Search Action */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  paddingTop: '12px',
-                  flexWrap: 'wrap',
-                }}
-              >
+              <div className="hero-search-inputs-row">
                 {/* Location Filter Selector */}
                 <div
                   className="glass-inset"

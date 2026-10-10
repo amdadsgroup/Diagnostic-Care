@@ -36,6 +36,7 @@ interface MobileNavigationProps {
   currentRole?: UserRole;
   onOpenSearch?: () => void;
   onOpenAuth?: () => void;
+  onOpenHelpline?: () => void;
   unreadCount?: number;
   currentUser?: any;
 }
@@ -47,6 +48,7 @@ export default function MobileNavigation({
   currentRole = 'PATIENT',
   onOpenSearch,
   onOpenAuth,
+  onOpenHelpline,
   unreadCount = 0,
   currentUser,
 }: MobileNavigationProps) {
@@ -191,8 +193,9 @@ export default function MobileNavigation({
       {/* 4. Messages / Helpline Support */}
       <button
         onClick={() => {
-          // Open helpline or support tab
-          if (typeof window !== 'undefined') {
+          if (onOpenHelpline) {
+            onOpenHelpline();
+          } else if (typeof window !== 'undefined') {
             const el = document.getElementById('footer-call-helpline-cta');
             if (el) {
               el.scrollIntoView({ behavior: 'smooth' });

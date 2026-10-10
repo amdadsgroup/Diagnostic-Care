@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://diagnosticcare.com.bd'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://diagnosticcare.vercel.app'),
   title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
   description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians, check real-time chamber serial queues, and book guaranteed appointments in ${BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION}, Sylhet, and nationwide. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
   applicationName: BRAND_CONSTANTS.BRAND_NAME,

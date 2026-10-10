@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://diagnosticcare.com.bd';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnosticcare.vercel.app';
   const currentDate = new Date().toISOString();
 
   return [
