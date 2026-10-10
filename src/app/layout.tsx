@@ -3,6 +3,7 @@ import './globals.css';
 import { BRAND_CONSTANTS, BRAND_COLORS, BRAND_LOGOS, BRAND_FAVICONS } from '@/config/brand';
 import PWAController from '@/components/pwa/PWAController';
 import { LanguageProvider } from '@/context/LanguageContext';
+import GlobalMobileNavigation from '@/components/navigation/GlobalMobileNavigation';
 
 export const viewport: Viewport = {
   themeColor: BRAND_COLORS.primary, // Signal Blue #0057FF
@@ -127,6 +128,7 @@ export default function RootLayout({
         <LanguageProvider>
           <PWAController />
           {children}
+          <GlobalMobileNavigation />
         </LanguageProvider>
       </body>
     </html>

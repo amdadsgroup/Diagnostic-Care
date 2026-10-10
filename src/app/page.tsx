@@ -1413,21 +1413,6 @@ export default function HomePage() {
         language={language}
       />
 
-      {/* MOBILE BOTTOM NAVIGATION DOCK */}
-      <MobileNavigation
-        language={language}
-        activeTab={activeTab}
-        setActiveTab={handleTabNavigation}
-        currentRole={currentRole}
-        currentUser={currentUser}
-        onOpenAuth={(mode = 'login') => {
-          setAuthModalMode(mode);
-          setIsAuthModalOpen(true);
-        }}
-        onOpenSearch={() => handleTabNavigation('search')}
-        onOpenHelpline={() => setIsHelplineOpen(true)}
-      />
-
       {/* REDESIGNED FOOTER */}
       <Footer language={language} setLanguage={handleLanguageChange} />
     </div>

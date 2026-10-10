@@ -792,54 +792,74 @@ input, select, textarea {
    Mobile Floating Bottom Dock Navigation
    ========================================================================== */
 .mobile-bottom-dock {
-  display: none;
+  display: none !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 16px));
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 16px)) !important;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-bottom-dock {
     display: flex !important;
-    position: fixed;
-    bottom: 12px;
-    left: 14px;
-    right: 14px;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: var(--blur-nav);
-    -webkit-backdrop-filter: var(--blur-nav);
-    border: 1px solid var(--glass-border);
-    padding: 8px 12px max(8px, env(safe-area-inset-bottom));
-    justify-content: space-around;
-    align-items: center;
-    z-index: 9900;
-    box-shadow: 0 16px 36px rgba(0, 96, 250, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+    position: fixed !important;
+    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    border-radius: 24px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.85) !important;
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    z-index: 9999 !important;
+    box-shadow: 0 12px 32px rgba(0, 96, 250, 0.14), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
+    pointer-events: auto !important;
   }
 
+  .mobile-dock-btn,
   .mobile-dock-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--slate-500);
-    padding: 6px 12px;
-    border-radius: 14px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: #64748B;
+    cursor: pointer;
     min-height: 48px;
-    min-width: 48px;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
+  .mobile-dock-btn.active,
   .mobile-dock-item.active {
-    color: var(--brand-primary);
-    background: var(--brand-fresh-mint);
-    border: 1px solid rgba(0, 96, 250, 0.15);
-    transform: translateY(-2px);
+    color: #0060FA !important;
+    background: rgba(0, 96, 250, 0.08) !important;
+  }
+
+  .mobile-dock-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-dock-btn.active .mobile-dock-label,
+  .mobile-dock-item.active span {
+    color: #0060FA !important;
+    font-weight: 800 !important;
   }
 }
 

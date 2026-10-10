@@ -1087,18 +1087,6 @@ export default function AppointmentsPatientDashboardPage() {
         />
       )}
 
-      {/* Mobile Bottom Navigation Dock */}
-      <MobileNavigation
-        language={language}
-        activeTab="bookings"
-        setActiveTab={(tab) => {
-          if (tab === 'marketplace') router.push('/');
-          else router.push(`/?tab=${tab}`);
-        }}
-        currentUser={currentUser}
-        onOpenAuth={(mode = 'login') => setIsAuthModalOpen(true)}
-      />
-
       <Footer language={language} />
     </div>
   );
