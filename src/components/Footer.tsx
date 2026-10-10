@@ -326,9 +326,12 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               </Link>
             </li>
             <li>
-              <Link href="/doctor/portal" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Doctor Chamber Portal
-              </Link>
+              <button
+                onClick={() => handleLinkClick('prescriptions')}
+                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
+              >
+                Digital Prescriptions Vault
+              </button>
             </li>
           </ul>
         </div>
@@ -388,10 +391,10 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
             </li>
             <li>
               <button
-                onClick={() => handleLinkClick('portal')}
-                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
+                onClick={() => handleLinkClick('messages')}
+                style={{ color: 'inherit', textAlign: 'left', cursor: 'pointer', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
               >
-                Provider & Partner Portal
+                Customer Care & Support
               </button>
             </li>
             <li>

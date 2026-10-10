@@ -375,25 +375,6 @@ export const Header: React.FC<HeaderProps> = ({
             <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
           </button>
 
-          {/* 7. Doctor Portal */}
-          <Link
-            href="/doctor/portal"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: (pathname?.startsWith('/doctor') || activeTab === 'portal' || activeTab === 'doctor-portal') ? 800 : 600,
-              color: (pathname?.startsWith('/doctor') || activeTab === 'portal' || activeTab === 'doctor-portal') ? '#FFFFFF' : '#334155',
-              backgroundColor: (pathname?.startsWith('/doctor') || activeTab === 'portal' || activeTab === 'doctor-portal') ? BRAND_COLORS.primary : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <span>{language === 'en' ? 'Doctor Portal' : 'ডাক্তার পোর্টাল'}</span>
-          </Link>
         </nav>
 
         {/* Right Side Actions */}
