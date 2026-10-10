@@ -48,8 +48,8 @@ export default function CategoryNavigator({
       descBn: 'সকল ভেরিফায়েড বিশেষজ্ঞ চিকিৎসক',
       count: '1,200+ Doctors',
       icon: Stethoscope,
-      bg: 'rgba(15, 118, 110, 0.1)',
-      color: '#0F766E',
+      bg: 'rgba(0, 96, 250, 0.1)',
+      color: '#0060FA',
     },
     {
       key: 'Cardiologist',
@@ -212,12 +212,12 @@ export default function CategoryNavigator({
                 padding: '20px',
                 borderRadius: '18px',
                 border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--glass-border)',
-                backgroundColor: isSelected ? 'rgba(221, 247, 240, 0.75)' : 'var(--glass-surface-card)',
+                backgroundColor: isSelected ? 'rgba(235, 243, 255, 0.75)' : 'var(--glass-surface-card)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '14px',
-                boxShadow: isSelected ? '0 8px 24px rgba(15, 118, 110, 0.2)' : 'var(--glass-shadow-sm)',
+                boxShadow: isSelected ? '0 8px 24px rgba(0, 96, 250, 0.2)' : 'var(--glass-shadow-sm)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>

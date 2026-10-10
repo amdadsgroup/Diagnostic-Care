@@ -137,7 +137,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
         {/* Sticky Modal Header */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+            background: 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)',
             color: '#FFFFFF',
             padding: '18px 22px',
             borderTopLeftRadius: '22px',
@@ -223,17 +223,17 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
           <div
             style={{
               padding: '10px 14px',
-              background: 'rgba(221, 247, 240, 0.55)',
-              border: '1px solid rgba(15, 118, 110, 0.25)',
+              background: 'rgba(235, 243, 255, 0.55)',
+              border: '1px solid rgba(0, 96, 250, 0.25)',
               borderRadius: '12px',
-              color: '#115E59',
+              color: '#004ED1',
               fontSize: '12.5px',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
             }}
           >
-            <Shield size={16} color="#0F766E" style={{ flexShrink: 0 }} />
+            <Shield size={16} color="#0060FA" style={{ flexShrink: 0 }} />
             <div>
               <strong>{language === 'en' ? 'Exclusive Slot Hold Active' : 'এক্সক্লুসিভ চেম্বার স্লট হোল্ড সক্রিয়'}</strong>: {language === 'en' ? 'This slot is reserved for you for 5 minutes. No other patient can book it during this countdown.' : 'পরবর্তী ৫ মিনিটের জন্য এই স্লটটি আপনার জন্য সংরক্ষিত।'}
             </div>
@@ -275,17 +275,17 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
           >
             <div>
               <div style={{ color: '#627680', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Doctor & Chamber</div>
-              <div style={{ fontWeight: 800, color: '#15313B' }}>{association.doctor?.fullName}</div>
-              <div style={{ color: '#0F766E', fontSize: '12px', fontWeight: 600 }}>{association.doctor?.specialization}</div>
+              <div style={{ fontWeight: 800, color: '#090D14' }}>{association.doctor?.fullName}</div>
+              <div style={{ color: '#0060FA', fontSize: '12px', fontWeight: 600 }}>{association.doctor?.specialization}</div>
             </div>
             <div>
               <div style={{ color: '#627680', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Facility & Branch</div>
-              <div style={{ fontWeight: 700, color: '#15313B' }}>{association.organizationName}</div>
+              <div style={{ fontWeight: 700, color: '#090D14' }}>{association.organizationName}</div>
               <div style={{ color: '#627680', fontSize: '12px' }}>{association.branchName}, {association.chamberRoomNumber}</div>
             </div>
             <div>
               <div style={{ color: '#627680', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Consultation Date & Slot</div>
-              <div style={{ fontWeight: 700, color: '#15313B' }}>{slot.slotDate} at {slot.startTime}</div>
+              <div style={{ fontWeight: 700, color: '#090D14' }}>{slot.slotDate} at {slot.startTime}</div>
             </div>
             <div>
               <div style={{ color: '#627680', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Consultation Fee</div>
@@ -299,28 +299,28 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
         {/* Patient Registration Form */}
         <form onSubmit={handleSubmit} style={{ padding: '20px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#090D14', margin: 0 }}>
               {t.patientDetailsTitle}
             </h4>
             <div style={{ display: 'flex', gap: '6px' }}>
               <button
                 type="button"
                 onClick={() => handleQuickFill('SELF')}
-                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(15, 118, 110, 0.25)', background: 'rgba(221, 247, 240, 0.4)', color: '#0F766E', cursor: 'pointer', fontWeight: 600 }}
+                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(0, 96, 250, 0.25)', background: 'rgba(235, 243, 255, 0.4)', color: '#0060FA', cursor: 'pointer', fontWeight: 600 }}
               >
                 + Self
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickFill('MOTHER')}
-                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(15, 118, 110, 0.25)', background: 'rgba(221, 247, 240, 0.4)', color: '#0F766E', cursor: 'pointer', fontWeight: 600 }}
+                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(0, 96, 250, 0.25)', background: 'rgba(235, 243, 255, 0.4)', color: '#0060FA', cursor: 'pointer', fontWeight: 600 }}
               >
                 + Mother
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickFill('CHILD')}
-                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(15, 118, 110, 0.25)', background: 'rgba(221, 247, 240, 0.4)', color: '#0F766E', cursor: 'pointer', fontWeight: 600 }}
+                style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(0, 96, 250, 0.25)', background: 'rgba(235, 243, 255, 0.4)', color: '#0060FA', cursor: 'pointer', fontWeight: 600 }}
               >
                 + Child
               </button>
@@ -329,7 +329,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px', marginBottom: '14px' }}>
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#15313B' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#090D14' }}>
                 {t.patientNameLabel} *
               </label>
               <input
@@ -345,7 +345,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#15313B' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#090D14' }}>
                 {t.patientPhoneLabel} *
               </label>
               <input
@@ -361,7 +361,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#15313B' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#090D14' }}>
                 {t.patientAgeLabel} *
               </label>
               <input
@@ -379,18 +379,18 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: '#15313B' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: '#090D14' }}>
                 {t.patientGenderLabel}
               </label>
               <div style={{ display: 'flex', gap: '20px', fontSize: '13px' }}>
                 {(['MALE', 'FEMALE', 'OTHER'] as const).map((gender) => (
-                  <label key={gender} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 500, color: '#15313B' }}>
+                  <label key={gender} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 500, color: '#090D14' }}>
                     <input
                       type="radio"
                       name="gender"
                       checked={patientGender === gender}
                       onChange={() => setPatientGender(gender)}
-                      style={{ accentColor: '#0F766E' }}
+                      style={{ accentColor: '#0060FA' }}
                     />
                     {gender === 'MALE' ? 'Male (পুরুষ)' : gender === 'FEMALE' ? 'Female (মহিলা)' : 'Other'}
                   </label>
@@ -399,7 +399,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#15313B' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#090D14' }}>
                 {language === 'en' ? 'Health Symptoms / Chief Complaint (Optional)' : 'রোগের লক্ষণ / সমস্যা (ঐচ্ছিক)'}
               </label>
               <input
@@ -415,7 +415,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
 
           {/* Payment Method Selector */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: '#15313B' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: '#090D14' }}>
               {t.paymentMethodLabel}
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
@@ -426,11 +426,11 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                 style={{
                   padding: '10px 8px',
                   borderRadius: '10px',
-                  border: `2px solid ${paymentMethod === 'CASH_AT_DESK' ? '#0F766E' : 'rgba(226, 232, 240, 0.8)'}`,
-                  backgroundColor: paymentMethod === 'CASH_AT_DESK' ? 'rgba(221, 247, 240, 0.5)' : 'rgba(255, 255, 255, 0.65)',
+                  border: `2px solid ${paymentMethod === 'CASH_AT_DESK' ? '#0060FA' : 'rgba(226, 232, 240, 0.8)'}`,
+                  backgroundColor: paymentMethod === 'CASH_AT_DESK' ? 'rgba(235, 243, 255, 0.5)' : 'rgba(255, 255, 255, 0.65)',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: paymentMethod === 'CASH_AT_DESK' ? '#0F766E' : '#15313B',
+                  color: paymentMethod === 'CASH_AT_DESK' ? '#0060FA' : '#090D14',
                   textAlign: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -449,7 +449,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                   backgroundColor: paymentMethod === 'BKASH' ? '#FDF2F8' : 'rgba(255, 255, 255, 0.65)',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: paymentMethod === 'BKASH' ? '#BE185D' : '#15313B',
+                  color: paymentMethod === 'BKASH' ? '#BE185D' : '#090D14',
                   textAlign: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -468,7 +468,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
                   backgroundColor: paymentMethod === 'NAGAD' ? '#FFF7ED' : 'rgba(255, 255, 255, 0.65)',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: paymentMethod === 'NAGAD' ? '#C2410C' : '#15313B',
+                  color: paymentMethod === 'NAGAD' ? '#C2410C' : '#090D14',
                   textAlign: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -500,7 +500,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '11px', color: '#627680' }}>
-            Need booking assistance? Call Helpline: <strong style={{ color: '#0F766E' }}>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong>
+            Need booking assistance? Call Helpline: <strong style={{ color: '#0060FA' }}>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong>
           </div>
         </form>
       </div>

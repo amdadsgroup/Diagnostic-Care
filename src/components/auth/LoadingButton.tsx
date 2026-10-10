@@ -51,7 +51,7 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
         borderRadius: '12px',
         backgroundColor: getBackgroundColor(),
         backgroundImage: variant === 'primary' && !disabled && !loading
-          ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)'
+          ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)'
           : undefined,
         color: getTextColor(),
         border: variant === 'outline' ? `1.5px solid ${BRAND_COLORS.primary}` : 'none',
@@ -59,7 +59,7 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
         transition: 'all 0.2s ease',
         boxShadow:
           variant === 'primary' && !disabled && !loading
-            ? '0 6px 16px rgba(15, 118, 110, 0.25)'
+            ? '0 6px 16px rgba(0, 96, 250, 0.25)'
             : 'none',
         ...style,
       }}

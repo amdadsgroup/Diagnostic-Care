@@ -248,8 +248,8 @@ export default function MobileSearchView({
                   key={term}
                   onClick={() => handleSearchSubmit(term)}
                   style={{
-                    backgroundColor: 'rgba(15, 118, 110, 0.08)',
-                    border: '1px solid rgba(15, 118, 110, 0.2)',
+                    backgroundColor: 'rgba(0, 96, 250, 0.08)',
+                    border: '1px solid rgba(0, 96, 250, 0.2)',
                     borderRadius: '8px',
                     padding: '6px 12px',
                     fontSize: '12px',
@@ -359,7 +359,7 @@ export default function MobileSearchView({
                   width: '52px',
                   height: '52px',
                   borderRadius: '12px',
-                  backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                  backgroundColor: 'rgba(0, 96, 250, 0.1)',
                   color: 'var(--color-primary)',
                   display: 'flex',
                   alignItems: 'center',
@@ -452,7 +452,7 @@ export default function MobileSearchView({
                         padding: '6px 10px',
                         borderRadius: '6px',
                         border: '1px solid var(--color-primary)',
-                        backgroundColor: 'rgba(15, 118, 110, 0.08)',
+                        backgroundColor: 'rgba(0, 96, 250, 0.08)',
                         color: 'var(--color-primary)',
                         fontSize: '12px',
                         fontWeight: 700,
@@ -542,7 +542,7 @@ export default function MobileSearchView({
                       fontWeight: 600,
                       border: '1px solid',
                       borderColor: selectedSpecialty === spec ? 'var(--color-primary)' : '#E2E8F0',
-                      backgroundColor: selectedSpecialty === spec ? 'rgba(15, 118, 110, 0.1)' : '#FFFFFF',
+                      backgroundColor: selectedSpecialty === spec ? 'rgba(0, 96, 250, 0.1)' : '#FFFFFF',
                       color: selectedSpecialty === spec ? 'var(--color-primary)' : 'var(--slate-700)',
                       cursor: 'pointer',
                     }}

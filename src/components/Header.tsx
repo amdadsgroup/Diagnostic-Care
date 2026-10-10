@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
                 border: '1px solid rgba(255, 255, 255, 0.22)',
                 padding: '2px 10px',
                 borderRadius: '9999px',
-                color: '#DDF7F0',
+                color: '#EBF3FF',
                 fontSize: '11px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -142,10 +142,10 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                color: '#DDF7F0',
+                color: '#EBF3FF',
                 fontWeight: 700,
                 textDecoration: 'none',
-                background: 'rgba(15, 118, 110, 0.35)',
+                background: 'rgba(0, 96, 250, 0.35)',
                 padding: '2px 10px',
                 borderRadius: '9999px',
                 border: '1px solid rgba(94, 234, 212, 0.35)',
@@ -174,8 +174,8 @@ export const Header: React.FC<HeaderProps> = ({
                   if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'en');
                 }}
                 style={{
-                  color: language === 'en' ? '#FFFFFF' : '#DDF7F0',
-                  background: language === 'en' ? '#0F766E' : 'transparent',
+                  color: language === 'en' ? '#FFFFFF' : '#EBF3FF',
+                  background: language === 'en' ? 'var(--brand-primary)' : 'transparent',
                   fontWeight: 700,
                   fontSize: '10.5px',
                   padding: '2px 7px',
@@ -191,8 +191,8 @@ export const Header: React.FC<HeaderProps> = ({
                   if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'bn');
                 }}
                 style={{
-                  color: language === 'bn' ? '#FFFFFF' : '#DDF7F0',
-                  background: language === 'bn' ? '#0F766E' : 'transparent',
+                  color: language === 'bn' ? '#FFFFFF' : '#EBF3FF',
+                  background: language === 'bn' ? 'var(--brand-primary)' : 'transparent',
                   fontWeight: 700,
                   fontSize: '10.5px',
                   padding: '2px 7px',
@@ -387,13 +387,13 @@ export const Header: React.FC<HeaderProps> = ({
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             padding: '20px 24px 28px',
-            boxShadow: '0 16px 36px rgba(15, 118, 110, 0.12)',
+            boxShadow: '0 16px 36px rgba(0, 96, 250, 0.12)',
             animation: 'slideDown 0.2s ease-out',
           }}
           className="d-mobile-only"
         >
           {/* Logo in drawer header */}
-          <div style={{ marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(15, 118, 110, 0.12)' }}>
+          <div style={{ marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(0, 96, 250, 0.12)' }}>
             <BrandLogo variant="horizontal" size={32} />
           </div>
 
@@ -406,7 +406,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#15313B' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#090D14' }}>
                       {currentUser.fullName}
                     </div>
                     <div style={{ fontSize: '11px', color: '#627680' }}>
@@ -470,7 +470,7 @@ export const Header: React.FC<HeaderProps> = ({
                     padding: '8px 12px',
                     borderRadius: '9999px',
                     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    color: '#15313B',
+                    color: '#090D14',
                     border: '1px solid var(--glass-border)',
                     fontWeight: 700,
                     fontSize: '12.5px',

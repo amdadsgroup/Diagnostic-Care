@@ -118,7 +118,7 @@ export default function TrustSection({ language }: { language: SupportedLanguage
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    boxShadow: '0 4px 12px rgba(15, 118, 110, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 96, 250, 0.1)',
                   }}
                 >
                   <Icon size={24} />
@@ -178,9 +178,9 @@ export default function TrustSection({ language }: { language: SupportedLanguage
                     width: '36px',
                     height: '36px',
                     borderRadius: '10px',
-                    background: 'rgba(15, 118, 110, 0.1)',
+                    background: 'rgba(0, 96, 250, 0.1)',
                     color: 'var(--color-primary)',
-                    border: '1px solid rgba(15, 118, 110, 0.2)',
+                    border: '1px solid rgba(0, 96, 250, 0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

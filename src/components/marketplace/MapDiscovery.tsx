@@ -257,7 +257,7 @@ export default function MapDiscovery({
             {filteredFacilities.map((fac) => {
               const isSelected = selectedFacility.id === fac.id;
               const isHospitalOpd = fac.type === 'HOSPITAL_OPD';
-              const pinColor = isHospitalOpd ? '#0284C7' : '#0F766E';
+              const pinColor = isHospitalOpd ? '#0284C7' : '#0060FA';
 
               return (
                 <div

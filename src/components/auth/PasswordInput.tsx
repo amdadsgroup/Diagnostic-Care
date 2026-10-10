@@ -71,8 +71,8 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             letterSpacing: showPassword ? 'normal' : '0.12em',
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#0F766E';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+            e.currentTarget.style.borderColor = '#0060FA';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 96, 250, 0.15)';
           }}
           onBlur={(e) => {
             e.currentTarget.style.borderColor = error ? '#EF4444' : 'var(--glass-border)';

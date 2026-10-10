@@ -277,11 +277,11 @@ export default function DoctorsPage() {
           <div className="container">
             {/* Breadcrumb */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#627680', marginBottom: '12px' }}>
-              <Link href="/" style={{ color: '#0F766E', fontWeight: 600 }}>
+              <Link href="/" style={{ color: '#0060FA', fontWeight: 600 }}>
                 {language === 'en' ? 'Home' : 'হোম'}
               </Link>
               <ChevronRight size={14} color="#8FA0AA" />
-              <span style={{ color: '#15313B', fontWeight: 700 }}>
+              <span style={{ color: '#090D14', fontWeight: 700 }}>
                 {language === 'en' ? 'Specialist Doctors' : 'বিশেষজ্ঞ ডাক্তার'}
               </span>
             </div>
@@ -294,12 +294,12 @@ export default function DoctorsPage() {
                     alignItems: 'center',
                     gap: '6px',
                     backgroundColor: 'var(--brand-fresh-mint)',
-                    color: '#0F766E',
+                    color: '#0060FA',
                     fontSize: '12px',
                     fontWeight: 700,
                     padding: '4px 14px',
                     borderRadius: '20px',
-                    border: '1px solid rgba(15, 118, 110, 0.25)',
+                    border: '1px solid rgba(0, 96, 250, 0.25)',
                     marginBottom: '10px',
                   }}
                 >
@@ -310,7 +310,7 @@ export default function DoctorsPage() {
                   style={{
                     fontSize: 'clamp(26px, 3.2vw, 36px)',
                     fontWeight: 800,
-                    color: '#15313B',
+                    color: '#090D14',
                     letterSpacing: '-0.02em',
                     lineHeight: 1.2,
                     marginBottom: '8px',
@@ -340,7 +340,7 @@ export default function DoctorsPage() {
                     width: '38px',
                     height: '38px',
                     borderRadius: '10px',
-                    backgroundColor: '#0F766E',
+                    backgroundColor: '#0060FA',
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
@@ -350,7 +350,7 @@ export default function DoctorsPage() {
                   <Stethoscope size={20} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>
                     {filteredDoctors.length} {language === 'en' ? 'Doctors' : 'জন ডাক্তার'}
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#627680' }}>
@@ -695,11 +695,11 @@ export default function DoctorsPage() {
                             height: '64px',
                             borderRadius: '16px',
                             backgroundColor: 'var(--brand-fresh-mint)',
-                            border: '1px solid rgba(15, 118, 110, 0.25)',
+                            border: '1px solid rgba(0, 96, 250, 0.25)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#0F766E',
+                            color: '#0060FA',
                             flexShrink: 0,
                             overflow: 'hidden',
                           }}
@@ -711,7 +711,7 @@ export default function DoctorsPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                             <Link
                               href={`/doctors/${doc.id}`}
-                              style={{ textDecoration: 'none', color: '#15313B' }}
+                              style={{ textDecoration: 'none', color: '#090D14' }}
                             >
                               <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>
                                 {doc.fullName}
@@ -720,7 +720,7 @@ export default function DoctorsPage() {
                             <ShieldCheck size={16} color="#15803D" />
                           </div>
 
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F766E', marginBottom: '3px' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#0060FA', marginBottom: '3px' }}>
                             {doc.specialization}
                           </div>
 
@@ -743,7 +743,7 @@ export default function DoctorsPage() {
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
                           <span style={{ color: '#627680' }}>BMDC Reg:</span>
-                          <span style={{ fontWeight: 700, color: '#15313B' }}>
+                          <span style={{ fontWeight: 700, color: '#090D14' }}>
                             {doc.bmdcNumber || 'A-12345'}
                           </span>
                         </div>
@@ -751,7 +751,7 @@ export default function DoctorsPage() {
                         {assoc && (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
                             <span style={{ color: '#627680' }}>Chamber:</span>
-                            <span style={{ fontWeight: 600, color: '#15313B' }}>
+                            <span style={{ fontWeight: 600, color: '#090D14' }}>
                               {assoc.branchName || 'Popular Diagnostic Center'}
                             </span>
                           </div>
@@ -759,7 +759,7 @@ export default function DoctorsPage() {
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
                           <span style={{ color: '#627680' }}>Consultation Fee:</span>
-                          <span style={{ fontWeight: 800, color: '#0F766E', fontSize: '13.5px' }}>
+                          <span style={{ fontWeight: 800, color: '#0060FA', fontSize: '13.5px' }}>
                             ৳ {assoc?.consultationFee || 700}
                           </span>
                         </div>
@@ -767,8 +767,8 @@ export default function DoctorsPage() {
 
                       {/* Available Slots Preview */}
                       <div style={{ marginBottom: '18px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <Clock size={13} color="#0F766E" />
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Clock size={13} color="#0060FA" />
                           <span>{language === 'en' ? 'Available Today (5-Min Hold):' : 'আজকের সময়সূচী:'}</span>
                         </div>
 
@@ -791,7 +791,7 @@ export default function DoctorsPage() {
                                       ? '1px solid rgba(143, 160, 170, 0.3)'
                                       : isHeld
                                       ? '1px solid #B45309'
-                                      : '1px solid rgba(15, 118, 110, 0.3)',
+                                      : '1px solid rgba(0, 96, 250, 0.3)',
                                     backgroundColor: isBooked
                                       ? 'rgba(244, 248, 250, 0.7)'
                                       : isHeld
@@ -801,9 +801,9 @@ export default function DoctorsPage() {
                                       ? '#8FA0AA'
                                       : isHeld
                                       ? '#B45309'
-                                      : '#0F766E',
+                                      : '#0060FA',
                                     cursor: isBooked ? 'not-allowed' : 'pointer',
-                                    boxShadow: isBooked ? 'none' : '0 2px 6px rgba(15, 118, 110, 0.08)',
+                                    boxShadow: isBooked ? 'none' : '0 2px 6px rgba(0, 96, 250, 0.08)',
                                     transition: 'all 0.15s ease',
                                   }}
                                 >
@@ -832,7 +832,7 @@ export default function DoctorsPage() {
                           textDecoration: 'none',
                         }}
                       >
-                        <User size={14} color="#0F766E" />
+                        <User size={14} color="#0060FA" />
                         <span>{language === 'en' ? 'View Profile' : 'প্রোফাইল ও স্লট'}</span>
                       </Link>
 
@@ -867,7 +867,7 @@ export default function DoctorsPage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#0F766E',
+                          color: '#0060FA',
                           textDecoration: 'none',
                           flexShrink: 0,
                         }}

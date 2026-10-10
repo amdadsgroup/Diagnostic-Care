@@ -60,7 +60,7 @@ export default function HeroSection({
         position: 'relative',
         backgroundColor: 'var(--brand-bg)',
         backgroundImage:
-          'radial-gradient(circle at 10% 20%, rgba(15, 118, 110, 0.09) 0%, transparent 45%), radial-gradient(circle at 90% 80%, rgba(221, 247, 240, 0.7) 0%, transparent 45%)',
+          'radial-gradient(circle at 10% 20%, rgba(0, 96, 250, 0.09) 0%, transparent 45%), radial-gradient(circle at 90% 80%, rgba(235, 243, 255, 0.7) 0%, transparent 45%)',
         padding: '56px 0 64px 0',
         borderBottom: '1px solid var(--glass-border)',
         overflow: 'hidden',
@@ -75,7 +75,7 @@ export default function HeroSection({
           width: '450px',
           height: '450px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(15, 118, 110, 0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 96, 250, 0.1) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -87,7 +87,7 @@ export default function HeroSection({
           width: '380px',
           height: '380px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(221, 247, 240, 0.8) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(235, 243, 255, 0.8) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -103,9 +103,9 @@ export default function HeroSection({
                 marginBottom: '14px',
                 padding: '6px 14px',
                 fontSize: '11px',
-                color: '#0F766E',
+                color: '#0060FA',
                 background: 'var(--brand-fresh-mint)',
-                borderColor: 'rgba(15, 118, 110, 0.25)',
+                borderColor: 'rgba(0, 96, 250, 0.25)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -114,10 +114,10 @@ export default function HeroSection({
                 lineHeight: 1.4,
               }}
             >
-              <Sparkles size={13} color="#0F766E" />
+              <Sparkles size={13} color="#0060FA" />
               <span>{t.heroBadge}</span>
-              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#0F766E' }} />
-              <span style={{ color: '#15313B', fontWeight: 600 }}>
+              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#0060FA' }} />
+              <span style={{ color: '#090D14', fontWeight: 600 }}>
                 {BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Hub • Bangladesh
               </span>
             </div>
@@ -130,7 +130,7 @@ export default function HeroSection({
                 lineHeight: 1.25,
                 letterSpacing: '-0.02em',
                 marginBottom: '14px',
-                color: '#15313B',
+                color: '#090D14',
                 wordBreak: 'normal',
                 overflowWrap: 'break-word',
                 maxWidth: '100%',
@@ -172,7 +172,7 @@ export default function HeroSection({
                 }}
                 className="btn-outline hero-cta-btn"
               >
-                <Activity size={15} color="#0F766E" />
+                <Activity size={15} color="#0060FA" />
                 <span>{language === 'en' ? 'Chamber Schedules & Queue' : 'চেম্বার শিডিউল ও কিউ'}</span>
               </button>
             </div>
@@ -219,10 +219,10 @@ export default function HeroSection({
                       borderRadius: '9999px',
                       fontSize: '12.5px',
                       fontWeight: 700,
-                      background: activeSearchTab === item.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(255, 255, 255, 0.85)',
+                      background: activeSearchTab === item.id ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'rgba(255, 255, 255, 0.85)',
                       color: activeSearchTab === item.id ? '#FFFFFF' : '#627680',
                       border: activeSearchTab === item.id ? '1px solid rgba(255, 255, 255, 0.45)' : '1px solid var(--glass-border)',
-                      boxShadow: activeSearchTab === item.id ? '0 4px 12px rgba(15, 118, 110, 0.3)' : 'var(--glass-shadow-sm)',
+                      boxShadow: activeSearchTab === item.id ? '0 4px 12px rgba(0, 96, 250, 0.3)' : 'var(--glass-shadow-sm)',
                       whiteSpace: 'nowrap',
                       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       cursor: 'pointer',
@@ -247,7 +247,7 @@ export default function HeroSection({
                     borderRadius: '12px',
                   }}
                 >
-                  <MapPin size={16} color="#0F766E" />
+                  <MapPin size={16} color="#0060FA" />
                   <select
                     id="hero-district-select"
                     value={selectedDistrict}
@@ -255,7 +255,7 @@ export default function HeroSection({
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: '#15313B',
+                      color: '#090D14',
                       fontSize: '13px',
                       fontWeight: 700,
                       outline: 'none',
@@ -283,7 +283,7 @@ export default function HeroSection({
                     minWidth: 0,
                   }}
                 >
-                  <Search size={17} color="#0F766E" />
+                  <Search size={17} color="#0060FA" />
                   <input
                     type="text"
                     id="hero-universal-search-input"
@@ -296,7 +296,7 @@ export default function HeroSection({
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: '#15313B',
+                      color: '#090D14',
                       fontSize: '13.5px',
                       fontWeight: 500,
                     }}
@@ -333,7 +333,7 @@ export default function HeroSection({
               <span
                 style={{
                   fontSize: '12px',
-                  color: '#0F766E',
+                  color: '#0060FA',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -352,7 +352,7 @@ export default function HeroSection({
                     fontSize: '11.5px',
                     padding: '5px 12px',
                     cursor: 'pointer',
-                    color: '#15313B',
+                    color: '#090D14',
                   }}
                 >
                   {language === 'en' ? item.labelEn : item.labelBn}
@@ -383,7 +383,7 @@ export default function HeroSection({
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <BrandSymbol size={26} altText="Diagnostic Care" />
-                  <span style={{ fontSize: '14.5px', fontWeight: 800, color: '#15313B', letterSpacing: '-0.01em' }}>
+                  <span style={{ fontSize: '14.5px', fontWeight: 800, color: '#090D14', letterSpacing: '-0.01em' }}>
                     {t.telemetryTitle}
                   </span>
                 </div>
@@ -392,7 +392,7 @@ export default function HeroSection({
                   style={{
                     padding: '5px 12px',
                     borderRadius: '9999px',
-                    border: '1px solid rgba(15, 118, 110, 0.25)',
+                    border: '1px solid rgba(0, 96, 250, 0.25)',
                   }}
                 >
                   <span
@@ -429,18 +429,18 @@ export default function HeroSection({
                         height: '42px',
                         borderRadius: '12px',
                         backgroundColor: 'var(--brand-fresh-mint)',
-                        color: '#0F766E',
+                        color: '#0060FA',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        border: '1px solid rgba(15, 118, 110, 0.2)',
+                        border: '1px solid rgba(0, 96, 250, 0.2)',
                         flexShrink: 0,
                       }}
                     >
                       <Stethoscope size={20} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#15313B' }}>
+                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#090D14' }}>
                         Dr. Anisur Rahman • Room 204
                       </div>
                       <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
@@ -459,7 +459,7 @@ export default function HeroSection({
                     >
                       CHAMBER ACTIVE
                     </span>
-                    <div style={{ fontSize: '11px', color: '#0F766E', marginTop: '3px', fontWeight: 700 }}>
+                    <div style={{ fontSize: '11px', color: '#0060FA', marginTop: '3px', fontWeight: 700 }}>
                       Live Queue Token #02
                     </div>
                   </div>
@@ -494,7 +494,7 @@ export default function HeroSection({
                       <Clock size={20} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#15313B' }}>
+                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#090D14' }}>
                         Live Chamber Queue Engine
                       </div>
                       <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
@@ -525,11 +525,11 @@ export default function HeroSection({
                       padding: '14px 16px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0F766E', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0060FA', marginBottom: '6px' }}>
                       <TestTube2 size={16} />
                       <span style={{ fontSize: '12px', fontWeight: 800 }}>Pathology Lab</span>
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>4 Hours</div>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>4 Hours</div>
                     <div style={{ fontSize: '11px', color: '#627680', fontWeight: 500 }}>Avg. CBC & Urine Delivery</div>
                   </div>
 
@@ -544,7 +544,7 @@ export default function HeroSection({
                       <Ambulance size={16} />
                       <span style={{ fontSize: '12px', fontWeight: 800 }}>Ambulance 24/7</span>
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>12 Mins</div>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>12 Mins</div>
                     <div style={{ fontSize: '11px', color: '#627680', fontWeight: 500 }}>Avg. Response in Moulvibazar</div>
                   </div>
                 </div>
@@ -565,13 +565,13 @@ export default function HeroSection({
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <ShieldCheck size={16} color="#15803D" />
-                  <span style={{ fontWeight: 700, color: '#15313B' }}>BMDC Registered & DGHS Verified</span>
+                  <span style={{ fontWeight: 700, color: '#090D14' }}>BMDC Registered & DGHS Verified</span>
                 </span>
                 <button
                   onClick={onOpenHelpline}
                   className="glass-pill"
                   style={{
-                    color: '#0F766E',
+                    color: '#0060FA',
                     fontWeight: 700,
                     fontSize: '11.5px',
                     padding: '5px 12px',

@@ -235,14 +235,14 @@ export default function DoctorDashboardPage() {
           <div
             className="glass-card"
             style={{
-              background: 'linear-gradient(135deg, rgba(15, 118, 110, 0.95) 0%, rgba(17, 94, 89, 0.95) 100%)',
+              background: 'linear-gradient(135deg, rgba(0, 96, 250, 0.95) 0%, rgba(0, 78, 209, 0.95) 100%)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               color: '#FFFFFF',
               borderRadius: '24px',
               padding: '28px 32px',
               marginBottom: '28px',
-              boxShadow: '0 16px 36px -10px rgba(15, 118, 110, 0.3)',
+              boxShadow: '0 16px 36px -10px rgba(0, 96, 250, 0.3)',
               border: '1px solid rgba(255, 255, 255, 0.25)',
               display: 'flex',
               justifyContent: 'space-between',
@@ -258,7 +258,7 @@ export default function DoctorDashboardPage() {
                   height: '68px',
                   borderRadius: '20px',
                   backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                  color: '#0F766E',
+                  color: '#0060FA',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -268,11 +268,11 @@ export default function DoctorDashboardPage() {
                   flexShrink: 0,
                 }}
               >
-                <Stethoscope size={38} color="#0F766E" />
+                <Stethoscope size={38} color="#0060FA" />
               </div>
               <div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255, 255, 255, 0.18)', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
-                  <ShieldCheck size={13} color="#DDF7F0" />
+                  <ShieldCheck size={13} color="#EBF3FF" />
                   BMDC REG: A-45892 (VERIFIED)
                 </div>
                 <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
@@ -322,7 +322,7 @@ export default function DoctorDashboardPage() {
               <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? "Today's Total Patients" : 'আজকের মোট সিরিয়াল'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#15313B', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#090D14', marginTop: '4px' }}>
                 {totalPatients}
               </div>
             </div>
@@ -331,7 +331,7 @@ export default function DoctorDashboardPage() {
               <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? 'Currently In-Room' : 'বর্তমানে চেম্বারে'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#0F766E', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#0060FA', marginTop: '4px' }}>
                 {inRoomPatient ? `Token #${inRoomPatient.token}` : 'None'}
               </div>
             </div>
@@ -349,7 +349,7 @@ export default function DoctorDashboardPage() {
               <div style={{ fontSize: '12px', fontWeight: 700, color: '#627680', textTransform: 'uppercase' }}>
                 {language === 'en' ? 'Chamber Fees Collected' : 'মোট ফি সংগ্রহ'}
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#15313B', marginTop: '4px' }}>
+              <div style={{ fontSize: '26px', fontWeight: 900, color: '#090D14', marginTop: '4px' }}>
                 {formatCurrency(revenueTotal)}
               </div>
             </div>
@@ -385,7 +385,7 @@ export default function DoctorDashboardPage() {
                     padding: '10px 18px',
                     borderRadius: '12px',
                     border: isActive ? 'none' : '1px solid rgba(226, 232, 240, 0.8)',
-                    background: isActive ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(255, 255, 255, 0.65)',
+                    background: isActive ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'rgba(255, 255, 255, 0.65)',
                     backdropFilter: 'blur(8px)',
                     color: isActive ? '#FFFFFF' : '#627680',
                     fontWeight: 700,
@@ -393,7 +393,7 @@ export default function DoctorDashboardPage() {
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                     whiteSpace: 'nowrap',
-                    boxShadow: isActive ? '0 4px 14px rgba(15, 118, 110, 0.22)' : 'none',
+                    boxShadow: isActive ? '0 4px 14px rgba(0, 96, 250, 0.22)' : 'none',
                   }}
                 >
                   <Icon size={16} />
@@ -414,7 +414,7 @@ export default function DoctorDashboardPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                     {language === 'en' ? "Today's Patient Queue" : 'আজকের সিরিয়াল তালিকা'}
                   </h3>
                   <span style={{ fontSize: '12px', color: '#627680', fontWeight: 600 }}>
@@ -431,14 +431,14 @@ export default function DoctorDashboardPage() {
                         style={{
                           padding: '14px 16px',
                           borderRadius: '14px',
-                          border: isCurrent ? '2px solid #0F766E' : '1px solid rgba(226, 232, 240, 0.8)',
-                          background: isCurrent ? 'linear-gradient(135deg, rgba(221, 247, 240, 0.45) 0%, rgba(255, 255, 255, 0.85) 100%)' : 'rgba(255, 255, 255, 0.6)',
+                          border: isCurrent ? '2px solid #0060FA' : '1px solid rgba(226, 232, 240, 0.8)',
+                          background: isCurrent ? 'linear-gradient(135deg, rgba(235, 243, 255, 0.45) 0%, rgba(255, 255, 255, 0.85) 100%)' : 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(8px)',
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
                           transition: 'all 0.15s ease',
-                          boxShadow: isCurrent ? '0 6px 16px rgba(15, 118, 110, 0.12)' : 'none',
+                          boxShadow: isCurrent ? '0 6px 16px rgba(0, 96, 250, 0.12)' : 'none',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -447,9 +447,9 @@ export default function DoctorDashboardPage() {
                               width: '38px',
                               height: '38px',
                               borderRadius: '10px',
-                              backgroundColor: isCurrent ? '#0F766E' : 'rgba(221, 247, 240, 0.5)',
-                              color: isCurrent ? '#FFFFFF' : '#0F766E',
-                              border: isCurrent ? 'none' : '1px solid rgba(15, 118, 110, 0.2)',
+                              backgroundColor: isCurrent ? '#0060FA' : 'rgba(235, 243, 255, 0.5)',
+                              color: isCurrent ? '#FFFFFF' : '#0060FA',
+                              border: isCurrent ? 'none' : '1px solid rgba(0, 96, 250, 0.2)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -462,7 +462,7 @@ export default function DoctorDashboardPage() {
                           </span>
 
                           <div>
-                            <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#15313B' }}>
+                            <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#090D14' }}>
                               {p.name}
                             </div>
                             <div style={{ fontSize: '12px', color: '#627680', marginTop: '2px' }}>
@@ -473,7 +473,7 @@ export default function DoctorDashboardPage() {
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           {p.status === 'IN_ROOM' && (
-                            <span style={{ backgroundColor: 'rgba(15, 118, 110, 0.12)', color: '#0F766E', border: '1px solid rgba(15, 118, 110, 0.25)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
+                            <span style={{ backgroundColor: 'rgba(0, 96, 250, 0.12)', color: '#0060FA', border: '1px solid rgba(0, 96, 250, 0.25)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                               IN ROOM
                             </span>
                           )}
@@ -515,7 +515,7 @@ export default function DoctorDashboardPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                     {language === 'en' ? 'Active Consultation' : 'বর্তমান রোগী কনসালটেশন'}
                   </h3>
                   {activePatient && (
@@ -528,7 +528,7 @@ export default function DoctorDashboardPage() {
                 {activePatient ? (
                   <div>
                     <div className="glass-inset" style={{ padding: '16px', marginBottom: '18px' }}>
-                      <div style={{ fontSize: '16px', fontWeight: 800, color: '#15313B' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 800, color: '#090D14' }}>
                         {activePatient.name}
                       </div>
                       <div style={{ fontSize: '13px', color: '#627680', marginTop: '2px' }}>
@@ -537,7 +537,7 @@ export default function DoctorDashboardPage() {
                     </div>
 
                     <div style={{ marginBottom: '14px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                         {language === 'en' ? 'Clinical Diagnosis' : 'রোগের প্রাথমিক নির্ণয়'}
                       </label>
                       <input
@@ -551,7 +551,7 @@ export default function DoctorDashboardPage() {
                     </div>
 
                     <div style={{ marginBottom: '18px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                         {language === 'en' ? 'Clinical Notes & Advice' : 'ডাক্তারের পরামর্শ ও পর্যবেক্ষণ'}
                       </label>
                       <textarea
@@ -616,7 +616,7 @@ export default function DoctorDashboardPage() {
                 maxWidth: '780px',
               }}
             >
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', marginBottom: '18px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', marginBottom: '18px' }}>
                 {language === 'en' ? 'Digital Rx Prescription Writer' : 'ডিজিটাল প্রেসক্রিপশন তৈরি'}
               </h3>
 
@@ -660,17 +660,17 @@ export default function DoctorDashboardPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                     <thead style={{ background: 'rgba(244, 248, 250, 0.85)', borderBottom: '1px solid rgba(226, 232, 240, 0.8)' }}>
                       <tr>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Medicine</th>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Dosage</th>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Instructions</th>
-                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#15313B' }}>Days</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#090D14' }}>Medicine</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#090D14' }}>Dosage</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#090D14' }}>Instructions</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#090D14' }}>Days</th>
                       </tr>
                     </thead>
                     <tbody>
                       {medicines.map((m, idx) => (
                         <tr key={idx} style={{ borderBottom: '1px solid rgba(241, 245, 249, 0.8)' }}>
-                          <td style={{ padding: '10px 14px', fontWeight: 600, color: '#15313B' }}>{m.name}</td>
-                          <td style={{ padding: '10px 14px', color: '#0F766E', fontWeight: 700 }}>{m.dose}</td>
+                          <td style={{ padding: '10px 14px', fontWeight: 600, color: '#090D14' }}>{m.name}</td>
+                          <td style={{ padding: '10px 14px', color: '#0060FA', fontWeight: 700 }}>{m.dose}</td>
                           <td style={{ padding: '10px 14px', color: '#627680' }}>{m.instruction}</td>
                           <td style={{ padding: '10px 14px', color: '#627680' }}>{m.days} days</td>
                         </tr>
@@ -680,7 +680,7 @@ export default function DoctorDashboardPage() {
                 </div>
 
                 <div style={{ marginTop: '12px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                     {language === 'en' ? 'Recommended Diagnostic Tests' : 'প্রস্তাবিত ল্যাব টেস্ট'}
                   </label>
                   <input
@@ -704,14 +704,14 @@ export default function DoctorDashboardPage() {
                 maxWidth: '780px',
               }}
             >
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', marginBottom: '18px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', marginBottom: '18px' }}>
                 {language === 'en' ? 'Chamber Working Schedule' : 'চেম্বারের সাপ্তাহিক সময়সূচি'}
               </h3>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div className="glass-inset" style={{ padding: '18px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#15313B' }}>
+                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#090D14' }}>
                       Popular Diagnostic Center (Moulvibazar Main Branch)
                     </div>
                     <span style={{ backgroundColor: 'rgba(21, 128, 61, 0.1)', color: '#15803D', border: '1px solid rgba(21, 128, 61, 0.25)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
@@ -719,9 +719,9 @@ export default function DoctorDashboardPage() {
                     </span>
                   </div>
                   <div style={{ fontSize: '13px', color: '#627680' }}>
-                    Days: <strong style={{ color: '#15313B' }}>Saturday to Thursday (শনিবার - বৃহস্পতিবার)</strong> • 16:00 to 20:00 (4:00 PM - 8:00 PM)
+                    Days: <strong style={{ color: '#090D14' }}>Saturday to Thursday (শনিবার - বৃহস্পতিবার)</strong> • 16:00 to 20:00 (4:00 PM - 8:00 PM)
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#0F766E', fontWeight: 600, marginTop: '4px' }}>
+                  <div style={{ fontSize: '12.5px', color: '#0060FA', fontWeight: 600, marginTop: '4px' }}>
                     Slot Duration: 15 mins • Max 16 patients/day • Consultation Fee: ৳800
                   </div>
                 </div>
@@ -734,7 +734,7 @@ export default function DoctorDashboardPage() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                     {language === 'en' ? 'Leave & Holiday Management' : 'ছুটি ও বন্ধ ব্যবস্থাপনা'}
                   </h3>
                   <p style={{ fontSize: '13px', color: '#627680', margin: '2px 0 0 0' }}>
@@ -776,11 +776,11 @@ export default function DoctorDashboardPage() {
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '15px', color: '#15313B' }}>
+                      <div style={{ fontWeight: 800, fontSize: '15px', color: '#090D14' }}>
                         {l.reason}
                       </div>
                       <div style={{ fontSize: '13px', color: '#627680', marginTop: '2px' }}>
-                        Dates: <strong style={{ color: '#15313B' }}>{l.startDate}</strong> to <strong style={{ color: '#15313B' }}>{l.endDate}</strong>
+                        Dates: <strong style={{ color: '#090D14' }}>{l.startDate}</strong> to <strong style={{ color: '#090D14' }}>{l.endDate}</strong>
                       </div>
                     </div>
 
@@ -818,7 +818,7 @@ export default function DoctorDashboardPage() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                 {language === 'en' ? 'Schedule Doctor Leave' : 'ডাক্তারের ছুটি নির্ধারণ'}
               </h3>
               <button
@@ -831,7 +831,7 @@ export default function DoctorDashboardPage() {
 
             <form onSubmit={handleAddLeave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Start Date' : 'শুরুর তারিখ'} *
                 </label>
                 <input
@@ -845,7 +845,7 @@ export default function DoctorDashboardPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'End Date' : 'শেষের তারিখ'} *
                 </label>
                 <input
@@ -859,7 +859,7 @@ export default function DoctorDashboardPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Reason / Details' : 'ছুটির কারণ'}
                 </label>
                 <input

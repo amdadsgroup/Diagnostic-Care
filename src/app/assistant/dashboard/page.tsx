@@ -224,9 +224,9 @@ export default function DoctorAssistantDashboardPage() {
                   width: '64px',
                   height: '64px',
                   borderRadius: '18px',
-                  backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                  backgroundColor: 'rgba(0, 96, 250, 0.1)',
                   color: 'var(--color-primary)',
-                  border: '1px solid rgba(15, 118, 110, 0.2)',
+                  border: '1px solid rgba(0, 96, 250, 0.2)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -337,12 +337,12 @@ export default function DoctorAssistantDashboardPage() {
                 padding: '10px 20px',
                 borderRadius: '12px',
                 border: 'none',
-                background: activeTab === 'queue' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                background: activeTab === 'queue' ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'transparent',
                 color: activeTab === 'queue' ? '#FFFFFF' : 'var(--color-text-secondary)',
                 fontWeight: 700,
                 fontSize: '13.5px',
                 cursor: 'pointer',
-                boxShadow: activeTab === 'queue' ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
+                boxShadow: activeTab === 'queue' ? '0 4px 14px rgba(0, 96, 250, 0.25)' : 'none',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -359,12 +359,12 @@ export default function DoctorAssistantDashboardPage() {
                 padding: '10px 20px',
                 borderRadius: '12px',
                 border: 'none',
-                background: activeTab === 'invitations' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                background: activeTab === 'invitations' ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'transparent',
                 color: activeTab === 'invitations' ? '#FFFFFF' : 'var(--color-text-secondary)',
                 fontWeight: 700,
                 fontSize: '13.5px',
                 cursor: 'pointer',
-                boxShadow: activeTab === 'invitations' ? '0 4px 14px rgba(15, 118, 110, 0.25)' : 'none',
+                boxShadow: activeTab === 'invitations' ? '0 4px 14px rgba(0, 96, 250, 0.25)' : 'none',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -416,7 +416,7 @@ export default function DoctorAssistantDashboardPage() {
                             width: '46px',
                             height: '46px',
                             borderRadius: '14px',
-                            background: isCurrent ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(241, 245, 249, 0.85)',
+                            background: isCurrent ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'rgba(241, 245, 249, 0.85)',
                             color: isCurrent ? '#FFFFFF' : 'var(--color-text-primary)',
                             display: 'flex',
                             alignItems: 'center',
@@ -424,7 +424,7 @@ export default function DoctorAssistantDashboardPage() {
                             fontWeight: 900,
                             fontSize: '18px',
                             flexShrink: 0,
-                            boxShadow: isCurrent ? '0 4px 12px rgba(15, 118, 110, 0.3)' : 'none',
+                            boxShadow: isCurrent ? '0 4px 12px rgba(0, 96, 250, 0.3)' : 'none',
                           }}
                         >
                           #{p.token}
@@ -579,7 +579,7 @@ export default function DoctorAssistantDashboardPage() {
                       <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
                         {inv.email} • Assigned to: <strong style={{ color: 'var(--color-text-primary)' }}>{inv.branch}</strong>
                       </div>
-                      <div style={{ fontSize: '12px', color: '#0F766E', marginTop: '6px', fontWeight: 600 }}>
+                      <div style={{ fontSize: '12px', color: '#0060FA', marginTop: '6px', fontWeight: 600 }}>
                         Permissions: Manage Queue ({inv.canManageQueue ? '✓' : '✗'}), Check-in Patients ({inv.canCheckIn ? '✓' : '✗'}), Medical History (Strictly Blocked)
                       </div>
                     </div>

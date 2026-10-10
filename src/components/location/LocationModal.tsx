@@ -148,8 +148,8 @@ export default function LocationModal({
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            backgroundColor: 'rgba(221, 247, 240, 0.65)',
-            border: '1.5px solid rgba(15, 118, 110, 0.35)',
+            backgroundColor: 'rgba(235, 243, 255, 0.65)',
+            border: '1.5px solid rgba(0, 96, 250, 0.35)',
             padding: '12px 16px',
             borderRadius: '14px',
             color: 'var(--color-primary)',
@@ -168,7 +168,7 @@ export default function LocationModal({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(15, 118, 110, 0.15)',
+              boxShadow: '0 2px 8px rgba(0, 96, 250, 0.15)',
             }}
           >
             <Navigation size={18} color="var(--color-primary)" className={isLocating ? 'spin-slow' : ''} />
@@ -231,7 +231,7 @@ export default function LocationModal({
                   padding: '12px 14px',
                   borderRadius: '12px',
                   border: isSelected ? '1.5px solid var(--color-primary)' : '1px solid var(--glass-border)',
-                  backgroundColor: isSelected ? 'rgba(221, 247, 240, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: isSelected ? 'rgba(235, 243, 255, 0.6)' : 'rgba(255, 255, 255, 0.7)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.15s ease',

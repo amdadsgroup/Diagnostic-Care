@@ -271,14 +271,14 @@ export default function AppointmentsPatientDashboardPage() {
           <div
             className="glass-card"
             style={{
-              background: 'linear-gradient(135deg, rgba(15, 118, 110, 0.95) 0%, rgba(17, 94, 89, 0.95) 100%)',
+              background: 'linear-gradient(135deg, rgba(0, 96, 250, 0.95) 0%, rgba(0, 78, 209, 0.95) 100%)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               color: '#FFFFFF',
               borderRadius: '24px',
               padding: '28px 32px',
               marginBottom: '28px',
-              boxShadow: '0 16px 36px -10px rgba(15, 118, 110, 0.3)',
+              boxShadow: '0 16px 36px -10px rgba(0, 96, 250, 0.3)',
               border: '1px solid rgba(255, 255, 255, 0.25)',
               display: 'flex',
               justifyContent: 'space-between',
@@ -294,7 +294,7 @@ export default function AppointmentsPatientDashboardPage() {
                   height: '64px',
                   borderRadius: '18px',
                   backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                  color: '#0F766E',
+                  color: '#0060FA',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -304,11 +304,11 @@ export default function AppointmentsPatientDashboardPage() {
                   flexShrink: 0,
                 }}
               >
-                <User size={34} color="#0F766E" />
+                <User size={34} color="#0060FA" />
               </div>
               <div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255, 255, 255, 0.18)', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
-                  <ShieldCheck size={13} color="#DDF7F0" />
+                  <ShieldCheck size={13} color="#EBF3FF" />
                   {language === 'en' ? 'Verified Patient Account' : 'ভেরিফাইড পেশেন্ট প্রোফাইল'}
                 </div>
                 <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
@@ -325,7 +325,7 @@ export default function AppointmentsPatientDashboardPage() {
                 href="/doctors"
                 style={{
                   backgroundColor: '#FFFFFF',
-                  color: '#0F766E',
+                  color: '#0060FA',
                   padding: '10px 20px',
                   borderRadius: '12px',
                   fontSize: '13.5px',
@@ -338,7 +338,7 @@ export default function AppointmentsPatientDashboardPage() {
                   transition: 'all 0.2s ease',
                 }}
               >
-                <Stethoscope size={16} color="#0F766E" />
+                <Stethoscope size={16} color="#0060FA" />
                 <span>{language === 'en' ? 'Find New Doctor' : 'নতুন ডাক্তার খুঁজুন'}</span>
               </Link>
             </div>
@@ -375,7 +375,7 @@ export default function AppointmentsPatientDashboardPage() {
                     padding: '10px 18px',
                     borderRadius: '12px',
                     border: isActive ? 'none' : '1px solid rgba(226, 232, 240, 0.8)',
-                    background: isActive ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(255, 255, 255, 0.65)',
+                    background: isActive ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'rgba(255, 255, 255, 0.65)',
                     backdropFilter: 'blur(8px)',
                     color: isActive ? '#FFFFFF' : '#627680',
                     fontWeight: 700,
@@ -383,7 +383,7 @@ export default function AppointmentsPatientDashboardPage() {
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                     whiteSpace: 'nowrap',
-                    boxShadow: isActive ? '0 4px 14px rgba(15, 118, 110, 0.22)' : 'none',
+                    boxShadow: isActive ? '0 4px 14px rgba(0, 96, 250, 0.22)' : 'none',
                   }}
                 >
                   <Icon size={16} />
@@ -404,8 +404,8 @@ export default function AppointmentsPatientDashboardPage() {
                     textAlign: 'center',
                   }}
                 >
-                  <Calendar size={40} color="#0F766E" style={{ margin: '0 auto 12px', opacity: 0.6 }} />
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', marginBottom: '6px' }}>
+                  <Calendar size={40} color="#0060FA" style={{ margin: '0 auto 12px', opacity: 0.6 }} />
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', marginBottom: '6px' }}>
                     {language === 'en' ? 'No Upcoming Appointments' : 'কোনো আসন্ন অ্যাপয়েন্টমেন্ট নেই'}
                   </h3>
                   <p style={{ fontSize: '14px', color: '#627680', marginBottom: '20px' }}>
@@ -449,15 +449,15 @@ export default function AppointmentsPatientDashboardPage() {
                             width: '56px',
                             height: '56px',
                             borderRadius: '16px',
-                            background: 'linear-gradient(135deg, rgba(15, 118, 110, 0.12) 0%, rgba(221, 247, 240, 0.6) 100%)',
-                            border: '1px solid rgba(15, 118, 110, 0.25)',
-                            color: '#0F766E',
+                            background: 'linear-gradient(135deg, rgba(0, 96, 250, 0.12) 0%, rgba(235, 243, 255, 0.6) 100%)',
+                            border: '1px solid rgba(0, 96, 250, 0.25)',
+                            color: '#0060FA',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexShrink: 0,
-                            boxShadow: '0 4px 12px rgba(15, 118, 110, 0.08)',
+                            boxShadow: '0 4px 12px rgba(0, 96, 250, 0.08)',
                           }}
                         >
                           <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>TOKEN</span>
@@ -480,29 +480,29 @@ export default function AppointmentsPatientDashboardPage() {
                               CONFIRMED
                             </span>
                             <span style={{ fontSize: '12px', color: '#627680', fontWeight: 600 }}>
-                              Code: <strong style={{ color: '#15313B' }}>{apt.bookingCode}</strong>
+                              Code: <strong style={{ color: '#090D14' }}>{apt.bookingCode}</strong>
                             </span>
                           </div>
 
-                          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: '0 0 2px 0' }}>
+                          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', margin: '0 0 2px 0' }}>
                             {apt.doctorName}
                           </h3>
-                          <div style={{ fontSize: '13px', color: '#0F766E', fontWeight: 600, marginBottom: '6px' }}>
+                          <div style={{ fontSize: '13px', color: '#0060FA', fontWeight: 600, marginBottom: '6px' }}>
                             {apt.specialization}
                           </div>
 
                           <div style={{ fontSize: '12.5px', color: '#627680', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              <Building2 size={14} color="#0F766E" />
+                              <Building2 size={14} color="#0060FA" />
                               {apt.organizationName} ({apt.branchName})
                             </span>
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              <Calendar size={14} color="#0F766E" />
+                              <Calendar size={14} color="#0060FA" />
                               {apt.appointmentDate} at {apt.startTime}
                             </span>
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              <User size={14} color="#0F766E" />
-                              Patient: <strong style={{ color: '#15313B' }}>{apt.patientName}</strong> ({apt.patientAge}y)
+                              <User size={14} color="#0060FA" />
+                              Patient: <strong style={{ color: '#090D14' }}>{apt.patientName}</strong> ({apt.patientAge}y)
                             </span>
                           </div>
                         </div>
@@ -602,7 +602,7 @@ export default function AppointmentsPatientDashboardPage() {
                         </span>
                         <span style={{ fontSize: '12px', color: '#627680' }}>{apt.appointmentDate}</span>
                       </div>
-                      <div style={{ fontWeight: 800, fontSize: '16px', color: '#15313B' }}>
+                      <div style={{ fontWeight: 800, fontSize: '16px', color: '#090D14' }}>
                         {apt.doctorName}
                       </div>
                       <div style={{ fontSize: '13px', color: '#627680' }}>
@@ -625,7 +625,7 @@ export default function AppointmentsPatientDashboardPage() {
                           gap: '6px',
                         }}
                       >
-                        <FileText size={14} color="#0F766E" />
+                        <FileText size={14} color="#0060FA" />
                         <span>{language === 'en' ? 'Rx Prescription' : 'প্রেসক্রিপশন'}</span>
                       </button>
                     </div>
@@ -640,7 +640,7 @@ export default function AppointmentsPatientDashboardPage() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
                 <div>
-                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                     {language === 'en' ? 'Authorized Family Members' : 'অনুমোদিত পারিবারিক সদস্য'}
                   </h2>
                   <p style={{ fontSize: '13px', color: '#627680', margin: '2px 0 0 0' }}>
@@ -694,7 +694,7 @@ export default function AppointmentsPatientDashboardPage() {
                       >
                         {fam.relationship}
                       </span>
-                      <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#15313B', margin: '6px 0 2px 0' }}>
+                      <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#090D14', margin: '6px 0 2px 0' }}>
                         {fam.name}
                       </h4>
                       <p style={{ fontSize: '12.5px', color: '#627680', margin: 0 }}>
@@ -737,14 +737,14 @@ export default function AppointmentsPatientDashboardPage() {
                 >
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                         {doc.fullName}
                       </h3>
                       <span style={{ fontSize: '12px', color: '#D97706', fontWeight: 700 }}>
                         ★ {doc.rating}
                       </span>
                     </div>
-                    <div style={{ fontSize: '13px', color: '#0F766E', fontWeight: 600, marginTop: '2px' }}>
+                    <div style={{ fontSize: '13px', color: '#0060FA', fontWeight: 600, marginTop: '2px' }}>
                       {doc.specialization}
                     </div>
                     <div style={{ fontSize: '12px', color: '#627680', marginTop: '4px' }}>
@@ -780,14 +780,14 @@ export default function AppointmentsPatientDashboardPage() {
                 maxWidth: '680px',
               }}
             >
-              <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', marginBottom: '20px' }}>
                 {language === 'en' ? 'Account Preferences & Security' : 'অ্যাকাউন্ট ও নিরাপত্তা সেটিংস'}
               </h2>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid rgba(226, 232, 240, 0.7)' }}>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#15313B' }}>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#090D14' }}>
                       {language === 'en' ? 'Preferred Language' : 'পছন্দের ভাষা'}
                     </div>
                     <div style={{ fontSize: '12.5px', color: '#627680' }}>
@@ -811,7 +811,7 @@ export default function AppointmentsPatientDashboardPage() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid rgba(226, 232, 240, 0.7)' }}>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#15313B' }}>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#090D14' }}>
                       {language === 'en' ? 'SMS Booking Alerts' : 'এসএমএস বুকিং অ্যালার্ট'}
                     </div>
                     <div style={{ fontSize: '12.5px', color: '#627680' }}>
@@ -825,7 +825,7 @@ export default function AppointmentsPatientDashboardPage() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#15313B' }}>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#090D14' }}>
                       {language === 'en' ? 'Customer Care Helpline' : 'কাস্টমার কেয়ার হেল্পলাইন'}
                     </div>
                     <div style={{ fontSize: '12.5px', color: '#627680' }}>
@@ -876,7 +876,7 @@ export default function AppointmentsPatientDashboardPage() {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <AlertTriangle size={28} color="#B91C1C" />
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                 {language === 'en' ? 'Cancel Appointment?' : 'অ্যাপয়েন্টমেন্ট বাতিল করবেন?'}
               </h3>
             </div>
@@ -888,7 +888,7 @@ export default function AppointmentsPatientDashboardPage() {
             </p>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                 {language === 'en' ? 'Reason for Cancellation (Optional):' : 'বাতিলের কারণ (ঐচ্ছিক):'}
               </label>
               <input
@@ -959,7 +959,7 @@ export default function AppointmentsPatientDashboardPage() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B', margin: 0 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14', margin: 0 }}>
                 {language === 'en' ? 'Add Family Member' : 'পারিবারিক সদস্য যুক্ত করুন'}
               </h3>
               <button
@@ -972,7 +972,7 @@ export default function AppointmentsPatientDashboardPage() {
 
             <form onSubmit={handleAddFamilyMember} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                   {language === 'en' ? 'Full Name' : 'পূর্ণ নাম'} *
                 </label>
                 <input
@@ -988,7 +988,7 @@ export default function AppointmentsPatientDashboardPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                     {language === 'en' ? 'Relationship' : 'সম্পর্ক'}
                   </label>
                   <select
@@ -1007,7 +1007,7 @@ export default function AppointmentsPatientDashboardPage() {
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                     {language === 'en' ? 'Age (Years)' : 'বয়স'} *
                   </label>
                   <input
@@ -1026,7 +1026,7 @@ export default function AppointmentsPatientDashboardPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                     {language === 'en' ? 'Gender' : 'লিঙ্গ'}
                   </label>
                   <select
@@ -1042,7 +1042,7 @@ export default function AppointmentsPatientDashboardPage() {
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#15313B', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#090D14', display: 'block', marginBottom: '6px' }}>
                     {language === 'en' ? 'Blood Group' : 'রক্তের গ্রুপ'}
                   </label>
                   <select

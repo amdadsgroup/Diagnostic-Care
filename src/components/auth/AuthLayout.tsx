@@ -129,7 +129,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           <div
             className="d-desktop-only"
             style={{
-              background: 'linear-gradient(145deg, #115E59 0%, #0F766E 55%, #15313B 100%)',
+              background: 'linear-gradient(145deg, #004ED1 0%, #0060FA 55%, #090D14 100%)',
               color: '#FFFFFF',
               padding: '48px 40px',
               display: 'flex',
@@ -145,7 +145,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 position: 'absolute',
                 inset: 0,
                 backgroundImage:
-                  'radial-gradient(circle at 10% 10%, rgba(221, 247, 240, 0.15) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(15, 118, 110, 0.4) 0%, transparent 60%)',
+                  'radial-gradient(circle at 10% 10%, rgba(235, 243, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(0, 96, 250, 0.4) 0%, transparent 60%)',
                 pointerEvents: 'none',
               }}
             />
@@ -157,18 +157,18 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  backgroundColor: 'rgba(221, 247, 240, 0.15)',
-                  border: '1px solid rgba(221, 247, 240, 0.3)',
+                  backgroundColor: 'rgba(235, 243, 255, 0.15)',
+                  border: '1px solid rgba(235, 243, 255, 0.3)',
                   padding: '5px 14px',
                   borderRadius: '100px',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: '#DDF7F0',
+                  color: '#EBF3FF',
                   marginBottom: '24px',
                   backdropFilter: 'var(--blur-card)',
                 }}
               >
-                <Activity size={14} color="#DDF7F0" />
+                <Activity size={14} color="#EBF3FF" />
                 <span>{language === 'bn' ? 'জাতীয় স্বাস্থ্যসেবা অবকাঠামো' : 'National Healthcare Infrastructure'}</span>
               </div>
 
@@ -182,7 +182,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                   color: '#FFFFFF',
                 }}
               >
-                Diagnostic <span style={{ color: '#DDF7F0' }}>Care</span>
+                Diagnostic <span style={{ color: '#EBF3FF' }}>Care</span>
               </h2>
 
               <p
@@ -221,7 +221,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#DDF7F0',
+                    color: '#EBF3FF',
                     flexShrink: 0,
                   }}
                 >

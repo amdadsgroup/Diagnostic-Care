@@ -235,7 +235,7 @@ export default function DoctorDetailPage() {
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px' }}>
           <div className="glass-card" style={{ maxWidth: '480px', textAlign: 'center', padding: '40px' }}>
             <AlertTriangle size={48} color="#B91C1C" style={{ margin: '0 auto 16px' }} />
-            <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#15313B', marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#090D14', marginBottom: '8px' }}>
               {language === 'en' ? 'Doctor Profile Not Found' : 'ডাক্তার প্রোফাইল পাওয়া যায়নি'}
             </h2>
             <p style={{ color: '#627680', fontSize: '14px', marginBottom: '24px' }}>
@@ -299,7 +299,7 @@ export default function DoctorDetailPage() {
           {confirmedBooking && (
             <div
               style={{
-                background: 'linear-gradient(135deg, rgba(221, 247, 240, 0.8) 0%, rgba(255, 255, 255, 0.92) 100%)',
+                background: 'linear-gradient(135deg, rgba(235, 243, 255, 0.8) 0%, rgba(255, 255, 255, 0.92) 100%)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
                 border: '1px solid rgba(21, 128, 61, 0.3)',
@@ -320,11 +320,11 @@ export default function DoctorDetailPage() {
                   <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#15803D', marginBottom: '6px' }}>
                     {language === 'en' ? 'Appointment Confirmed Successfully!' : 'অ্যাপয়েন্টমেন্ট সফলভাবে নিশ্চিত হয়েছে!'}
                   </h3>
-                  <p style={{ fontSize: '14px', color: '#115E59', marginBottom: '8px' }}>
+                  <p style={{ fontSize: '14px', color: '#004ED1', marginBottom: '8px' }}>
                     {language === 'en' ? 'Booking Reference:' : 'বুকিং রেফারেন্স:'}{' '}
                     <strong>{confirmedBooking.bookingCode}</strong> • Token #{confirmedBooking.tokenNumber}
                   </p>
-                  <p style={{ fontSize: '13px', color: '#15313B' }}>
+                  <p style={{ fontSize: '13px', color: '#090D14' }}>
                     {confirmedBooking.doctorName} • {confirmedBooking.organizationName} • {confirmedBooking.appointmentDate} ({confirmedBooking.startTime})
                   </p>
                 </div>
@@ -401,19 +401,19 @@ export default function DoctorDetailPage() {
                       width: '84px',
                       height: '84px',
                       borderRadius: '20px',
-                      background: 'linear-gradient(135deg, rgba(15, 118, 110, 0.12) 0%, rgba(221, 247, 240, 0.6) 100%)',
-                      border: '1px solid rgba(15, 118, 110, 0.25)',
-                      color: '#0F766E',
+                      background: 'linear-gradient(135deg, rgba(0, 96, 250, 0.12) 0%, rgba(235, 243, 255, 0.6) 100%)',
+                      border: '1px solid rgba(0, 96, 250, 0.25)',
+                      color: '#0060FA',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '32px',
                       fontWeight: 800,
                       flexShrink: 0,
-                      boxShadow: '0 4px 12px rgba(15, 118, 110, 0.08)',
+                      boxShadow: '0 4px 12px rgba(0, 96, 250, 0.08)',
                     }}
                   >
-                    <Stethoscope size={44} color="#0F766E" />
+                    <Stethoscope size={44} color="#0060FA" />
                   </div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
@@ -451,7 +451,7 @@ export default function DoctorDetailPage() {
                       )}
                     </div>
 
-                    <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#15313B', marginBottom: '6px', letterSpacing: '-0.02em' }}>
+                    <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#090D14', marginBottom: '6px', letterSpacing: '-0.02em' }}>
                       {doctor.fullName}
                     </h1>
 
@@ -476,7 +476,7 @@ export default function DoctorDetailPage() {
                     <div style={{ fontSize: '11px', color: '#627680', fontWeight: 600, textTransform: 'uppercase' }}>
                       {language === 'en' ? 'BMDC Reg. No.' : 'বিএমডিসি নম্বর'}
                     </div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#15313B', marginTop: '2px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#090D14', marginTop: '2px' }}>
                       {doctor.bmdcNumber}
                     </div>
                   </div>
@@ -485,7 +485,7 @@ export default function DoctorDetailPage() {
                     <div style={{ fontSize: '11px', color: '#627680', fontWeight: 600, textTransform: 'uppercase' }}>
                       {language === 'en' ? 'Clinical Experience' : 'অভিজ্ঞতা'}
                     </div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#15313B', marginTop: '2px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#090D14', marginTop: '2px' }}>
                       {doctor.experienceYears} {language === 'en' ? 'Years' : 'বছর'}
                     </div>
                   </div>
@@ -503,7 +503,7 @@ export default function DoctorDetailPage() {
                     <div style={{ fontSize: '11px', color: '#627680', fontWeight: 600, textTransform: 'uppercase' }}>
                       {language === 'en' ? 'Languages' : 'ভাষা'}
                     </div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#15313B', marginTop: '2px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#090D14', marginTop: '2px' }}>
                       {doctor.languages.join(', ')}
                     </div>
                   </div>
@@ -511,7 +511,7 @@ export default function DoctorDetailPage() {
 
                 {/* Clinical Bio */}
                 <div>
-                  <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#15313B', marginBottom: '8px' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#090D14', marginBottom: '8px' }}>
                     {language === 'en' ? 'Professional Biography & Expertise' : 'পেশাগত পরিচিতি ও দক্ষতা'}
                   </h4>
                   <p style={{ fontSize: '13.5px', color: '#627680', lineHeight: 1.6 }}>
@@ -526,17 +526,17 @@ export default function DoctorDetailPage() {
                   style={{
                     marginTop: '20px',
                     padding: '12px 14px',
-                    background: 'rgba(221, 247, 240, 0.4)',
-                    border: '1px solid rgba(15, 118, 110, 0.2)',
+                    background: 'rgba(235, 243, 255, 0.4)',
+                    border: '1px solid rgba(0, 96, 250, 0.2)',
                     borderRadius: '12px',
                     fontSize: '12px',
-                    color: '#115E59',
+                    color: '#004ED1',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
                   }}
                 >
-                  <Info size={16} color="#0F766E" style={{ flexShrink: 0 }} />
+                  <Info size={16} color="#0060FA" style={{ flexShrink: 0 }} />
                   <span>
                     {language === 'en'
                       ? 'BMDC credentials verified via Directorate General of Health Services (DGHS) database.'
@@ -552,7 +552,7 @@ export default function DoctorDetailPage() {
                   padding: '24px',
                 }}
               >
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#15313B', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#090D14', marginBottom: '16px' }}>
                   {language === 'en' ? 'Practicing Chambers & Branches' : 'চেম্বার ও শাখা সমূহ'}
                 </h3>
 
@@ -564,21 +564,21 @@ export default function DoctorDetailPage() {
                         key={assoc.id}
                         onClick={() => setSelectedAssoc(assoc)}
                         style={{
-                          border: isSelected ? '2px solid #0F766E' : '1px solid rgba(226, 232, 240, 0.8)',
+                          border: isSelected ? '2px solid #0060FA' : '1px solid rgba(226, 232, 240, 0.8)',
                           background: isSelected
-                            ? 'linear-gradient(135deg, rgba(221, 247, 240, 0.45) 0%, rgba(255, 255, 255, 0.85) 100%)'
+                            ? 'linear-gradient(135deg, rgba(235, 243, 255, 0.45) 0%, rgba(255, 255, 255, 0.85) 100%)'
                             : 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
                           borderRadius: '16px',
                           padding: '16px',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
-                          boxShadow: isSelected ? '0 6px 18px rgba(15, 118, 110, 0.12)' : 'none',
+                          boxShadow: isSelected ? '0 6px 18px rgba(0, 96, 250, 0.12)' : 'none',
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                           <div>
-                            <div style={{ fontWeight: 700, fontSize: '15px', color: '#15313B' }}>
+                            <div style={{ fontWeight: 700, fontSize: '15px', color: '#090D14' }}>
                               {assoc.organizationName}
                             </div>
                             <div style={{ fontSize: '13px', color: '#627680', marginTop: '2px' }}>
@@ -587,9 +587,9 @@ export default function DoctorDetailPage() {
                           </div>
                           <span
                             style={{
-                              backgroundColor: isSelected ? '#0F766E' : 'rgba(221, 247, 240, 0.5)',
-                              color: isSelected ? '#FFFFFF' : '#0F766E',
-                              border: isSelected ? 'none' : '1px solid rgba(15, 118, 110, 0.2)',
+                              backgroundColor: isSelected ? '#0060FA' : 'rgba(235, 243, 255, 0.5)',
+                              color: isSelected ? '#FFFFFF' : '#0060FA',
+                              border: isSelected ? 'none' : '1px solid rgba(0, 96, 250, 0.2)',
                               padding: '4px 10px',
                               borderRadius: '8px',
                               fontSize: '12px',
@@ -601,7 +601,7 @@ export default function DoctorDetailPage() {
                         </div>
 
                         <div style={{ fontSize: '12.5px', color: '#627680', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <MapPin size={14} color="#0F766E" />
+                          <MapPin size={14} color="#0060FA" />
                           <span>{assoc.upazilaName}, {assoc.districtName}</span>
                         </div>
 
@@ -623,7 +623,7 @@ export default function DoctorDetailPage() {
                   color: '#627680',
                 }}
               >
-                <h4 style={{ fontWeight: 700, color: '#15313B', marginBottom: '10px' }}>
+                <h4 style={{ fontWeight: 700, color: '#090D14', marginBottom: '10px' }}>
                   {language === 'en' ? 'Chamber Policies & Guidelines' : 'চেম্বার নীতিমালা ও নির্দেশনা'}
                 </h4>
                 <ul style={{ paddingLeft: '18px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: 1.5 }}>
@@ -631,7 +631,7 @@ export default function DoctorDetailPage() {
                   <li>{language === 'en' ? 'Free appointment cancellation up to 2 hours prior to scheduled slot.' : 'স্লটের ২ ঘণ্টা পূর্বে সম্পূর্ণ বিনামূল্যে অ্যাপয়েন্টমেন্ট বাতিল করা যাবে।'}</li>
                   <li>
                     {language === 'en' ? 'Emergency Helpline:' : 'জরুরি হেল্পলাইন:'}{' '}
-                    <strong style={{ color: '#0F766E' }}>01886748564</strong>{' '}
+                    <strong style={{ color: '#0060FA' }}>01886748564</strong>{' '}
                     ({language === 'en' ? 'Diagnostic Care 24/7 Support' : 'ডায়াগনস্টিক কেয়ার সার্বক্ষণিক সহায়তা'})
                   </li>
                 </ul>
@@ -648,14 +648,14 @@ export default function DoctorDetailPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <div>
-                    <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#15313B' }}>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>
                       {language === 'en' ? 'Select Appointment Date' : 'অ্যাপয়েন্টমেন্টের তারিখ নির্বাচন করুন'}
                     </h2>
                     <p style={{ fontSize: '13px', color: '#627680', marginTop: '2px' }}>
                       {selectedAssoc?.branchName || 'Main Branch'} • Asia/Dhaka Timezone
                     </p>
                   </div>
-                  <Calendar size={22} color="#0F766E" />
+                  <Calendar size={22} color="#0060FA" />
                 </div>
 
                 {/* 7-Day Date Carousel */}
@@ -678,12 +678,12 @@ export default function DoctorDetailPage() {
                           minWidth: '82px',
                           padding: '12px 8px',
                           borderRadius: '14px',
-                          border: isSelected ? '2px solid #0F766E' : '1px solid rgba(226, 232, 240, 0.8)',
+                          border: isSelected ? '2px solid #0060FA' : '1px solid rgba(226, 232, 240, 0.8)',
                           background: isSelected
-                            ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)'
+                            ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)'
                             : 'rgba(255, 255, 255, 0.65)',
                           backdropFilter: 'blur(8px)',
-                          color: isSelected ? '#FFFFFF' : '#15313B',
+                          color: isSelected ? '#FFFFFF' : '#090D14',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
@@ -691,7 +691,7 @@ export default function DoctorDetailPage() {
                           cursor: 'pointer',
                           transition: 'all 0.15s ease',
                           flexShrink: 0,
-                          boxShadow: isSelected ? '0 6px 18px rgba(15, 118, 110, 0.25)' : 'none',
+                          boxShadow: isSelected ? '0 6px 18px rgba(0, 96, 250, 0.25)' : 'none',
                         }}
                       >
                         <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', opacity: isSelected ? 0.95 : 0.6 }}>
@@ -705,8 +705,8 @@ export default function DoctorDetailPage() {
                             style={{
                               fontSize: '9px',
                               fontWeight: 700,
-                              backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.25)' : 'rgba(15, 118, 110, 0.12)',
-                              color: isSelected ? '#FFFFFF' : '#0F766E',
+                              backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 96, 250, 0.12)',
+                              color: isSelected ? '#FFFFFF' : '#0060FA',
                               padding: '1px 6px',
                               borderRadius: '4px',
                               marginTop: '2px',
@@ -723,7 +723,7 @@ export default function DoctorDetailPage() {
                 {/* Discrete Slot Grid */}
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#15313B' }}>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#090D14' }}>
                       {language === 'en' ? 'Available Chamber Time Slots' : 'উপলব্ধ সময়সূচি (স্লট)'}
                     </h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '12px' }}>
@@ -747,7 +747,7 @@ export default function DoctorDetailPage() {
                         color: '#627680',
                       }}
                     >
-                      <Clock size={32} color="#0F766E" style={{ margin: '0 auto 8px', opacity: 0.6 }} />
+                      <Clock size={32} color="#0060FA" style={{ margin: '0 auto 8px', opacity: 0.6 }} />
                       <p style={{ fontWeight: 600, fontSize: '14px' }}>
                         {language === 'en'
                           ? 'No chamber consultation sessions scheduled on this date.'
@@ -772,17 +772,17 @@ export default function DoctorDetailPage() {
                             style={{
                               padding: '12px 10px',
                               borderRadius: '14px',
-                              border: isBooked ? '1px solid rgba(226, 232, 240, 0.6)' : '1px solid rgba(15, 118, 110, 0.35)',
-                              background: isBooked ? 'rgba(241, 245, 249, 0.6)' : 'linear-gradient(135deg, rgba(221, 247, 240, 0.45) 0%, rgba(255, 255, 255, 0.8) 100%)',
+                              border: isBooked ? '1px solid rgba(226, 232, 240, 0.6)' : '1px solid rgba(0, 96, 250, 0.35)',
+                              background: isBooked ? 'rgba(241, 245, 249, 0.6)' : 'linear-gradient(135deg, rgba(235, 243, 255, 0.45) 0%, rgba(255, 255, 255, 0.8) 100%)',
                               backdropFilter: 'blur(8px)',
-                              color: isBooked ? '#94A3B8' : '#0F766E',
+                              color: isBooked ? '#94A3B8' : '#0060FA',
                               cursor: isBooked ? 'not-allowed' : 'pointer',
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: 'center',
                               gap: '4px',
                               transition: 'all 0.15s ease',
-                              boxShadow: isBooked ? 'none' : '0 2px 8px rgba(15, 118, 110, 0.08)',
+                              boxShadow: isBooked ? 'none' : '0 2px 8px rgba(0, 96, 250, 0.08)',
                             }}
                           >
                             <span style={{ fontSize: '14px', fontWeight: 800 }}>
@@ -801,18 +801,18 @@ export default function DoctorDetailPage() {
                 {/* 5-minute atomic hold reminder */}
                 <div
                   style={{
-                    background: 'rgba(221, 247, 240, 0.55)',
+                    background: 'rgba(235, 243, 255, 0.55)',
                     borderRadius: '12px',
                     padding: '14px 16px',
-                    border: '1px solid rgba(15, 118, 110, 0.25)',
+                    border: '1px solid rgba(0, 96, 250, 0.25)',
                     fontSize: '12.5px',
-                    color: '#115E59',
+                    color: '#004ED1',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
                   }}
                 >
-                  <Clock size={18} color="#0F766E" style={{ flexShrink: 0 }} />
+                  <Clock size={18} color="#0060FA" style={{ flexShrink: 0 }} />
                   <span>
                     {language === 'en'
                       ? 'Selecting a time slot holds it temporarily for 5 minutes, preventing double bookings.'

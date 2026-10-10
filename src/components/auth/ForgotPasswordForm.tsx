@@ -146,7 +146,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = BRAND_COLORS.primary;
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 96, 250, 0.15)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--glass-border)';
@@ -197,7 +197,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               width: '56px',
               height: '56px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(221, 247, 240, 0.7)',
+              backgroundColor: 'rgba(235, 243, 255, 0.7)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

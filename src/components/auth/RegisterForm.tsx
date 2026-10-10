@@ -195,7 +195,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = BRAND_COLORS.primary;
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 96, 250, 0.15)';
           }}
           onBlur={(e) => {
             e.currentTarget.style.borderColor = fieldErrors.fullName ? '#EF4444' : '#E2E8F0';
@@ -256,7 +256,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = BRAND_COLORS.primary;
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 96, 250, 0.15)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = fieldErrors.phone ? '#EF4444' : '#E2E8F0';
@@ -297,7 +297,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = BRAND_COLORS.primary;
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(15, 118, 110, 0.15)';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 96, 250, 0.15)';
           }}
           onBlur={(e) => {
             e.currentTarget.style.borderColor = fieldErrors.email ? '#EF4444' : '#E2E8F0';

@@ -86,7 +86,7 @@ export default function MobileNavigation({
         justifyContent: 'space-around',
         alignItems: 'center',
         zIndex: 9900,
-        boxShadow: '0 16px 36px rgba(15, 118, 110, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.95)',
+        boxShadow: '0 16px 36px rgba(0, 96, 250, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.95)',
       }}
     >
       {/* 1. Home */}

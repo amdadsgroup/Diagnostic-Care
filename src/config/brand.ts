@@ -30,58 +30,60 @@ export const BRAND_CONSTANTS = {
 } as const;
 
 export const BRAND_COLORS = {
-  // Primary Glassmorphism Healthcare Palette
-  primary: '#0F766E', // Primary Healthcare Teal
-  primaryHover: '#115E59', // Deep Teal
-  primaryActive: '#0B4E4A',
-  primaryLight: '#DDF7F0', // Fresh Mint
-  primaryFaint: 'rgba(15, 118, 110, 0.08)',
+  // Primary Glassmorphism Healthcare Palette (Extracted directly from Diagnostic Care Logo)
+  primary: '#0060FA', // Primary Logo Signal Blue
+  primaryHover: '#004ED1', // Deep Cobalt
+  primaryActive: '#003FA8',
+  primaryLight: '#EBF3FF', // Ice Blue Tint
+  primaryFaint: 'rgba(0, 96, 250, 0.08)',
+  primaryGlow: 'rgba(0, 96, 250, 0.22)',
 
-  // Deep Teal & Accents
-  deepTeal: '#115E59',
-  deepNavy: '#15313B', // Primary Dark Slate
-  freshMint: '#DDF7F0', // Fresh Mint
+  // Logo Deep Ink & Accents
+  deepTeal: '#004ED1',
+  deepNavy: '#090D14', // Primary Dark Slate / Ink from Logo
+  freshMint: '#EBF3FF', // Ice Blue Tint
   secondaryBlue: '#E0F2FE',
-  healthcareTeal: '#0F766E',
+  accentCerulean: '#00A3FF', // Subtle Gradient Shift
+  healthcareTeal: '#0060FA',
 
   // Glassmorphism Surfaces & Canvas
-  background: '#F4F8FA', // Soft Healthcare Canvas Background
-  surface: 'rgba(255, 255, 255, 0.68)', // Translucent Glass Surface
-  surfaceSubtle: 'rgba(255, 255, 255, 0.52)',
-  surfaceElevated: 'rgba(255, 255, 255, 0.85)',
-  glassSurface: 'rgba(255, 255, 255, 0.68)',
-  glassBorder: 'rgba(255, 255, 255, 0.78)',
-  glassCardShadow: '0 10px 30px -4px rgba(15, 118, 110, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9)',
-  glassBtnPrimaryShadow: '0 8px 20px -2px rgba(15, 118, 110, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5)',
-  glassPillShadow: '0 4px 12px rgba(15, 118, 110, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+  background: '#F8FAFC', // Soft Healthcare Canvas Background
+  surface: 'rgba(255, 255, 255, 0.72)', // Translucent Glass Surface
+  surfaceSubtle: 'rgba(255, 255, 255, 0.55)',
+  surfaceElevated: 'rgba(255, 255, 255, 0.88)',
+  glassSurface: 'rgba(255, 255, 255, 0.72)',
+  glassBorder: 'rgba(255, 255, 255, 0.85)',
+  glassCardShadow: '0 12px 32px -4px rgba(0, 96, 250, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95)',
+  glassBtnPrimaryShadow: '0 8px 22px -2px rgba(0, 96, 250, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5)',
+  glassPillShadow: '0 4px 14px rgba(0, 96, 250, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
 
   // Typography & Neutrals (High Contrast WCAG AA)
-  text: '#15313B', // Primary Text
-  textDark: '#15313B', // Deep Heading
-  textSecondary: '#627680', // Secondary Text
-  textMuted: '#8FA0AA',
-  textLight: '#CBD5E1',
+  text: '#090D14', // Primary Text (Logo Ink)
+  textDark: '#090D14', // Deep Heading
+  textSecondary: '#475569', // Secondary Text (Slate)
+  textMuted: '#64748B',
+  textLight: '#94A3B8',
 
   // Glass Borders
-  border: 'rgba(255, 255, 255, 0.78)',
-  borderSubtle: 'rgba(255, 255, 255, 0.55)',
-  borderStrong: 'rgba(15, 118, 110, 0.22)',
-  borderBrand: 'rgba(15, 118, 110, 0.35)',
+  border: 'rgba(255, 255, 255, 0.85)',
+  borderSubtle: 'rgba(255, 255, 255, 0.60)',
+  borderStrong: 'rgba(0, 96, 250, 0.22)',
+  borderBrand: 'rgba(0, 96, 250, 0.35)',
 
   // Fixed colors
   white: '#FFFFFF',
-  black: '#15313B',
+  black: '#090D14',
 
-  // Semantic Status Tokens
-  success: '#15803D',
-  successBg: 'rgba(21, 128, 61, 0.12)',
-  warning: '#B45309',
-  warningBg: 'rgba(180, 83, 9, 0.12)',
-  danger: '#B91C1C',
-  dangerBg: 'rgba(185, 28, 28, 0.12)',
-  error: '#B91C1C',
-  info: '#0F766E',
-  infoBg: 'rgba(15, 118, 110, 0.1)',
+  // Semantic Medical Status Tokens (Strictly distinguishable from brand blue)
+  success: '#10B981', // Clinical Emerald
+  successBg: 'rgba(16, 185, 129, 0.12)',
+  warning: '#F59E0B', // Amber Hold
+  warningBg: 'rgba(245, 158, 11, 0.12)',
+  danger: '#EF4444', // Red Critical
+  dangerBg: 'rgba(239, 68, 68, 0.12)',
+  error: '#EF4444',
+  info: '#0060FA',
+  infoBg: 'rgba(0, 96, 250, 0.10)',
 } as const;
 
 export const BRAND_LOGOS = {

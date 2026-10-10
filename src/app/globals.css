@@ -6,60 +6,61 @@
      Translucent glass panels, frosted blurs, subtle highlights & teal palette
      ========================================================================== */
   
-  /* Primary Healthcare Teal Palette */
-  --brand-primary: #0F766E;          /* Primary Healthcare Teal */
-  --brand-primary-hover: #115E59;    /* Deep Teal */
-  --brand-primary-active: #0B4E4A;
-  --brand-primary-light: #DDF7F0;    /* Fresh Mint */
-  --brand-primary-glow: rgba(15, 118, 110, 0.22);
+  /* Primary Healthcare Logo Palette (Extracted directly from Diagnostic Care Logo) */
+  --brand-primary: #0060FA;          /* Primary Logo Signal Blue */
+  --brand-primary-hover: #004ED1;    /* Deep Cobalt */
+  --brand-primary-active: #003FA8;
+  --brand-primary-light: #EBF3FF;    /* Ice Blue Tint */
+  --brand-primary-glow: rgba(0, 96, 250, 0.22);
   
-  --brand-deep-teal: #115E59;
-  --brand-fresh-mint: #DDF7F0;
-  --brand-teal: #0F766E;
-  --brand-navy: #15313B;             /* Primary Dark Slate Header */
+  --brand-deep-teal: #004ED1;
+  --brand-fresh-mint: #EBF3FF;
+  --brand-teal: #0060FA;
+  --brand-navy: #090D14;             /* Logo Deep Ink Header */
   --brand-secondary-blue: #E0F2FE;
+  --brand-accent-blue: #00A3FF;
 
   /* Canvas & Glass Surfaces */
-  --brand-bg: #F4F8FA;               /* Soft Healthcare Background */
-  --canvas-bg: #F4F8FA;
+  --brand-bg: #F8FAFC;               /* Soft Healthcare Background */
+  --canvas-bg: #F8FAFC;
   
-  --glass-surface: rgba(255, 255, 255, 0.68);
-  --glass-surface-subtle: rgba(255, 255, 255, 0.52);
-  --glass-surface-card: rgba(255, 255, 255, 0.72);
-  --glass-surface-elevated: rgba(255, 255, 255, 0.85);
-  --glass-surface-modal: rgba(255, 255, 255, 0.94);
-  --glass-surface-sunken: rgba(244, 248, 250, 0.75);
+  --glass-surface: rgba(255, 255, 255, 0.72);
+  --glass-surface-subtle: rgba(255, 255, 255, 0.55);
+  --glass-surface-card: rgba(255, 255, 255, 0.75);
+  --glass-surface-elevated: rgba(255, 255, 255, 0.88);
+  --glass-surface-modal: rgba(255, 255, 255, 0.96);
+  --glass-surface-sunken: rgba(240, 246, 255, 0.75);
 
   --brand-surface: var(--glass-surface);
   --brand-surface-card: var(--glass-surface-card);
   --brand-surface-subtle: var(--glass-surface-subtle);
 
   /* Glass Borders */
-  --glass-border: rgba(255, 255, 255, 0.78);
-  --glass-border-subtle: rgba(255, 255, 255, 0.55);
-  --glass-border-teal: rgba(15, 118, 110, 0.2);
-  --glass-border-strong: rgba(15, 118, 110, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-border-subtle: rgba(255, 255, 255, 0.60);
+  --glass-border-teal: rgba(0, 96, 250, 0.18);
+  --glass-border-strong: rgba(0, 96, 250, 0.35);
 
   --brand-border: var(--glass-border);
   --brand-border-subtle: var(--glass-border-subtle);
   --brand-border-brand: var(--glass-border-teal);
 
   /* High Contrast Healthcare Typography (WCAG 2.2 AA) */
-  --brand-text: #15313B;             /* Primary Dark Text */
-  --brand-text-dark: #15313B;        /* Headings */
-  --brand-text-secondary: #627680;   /* Secondary Body Text */
-  --brand-text-muted: #8FA0AA;       /* Subtle Text */
-  --brand-text-light: #CBD5E1;
+  --brand-text: #090D14;             /* Primary Dark Text (Logo Ink) */
+  --brand-text-dark: #090D14;        /* Headings */
+  --brand-text-secondary: #475569;   /* Secondary Body Text */
+  --brand-text-muted: #64748B;       /* Subtle Text */
+  --brand-text-light: #94A3B8;
 
-  /* Semantic Status Tokens */
-  --brand-success: #15803D;
-  --brand-success-bg: rgba(21, 128, 61, 0.12);
-  --brand-warning: #B45309;
-  --brand-warning-bg: rgba(180, 83, 9, 0.12);
-  --brand-danger: #B91C1C;
-  --brand-danger-bg: rgba(185, 28, 28, 0.12);
-  --brand-info: #0F766E;
-  --brand-info-bg: rgba(15, 118, 110, 0.1);
+  /* Semantic Status Tokens (Distinct from Brand Blue) */
+  --brand-success: #10B981;
+  --brand-success-bg: rgba(16, 185, 129, 0.12);
+  --brand-warning: #F59E0B;
+  --brand-warning-bg: rgba(245, 158, 11, 0.12);
+  --brand-danger: #EF4444;
+  --brand-danger-bg: rgba(239, 68, 68, 0.12);
+  --brand-info: #0060FA;
+  --brand-info-bg: rgba(0, 96, 250, 0.10);
 
   /* Glassmorphism Blur Filters */
   --blur-nav: blur(16px);
@@ -68,27 +69,27 @@
   --blur-subtle: blur(8px);
 
   /* Glassmorphism Ambient Shadows */
-  --glass-shadow-sm: 0 4px 16px -2px rgba(17, 94, 89, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  --glass-shadow-sm: 0 4px 16px -2px rgba(0, 96, 250, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
   --glass-shadow-card: 
-    0 10px 30px -4px rgba(15, 118, 110, 0.07),
+    0 12px 32px -4px rgba(0, 96, 250, 0.07),
     0 4px 12px -2px rgba(0, 0, 0, 0.03),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
   --glass-shadow-hover: 
-    0 20px 40px -6px rgba(15, 118, 110, 0.12),
+    0 20px 42px -6px rgba(0, 96, 250, 0.14),
     0 8px 16px -3px rgba(0, 0, 0, 0.04),
     inset 0 1px 2px 0 rgba(255, 255, 255, 1);
   --glass-shadow-modal: 
-    0 25px 60px -10px rgba(17, 94, 89, 0.18),
+    0 25px 60px -10px rgba(9, 13, 20, 0.22),
     0 12px 24px -4px rgba(0, 0, 0, 0.08),
     inset 0 1px 2px 0 rgba(255, 255, 255, 0.95);
   --glass-shadow-btn: 
-    0 8px 20px -2px rgba(15, 118, 110, 0.35),
+    0 8px 22px -2px rgba(0, 96, 250, 0.35),
     inset 0 1px 1px rgba(255, 255, 255, 0.5);
   --glass-shadow-pill: 
-    0 4px 12px rgba(15, 118, 110, 0.06),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    0 4px 14px rgba(0, 96, 250, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.85);
   --glass-shadow-input: 
-    inset 0 2px 4px rgba(17, 94, 89, 0.06),
+    inset 0 2px 4px rgba(0, 96, 250, 0.04),
     0 1px 2px rgba(255, 255, 255, 0.8);
 
   /* Border Radii */
@@ -116,23 +117,23 @@
   --clay-btn-white-shadow: var(--glass-shadow-sm);
   --clay-btn-white-hover: var(--glass-shadow-card);
   --clay-input-shadow: var(--glass-shadow-input);
-  --clay-input-focus: 0 0 0 3px rgba(15, 118, 110, 0.25);
+  --clay-input-focus: 0 0 0 3px rgba(0, 96, 250, 0.25);
   --clay-pill-shadow: var(--glass-shadow-pill);
   --clay-modal-shadow: var(--glass-shadow-modal);
 
-  --navy-950: #15313B;
-  --navy-900: #15313B;
+  --navy-950: #090D14;
+  --navy-900: #090D14;
   --navy-850: #1A3C47;
   --navy-800: #1E4654;
   --navy-700: #245667;
-  --navy-600: #0F766E;
+  --navy-600: #0060FA;
 
-  --cyan-500: #0F766E;
-  --cyan-600: #0F766E;
-  --cyan-50: #DDF7F0;
-  --brand-teal-600: #0F766E;
-  --brand-teal-500: #0F766E;
-  --brand-teal-50: #DDF7F0;
+  --cyan-500: #0060FA;
+  --cyan-600: #0060FA;
+  --cyan-50: #EBF3FF;
+  --brand-teal-600: #0060FA;
+  --brand-teal-500: #0060FA;
+  --brand-teal-50: #EBF3FF;
 
   --emerald-500: #15803D;
   --emerald-600: #166534;
@@ -161,7 +162,7 @@
   --slate-600: #475569;
   --slate-700: #334155;
   --slate-800: #1E293B;
-  --slate-900: #15313B;
+  --slate-900: #090D14;
 
   --shadow-sm: var(--glass-shadow-sm);
   --shadow-md: var(--glass-shadow-card);
@@ -188,9 +189,9 @@ body {
   font-family: var(--font-sans);
   background-color: var(--brand-bg);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(221, 247, 240, 0.6) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(15, 118, 110, 0.08) 0px, transparent 40%),
-    radial-gradient(at 50% 100%, rgba(221, 247, 240, 0.45) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(235, 243, 255, 0.6) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(0, 96, 250, 0.08) 0px, transparent 40%),
+    radial-gradient(at 50% 100%, rgba(235, 243, 255, 0.45) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--brand-text);
   line-height: 1.55;
@@ -210,14 +211,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(15, 118, 110, 0.25);
+  background: rgba(0, 96, 250, 0.25);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 118, 110, 0.45);
+  background: rgba(0, 96, 250, 0.45);
 }
 
 a {
@@ -261,7 +262,7 @@ input, select, textarea {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 10px 30px -5px rgba(15, 118, 110, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 30px -5px rgba(0, 96, 250, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95);
   transition: all 0.25s ease;
 }
 
@@ -269,8 +270,8 @@ input, select, textarea {
 .medical-grid-bg {
   background-color: var(--brand-bg);
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(15, 118, 110, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 90% 80%, rgba(221, 247, 240, 0.6) 0%, transparent 45%);
+    radial-gradient(circle at 10% 20%, rgba(0, 96, 250, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(235, 243, 255, 0.6) 0%, transparent 45%);
 }
 
 .healthcare-hero-bg {
@@ -307,7 +308,7 @@ input, select, textarea {
 .clay-card-interactive:hover {
   transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.82);
-  border-color: rgba(15, 118, 110, 0.35);
+  border-color: rgba(0, 96, 250, 0.35);
   box-shadow: var(--glass-shadow-hover);
 }
 
@@ -331,7 +332,7 @@ input, select, textarea {
 .clay-sunken {
   background: var(--glass-surface-sunken);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(15, 118, 110, 0.12);
+  border: 1px solid rgba(0, 96, 250, 0.12);
   box-shadow: var(--glass-shadow-input);
 }
 
@@ -340,7 +341,7 @@ input, select, textarea {
    ========================================================================== */
 .btn-primary,
 .glass-btn-primary {
-  background: linear-gradient(135deg, #0F766E 0%, #115E59 100%) !important;
+  background: linear-gradient(135deg, #0060FA 0%, #004ED1 100%) !important;
   color: #FFFFFF !important;
   padding: 12px 24px;
   border-radius: var(--radius-pill);
@@ -359,21 +360,21 @@ input, select, textarea {
 
 .btn-primary:hover,
 .glass-btn-primary:hover {
-  background: linear-gradient(135deg, #115E59 0%, #0B4E4A 100%) !important;
+  background: linear-gradient(135deg, #004ED1 0%, #003FA8 100%) !important;
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px -2px rgba(15, 118, 110, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 26px -2px rgba(0, 96, 250, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.6);
   border-color: rgba(255, 255, 255, 0.6);
 }
 
 .btn-primary:active,
 .glass-btn-primary:active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 96, 250, 0.3);
 }
 
 .btn-cyan,
 .btn-teal {
-  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%) !important;
+  background: linear-gradient(135deg, #0060FA 0%, #14B8A6 100%) !important;
   color: #FFFFFF !important;
   padding: 11px 22px;
   border-radius: var(--radius-pill);
@@ -392,7 +393,7 @@ input, select, textarea {
 .btn-cyan:hover,
 .btn-teal:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.35);
+  box-shadow: 0 12px 24px rgba(0, 96, 250, 0.35);
 }
 
 .btn-outline,
@@ -423,13 +424,13 @@ input, select, textarea {
   transform: translateY(-2px);
   box-shadow: var(--glass-shadow-card);
   color: var(--brand-primary) !important;
-  border-color: rgba(15, 118, 110, 0.35) !important;
+  border-color: rgba(0, 96, 250, 0.35) !important;
 }
 
 .btn-brand-subtle {
   background: var(--brand-fresh-mint) !important;
   color: var(--brand-primary) !important;
-  border: 1px solid rgba(15, 118, 110, 0.2);
+  border: 1px solid rgba(0, 96, 250, 0.2);
   border-radius: var(--radius-pill);
   font-weight: 700;
   display: inline-flex;
@@ -536,7 +537,7 @@ input, select, textarea {
   align-items: center;
   justify-content: space-between;
   padding: 18px 22px;
-  background: linear-gradient(135deg, #15313B 0%, #115E59 100%);
+  background: linear-gradient(135deg, #090D14 0%, #004ED1 100%);
   color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -624,7 +625,7 @@ input, select, textarea {
   width: 100%;
   padding: 12px 18px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(15, 118, 110, 0.18);
+  border: 1px solid rgba(0, 96, 250, 0.18);
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: var(--blur-subtle);
   -webkit-backdrop-filter: var(--blur-subtle);
@@ -645,13 +646,13 @@ input, select, textarea {
 .auth-field textarea:focus {
   background: #FFFFFF;
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.22);
+  box-shadow: 0 0 0 3px rgba(0, 96, 250, 0.22);
 }
 
 .auth-input-group {
   display: flex;
   align-items: center;
-  border: 1px solid rgba(15, 118, 110, 0.18);
+  border: 1px solid rgba(0, 96, 250, 0.18);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.78);
   box-shadow: var(--glass-shadow-input);
@@ -662,7 +663,7 @@ input, select, textarea {
 .auth-input-group:focus-within {
   background: #FFFFFF;
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.22);
+  box-shadow: 0 0 0 3px rgba(0, 96, 250, 0.22);
 }
 
 .auth-input-prefix {
@@ -670,8 +671,8 @@ input, select, textarea {
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--slate-600);
-  background: rgba(221, 247, 240, 0.5);
-  border-right: 1px solid rgba(15, 118, 110, 0.15);
+  background: rgba(235, 243, 255, 0.5);
+  border-right: 1px solid rgba(0, 96, 250, 0.15);
   height: 46px;
   display: flex;
   align-items: center;
@@ -690,7 +691,7 @@ input, select, textarea {
 }
 
 .auth-submit-btn {
-  background: linear-gradient(135deg, #0F766E 0%, #115E59 100%);
+  background: linear-gradient(135deg, #0060FA 0%, #004ED1 100%);
   color: white;
   padding: 13px 22px;
   border-radius: var(--radius-pill);
@@ -707,9 +708,9 @@ input, select, textarea {
 }
 
 .auth-submit-btn:hover {
-  background: linear-gradient(135deg, #115E59 0%, #0B4E4A 100%);
+  background: linear-gradient(135deg, #004ED1 0%, #003FA8 100%);
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.4);
+  box-shadow: 0 12px 24px rgba(0, 96, 250, 0.4);
 }
 
 .auth-submit-btn:disabled {
@@ -747,12 +748,12 @@ input, select, textarea {
 .glass-pill:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(15, 118, 110, 0.35);
+  border-color: rgba(0, 96, 250, 0.35);
   box-shadow: var(--glass-shadow-card);
 }
 
 .day-pill.selected {
-  background: linear-gradient(135deg, #0F766E 0%, #115E59 100%) !important;
+  background: linear-gradient(135deg, #0060FA 0%, #004ED1 100%) !important;
   color: #FFFFFF !important;
   border-color: rgba(255, 255, 255, 0.45) !important;
   box-shadow: var(--glass-shadow-btn) !important;
@@ -762,8 +763,8 @@ input, select, textarea {
 .glass-badge-teal,
 .clay-badge-teal {
   background: var(--brand-fresh-mint);
-  color: #0F766E;
-  border-color: rgba(15, 118, 110, 0.25);
+  color: #0060FA;
+  border-color: rgba(0, 96, 250, 0.25);
 }
 
 .glass-badge-success,
@@ -816,7 +817,7 @@ input, select, textarea {
     justify-content: space-around;
     align-items: center;
     z-index: 9900;
-    box-shadow: 0 16px 36px rgba(15, 118, 110, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+    box-shadow: 0 16px 36px rgba(0, 96, 250, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.95);
   }
 
   .mobile-dock-item {
@@ -837,7 +838,7 @@ input, select, textarea {
   .mobile-dock-item.active {
     color: var(--brand-primary);
     background: var(--brand-fresh-mint);
-    border: 1px solid rgba(15, 118, 110, 0.15);
+    border: 1px solid rgba(0, 96, 250, 0.15);
     transform: translateY(-2px);
   }
 }
@@ -881,7 +882,7 @@ input, select, textarea {
 .portal-stat-card:hover {
   transform: translateY(-3px);
   background: rgba(255, 255, 255, 0.82);
-  border-color: rgba(15, 118, 110, 0.3);
+  border-color: rgba(0, 96, 250, 0.3);
   box-shadow: var(--glass-shadow-hover);
 }
 
@@ -941,8 +942,8 @@ input, select, textarea {
 }
 
 .beacon-dot.cyan {
-  background-color: #0F766E;
-  box-shadow: 0 0 10px #0F766E;
+  background-color: #0060FA;
+  box-shadow: 0 0 10px #0060FA;
 }
 
 @keyframes beaconPulse {

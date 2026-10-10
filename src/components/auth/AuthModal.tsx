@@ -73,7 +73,7 @@ export default function AuthModal({
           position: 'relative',
           backgroundColor: '#FFFFFF',
           borderRadius: '24px',
-          boxShadow: '0 25px 50px -12px rgba(15, 118, 110, 0.25)',
+          boxShadow: '0 25px 50px -12px rgba(0, 96, 250, 0.25)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
