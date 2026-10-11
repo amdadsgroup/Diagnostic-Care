@@ -21,6 +21,7 @@ import {
   Clock,
   FileText,
   MessageSquare,
+  Building2,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -132,8 +133,37 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Right: Emergency 24/7 Helpline & Language */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {/* Right: Emergency 24/7 Helpline, Provider Hub & Language */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Hospital & Doctor Access Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('provider-hub');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-hospital-portal', { detail: { mode: 'login' } }));
+                }
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                background: 'rgba(59, 130, 246, 0.25)',
+                border: '1px solid rgba(96, 165, 250, 0.45)',
+                color: '#93C5FD',
+                padding: '2px 9px',
+                borderRadius: '9999px',
+                fontSize: '11px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Building2 size={12} color="#93C5FD" />
+              <span>{language === 'en' ? 'Hospital & Doctor Portal' : 'হাসপাতাল ও ডাক্তার পোর্টাল'}</span>
+            </button>
+
             <a
               href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
               style={{

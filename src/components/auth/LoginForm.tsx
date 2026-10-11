@@ -361,17 +361,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               : 'Doctor, Hospital or Diagnostic Center?'}
           </span>
         </div>
-        <a
-          href="/#provider-hub"
+        <button
+          type="button"
+          onClick={() => {
+            if (onClose) onClose();
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('open-hospital-portal', { detail: { mode: 'login' } }));
+              const el = document.getElementById('provider-hub');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+          }}
           style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
             color: BRAND_COLORS.primary,
             fontWeight: 800,
-            textDecoration: 'none',
+            cursor: 'pointer',
             whiteSpace: 'nowrap',
+            fontSize: '12.5px',
           }}
         >
           {language === 'bn' ? 'নিবন্ধন ও লগইন →' : 'Hospital & Doctor Hub →'}
-        </a>
+        </button>
       </div>
 
       {/* Customer Care Helpline */}

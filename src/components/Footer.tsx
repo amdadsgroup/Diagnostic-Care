@@ -34,6 +34,36 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
   const [isHospitalAuthOpen, setIsHospitalAuthOpen] = useState(false);
   const [hospitalAuthMode, setHospitalAuthMode] = useState<'login' | 'register'>('login');
 
+  React.useEffect(() => {
+    const handleHash = () => {
+      if (typeof window !== 'undefined' && window.location.hash === '#provider-hub') {
+        const el = document.getElementById('provider-hub');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        setIsHospitalAuthOpen(true);
+      }
+    };
+
+    const handleCustomEvent = (e: any) => {
+      const mode = e?.detail?.mode || 'login';
+      setHospitalAuthMode(mode);
+      setIsHospitalAuthOpen(true);
+      const el = document.getElementById('provider-hub');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.addEventListener('hashchange', handleHash);
+    window.addEventListener('open-hospital-portal', handleCustomEvent);
+
+    if (typeof window !== 'undefined' && window.location.hash === '#provider-hub') {
+      setIsHospitalAuthOpen(true);
+    }
+
+    return () => {
+      window.removeEventListener('hashchange', handleHash);
+      window.removeEventListener('open-hospital-portal', handleCustomEvent);
+    };
+  }, []);
+
   const handleLinkClick = (tab: string, category?: string) => {
     if (onNavigateTab) {
       onNavigateTab(tab, category);

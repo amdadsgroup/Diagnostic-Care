@@ -15,7 +15,6 @@ import { LiveQueueCard } from '@/components/LiveQueueCard';
 import { DoctorAssistantView } from '@/components/DoctorAssistantView';
 import { SuperAdminView } from '@/components/SuperAdminView';
 import AuthModal from '@/components/auth/AuthModal';
-import HospitalAuthModal from '@/components/provider/HospitalAuthModal';
 import DoctorPortal from '@/components/doctor/DoctorPortal';
 import PatientDashboard from '@/components/patient/PatientDashboard';
 import LiveQueueTracker from '@/components/queue/LiveQueueTracker';
@@ -476,7 +475,13 @@ export default function HomePage() {
           setAuthModalMode(mode);
           setIsAuthModalOpen(true);
         }}
-        onOpenOnboard={() => setIsProviderOnboardOpen(true)}
+        onOpenOnboard={() => {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('open-hospital-portal', { detail: { mode: 'register' } }));
+            const el = document.getElementById('provider-hub');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
         selectedLocation={selectedLocation}
         onOpenLocation={() => setIsLocationModalOpen(true)}
         onSelectCategory={handleCategorySelection}
@@ -1344,15 +1349,6 @@ export default function HomePage() {
         }}
       />
 
-      {/* HOSPITAL & PROVIDER ACCESS SYSTEM */}
-      <HospitalAuthModal
-        isOpen={isProviderOnboardOpen}
-        onClose={() => setIsProviderOnboardOpen(false)}
-        defaultMode="register"
-        onSuccess={() => {
-          setIsProviderOnboardOpen(false);
-        }}
-      />
 
       {/* DIGITAL PRESCRIPTION SLIP MODAL */}
       <PrescriptionSlipModal

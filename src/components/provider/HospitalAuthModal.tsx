@@ -38,6 +38,14 @@ export default function HospitalAuthModal({
   const { language } = useLanguage();
   const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
 
+  React.useEffect(() => {
+    if (isOpen) {
+      setMode(defaultMode);
+      setErrorMessage('');
+      setSuccessMessage('');
+    }
+  }, [defaultMode, isOpen]);
+
   // Login form state
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
