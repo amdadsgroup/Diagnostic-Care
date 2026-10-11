@@ -54,6 +54,12 @@ const SECTION_METADATA: Record<AdminSection, SectionMeta> = {
     title: 'Operational Overview & Executive Metrics',
     titleBn: 'অপারেশনাল ওভারভিউ ও এক্সিকিউটিভ মেট্রিক্স',
   },
+  subscriptions: {
+    category: 'Business Operations',
+    categoryBn: 'বিজনেস অপারেশনস',
+    title: 'Subscription Operations & Provider Billing Hub',
+    titleBn: 'সাবস্ক্রিপশন অপারেশনস ও প্রোভাইডার বিলিং হাব',
+  },
   doctors: {
     category: 'Healthcare Operations',
     categoryBn: 'হেলথকেয়ার অপারেশনস',

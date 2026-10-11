@@ -6,13 +6,15 @@ import {
   Save,
   Phone,
   Shield,
-  Percent,
+  CreditCard,
   CheckCircle2,
   RefreshCw,
   AlertTriangle,
   Globe,
+  Repeat,
 } from 'lucide-react';
 import { BRAND_COLORS, BRAND_CONSTANTS } from '@/config/brand';
+import { useAdminTheme } from '../AdminThemeContext';
 
 interface SystemSettingsTabProps {
   language: 'en' | 'bn';
@@ -20,13 +22,17 @@ interface SystemSettingsTabProps {
 }
 
 export default function SystemSettingsTab({ language, adminEmail }: SystemSettingsTabProps) {
+  const { theme, tokens } = useAdminTheme();
+
   const [config, setConfig] = useState<{
     brandName: string;
     tagline: string;
     customerCarePhone: string;
     companyEmail: string;
-    platformCommissionPercent: number;
+    primaryRevenueModel: string;
+    patientBookingTakeRate: number;
     currencySymbol: string;
+    sslcommerzActive: boolean;
     smsGatewayActive: boolean;
     maintenanceMode: boolean;
   }>({
@@ -34,8 +40,10 @@ export default function SystemSettingsTab({ language, adminEmail }: SystemSettin
     tagline: BRAND_CONSTANTS.TAGLINE,
     customerCarePhone: BRAND_CONSTANTS.CUSTOMER_CARE_PHONE,
     companyEmail: BRAND_CONSTANTS.COMPANY_EMAIL,
-    platformCommissionPercent: 10.0,
+    primaryRevenueModel: 'B2B Provider Subscriptions (Monthly & Annual)',
+    patientBookingTakeRate: 0.0,
     currencySymbol: BRAND_CONSTANTS.CURRENCY_SYMBOL,
+    sslcommerzActive: true,
     smsGatewayActive: true,
     maintenanceMode: false,
   });
@@ -49,24 +57,25 @@ export default function SystemSettingsTab({ language, adminEmail }: SystemSettin
   };
 
   return (
-    <div style={{ maxWidth: '720px' }}>
+    <div style={{ maxWidth: '780px' }}>
       <form
         onSubmit={handleSubmit}
         style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '18px',
+          backgroundColor: tokens.cardBg,
+          backdropFilter: tokens.backdropBlur,
+          borderRadius: '20px',
           padding: '28px',
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
+          border: `1px solid ${tokens.cardBorder}`,
+          boxShadow: tokens.cardShadow,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '22px' }}>
           <Settings size={22} color={BRAND_COLORS.primary} />
           <div>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-              {language === 'bn' ? 'প্ল্যাটফর্ম গ্লোবাল সেটিংস' : 'Platform System Settings'}
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: tokens.textPrimary, margin: 0 }}>
+              {language === 'bn' ? 'প্ল্যাটফর্ম ও সাবস্ক্রিপশন গ্লোবাল কনফিগারেশন' : 'Platform & Subscription System Settings'}
             </h3>
-            <div style={{ fontSize: '12px', color: '#64748B' }}>
+            <div style={{ fontSize: '12px', color: tokens.textMuted }}>
               Centralized marketplace configuration and operational parameters
             </div>
           </div>
@@ -75,25 +84,43 @@ export default function SystemSettingsTab({ language, adminEmail }: SystemSettin
         {/* Brand Name & Tagline */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
               Brand Name:
             </label>
             <input
               type="text"
               value={config.brandName}
               onChange={(e) => setConfig({ ...config, brandName: e.target.value })}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid #CBD5E1', fontSize: '13px', boxSizing: 'border-box' }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: `1px solid ${tokens.inputBorder}`,
+                backgroundColor: tokens.inputBg,
+                color: tokens.textPrimary,
+                fontSize: '13px',
+                boxSizing: 'border-box',
+              }}
             />
           </div>
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
               Tagline:
             </label>
             <input
               type="text"
               value={config.tagline}
               onChange={(e) => setConfig({ ...config, tagline: e.target.value })}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid #CBD5E1', fontSize: '13px', boxSizing: 'border-box' }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: `1px solid ${tokens.inputBorder}`,
+                backgroundColor: tokens.inputBg,
+                color: tokens.textPrimary,
+                fontSize: '13px',
+                boxSizing: 'border-box',
+              }}
             />
           </div>
         </div>
@@ -101,80 +128,142 @@ export default function SystemSettingsTab({ language, adminEmail }: SystemSettin
         {/* Customer Care Hotline & Email */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
-              Customer Care Phone (24/7):
+            <label style={{ fontSize: '12.5px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
+              Customer Care Hotline (24/7):
             </label>
             <input
               type="text"
               value={config.customerCarePhone}
               onChange={(e) => setConfig({ ...config, customerCarePhone: e.target.value })}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid #CBD5E1', fontSize: '13px', boxSizing: 'border-box' }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: `1px solid ${tokens.inputBorder}`,
+                backgroundColor: tokens.inputBg,
+                color: tokens.textPrimary,
+                fontSize: '13px',
+                boxSizing: 'border-box',
+              }}
             />
           </div>
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
               Official Support Email:
             </label>
             <input
               type="email"
               value={config.companyEmail}
               onChange={(e) => setConfig({ ...config, companyEmail: e.target.value })}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid #CBD5E1', fontSize: '13px', boxSizing: 'border-box' }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: `1px solid ${tokens.inputBorder}`,
+                backgroundColor: tokens.inputBg,
+                color: tokens.textPrimary,
+                fontSize: '13px',
+                boxSizing: 'border-box',
+              }}
             />
           </div>
         </div>
 
-        {/* Commission Rate & Currency */}
+        {/* Business Model Policy Parameters */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '22px' }}>
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
-              Default Platform Commission Rate (%):
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              value={config.platformCommissionPercent}
-              onChange={(e) => setConfig({ ...config, platformCommissionPercent: parseFloat(e.target.value) || 0 })}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid #CBD5E1', fontSize: '13px', boxSizing: 'border-box' }}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
-              Default Currency:
+            <label style={{ fontSize: '12.5px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
+              Primary Revenue Architecture:
             </label>
             <input
               type="text"
-              disabled
-              value="Bangladeshi Taka (৳ BDT)"
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', fontSize: '13px', boxSizing: 'border-box' }}
+              readOnly
+              value={config.primaryRevenueModel}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: `1px solid ${tokens.inputBorder}`,
+                backgroundColor: tokens.cardBgSubtle,
+                color: tokens.primary,
+                fontWeight: 700,
+                fontSize: '12.5px',
+                boxSizing: 'border-box',
+                cursor: 'not-allowed',
+              }}
             />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12.5px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
+              Patient Booking Commission Take-Rate:
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                readOnly
+                value="0.0% (Zero Booking Deductions Policy)"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  border: `1px solid ${tokens.inputBorder}`,
+                  backgroundColor: tokens.cardBgSubtle,
+                  color: '#10B981',
+                  fontWeight: 700,
+                  fontSize: '12.5px',
+                  boxSizing: 'border-box',
+                  cursor: 'not-allowed',
+                }}
+              />
+            </div>
           </div>
         </div>
 
+        {/* Gateway & Infrastructure Toggles */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', backgroundColor: tokens.cardBgSubtle, borderRadius: '12px', marginBottom: '24px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 700, color: tokens.textPrimary, cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={config.sslcommerzActive}
+              onChange={(e) => setConfig({ ...config, sslcommerzActive: e.target.checked })}
+            />
+            SSLCommerz & Local MFS Gateways Enabled (Cards, bKash, Nagad)
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 700, color: tokens.textPrimary, cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={config.smsGatewayActive}
+              onChange={(e) => setConfig({ ...config, smsGatewayActive: e.target.checked })}
+            />
+            SMS Gateway Alerts Active (Greenweb / SSL Wireless)
+          </label>
+        </div>
+
         {saved && (
-          <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: '#F0FDF4', color: '#16A34A', fontSize: '12.5px', fontWeight: 700, marginBottom: '16px' }}>
-            ✓ Platform settings updated successfully.
+          <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: '#10B981', fontSize: '12.5px', fontWeight: 700, marginBottom: '14px' }}>
+            ✓ Platform settings updated and synchronized with central server.
           </div>
         )}
 
         <button
           type="submit"
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
+            padding: '11px 24px',
             backgroundColor: BRAND_COLORS.primary,
-            color: '#FFFFFF',
             border: 'none',
-            padding: '11px 22px',
+            color: '#FFFFFF',
             borderRadius: '10px',
             fontSize: '13px',
             fontWeight: 700,
             cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
           <Save size={16} />
-          <span>{language === 'bn' ? 'সেটিংস সংরক্ষণ করুন' : 'Save System Settings'}</span>
+          <span>{language === 'bn' ? 'সেটিংস সংরক্ষণ করুন' : 'Save System Configuration'}</span>
         </button>
       </form>
     </div>

@@ -1,5 +1,6 @@
 export type AdminSection =
   | 'dashboard'
+  | 'subscriptions'
   | 'users'
   | 'doctors'
   | 'hospitals'
@@ -37,9 +38,9 @@ export interface PlatformSettings {
   brandName: string;
   helplinePhone: string;
   companyEmail: string;
-  platformCommissionRate: number;
-  currencySymbol: string;
+  defaultCurrency: string;
   isMaintenanceMode: boolean;
   smsGatewayActive: boolean;
   bmdcVerificationApiActive: boolean;
+  primaryRevenueModel: 'SUBSCRIPTION_RECURRING';
 }

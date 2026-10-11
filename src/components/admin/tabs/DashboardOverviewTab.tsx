@@ -288,7 +288,7 @@ export default function DashboardOverviewTab({
               }}
             >
               <Sparkles size={13} color="#38BDF8" />
-              {language === 'bn' ? 'মোট প্ল্যাটফর্ম লেনদেন ও আয়' : 'TOTAL PLATFORM VOLUME (VERIFIED REALTIME)'}
+              {language === 'bn' ? 'প্রোভাইডার রিকারিং সাবস্ক্রিপশন ও প্ল্যাটফর্ম ভলিউম' : 'PROVIDER RECURRING SUBSCRIPTIONS & PLATFORM VOLUME'}
             </span>
           </div>
           <div
@@ -307,8 +307,8 @@ export default function DashboardOverviewTab({
           </div>
           <div style={{ fontSize: '12px', color: '#CBD5E1', marginTop: '6px' }}>
             {language === 'bn'
-              ? 'সরাসরি সম্পন্ন অ্যাপয়েন্টমেন্ট ও রিয়েলটাইম রেকর্ড থেকে প্রাপ্ত • প্ল্যাটফর্ম কমিশন ১০% হারে সংরক্ষিত'
-              : 'Computed directly from verified database appointments • Standard 10% platform commission model'}
+              ? 'ডায়াগনস্টিক সেন্টার ও হাসপাতাল সাবস্ক্রিপশন রাজস্ব • ০% রোগী কমিশন পলিসি'
+              : 'Predictable B2B recurring provider subscription revenue • 0% patient commission policy'}
           </div>
         </div>
 

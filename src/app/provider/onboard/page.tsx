@@ -6,7 +6,7 @@ import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import { useLanguage } from '@/context/LanguageContext';
-import { ArrowLeft, Building2, CheckCircle2, ShieldCheck, PhoneCall } from 'lucide-react';
+import { ArrowLeft, Building2, TestTube2, CheckCircle2, ShieldCheck, Sparkles, PhoneCall } from 'lucide-react';
 import LoadingButton from '@/components/auth/LoadingButton';
 import FormField from '@/components/auth/FormField';
 import { AuthError, AuthSuccess } from '@/components/auth/AuthAlerts';
@@ -14,14 +14,17 @@ import { AuthError, AuthSuccess } from '@/components/auth/AuthAlerts';
 export default function ProviderOnboardPage() {
   const { language } = useLanguage();
 
-  const [providerType, setProviderType] = useState('HOSPITAL');
+  const [providerType, setProviderType] = useState<'HOSPITAL' | 'DIAGNOSTIC_CENTER'>('DIAGNOSTIC_CENTER');
   const [orgName, setOrgName] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [email, setEmail] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
+  const [dghsNumber, setDghsNumber] = useState('');
   const [district, setDistrict] = useState('Moulvibazar');
   const [address, setAddress] = useState('');
+  const [selectedPlanTier, setSelectedPlanTier] = useState<'basic' | 'professional' | 'premium' | 'enterprise'>('professional');
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly');
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -34,8 +37,8 @@ export default function ProviderOnboardPage() {
     if (!orgName.trim() || !contactName.trim() || !contactPhone.trim()) {
       setError(
         language === 'bn'
-          ? 'অনুগ্রহ করে হাসপাতালের নাম, যোগাযোগের ব্যক্তি ও মোবাইল নম্বর লিখুন।'
-          : 'Please provide hospital name, contact person name, and mobile number.'
+          ? 'অনুগ্রহ করে প্রতিষ্ঠানের নাম, যোগাযোগের ব্যক্তি ও মোবাইল নম্বর লিখুন।'
+          : 'Please provide organization name, contact person name, and mobile number.'
       );
       return;
     }
@@ -47,14 +50,17 @@ export default function ProviderOnboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          providerType: 'HOSPITAL',
+          providerType,
           organizationName: orgName.trim(),
           contactPerson: contactName.trim(),
           phone: contactPhone.trim(),
           email: email.trim(),
           licenseNumber: licenseNumber.trim(),
+          dghsNumber: dghsNumber.trim(),
           district,
           address: address.trim(),
+          selectedPlanTier,
+          billingInterval,
         }),
       });
 
@@ -115,7 +121,7 @@ export default function ProviderOnboardPage() {
       </header>
 
       {/* Main Container */}
-      <main style={{ maxWidth: '820px', margin: '0 auto', padding: '40px 20px 80px' }}>
+      <main style={{ maxWidth: '860px', margin: '0 auto', padding: '40px 20px 80px' }}>
         <div
           style={{
             backgroundColor: '#FFFFFF',
@@ -125,19 +131,19 @@ export default function ProviderOnboardPage() {
             border: '1px solid #E2E8F0',
           }}
         >
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#0057FF', fontWeight: 700, fontSize: '13px', marginBottom: '12px' }}>
-            <Building2 size={16} />
-            <span>{language === 'bn' ? 'হাসপাতাল অনবোর্ডিং পোর্টাল' : 'HOSPITAL ONBOARDING PORTAL'}</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: BRAND_COLORS.primary, fontWeight: 700, fontSize: '13px', marginBottom: '12px' }}>
+            <Sparkles size={16} />
+            <span>{language === 'bn' ? 'প্রোভাইডার অনবোর্ডিং ও পার্টনারশিপ' : 'HEALTHCARE PROVIDER ONBOARDING'}</span>
           </div>
 
           <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginBottom: '8px', lineHeight: 1.25 }}>
-            {language === 'bn' ? 'হাসপাতাল পার্টনারশিপ ও অনবোর্ডিং' : 'Hospital Partnership & Onboarding'}
+            {language === 'bn' ? 'ডায়াগনস্টিক সেন্টার ও হাসপাতাল রেজিস্ট্রি' : 'Diagnostic Center & Hospital Partnership'}
           </h1>
 
           <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '32px', lineHeight: 1.5 }}>
             {language === 'bn'
-              ? 'ডায়াগনস্টিক কেয়ার প্ল্যাটফর্মে আপনার হাসপাতাল বা স্পেশালাইজড ক্লিনিক যুক্ত করুন। ডাক্তার শিডিউল, ইনপেশেন্ট ও ওপিডি সুবিধা ডিজিটালাইজ করুন।'
-              : 'Register your hospital with Diagnostic Care. Manage outpatient doctor chambers, patient queue workflows, and connect with thousands of patients.'}
+              ? 'ডায়াগনস্টিক কেয়ার সাবস্ক্রিপশন প্ল্যাটফর্মে যুক্ত হোন। রোগীদের নিকট আপনার ল্যাব টেস্ট, ডাক্তার চেম্বার ও হাসপাতালের সেবা ডিজিটালাইজ করুন। কোনো রোগী কমিশন নেই।'
+              : 'Join Bangladesh’s premier healthcare marketplace. List test catalogs, chamber appointments, and multi-branch services with predictable recurring subscriptions.'}
           </p>
 
           {error && <AuthError message={error} onDismiss={() => setError('')} />}
@@ -160,62 +166,106 @@ export default function ProviderOnboardPage() {
                 <CheckCircle2 size={36} />
               </div>
               <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', marginBottom: '10px' }}>
-                {language === 'bn' ? 'আবেদন সফলভাবে গৃহীত হয়েছে!' : 'Application Submitted Successfully!'}
+                {language === 'bn' ? 'আবেদন ও প্ল্যান রেজিস্ট্রেশন সম্পন্ন!' : 'Registration & Plan Selection Submitted!'}
               </h2>
-              <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '480px', margin: '0 auto 28px', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '520px', margin: '0 auto 28px', lineHeight: 1.6 }}>
                 {language === 'bn'
-                  ? 'আমাদের ভেরিফিকেশন ও অনবোর্ডিং টিম শীঘ্রই আপনার সাথে যোগাযোগ করবে এবং আপনার পোর্টাল অ্যাক্টিভেট করবে।'
-                  : 'Our healthcare onboarding operations team will verify your credentials and contact you within 24 hours to activate your provider console.'}
+                  ? `আমাদের ডিজিএইচএস ও লাইসেন্স ভেরিফিকেশন টিম আপনার তথ্য নিরীক্ষা করছে। আপনি সরাসরি আপনার প্রোভাইডার সাবস্ক্রিপশন পোর্টালে গিয়ে বিস্তারিত দেখতে ও বিলিং সেটআপ করতে পারেন।`
+                  : `Our DGHS and trade license verification team is reviewing your credentials. You can now access your provider subscription console to manage billing and invoices.`}
               </p>
-              <Link
-                href="/"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  padding: '12px 24px',
-                  backgroundColor: '#0057FF',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  borderRadius: '10px',
-                  textDecoration: 'none',
-                }}
-              >
-                {language === 'bn' ? 'মার্কেটপ্লেসে ফিরুন' : 'Return to Marketplace'}
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} noValidate>
-              {/* Provider Category Selection: Hospital Only */}
-              <div style={{ marginBottom: '22px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#1E293B', marginBottom: '8px' }}>
-                  {language === 'bn' ? 'প্রতিষ্ঠানের ধরন' : 'Healthcare Facility Type'}
-                </label>
-                <div
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link
+                  href="/provider/subscription"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '10px',
-                    padding: '12px 20px',
-                    borderRadius: '12px',
-                    backgroundColor: '#EFF6FF',
-                    border: '2px solid #0057FF',
-                    color: '#0057FF',
+                    padding: '12px 24px',
+                    backgroundColor: BRAND_COLORS.primary,
+                    color: '#FFFFFF',
                     fontWeight: 700,
                     fontSize: '14px',
+                    borderRadius: '10px',
+                    textDecoration: 'none',
                   }}
                 >
-                  <Building2 size={20} />
-                  <span>{language === 'bn' ? 'হাসপাতাল ও ক্লিনিক (Hospital & Clinic)' : 'Hospital & Clinic'}</span>
+                  {language === 'bn' ? 'সাবস্ক্রিপশন পোর্টালে যান' : 'Go to Subscription Portal'}
+                </Link>
+                <Link
+                  href="/"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '12px 24px',
+                    backgroundColor: '#F1F5F9',
+                    color: '#334155',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    borderRadius: '10px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {language === 'bn' ? 'মার্কেটপ্লেসে ফিরুন' : 'Return to Marketplace'}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Step 1: Provider Category Selection */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#1E293B', marginBottom: '8px' }}>
+                  {language === 'bn' ? '১. প্রতিষ্ঠানের ধরন নির্বাচন করুন' : '1. Select Healthcare Facility Type'} *
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setProviderType('DIAGNOSTIC_CENTER')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '14px 18px',
+                      borderRadius: '12px',
+                      border: `2px solid ${providerType === 'DIAGNOSTIC_CENTER' ? BRAND_COLORS.primary : '#E2E8F0'}`,
+                      backgroundColor: providerType === 'DIAGNOSTIC_CENTER' ? '#EFF6FF' : '#FFFFFF',
+                      color: providerType === 'DIAGNOSTIC_CENTER' ? BRAND_COLORS.primary : '#334155',
+                      fontWeight: 700,
+                      fontSize: '13.5px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <TestTube2 size={20} />
+                    <span>{language === 'bn' ? 'ডায়াগনস্টিক সেন্টার' : 'Diagnostic Center'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setProviderType('HOSPITAL')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '14px 18px',
+                      borderRadius: '12px',
+                      border: `2px solid ${providerType === 'HOSPITAL' ? BRAND_COLORS.primary : '#E2E8F0'}`,
+                      backgroundColor: providerType === 'HOSPITAL' ? '#EFF6FF' : '#FFFFFF',
+                      color: providerType === 'HOSPITAL' ? BRAND_COLORS.primary : '#334155',
+                      fontWeight: 700,
+                      fontSize: '13.5px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Building2 size={20} />
+                    <span>{language === 'bn' ? 'হাসপাতাল ও ক্লিনিক' : 'Hospital & Clinic'}</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Hospital Name */}
-              <FormField label={language === 'bn' ? 'হাসপাতালের নাম' : 'Hospital / Clinic Name'} required id="org-name">
+              {/* Step 2: Organization Name */}
+              <FormField label={language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name'} required id="org-name">
                 <input
                   id="org-name"
                   type="text"
-                  placeholder={language === 'bn' ? 'যেমন: স্কয়ার হাসপাতাল বা মৌলভীবাজার সেন্ট্রাল হাসপাতাল' : 'e.g. Moulvibazar Central Hospital'}
+                  placeholder={language === 'bn' ? 'যেমন: পপুলার ডায়াগনস্টিক সেন্টার বা ইবনে সিনা হাসপাতাল' : 'e.g. Popular Diagnostic Center'}
                   value={orgName}
                   onChange={(e) => setOrgName(e.target.value)}
                   required
@@ -241,7 +291,7 @@ export default function ProviderOnboardPage() {
 
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
-                    {language === 'bn' ? 'মোবাইল নম্বর' : 'Mobile Number'} *
+                    {language === 'bn' ? 'মোবাইল নম্বর' : 'Official Phone Number'} *
                   </label>
                   <input
                     type="tel"
@@ -254,33 +304,28 @@ export default function ProviderOnboardPage() {
                 </div>
               </div>
 
-              {/* District & License */}
+              {/* Email & Trade License / DGHS */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
-                    {language === 'bn' ? 'জেলা' : 'Operational District'} *
+                    {language === 'bn' ? 'অফিসিয়াল ইমেইল' : 'Official Email'}
                   </label>
-                  <select
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    style={{ width: '100%', height: '46px', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', fontSize: '14px', backgroundColor: '#FFFFFF', boxSizing: 'border-box' }}
-                  >
-                    <option value="Moulvibazar">Moulvibazar (Launch Hub)</option>
-                    <option value="Sylhet">Sylhet Sadar</option>
-                    <option value="Habiganj">Habiganj</option>
-                    <option value="Sunamganj">Sunamganj</option>
-                    <option value="Dhaka">Dhaka Division</option>
-                    <option value="Chittagong">Chittagong</option>
-                  </select>
+                  <input
+                    type="email"
+                    placeholder="billing@organization.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ width: '100%', height: '46px', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
                 </div>
 
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
-                    {language === 'bn' ? 'ডিজিএইচএস বা ট্রেড লাইসেন্স নম্বর' : 'DGHS License / Registration No.'}
+                    {language === 'bn' ? 'ট্রেড লাইসেন্স বা ডিজিএইচএস নম্বর' : 'Trade License / DGHS Reg #'}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. DGHS-2026-XXXX"
+                    placeholder="TL-XXXXXX or DGHS-XXXXX"
                     value={licenseNumber}
                     onChange={(e) => setLicenseNumber(e.target.value)}
                     style={{ width: '100%', height: '46px', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', fontSize: '14px', boxSizing: 'border-box' }}
@@ -288,28 +333,122 @@ export default function ProviderOnboardPage() {
                 </div>
               </div>
 
-              {/* Address */}
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
-                  {language === 'bn' ? 'হাসপাতালের পূর্ণ ঠিকানা' : 'Hospital Location & Address'}
-                </label>
-                <input
-                  type="text"
-                  placeholder={language === 'bn' ? 'রোড, এলাকা ও বিস্তারিত ঠিকানা' : 'Street address, area'}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  style={{ width: '100%', height: '46px', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', fontSize: '14px', boxSizing: 'border-box' }}
-                />
+              {/* District & Address */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '24px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
+                    {language === 'bn' ? 'জেলা' : 'District'} *
+                  </label>
+                  <select
+                    value={district}
+                    onChange={(e) => setDistrict(e.target.value)}
+                    style={{ width: '100%', height: '46px', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', fontSize: '14px', backgroundColor: '#FFFFFF', boxSizing: 'border-box' }}
+                  >
+                    <option value="Moulvibazar">Moulvibazar (মৌলভীবাজার)</option>
+                    <option value="Sylhet">Sylhet (সিলেট)</option>
+                    <option value="Habiganj">Habiganj (হবিগঞ্জ)</option>
+                    <option value="Sunamganj">Sunamganj (সুনামগঞ্জ)</option>
+                    <option value="Dhaka">Dhaka (ঢাকা)</option>
+                    <option value="Chittagong">Chittagong (চট্টগ্রাম)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
+                    {language === 'bn' ? 'প্রতিষ্ঠানের ঠিকানা' : 'Full Address'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={language === 'bn' ? 'সড়ক, থানা, শহর' : 'Road, Thana, City'}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    style={{ width: '100%', height: '46px', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #E2E8F0', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              {/* Step 3: Subscription Plan Choice */}
+              <div style={{ marginBottom: '28px', padding: '20px', backgroundColor: '#F8FAFC', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
+                    {language === 'bn' ? '২. প্রারম্ভিক সাবস্ক্রিপশন প্ল্যান নির্বাচন করুন' : '2. Select Initial Membership Plan'}
+                  </label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setBillingInterval('monthly')}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: billingInterval === 'monthly' ? BRAND_COLORS.primary : '#E2E8F0',
+                        color: billingInterval === 'monthly' ? '#FFFFFF' : '#475569',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBillingInterval('annual')}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: billingInterval === 'annual' ? BRAND_COLORS.primary : '#E2E8F0',
+                        color: billingInterval === 'annual' ? '#FFFFFF' : '#475569',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Annual (Save 17%)
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '10px' }}>
+                  {[
+                    { tier: 'basic', name: 'Basic (৭ দিন ট্রায়াল)', bdt: billingInterval === 'annual' ? 5000 : 500 },
+                    { tier: 'professional', name: 'Professional', bdt: billingInterval === 'annual' ? 15000 : 1500 },
+                    { tier: 'premium', name: 'Premium (Top Tier)', bdt: billingInterval === 'annual' ? 35000 : 3500 },
+                    { tier: 'enterprise', name: 'Enterprise Group', bdt: billingInterval === 'annual' ? 80000 : 8000 },
+                  ].map((p) => (
+                    <div
+                      key={p.tier}
+                      onClick={() => setSelectedPlanTier(p.tier as any)}
+                      style={{
+                        padding: '12px',
+                        borderRadius: '10px',
+                        border: `1.5px solid ${selectedPlanTier === p.tier ? BRAND_COLORS.primary : '#CBD5E1'}`,
+                        backgroundColor: selectedPlanTier === p.tier ? '#EFF6FF' : '#FFFFFF',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>{p.name}</div>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: BRAND_COLORS.primary, marginTop: '2px' }}>
+                        ৳{p.bdt.toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Submit Button */}
-              <LoadingButton type="submit" loading={loading} loadingText={language === 'bn' ? 'আবেদন পাঠানো হচ্ছে...' : 'Submitting Application...'}>
-                {language === 'bn' ? 'অনবোর্ডিং আবেদন জমা দিন' : 'Submit Provider Application'}
+              <LoadingButton
+                type="submit"
+                loading={loading}
+                variant="primary"
+                fullWidth
+              >
+                {language === 'bn' ? 'আবেদন ও সাবস্ক্রিপশন সম্পন্ন করুন' : 'Submit Healthcare Registration & Plan'}
               </LoadingButton>
 
-              <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '12px', color: '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <PhoneCall size={12} />
-                <span>{language === 'bn' ? 'অনবোর্ডিং হেল্পলাইন: ০১৮৮৬-৭৪৮৫৬৪' : `Provider Assistance Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '16px', color: '#64748B', fontSize: '12px' }}>
+                <ShieldCheck size={16} color="#10B981" />
+                <span>DGHS Guidelines & Bangladesh Medical Data Protection Verified</span>
               </div>
             </form>
           )}

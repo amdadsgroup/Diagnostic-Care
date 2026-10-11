@@ -26,6 +26,7 @@ import {
   Shield,
   ChevronDown,
   X,
+  CreditCard,
 } from 'lucide-react';
 import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { useAdminTheme } from './AdminThemeContext';
@@ -39,6 +40,7 @@ interface AdminSidebarProps {
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
   counts?: {
+    subscriptions?: number;
     users?: number;
     doctors?: number;
     pendingVerif?: number;
@@ -173,6 +175,14 @@ export default function AdminSidebar({
       title: 'Business Operations',
       titleBn: 'বিজনেস অপারেশনস',
       items: [
+        {
+          id: 'subscriptions' as AdminSection,
+          label: 'Subscriptions & MRR',
+          labelBn: 'সাবস্ক্রিপশন ও রাজস্ব (MRR)',
+          icon: CreditCard,
+          badge: counts.subscriptions || 'MRR',
+          badgeColor: '#10B981',
+        },
         {
           id: 'users' as AdminSection,
           label: 'Users and Access',

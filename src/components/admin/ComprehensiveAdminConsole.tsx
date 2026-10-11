@@ -11,6 +11,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 // 17 Module Components
 import DashboardOverviewTab from './tabs/DashboardOverviewTab';
+import SubscriptionsTab from './tabs/SubscriptionsTab';
 import UsersAccessTab from './tabs/UsersAccessTab';
 import DoctorsTab from './tabs/DoctorsTab';
 import HospitalsTab from './tabs/HospitalsTab';
@@ -155,6 +156,10 @@ function ComprehensiveAdminConsoleInner() {
               onDateFilterChange={setDateFilter}
               onNavigateSection={setCurrentSection}
             />
+          )}
+
+          {currentSection === 'subscriptions' && (
+            <SubscriptionsTab language={language} adminEmail={currentUser?.email || 'contact.amdadur@gmail.com'} />
           )}
 
           {currentSection === 'users' && (
