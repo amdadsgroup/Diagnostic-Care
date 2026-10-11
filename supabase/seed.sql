@@ -81,3 +81,74 @@ VALUES
     ('f0000001-0000-0000-0000-000000000003', 'A-37428', 'Dr. Tariqul Islam', 'ডা. তারিকুল ইসলাম', 'Pediatrics (Child Health)', 'শিশু ও কিশোর রোগ বিশেষজ্ঞ', 'MBBS, DCH, MD (Pediatrics)', 800, 400, 'active')
 ON CONFLICT (bmdc_number) DO NOTHING;
 
+-- 8. Master Super Administrator Seed Account
+-- Email: contact.amdadur@gmail.com
+-- Password: @Amdadur2025
+DO $$
+DECLARE
+    admin_uid UUID := '00000000-0000-0000-0000-000000000001';
+BEGIN
+    -- Insert or update auth.users
+    IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'contact.amdadur@gmail.com') THEN
+        INSERT INTO auth.users (
+            id,
+            instance_id,
+            email,
+            encrypted_password,
+            email_confirmed_at,
+            raw_app_meta_data,
+            raw_user_meta_data,
+            created_at,
+            updated_at,
+            role,
+            aud
+        ) VALUES (
+            admin_uid,
+            '00000000-0000-0000-0000-000000000000',
+            'contact.amdadur@gmail.com',
+            crypt('@Amdadur2025', gen_salt('bf')),
+            NOW(),
+            '{"provider":"email","providers":["email"]}',
+            '{"full_name":"Amdadur Rahman (Platform Super Admin)","role":"SUPER_ADMIN"}',
+            NOW(),
+            NOW(),
+            'authenticated',
+            'authenticated'
+        );
+    ELSE
+        UPDATE auth.users
+        SET encrypted_password = crypt('@Amdadur2025', gen_salt('bf')),
+            raw_user_meta_data = raw_user_meta_data || '{"role":"SUPER_ADMIN"}'::jsonb
+        WHERE email = 'contact.amdadur@gmail.com'
+        RETURNING id INTO admin_uid;
+    END IF;
+
+    -- Ensure profile exists in public.profiles
+    INSERT INTO public.profiles (
+        id,
+        phone,
+        email,
+        full_name,
+        language_preference,
+        status,
+        is_email_verified
+    ) VALUES (
+        admin_uid,
+        '01886748564',
+        'contact.amdadur@gmail.com',
+        'Amdadur Rahman (Platform Super Admin)',
+        'en',
+        'active',
+        true
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        email = 'contact.amdadur@gmail.com',
+        full_name = 'Amdadur Rahman (Platform Super Admin)',
+        status = 'active';
+
+    -- Ensure super_admin role in public.user_roles
+    INSERT INTO public.user_roles (user_id, role, is_primary)
+    VALUES (admin_uid, 'super_admin', true)
+    ON CONFLICT (user_id, role) DO UPDATE SET is_primary = true;
+END $$;
+

