@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminSection } from './AdminTypes';
 import AdminSidebar from './AdminSidebar';
 import AdminTopNav from './AdminTopNav';
+import { AdminThemeProvider, useAdminTheme } from './AdminThemeContext';
 import { AdminService, AdminDashboardMetrics } from '@/services/admin.service';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { useLanguage } from '@/context/LanguageContext';
@@ -27,10 +28,13 @@ import NotificationsTab from './tabs/NotificationsTab';
 import AuditLogsTab from './tabs/AuditLogsTab';
 import SystemSettingsTab from './tabs/SystemSettingsTab';
 
-export default function ComprehensiveAdminConsole() {
+function ComprehensiveAdminConsoleInner() {
   const { language, setLanguage } = useLanguage();
+  const { theme, tokens } = useAdminTheme();
+
   const [currentSection, setCurrentSection] = useState<AdminSection>('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [metrics, setMetrics] = useState<AdminDashboardMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
@@ -49,8 +53,11 @@ export default function ComprehensiveAdminConsole() {
     try {
       const data = await AdminService.getDashboardMetrics(dateFilter);
       setMetrics(data);
-    } catch {}
-    setLoading(false);
+    } catch (err) {
+      console.error('Error fetching dashboard metrics:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -72,16 +79,24 @@ export default function ComprehensiveAdminConsole() {
       style={{
         display: 'flex',
         minHeight: '100vh',
-        backgroundColor: '#F8FAFC',
+        backgroundColor: tokens.bgCanvas,
+        backgroundImage: tokens.ambientGlow,
+        color: tokens.textPrimary,
         fontFamily: 'inherit',
+        transition: 'background-color 0.25s ease, color 0.25s ease',
       }}
     >
-      {/* 1. Futuristic Glassmorphism Sidebar (17 Modules) */}
+      {/* 1. Futuristic Glassmorphism Sidebar (5 Group Categories, 17 Modules) */}
       <AdminSidebar
         currentSection={currentSection}
-        onSelectSection={(sec) => setCurrentSection(sec)}
+        onSelectSection={(sec) => {
+          setCurrentSection(sec);
+          setIsMobileSidebarOpen(false);
+        }}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
         language={language}
         counts={{
           users: metrics?.totalUsers,
@@ -98,7 +113,15 @@ export default function ComprehensiveAdminConsole() {
       />
 
       {/* 2. Main Content Canvas */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden' }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          overflowX: 'hidden',
+        }}
+      >
         {/* Top Header */}
         <AdminTopNav
           currentSection={currentSection}
@@ -108,12 +131,22 @@ export default function ComprehensiveAdminConsole() {
           onLogout={handleLogout}
           onRefresh={fetchMetrics}
           isLoading={loading}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           searchQuery={globalSearch}
           onSearchChange={setGlobalSearch}
         />
 
         {/* Dynamic Tab Body */}
-        <main style={{ flex: 1, padding: '28px 24px', maxWidth: '1440px', width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+        <main
+          style={{
+            flex: 1,
+            padding: '28px 24px',
+            maxWidth: '1440px',
+            width: '100%',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+          }}
+        >
           {currentSection === 'dashboard' && (
             <DashboardOverviewTab
               metrics={metrics}
@@ -190,5 +223,13 @@ export default function ComprehensiveAdminConsole() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function ComprehensiveAdminConsole() {
+  return (
+    <AdminThemeProvider>
+      <ComprehensiveAdminConsoleInner />
+    </AdminThemeProvider>
   );
 }
