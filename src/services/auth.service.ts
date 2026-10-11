@@ -177,6 +177,127 @@ export class AuthService {
   }
 
   /**
+   * Register a new Hospital or Healthcare Provider account.
+   * Creates an authenticated user with HOSPITAL_ADMIN role and registers facility record.
+   */
+  static async registerHospital(params: {
+    hospitalName: string;
+    contactPerson: string;
+    phone: string;
+    email?: string;
+    password: string;
+    licenseNumber?: string;
+    district?: string;
+    address?: string;
+    language?: 'en' | 'bn';
+  }): Promise<{
+    user: any;
+    profile: AuthUserProfile | null;
+    error: string | null;
+  }> {
+    try {
+      const cleanPhone = this.normalizePhoneNumber(params.phone);
+      if (!this.isValidBangladeshPhone(cleanPhone)) {
+        return {
+          user: null,
+          profile: null,
+          error: 'Please enter a valid 11-digit Bangladesh mobile number (e.g. 017XXXXXXXX).',
+        };
+      }
+
+      if (params.hospitalName.trim().length < 3) {
+        return {
+          user: null,
+          profile: null,
+          error: 'Hospital / Facility name must be at least 3 characters.',
+        };
+      }
+
+      if (params.password.length < 8) {
+        return {
+          user: null,
+          profile: null,
+          error: 'Password must be at least 8 characters long.',
+        };
+      }
+
+      // Check if phone or email already registered
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('id, phone, email')
+        .or(`phone.eq.${cleanPhone}${params.email ? `,email.eq.${params.email.trim().toLowerCase()}` : ''}`)
+        .maybeSingle();
+
+      if (existingUser) {
+        return {
+          user: null,
+          profile: null,
+          error: 'This mobile number or email is already registered. Please login.',
+        };
+      }
+
+      const authEmail = params.email && params.email.trim().length > 0
+        ? params.email.trim().toLowerCase()
+        : `${cleanPhone}@hospital.diagnosticcare.com.bd`;
+
+      const selectedLanguage = params.language || 'en';
+
+      // Perform Supabase Auth signUp
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: authEmail,
+        password: params.password,
+        options: {
+          data: {
+            full_name: params.contactPerson.trim(),
+            hospital_name: params.hospitalName.trim(),
+            phone: cleanPhone,
+            role: 'HOSPITAL_ADMIN',
+            language: selectedLanguage,
+          },
+        },
+      });
+
+      if (authError) {
+        return { user: null, profile: null, error: authError.message };
+      }
+
+      const user = authData.user;
+      if (!user) {
+        return { user: null, profile: null, error: 'Hospital account creation failed.' };
+      }
+
+      // Record profile
+      try {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          phone: cleanPhone,
+          email: params.email ? params.email.trim().toLowerCase() : authEmail,
+          full_name: `${params.hospitalName.trim()} (${params.contactPerson.trim()})`,
+          language_preference: selectedLanguage,
+          status: 'active',
+        });
+      } catch (dbErr) {
+        console.warn('Hospital profile sync notice:', dbErr);
+      }
+
+      const userProfile: AuthUserProfile = {
+        id: user.id,
+        email: user.email,
+        phone: cleanPhone,
+        fullName: params.hospitalName.trim(),
+        languagePreference: selectedLanguage,
+        primaryRole: 'HOSPITAL_ADMIN',
+        roles: ['HOSPITAL_ADMIN'],
+        status: 'active',
+      };
+
+      return { user, profile: userProfile, error: null };
+    } catch (err: any) {
+      return { user: null, profile: null, error: err.message || 'Hospital registration failed.' };
+    }
+  }
+
+  /**
    * Log in user with either Mobile Number or Email + Password
    */
   static async signIn(
@@ -288,6 +409,9 @@ export class AuthService {
         return '/?tab=portal&role=DOCTOR_ASSISTANT';
       case 'DIAGNOSTIC_ADMIN':
       case 'DIAGNOSTIC_STAFF':
+      case 'HOSPITAL_ADMIN':
+      case 'HOSPITAL_STAFF':
+      case 'CLINIC_ADMIN':
         return '/?tab=portal&role=DIAGNOSTIC_ADMIN';
       case 'SUPER_ADMIN':
         return '/?tab=portal&role=SUPER_ADMIN';

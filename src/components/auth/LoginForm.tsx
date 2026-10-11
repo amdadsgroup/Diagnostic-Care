@@ -362,7 +362,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </span>
         </div>
         <a
-          href="/provider/onboard"
+          href="/#provider-hub"
           style={{
             color: BRAND_COLORS.primary,
             fontWeight: 800,
@@ -370,7 +370,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             whiteSpace: 'nowrap',
           }}
         >
-          {language === 'bn' ? 'নিবন্ধন করুন →' : 'Register Facility →'}
+          {language === 'bn' ? 'নিবন্ধন ও লগইন →' : 'Hospital & Doctor Hub →'}
         </a>
       </div>
 

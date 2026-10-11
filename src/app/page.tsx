@@ -15,7 +15,7 @@ import { LiveQueueCard } from '@/components/LiveQueueCard';
 import { DoctorAssistantView } from '@/components/DoctorAssistantView';
 import { SuperAdminView } from '@/components/SuperAdminView';
 import AuthModal from '@/components/auth/AuthModal';
-import ProviderOnboardingModal from '@/components/provider/ProviderOnboardingModal';
+import HospitalAuthModal from '@/components/provider/HospitalAuthModal';
 import DoctorPortal from '@/components/doctor/DoctorPortal';
 import PatientDashboard from '@/components/patient/PatientDashboard';
 import LiveQueueTracker from '@/components/queue/LiveQueueTracker';
@@ -1344,17 +1344,13 @@ export default function HomePage() {
         }}
       />
 
-      {/* B2B PROVIDER ONBOARDING WIZARD */}
-      <ProviderOnboardingModal
+      {/* HOSPITAL & PROVIDER ACCESS SYSTEM */}
+      <HospitalAuthModal
         isOpen={isProviderOnboardOpen}
         onClose={() => setIsProviderOnboardOpen(false)}
-        onSuccess={(org) => {
+        defaultMode="register"
+        onSuccess={() => {
           setIsProviderOnboardOpen(false);
-          setOnboardingNotice(
-            language === 'en'
-              ? `Verification initiated for ${org.name}. Our regional operational team will verify the BMDC/DGHS credentials within 24 hours. Support Helpline: 01886-748564.`
-              : `${org.name}-এর ভেরিফিকেশন কার্যক্রম শুরু হয়েছে। আমাদের টিম ২৪ ঘণ্টার মধ্যে যোগাযোগ করবে। সার্বক্ষণিক হেল্পলাইন: 01886-748564।`
-          );
         }}
       />
 

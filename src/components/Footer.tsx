@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
@@ -19,7 +19,9 @@ import {
   Building2,
   Stethoscope,
   UserPlus,
+  LogIn,
 } from 'lucide-react';
+import HospitalAuthModal from '@/components/provider/HospitalAuthModal';
 
 interface FooterProps {
   language: SupportedLanguage;
@@ -29,6 +31,8 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigateTab }) => {
   const t = TRANSLATIONS[language];
+  const [isHospitalAuthOpen, setIsHospitalAuthOpen] = useState(false);
+  const [hospitalAuthMode, setHospitalAuthMode] = useState<'login' | 'register'>('login');
 
   const handleLinkClick = (tab: string, category?: string) => {
     if (onNavigateTab) {
@@ -134,6 +138,7 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
 
       {/* Hospital, Diagnostic Center & Doctor Provider Portal Hub */}
       <div
+        id="provider-hub"
         style={{
           background: 'linear-gradient(135deg, rgba(0, 96, 250, 0.12) 0%, rgba(15, 32, 39, 0.9) 100%)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
@@ -169,9 +174,13 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            {/* Hospital & Diagnostic Center Register */}
-            <Link
-              href="/provider/onboard"
+            {/* Hospital Account Creation Modal Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                setHospitalAuthMode('register');
+                setIsHospitalAuthOpen(true);
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -183,17 +192,21 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
                 borderRadius: '10px',
                 fontSize: '13.5px',
                 fontWeight: 700,
-                textDecoration: 'none',
+                cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
             >
               <UserPlus size={16} />
-              <span>{language === 'en' ? 'Register Facility / Lab' : 'প্রতিষ্ঠান নিবন্ধন (ল্যাব/হাসপাতাল)'}</span>
-            </Link>
+              <span>{language === 'en' ? 'Create Hospital Account' : 'হাসপাতাল অ্যাকাউন্ট তৈরি'}</span>
+            </button>
 
-            {/* Provider Login (Diagnostic Center, Hospital & Doctor Portal) */}
-            <Link
-              href="/login?redirect=/?tab=portal"
+            {/* Hospital & Doctor Login Modal Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                setHospitalAuthMode('login');
+                setIsHospitalAuthOpen(true);
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -202,16 +215,17 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
                 backgroundColor: '#0060FA',
                 color: '#FFFFFF',
                 borderRadius: '10px',
+                border: 'none',
                 fontSize: '13.5px',
                 fontWeight: 700,
-                textDecoration: 'none',
+                cursor: 'pointer',
                 boxShadow: '0 4px 14px rgba(0, 96, 250, 0.35)',
                 transition: 'all 0.15s ease',
               }}
             >
               <Stethoscope size={16} />
-              <span>{language === 'en' ? 'Doctor & Facility Login' : 'ডাক্তার ও প্রতিষ্ঠান লগইন'}</span>
-            </Link>
+              <span>{language === 'en' ? 'Hospital & Doctor Login' : 'হাসপাতাল ও ডাক্তার লগইন'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -485,14 +499,28 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               </button>
             </li>
             <li>
-              <Link href="/provider/onboard" style={{ color: '#60A5FA', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Building2 size={13} /> {language === 'en' ? 'Facility Onboarding (Hospital/Lab)' : 'হাসপাতাল/ল্যাব অনবোর্ডিং'}
-              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setHospitalAuthMode('register');
+                  setIsHospitalAuthOpen(true);
+                }}
+                style={{ color: '#60A5FA', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}
+              >
+                <Building2 size={13} /> {language === 'en' ? 'Hospital Account Registration' : 'হাসপাতাল অ্যাকাউন্ট নিবন্ধন'}
+              </button>
             </li>
             <li>
-              <Link href="/login?redirect=/?tab=portal" style={{ color: '#60A5FA', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Stethoscope size={13} /> {language === 'en' ? 'Doctor & Center Portal Login' : 'ডাক্তার ও সেন্টার পোর্টাল লগইন'}
-              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setHospitalAuthMode('login');
+                  setIsHospitalAuthOpen(true);
+                }}
+                style={{ color: '#60A5FA', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}
+              >
+                <Stethoscope size={13} /> {language === 'en' ? 'Hospital & Doctor Portal Login' : 'হাসপাতাল ও ডাক্তার পোর্টাল লগইন'}
+              </button>
             </li>
             <li>
               <a href="#help" style={{ color: 'inherit' }}>Help Center & FAQ</a>
@@ -613,6 +641,13 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
           </div>
         </div>
       </div>
+
+      {/* Hospital & Doctor Access Modal (Bottom Portal System) */}
+      <HospitalAuthModal
+        isOpen={isHospitalAuthOpen}
+        onClose={() => setIsHospitalAuthOpen(false)}
+        defaultMode={hospitalAuthMode}
+      />
     </footer>
   );
 };
