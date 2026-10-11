@@ -4,6 +4,7 @@ import { BRAND_CONSTANTS, BRAND_COLORS, BRAND_LOGOS, BRAND_FAVICONS } from '@/co
 import PWAController from '@/components/pwa/PWAController';
 import { LanguageProvider } from '@/context/LanguageContext';
 import GlobalMobileNavigation from '@/components/navigation/GlobalMobileNavigation';
+import AdminCustomerBarrier from '@/components/auth/AdminCustomerBarrier';
 
 export const viewport: Viewport = {
   themeColor: BRAND_COLORS.primary, // Signal Blue #0057FF
@@ -127,7 +128,9 @@ export default function RootLayout({
       <body>
         <LanguageProvider>
           <PWAController />
-          {children}
+          <AdminCustomerBarrier>
+            {children}
+          </AdminCustomerBarrier>
           <GlobalMobileNavigation />
         </LanguageProvider>
       </body>

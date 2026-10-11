@@ -25,6 +25,11 @@ export class AppointmentService {
     branchName?: string;
   }): Promise<{ appointment: Appointment | null; error: string | null }> {
     try {
+      // Prevent admin account from booking patient slots
+      if (params.patientId === '00000000-0000-0000-0000-000000000001') {
+        return { appointment: null, error: 'Administrative accounts cannot book patient appointments. Please use a patient account.' };
+      }
+
       // 1. Try calling the atomic PostgreSQL stored procedure
       const { data: rpcData, error: rpcError } = await supabase.rpc('fn_book_appointment', {
         p_patient_id: params.patientId,

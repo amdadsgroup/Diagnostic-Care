@@ -379,7 +379,7 @@ export class AuthService {
         return {
           user: authData?.user || { id: adminProfile.id, email: adminProfile.email },
           profile: adminProfile,
-          redirectPath: '/?tab=portal&role=SUPER_ADMIN',
+          redirectPath: '/admin',
           error: null,
         };
       }
@@ -443,7 +443,7 @@ export class AuthService {
       case 'CLINIC_ADMIN':
         return '/?tab=portal&role=DIAGNOSTIC_ADMIN';
       case 'SUPER_ADMIN':
-        return '/?tab=portal&role=SUPER_ADMIN';
+        return '/admin';
       case 'PATIENT':
       default:
         return '/?tab=marketplace';

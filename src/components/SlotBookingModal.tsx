@@ -88,6 +88,20 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
       return;
     }
 
+    if (
+      currentUser &&
+      (currentUser.primaryRole === 'SUPER_ADMIN' ||
+        currentUser.roles?.includes('SUPER_ADMIN') ||
+        currentUser.email?.toLowerCase() === 'contact.amdadur@gmail.com')
+    ) {
+      setErrorMessage(
+        language === 'en'
+          ? 'Administrators cannot book appointments as customers. Please sign out and use a patient account.'
+          : 'অ্যাডমিন অ্যাকাউন্ট দ্বারা কাস্টমার সিরিয়াল বুকিং নিষিদ্ধ। সাধারণ রোগী অ্যাকাউন্ট ব্যবহার করুন।'
+      );
+      return;
+    }
+
     if (!patientName.trim()) {
       setErrorMessage(language === 'en' ? 'Please enter patient full name.' : 'রোগীর নাম প্রদান করুন।');
       return;
