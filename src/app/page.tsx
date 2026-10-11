@@ -40,6 +40,8 @@ import MobileMessagesView from '@/components/patient/MobileMessagesView';
 import MobileSearchView from '@/components/search/MobileSearchView';
 import LocationModal from '@/components/location/LocationModal';
 import NotificationSettingsModal from '@/components/notifications/NotificationSettingsModal';
+import DiagnosticCartModal from '@/components/marketplace/DiagnosticCartModal';
+import PilotFeedbackModal from '@/components/common/PilotFeedbackModal';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { DoctorService } from '@/services/doctor.service';
 import { AppointmentService } from '@/services/appointment.service';
@@ -151,6 +153,8 @@ export default function HomePage() {
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
+  const [isDiagnosticCartOpen, setIsDiagnosticCartOpen] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
   // Restore language & location and detect PWA shortcut action from URL + Load Supabase data
   useEffect(() => {
@@ -1069,6 +1073,42 @@ export default function HomePage() {
                       {spec === 'ALL' ? t.filterAllSpecialties : spec}
                     </button>
                   ))}
+                  <button
+                    onClick={() => setIsDiagnosticCartOpen(true)}
+                    style={{
+                      padding: '7px 16px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      backgroundColor: 'var(--brand-teal-600)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <span>🧪 {language === 'en' ? 'Book Lab Tests' : 'ল্যাব টেস্ট বুক করুন'}</span>
+                  </button>
+                  <button
+                    onClick={() => setIsFeedbackModalOpen(true)}
+                    style={{
+                      padding: '7px 14px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      backgroundColor: 'var(--slate-100)',
+                      color: 'var(--slate-700)',
+                      border: '1px solid var(--slate-300)',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <span>🐞 {language === 'en' ? 'Feedback / QA' : 'মতামত / ত্রুটি'}</span>
+                  </button>
                   <Link
                     href="/doctors"
                     style={{
@@ -1410,6 +1450,30 @@ export default function HomePage() {
       <NotificationSettingsModal
         isOpen={isNotificationsModalOpen}
         onClose={() => setIsNotificationsModalOpen(false)}
+        language={language}
+      />
+
+      {/* DIAGNOSTIC TEST CATALOG & HOME COLLECTION CART MODAL */}
+      <DiagnosticCartModal
+        isOpen={isDiagnosticCartOpen}
+        onClose={() => setIsDiagnosticCartOpen(false)}
+        language={language}
+        onProceedToPayment={(order) => {
+          setIsDiagnosticCartOpen(false);
+          setActivePaymentPayload({
+            bookingCode: `LAB-${Date.now().toString().slice(-6)}`,
+            amount: order.totalAmount,
+            name: `${order.tests.length} Diagnostic Tests (${order.collectionType === 'HOME_COLLECTION' ? 'Home Collection' : 'Lab Visit'})`,
+            org: 'Popular Diagnostic Center (Moulvibazar)',
+          });
+          setIsPaymentModalOpen(true);
+        }}
+      />
+
+      {/* OPERATIONAL LAUNCH QA & PILOT FEEDBACK MODAL */}
+      <PilotFeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
         language={language}
       />
 

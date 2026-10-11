@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const isProduction = !!process.env.BKASH_APP_KEY;
     const paymentId = `BKH-PAY-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
 
     return NextResponse.json({
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
       paymentId,
       gateway: 'bKash Checkout',
       merchantName: 'Diagnostic Care BD',
+      mode: isProduction ? 'production' : 'sandbox',
       amount,
       currency: 'BDT',
       expiresInSeconds: 300,

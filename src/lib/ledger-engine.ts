@@ -259,6 +259,61 @@ class LedgerEngine {
   }
 
   /**
+   * Get unsettled payable balance for a given provider organization
+   */
+  public getProviderPayableBalance(organizationId: string): number {
+    const providerEntries = this.ledgerEntries.filter(
+      (e) => e.account === 'LIABILITY_PROVIDER_PAYABLE' && e.description.includes(organizationId)
+    );
+    const credits = providerEntries.filter((e) => e.direction === 'CREDIT').reduce((s, e) => s + e.amount, 0);
+    const debits = providerEntries.filter((e) => e.direction === 'DEBIT').reduce((s, e) => s + e.amount, 0);
+    return credits - debits;
+  }
+
+  /**
+   * Process an automated payout disbursement to a provider (settling liability)
+   */
+  public processPayout(params: {
+    organizationId: string;
+    organizationName: string;
+    amount: number;
+    payoutChannel: 'BKASH_MERCHANT' | 'BANK_TRANSFER';
+    destinationAccount: string;
+  }): { success: boolean; payoutTxId: string; ledgerEntries: LedgerEntry[] } {
+    const { organizationId, organizationName, amount, payoutChannel, destinationAccount } = params;
+    const txId = `tx-payout-${Date.now()}`;
+    const now = new Date().toISOString();
+
+    // 1. DEBIT: Liability Provider Payable (Decreasing what platform owes provider)
+    // 2. CREDIT: Asset Escrow (Cash outflows from bank or escrow)
+    const entries: LedgerEntry[] = [
+      {
+        id: `leg-payout-${Date.now()}-1`,
+        transactionId: txId,
+        account: 'LIABILITY_PROVIDER_PAYABLE',
+        direction: 'DEBIT',
+        amount,
+        currency: 'BDT',
+        description: `Disbursement payout to ${organizationName} [${organizationId}] via ${payoutChannel} (${destinationAccount})`,
+        createdAt: now,
+      },
+      {
+        id: `leg-payout-${Date.now()}-2`,
+        transactionId: txId,
+        account: payoutChannel === 'BKASH_MERCHANT' ? 'ASSET_BKASH_ESCROW' : 'ASSET_CASH_RECEIVABLE',
+        direction: 'CREDIT',
+        amount,
+        currency: 'BDT',
+        description: `Disbursement transfer to ${destinationAccount} for ${organizationName}`,
+        createdAt: now,
+      },
+    ];
+
+    this.ledgerEntries.push(...entries);
+    return { success: true, payoutTxId: txId, ledgerEntries: entries };
+  }
+
+  /**
    * Ledger Audit Verification: Computes overall system debits vs credits
    */
   public verifyLedgerIntegrity(): {

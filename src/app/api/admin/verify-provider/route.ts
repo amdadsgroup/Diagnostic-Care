@@ -3,6 +3,21 @@ import { servicesEngine } from '@/lib/services-engine';
 import { createServerClient } from '@/lib/supabase/server';
 import { VerificationStatus } from '@/types';
 
+export async function GET() {
+  try {
+    const providers = servicesEngine.getOrganizations();
+    return NextResponse.json({
+      success: true,
+      providers,
+    }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to fetch providers queue' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

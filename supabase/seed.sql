@@ -65,3 +65,19 @@ VALUES
     ('d0000001-0000-0000-0000-000000000002', '12-Lead ECG (Electrocardiogram)', '১২-লিড ইসিজি', 'ECG-001', 'Cardiovascular electrical rhythm monitoring', 'active'),
     ('d0000001-0000-0000-0000-000000000002', 'Thyroid Stimulating Hormone (TSH)', 'টিএসএইচ হরমোন টেস্ট', 'TSH-001', 'Endocrine thyroid hormone assessment', 'active')
 ON CONFLICT (code) DO NOTHING;
+
+-- 6. Moulvibazar Verified Diagnostic Centers (Production Baseline)
+INSERT INTO public.diagnostic_centers (id, name, name_bn, slug, district_id, upazila_id, address, phone, email, status)
+VALUES
+    ('e0000001-0000-0000-0000-000000000001', 'Popular Diagnostic Center (Moulvibazar)', 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার)', 'popular-moulvibazar', 'b0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'Chowmohana, Syed Mujtoba Ali Road, Moulvibazar Sadar', '01886748564', 'moulvibazar@populardiagnostic.com', 'active'),
+    ('e0000001-0000-0000-0000-000000000002', 'Life Care Diagnostic Center (Moulvibazar)', 'লাইফ কেয়ার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার)', 'lifecare-moulvibazar', 'b0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'Kusumbag Point, Sreemangal Road, Moulvibazar', '01886748564', 'info@lifecaremb.com', 'active')
+ON CONFLICT (slug) DO NOTHING;
+
+-- 7. Moulvibazar BMDC Registered Doctors (Production Baseline)
+INSERT INTO public.doctors (id, bmdc_number, full_name, full_name_bn, specialty, specialty_bn, qualifications, consultation_fee, follow_up_fee, status)
+VALUES
+    ('f0000001-0000-0000-0000-000000000001', 'A-48291', 'Prof. Dr. M. A. Rahim', 'অধ্যাপক ডা. এম এ রহিম', 'Cardiology', 'হৃদরোগ ও মেডিসিন বিশেষজ্ঞ', 'MBBS, FCPS (Medicine), MD (Cardiology)', 1000, 500, 'active'),
+    ('f0000001-0000-0000-0000-000000000002', 'A-59102', 'Dr. Farhana Ahmed', 'ডা. ফারহানা আহমেদ', 'Gynecology & Obstetrics', 'স্ত্রী ও প্রসূতিরোগ বিশেষজ্ঞ', 'MBBS, DGO, MCPS (Obs & Gyn)', 800, 400, 'active'),
+    ('f0000001-0000-0000-0000-000000000003', 'A-37428', 'Dr. Tariqul Islam', 'ডা. তারিকুল ইসলাম', 'Pediatrics (Child Health)', 'শিশু ও কিশোর রোগ বিশেষজ্ঞ', 'MBBS, DCH, MD (Pediatrics)', 800, 400, 'active')
+ON CONFLICT (bmdc_number) DO NOTHING;
+

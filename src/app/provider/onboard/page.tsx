@@ -6,7 +6,7 @@ import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import { useLanguage } from '@/context/LanguageContext';
-import { ArrowLeft, Building2, Stethoscope, TestTube2, Ambulance, CheckCircle2, ShieldCheck, PhoneCall } from 'lucide-react';
+import { ArrowLeft, Building2, CheckCircle2, ShieldCheck, PhoneCall } from 'lucide-react';
 import LoadingButton from '@/components/auth/LoadingButton';
 import FormField from '@/components/auth/FormField';
 import { AuthError, AuthSuccess } from '@/components/auth/AuthAlerts';
@@ -14,7 +14,7 @@ import { AuthError, AuthSuccess } from '@/components/auth/AuthAlerts';
 export default function ProviderOnboardPage() {
   const { language } = useLanguage();
 
-  const [providerType, setProviderType] = useState('DIAGNOSTIC_CENTER');
+  const [providerType, setProviderType] = useState('HOSPITAL');
   const [orgName, setOrgName] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
@@ -34,8 +34,8 @@ export default function ProviderOnboardPage() {
     if (!orgName.trim() || !contactName.trim() || !contactPhone.trim()) {
       setError(
         language === 'bn'
-          ? 'অনুগ্রহ করে প্রতিষ্ঠানের নাম, যোগাযোগের ব্যক্তি ও মোবাইল নম্বর লিখুন।'
-          : 'Please provide organization name, contact person name, and mobile number.'
+          ? 'অনুগ্রহ করে হাসপাতালের নাম, যোগাযোগের ব্যক্তি ও মোবাইল নম্বর লিখুন।'
+          : 'Please provide hospital name, contact person name, and mobile number.'
       );
       return;
     }
@@ -47,7 +47,7 @@ export default function ProviderOnboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          providerType,
+          providerType: 'HOSPITAL',
           organizationName: orgName.trim(),
           contactPerson: contactName.trim(),
           phone: contactPhone.trim(),
@@ -127,17 +127,17 @@ export default function ProviderOnboardPage() {
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#0057FF', fontWeight: 700, fontSize: '13px', marginBottom: '12px' }}>
             <Building2 size={16} />
-            <span>{language === 'bn' ? 'প্রতিষ্ঠান অনবোর্ডিং পোর্টাল' : 'HEALTHCARE PROVIDER NETWORK'}</span>
+            <span>{language === 'bn' ? 'হাসপাতাল অনবোর্ডিং পোর্টাল' : 'HOSPITAL ONBOARDING PORTAL'}</span>
           </div>
 
           <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginBottom: '8px', lineHeight: 1.25 }}>
-            {language === 'bn' ? 'ডায়াগনস্টিক কেয়ার নেটওয়ার্কে যোগ দিন' : 'Partner with Diagnostic Care'}
+            {language === 'bn' ? 'হাসপাতাল পার্টনারশিপ ও অনবোর্ডিং' : 'Hospital Partnership & Onboarding'}
           </h1>
 
           <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '32px', lineHeight: 1.5 }}>
             {language === 'bn'
-              ? 'ডায়াগনস্টিক সেন্টার, হাসপাতাল, ক্লিনিক ও ডাক্তার চেম্বারের জন্য বাংলাদেশের আধুনিকতম ডিজিটাল অপারেটিং সিস্টেম।'
-              : 'Join Bangladesh’s connected healthcare marketplace. Expand your patient reach and modernize your pathology lab, clinic, or hospital operating system.'}
+              ? 'ডায়াগনস্টিক কেয়ার প্ল্যাটফর্মে আপনার হাসপাতাল বা স্পেশালাইজড ক্লিনিক যুক্ত করুন। ডাক্তার শিডিউল, ইনপেশেন্ট ও ওপিডি সুবিধা ডিজিটালাইজ করুন।'
+              : 'Register your hospital with Diagnostic Care. Manage outpatient doctor chambers, patient queue workflows, and connect with thousands of patients.'}
           </p>
 
           {error && <AuthError message={error} onDismiss={() => setError('')} />}
@@ -186,55 +186,36 @@ export default function ProviderOnboardPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate>
-              {/* Provider Category Selection */}
+              {/* Provider Category Selection: Hospital Only */}
               <div style={{ marginBottom: '22px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#1E293B', marginBottom: '8px' }}>
-                  {language === 'bn' ? 'প্রতিষ্ঠানের ধরন' : 'Healthcare Facility Type'} *
+                  {language === 'bn' ? 'প্রতিষ্ঠানের ধরন' : 'Healthcare Facility Type'}
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
-                  {[
-                    { id: 'DIAGNOSTIC_CENTER', label: language === 'bn' ? 'ডায়াগনস্টিক সেন্টার / ল্যাব' : 'Diagnostic Lab', icon: TestTube2 },
-                    { id: 'HOSPITAL', label: language === 'bn' ? 'হাসপাতাল ও ক্লিনিক' : 'Hospital / Clinic', icon: Building2 },
-                    { id: 'DOCTOR_CHAMBER', label: language === 'bn' ? 'ডাক্তার চেম্বার' : 'Doctor Chamber', icon: Stethoscope },
-                    { id: 'AMBULANCE_PROVIDER', label: language === 'bn' ? 'অ্যাম্বুলেন্স অপারেটর' : 'Ambulance Hub', icon: Ambulance },
-                  ].map((cat) => {
-                    const Icon = cat.icon;
-                    const isSelected = providerType === cat.id;
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setProviderType(cat.id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '12px 14px',
-                          borderRadius: '10px',
-                          backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
-                          border: isSelected ? '2px solid #0057FF' : '1.5px solid #E2E8F0',
-                          color: isSelected ? '#0057FF' : '#475569',
-                          fontWeight: isSelected ? 700 : 500,
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        <Icon size={16} />
-                        <span>{cat.label}</span>
-                      </button>
-                    );
-                  })}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '12px 20px',
+                    borderRadius: '12px',
+                    backgroundColor: '#EFF6FF',
+                    border: '2px solid #0057FF',
+                    color: '#0057FF',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                  }}
+                >
+                  <Building2 size={20} />
+                  <span>{language === 'bn' ? 'হাসপাতাল ও ক্লিনিক (Hospital & Clinic)' : 'Hospital & Clinic'}</span>
                 </div>
               </div>
 
-              {/* Organization Name */}
-              <FormField label={language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization / Facility Name'} required id="org-name">
+              {/* Hospital Name */}
+              <FormField label={language === 'bn' ? 'হাসপাতালের নাম' : 'Hospital / Clinic Name'} required id="org-name">
                 <input
                   id="org-name"
                   type="text"
-                  placeholder={language === 'bn' ? 'যেমন: পপুলার ডায়াগনস্টিক সেন্টার' : 'e.g. Popular Diagnostic Center'}
+                  placeholder={language === 'bn' ? 'যেমন: স্কয়ার হাসপাতাল বা মৌলভীবাজার সেন্ট্রাল হাসপাতাল' : 'e.g. Moulvibazar Central Hospital'}
                   value={orgName}
                   onChange={(e) => setOrgName(e.target.value)}
                   required
@@ -310,7 +291,7 @@ export default function ProviderOnboardPage() {
               {/* Address */}
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1E293B', marginBottom: '6px' }}>
-                  {language === 'bn' ? 'প্রতিষ্ঠানের ঠিকানা' : 'Facility Location & Branch Address'}
+                  {language === 'bn' ? 'হাসপাতালের পূর্ণ ঠিকানা' : 'Hospital Location & Address'}
                 </label>
                 <input
                   type="text"

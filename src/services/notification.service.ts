@@ -93,4 +93,21 @@ export class NotificationService {
       supabase.removeChannel(channel);
     };
   }
+
+  /**
+   * Forward SMS dispatch through production CommunicationGateway
+   */
+  static async sendSMS(to: string, message: string) {
+    const { CommunicationGateway } = await import('@/services/communication.service');
+    return CommunicationGateway.sendSMS({ to, message });
+  }
+
+  /**
+   * Forward Email dispatch through production CommunicationGateway
+   */
+  static async sendEmail(to: string, subject: string, html: string) {
+    const { CommunicationGateway } = await import('@/services/communication.service');
+    return CommunicationGateway.sendEmail({ to, subject, html });
+  }
 }
+

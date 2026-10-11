@@ -16,6 +16,9 @@ import {
   Globe,
   HeartPulse,
   ExternalLink,
+  Building2,
+  Stethoscope,
+  UserPlus,
 } from 'lucide-react';
 
 interface FooterProps {
@@ -126,6 +129,90 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               Call Now: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong>
             </span>
           </a>
+        </div>
+      </div>
+
+      {/* Hospital, Diagnostic Center & Doctor Provider Portal Hub */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(0, 96, 250, 0.12) 0%, rgba(15, 32, 39, 0.9) 100%)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          padding: '28px 0',
+        }}
+      >
+        <div
+          className="container"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '20px',
+            padding: '0 24px',
+          }}
+        >
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#60A5FA', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
+              <Building2 size={16} />
+              <span>{language === 'en' ? 'B2B Healthcare Provider Portal' : 'স্বাস্থ্যসেবা প্রদানকারী প্রতিষ্ঠান ও চিকিৎসক পোর্টাল'}</span>
+            </div>
+            <h3 style={{ fontSize: '19px', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
+              {language === 'en'
+                ? 'Hospital, Diagnostic Center & Doctor Management Access'
+                : 'হাসপাতাল, ডায়াগনস্টিক সেন্টার ও ডাক্তার লগইন ও নিবন্ধন হাব'}
+            </h3>
+            <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0, maxWidth: '640px' }}>
+              {language === 'en'
+                ? 'Manage laboratory test catalogs, physician consultation chambers, real-time token queues, and digital report delivery from your dedicated provider portal.'
+                : 'আপনার ল্যাবরেটরি টেস্ট ক্যাটালগ, বিশেষজ্ঞ চেম্বার সিরিয়াল, লাইভ টোকেন কিউ ও ডিজিটাল রিপোর্ট পরিচালনা করুন সরাসরি প্রোভাইডার কনসোল থেকে।'}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {/* Hospital & Diagnostic Center Register */}
+            <Link
+              href="/provider/onboard"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '11px 18px',
+                backgroundColor: 'rgba(0, 96, 250, 0.25)',
+                border: '1.5px solid #3B82F6',
+                color: '#93C5FD',
+                borderRadius: '10px',
+                fontSize: '13.5px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <UserPlus size={16} />
+              <span>{language === 'en' ? 'Register Facility / Lab' : 'প্রতিষ্ঠান নিবন্ধন (ল্যাব/হাসপাতাল)'}</span>
+            </Link>
+
+            {/* Provider Login (Diagnostic Center, Hospital & Doctor Portal) */}
+            <Link
+              href="/login?redirect=/?tab=portal"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '11px 20px',
+                backgroundColor: '#0060FA',
+                color: '#FFFFFF',
+                borderRadius: '10px',
+                fontSize: '13.5px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(0, 96, 250, 0.35)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Stethoscope size={16} />
+              <span>{language === 'en' ? 'Doctor & Facility Login' : 'ডাক্তার ও প্রতিষ্ঠান লগইন'}</span>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -396,6 +483,16 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
               >
                 Customer Care & Support
               </button>
+            </li>
+            <li>
+              <Link href="/provider/onboard" style={{ color: '#60A5FA', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Building2 size={13} /> {language === 'en' ? 'Facility Onboarding (Hospital/Lab)' : 'হাসপাতাল/ল্যাব অনবোর্ডিং'}
+              </Link>
+            </li>
+            <li>
+              <Link href="/login?redirect=/?tab=portal" style={{ color: '#60A5FA', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Stethoscope size={13} /> {language === 'en' ? 'Doctor & Center Portal Login' : 'ডাক্তার ও সেন্টার পোর্টাল লগইন'}
+              </Link>
             </li>
             <li>
               <a href="#help" style={{ color: 'inherit' }}>Help Center & FAQ</a>

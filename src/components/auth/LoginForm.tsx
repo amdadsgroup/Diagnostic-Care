@@ -337,36 +337,40 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         )}
       </div>
 
-      {/* Provider Onboarding Notice */}
+      {/* Hospital, Diagnostic Center & Doctor Portal Notice */}
       <div
         className="glass-inset"
         style={{
           marginTop: '24px',
-          padding: '12px 14px',
+          padding: '14px 16px',
           borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '10px',
-          fontSize: '12px',
+          fontSize: '12.5px',
+          backgroundColor: '#EFF6FF',
+          border: '1px solid #BFDBFE',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Building2 size={16} color={BRAND_COLORS.primary} />
-          <span style={{ color: '#475569', fontWeight: 500 }}>
-            {t.authLoginProviderNotice}
+          <Building2 size={18} color={BRAND_COLORS.primary} />
+          <span style={{ color: '#1E3A8A', fontWeight: 600 }}>
+            {language === 'bn'
+              ? 'ডাক্তার, হাসপাতাল বা ডায়াগনস্টিক সেন্টার?'
+              : 'Doctor, Hospital or Diagnostic Center?'}
           </span>
         </div>
         <a
           href="/provider/onboard"
           style={{
             color: BRAND_COLORS.primary,
-            fontWeight: 700,
+            fontWeight: 800,
             textDecoration: 'none',
             whiteSpace: 'nowrap',
           }}
         >
-          {t.authLoginProviderCta} →
+          {language === 'bn' ? 'নিবন্ধন করুন →' : 'Register Facility →'}
         </a>
       </div>
 
