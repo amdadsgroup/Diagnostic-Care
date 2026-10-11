@@ -109,8 +109,32 @@ export default function AdminPortalPage() {
   const isSuperAdmin =
     currentUser &&
     (currentUser.primaryRole === 'SUPER_ADMIN' ||
-      currentUser.roles.includes('SUPER_ADMIN') ||
+      currentUser.roles?.includes('SUPER_ADMIN') ||
       currentUser.email?.toLowerCase() === 'contact.amdadur@gmail.com');
+
+  if (isCheckingAuth) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC', gap: '14px' }}>
+        <div
+          style={{
+            width: '42px',
+            height: '42px',
+            border: '3.5px solid #E2E8F0',
+            borderTopColor: BRAND_COLORS.primary,
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
+        <span style={{ fontSize: '14px', color: '#64748B', fontWeight: 600 }}>
+          {language === 'bn' ? 'অ্যাডমিন সিকিউরিটি যাচাই করা হচ্ছে...' : 'Verifying Administrator Security Clearance...'}
+        </span>
+      </div>
+    );
+  }
+
+  if (isSuperAdmin) {
+    return <ComprehensiveAdminConsole />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
@@ -124,113 +148,10 @@ export default function AdminPortalPage() {
       />
 
       <main style={{ flex: 1, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '32px 16px' }}>
-        {/* State 1: Checking Authentication */}
-        {isCheckingAuth ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '360px', gap: '14px' }}>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                border: '3.5px solid #E2E8F0',
-                borderTopColor: BRAND_COLORS.primary,
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-              }}
-            />
-            <span style={{ fontSize: '14px', color: '#64748B', fontWeight: 600 }}>
-              {language === 'bn' ? 'অ্যাডমিন সিকিউরিটি যাচাই করা হচ্ছে...' : 'Verifying Administrator Security Clearance...'}
-            </span>
-          </div>
-        ) : isSuperAdmin ? (
-          /* State 2: Verified Super Admin Access */
-          <div>
-            {/* Super Admin Top Control Bar */}
-            <div
-              style={{
-                backgroundColor: '#0F172A',
-                color: '#FFFFFF',
-                borderRadius: '16px',
-                padding: '16px 22px',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '14px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(37, 99, 235, 0.25)',
-                    border: '1.5px solid #3B82F6',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#60A5FA',
-                  }}
-                >
-                  <ShieldCheck size={22} />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '15px', fontWeight: 800 }}>{currentUser.fullName}</span>
-                    <span
-                      style={{
-                        backgroundColor: '#10B981',
-                        color: '#FFFFFF',
-                        fontSize: '10.5px',
-                        fontWeight: 800,
-                        padding: '2px 8px',
-                        borderRadius: '9999px',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      SUPER ADMIN
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '2px' }}>
-                    {currentUser.email} • {language === 'bn' ? 'সেন্ট্রাল গভর্নেন্স সেশন সক্রিয়' : 'Central Governance Session Active'}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAdminLogout}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid rgba(248, 113, 113, 0.4)',
-                  color: '#F87171',
-                  padding: '8px 16px',
-                  borderRadius: '10px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <LogOut size={14} />
-                <span>{language === 'bn' ? 'অ্যাডমিন সাইন আউট' : 'Sign Out Admin'}</span>
-              </button>
-            </div>
-
-            {/* Comprehensive Admin Console */}
-            <ComprehensiveAdminConsole />
-          </div>
-        ) : (
-          /* State 3: Admin Login Form Screen */
-          <div style={{ maxWidth: '460px', margin: '40px auto', padding: '0 12px' }}>
-            <div
-              style={{
+        {/* State: Admin Login Form Screen */}
+        <div style={{ maxWidth: '460px', margin: '40px auto', padding: '0 12px' }}>
+          <div
+            style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '24px',
                 padding: '36px 32px',
@@ -469,7 +390,6 @@ export default function AdminPortalPage() {
               </div>
             </div>
           </div>
-        )}
       </main>
 
       <Footer language={language} setLanguage={setLanguage} />
