@@ -489,10 +489,13 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Auth Button */}
           {currentUser ? (
             <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '6px' }}>
-              <button
-                onClick={() => handleNavClick('profile')}
+              <Link
+                href="/patient/dashboard"
                 className="clay-pill"
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  textDecoration: 'none',
                   gap: '6px',
                   padding: '6px 10px',
                   color: '#0F172A',
@@ -512,7 +515,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   {currentUser.fullName || (language === 'en' ? 'Profile' : 'প্রোফাইল')}
                 </span>
-              </button>
+              </Link>
               {onLogout && (
                 <button
                   onClick={onLogout}

@@ -1,7 +1,7 @@
 'use client';
 
-import AppointmentsPatientDashboardPage from '@/app/appointments/page';
+import CustomerDashboardView from '@/components/patient/CustomerDashboardView';
 
-export default function PatientDashboardRoute() {
-  return <AppointmentsPatientDashboardPage />;
+export default function PatientDashboardPage() {
+  return <CustomerDashboardView />;
 }
