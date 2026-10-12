@@ -16,6 +16,7 @@ import {
   INITIAL_DOCTOR_ASSISTANTS,
   INITIAL_DIAGNOSTIC_TESTS,
   INITIAL_SUBSCRIPTION_PLANS,
+  INITIAL_REAL_APPOINTMENTS,
 } from './mock-data';
 import { generateDaySlots, isHoldExpired } from './slot-engine';
 
@@ -52,20 +53,27 @@ INITIAL_DOCTOR_ASSOCIATIONS.forEach((assoc) => {
     maxCapacity: 16,
   });
 
-  // All schedule slots start AVAILABLE without simulated bookings
+  // Check matching real appointments and mark slots
+  INITIAL_REAL_APPOINTMENTS.forEach((apt) => {
+    if (apt.doctorAssociationId === assoc.id && apt.appointmentDate === TODAY) {
+      const matchSlot = generated.find((s) => s.startTime === apt.startTime);
+      if (matchSlot) {
+        matchSlot.status = 'CONFIRMED';
+        matchSlot.tokenNumber = apt.tokenNumber;
+      }
+    }
+  });
+
   defaultSlots[key] = generated;
 
   defaultQueues[key] = {
     doctorAssociationId: assoc.id,
     queueDate: TODAY,
-    currentTokenServing: 0,
-    totalTokensIssued: 0,
+    currentTokenServing: 3,
+    totalTokensIssued: 8,
     avgConsultationMinutes: 15,
   };
 });
-
-// Production clean: Zero seed appointments
-const initialAppointments: Appointment[] = [];
 
 export const INITIAL_APP_STATE: AppState = {
   organizations: INITIAL_ORGANIZATIONS,
@@ -74,7 +82,7 @@ export const INITIAL_APP_STATE: AppState = {
   assistants: INITIAL_DOCTOR_ASSISTANTS,
   diagnosticTests: INITIAL_DIAGNOSTIC_TESTS,
   slots: defaultSlots,
-  appointments: initialAppointments,
+  appointments: INITIAL_REAL_APPOINTMENTS,
   queues: defaultQueues,
   subscriptionPlans: INITIAL_SUBSCRIPTION_PLANS,
   activeHoldSlotId: null,

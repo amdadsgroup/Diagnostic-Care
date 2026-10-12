@@ -63,15 +63,18 @@ export default function MobileSearchView({
 
   // Filter Doctors
   const filteredDoctors = doctorAssociations.filter((assoc) => {
+    const docName = assoc.doctor?.fullName || '';
+    const docSpec = assoc.doctor?.specialization || '';
+    const docQual = assoc.doctor?.qualifications || '';
     const matchesQ =
       !query ||
-      assoc.doctor?.fullName.toLowerCase().includes(query.toLowerCase()) ||
-      assoc.doctor?.specialization.toLowerCase().includes(query.toLowerCase()) ||
+      docName.toLowerCase().includes(query.toLowerCase()) ||
+      docSpec.toLowerCase().includes(query.toLowerCase()) ||
       assoc.organizationName.toLowerCase().includes(query.toLowerCase()) ||
-      assoc.doctor?.qualifications?.toLowerCase().includes(query.toLowerCase());
+      docQual.toLowerCase().includes(query.toLowerCase());
     const matchesSpecialty =
       selectedSpecialty === 'ALL' ||
-      assoc.doctor?.specialization.toLowerCase().includes(selectedSpecialty.toLowerCase());
+      docSpec.toLowerCase().includes(selectedSpecialty.toLowerCase());
     return matchesQ && matchesSpecialty;
   });
 
@@ -391,13 +394,13 @@ export default function MobileSearchView({
                   fontWeight: 800,
                 }}
               >
-                {assoc.doctor?.fullName.replace('Dr. ', '').charAt(0) || 'D'}
+                {(assoc.doctor?.fullName || 'Doctor').replace('Dr. ', '').charAt(0) || 'D'}
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                   <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
-                    {assoc.doctor?.fullName}
+                    {assoc.doctor?.fullName || 'Specialist Doctor'}
                   </h3>
                   {assoc.doctor?.bmdcNumber && (
                     <span

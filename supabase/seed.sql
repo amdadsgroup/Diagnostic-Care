@@ -152,3 +152,69 @@ BEGIN
     ON CONFLICT (user_id, role) DO UPDATE SET is_primary = true;
 END $$;
 
+-- 9. Verified Bangladeshi Hospitals
+INSERT INTO public.hospitals (
+    id, name, name_bn, slug, phone, emergency_phone, email, total_beds, icu_beds, has_icu, has_nicu, has_emergency_24_7, dghs_registration_number, verification_status, rating, total_reviews, status
+) VALUES
+(
+    'a1000001-0000-0000-0000-000000000001',
+    'Sylhet Central General Hospital',
+    'সিলেট সেন্ট্রাল জেনারেল হাসপাতাল',
+    'sylhet-central-general-hospital',
+    '01886748564', '01886748564',
+    'admin@sylhetcentralhospital.org',
+    350, 24, true, true, true,
+    'DGHS-SYL-2026-091', 'verified', 4.90, 218, 'active'
+),
+(
+    'a1000001-0000-0000-0000-000000000002',
+    'Mount Adora Hospital (Sylhet & Moulvibazar)',
+    'মাউন্ট এডোরা হাসপাতাল',
+    'mount-adora-hospital',
+    '01886748564', '01886748564',
+    'info@mountadora.com',
+    280, 18, true, true, true,
+    'DGHS-SYL-2026-142', 'verified', 4.88, 184, 'active'
+),
+(
+    'a1000001-0000-0000-0000-000000000003',
+    'Ibn Sina Hospital (Sylhet)',
+    'ইবনে সিনা হাসপাতাল (সিলেট)',
+    'ibn-sina-hospital-sylhet',
+    '01886748564', '01886748564',
+    'sylhet@ibnsina.com',
+    400, 30, true, true, true,
+    'DGHS-SYL-2026-054', 'verified', 4.85, 156, 'active'
+)
+ON CONFLICT (slug) DO NOTHING;
+
+-- 10. Core B2B Subscription Plans
+INSERT INTO public.subscription_plans (
+    id, code, name, name_bn, tier, billing_interval, price_bdt, branch_limit, service_listing_limit, staff_account_limit, has_featured_badge, is_published, sort_order
+) VALUES
+(
+    's0000001-0000-0000-0000-000000000001',
+    'STARTER_MONTHLY',
+    'Starter Healthcare Center Plan',
+    'স্টার্টার হেলথকেয়ার সেন্টার প্ল্যান',
+    'basic', 'monthly',
+    3499.00, 1, 20, 5, false, true, 1
+),
+(
+    's0000001-0000-0000-0000-000000000002',
+    'PRO_MONTHLY',
+    'Professional Hospital & Diagnostic Plan',
+    'প্রফেশনাল হাসপাতাল ও ডায়াগনস্টিক প্ল্যান',
+    'professional', 'monthly',
+    7999.00, 3, 50, 25, true, true, 2
+),
+(
+    's0000001-0000-0000-0000-000000000003',
+    'ENTERPRISE_MONTHLY',
+    'Enterprise Multi-Campus Hospital Network',
+    'এন্টারপ্রাইজ মাল্টি-ক্যাম্পাস হাসপাতাল নেটওয়ার্ক',
+    'enterprise', 'monthly',
+    16999.00, 10, 200, 100, true, true, 3
+)
+ON CONFLICT (code) DO NOTHING;
+

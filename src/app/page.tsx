@@ -400,13 +400,15 @@ export default function HomePage() {
 
   // Filter doctors
   const filteredAssociations = appState.doctorAssociations.filter((assoc) => {
+    const doc = assoc.doctor || appState.doctors.find((d) => d.id === assoc.doctorId);
     const matchesQuery =
-      assoc.doctor?.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      assoc.doctor?.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      assoc.organizationName.toLowerCase().includes(searchQuery.toLowerCase());
+      !searchQuery ||
+      Boolean(doc?.fullName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      Boolean(doc?.specialization?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      Boolean(assoc.organizationName?.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesDistrict = selectedDistrict === 'ALL' || assoc.districtName === selectedDistrict;
     const matchesSpecialty =
-      selectedSpecialty === 'ALL' || assoc.doctor?.specialization.toLowerCase().includes(selectedSpecialty.toLowerCase());
+      selectedSpecialty === 'ALL' || Boolean(doc?.specialization?.toLowerCase().includes(selectedSpecialty.toLowerCase()));
     return matchesQuery && matchesDistrict && matchesSpecialty;
   });
 
@@ -1138,7 +1140,8 @@ export default function HomePage() {
               {/* Doctors Grid */}
               <div className="grid-cards">
                 {filteredAssociations.map((assoc) => {
-                  const doctor = assoc.doctor!;
+                  const doctor = assoc.doctor || appState.doctors.find((d) => d.id === assoc.doctorId) || appState.doctors[0];
+                  if (!doctor) return null;
                   const dateKey = `${assoc.id}_${new Date().toISOString().split('T')[0]}`;
                   const slots = appState.slots[dateKey] || [];
 
