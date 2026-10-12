@@ -18,8 +18,6 @@ import {
   Home,
   Stethoscope,
   CalendarCheck,
-  Clock,
-  FileText,
   MessageSquare,
   Building2,
 } from 'lucide-react';
@@ -333,51 +331,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span>{language === 'en' ? 'Appointments' : 'অ্যাপয়েন্টমেন্ট'}</span>
           </Link>
 
-          {/* 4. Live Chamber Queue */}
-          <button
-            onClick={() => handleNavClick('queue')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: activeTab === 'queue' ? 800 : 600,
-              color: activeTab === 'queue' ? '#FFFFFF' : '#334155',
-              backgroundColor: activeTab === 'queue' ? BRAND_COLORS.primary : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <Clock size={14} />
-            <span>{language === 'en' ? 'Live Queue' : 'লাইভ কিউ'}</span>
-          </button>
-
-          {/* 5. Prescriptions Vault */}
-          <button
-            onClick={() => handleNavClick('prescriptions')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: (activeTab === 'prescriptions' || activeTab === 'reports') ? 800 : 600,
-              color: (activeTab === 'prescriptions' || activeTab === 'reports') ? '#FFFFFF' : '#334155',
-              backgroundColor: (activeTab === 'prescriptions' || activeTab === 'reports') ? BRAND_COLORS.primary : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <FileText size={14} />
-            <span>{language === 'en' ? 'Prescriptions' : 'প্রেসক্রিপশন'}</span>
-          </button>
-
-          {/* 6. Messages & Help Desk */}
+          {/* 4. Messages & Help Desk */}
           <button
             onClick={() => handleNavClick('messages')}
             style={{
@@ -398,29 +352,6 @@ export const Header: React.FC<HeaderProps> = ({
             <MessageSquare size={14} />
             <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
           </button>
-
-          {/* 7. Hospital Portal */}
-          <Link
-            href="/hospital/portal"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#0284C7',
-              backgroundColor: 'rgba(2, 132, 199, 0.08)',
-              border: '1px solid rgba(2, 132, 199, 0.2)',
-              textDecoration: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <Building2 size={14} />
-            <span>{language === 'en' ? 'Hospital Portal' : 'হাসপাতাল পোর্টাল'}</span>
-          </Link>
         </nav>
 
         {/* Right Side Actions */}
