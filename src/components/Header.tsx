@@ -136,15 +136,8 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Right: Emergency 24/7 Helpline, Provider Hub & Language */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Hospital & Doctor Access Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.getElementById('provider-hub');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('open-hospital-portal', { detail: { mode: 'login' } }));
-                }
-              }}
+            <Link
+              href="/hospital/portal"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -156,13 +149,14 @@ export const Header: React.FC<HeaderProps> = ({
                 borderRadius: '9999px',
                 fontSize: '11px',
                 fontWeight: 700,
+                textDecoration: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
             >
               <Building2 size={12} color="#93C5FD" />
               <span>{language === 'en' ? 'Hospital & Doctor Portal' : 'হাসপাতাল ও ডাক্তার পোর্টাল'}</span>
-            </button>
+            </Link>
 
             <a
               href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
@@ -405,6 +399,28 @@ export const Header: React.FC<HeaderProps> = ({
             <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
           </button>
 
+          {/* 7. Hospital Portal */}
+          <Link
+            href="/hospital/portal"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#0284C7',
+              backgroundColor: 'rgba(2, 132, 199, 0.08)',
+              border: '1px solid rgba(2, 132, 199, 0.2)',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Building2 size={14} />
+            <span>{language === 'en' ? 'Hospital Portal' : 'হাসপাতাল পোর্টাল'}</span>
+          </Link>
         </nav>
 
         {/* Right Side Actions */}
