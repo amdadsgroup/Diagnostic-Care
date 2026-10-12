@@ -1,20 +1,65 @@
 import { MetadataRoute } from 'next';
+import { PRODUCTION_DOMAIN } from '@/config/seo';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnosticcare.vercel.app';
   return {
     rules: [
       {
         userAgent: '*',
+        allow: [
+          '/',
+          '/doctors',
+          '/doctors/*',
+          '/hospitals',
+          '/hospitals/*',
+          '/diagnostic-centers',
+          '/diagnostic-centers/*',
+          '/diagnostic-tests',
+          '/locations',
+          '/locations/*',
+          '/appointments',
+          '/privacy',
+          '/terms',
+        ],
+        disallow: [
+          '/admin/',
+          '/admin',
+          '/patient/',
+          '/patient',
+          '/doctor/dashboard',
+          '/doctor/portal',
+          '/assistant/',
+          '/assistant',
+          '/hospital/dashboard',
+          '/hospital/portal',
+          '/provider/subscription',
+          '/login',
+          '/register',
+          '/forgot-password',
+          '/reset-password',
+          '/api/',
+        ],
+      },
+      {
+        userAgent: 'Googlebot',
         allow: '/',
         disallow: [
-          '/api/',
-          '/reset-password',
           '/admin/',
+          '/patient/',
+          '/doctor/dashboard',
+          '/assistant/',
+          '/hospital/dashboard',
+          '/hospital/portal',
+          '/provider/subscription',
+          '/login',
+          '/register',
+          '/forgot-password',
+          '/reset-password',
+          '/api/',
         ],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
+    sitemap: `${PRODUCTION_DOMAIN}/sitemap.xml`,
+    host: PRODUCTION_DOMAIN,
   };
 }

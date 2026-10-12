@@ -1,69 +1,152 @@
 import { MetadataRoute } from 'next';
+import { PRODUCTION_DOMAIN } from '@/config/seo';
+import { INITIAL_DOCTORS, INITIAL_ORGANIZATIONS } from '@/lib/mock-data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnosticcare.vercel.app';
   const currentDate = new Date().toISOString();
 
-  return [
+  // 1. Core Public Static Pages
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}`,
+      url: `${PRODUCTION_DOMAIN}`,
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1.0,
       alternates: {
         languages: {
-          en: `${baseUrl}?lang=en`,
-          bn: `${baseUrl}?lang=bn`,
+          en: `${PRODUCTION_DOMAIN}?lang=en`,
+          bn: `${PRODUCTION_DOMAIN}?lang=bn`,
         },
       },
     },
     {
-      url: `${baseUrl}/doctors`,
+      url: `${PRODUCTION_DOMAIN}/doctors`,
       lastModified: currentDate,
       changeFrequency: 'daily',
+      priority: 0.95,
+      alternates: {
+        languages: {
+          en: `${PRODUCTION_DOMAIN}/doctors?lang=en`,
+          bn: `${PRODUCTION_DOMAIN}/doctors?lang=bn`,
+        },
+      },
+    },
+    {
+      url: `${PRODUCTION_DOMAIN}/hospitals`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
       priority: 0.9,
+      alternates: {
+        languages: {
+          en: `${PRODUCTION_DOMAIN}/hospitals?lang=en`,
+          bn: `${PRODUCTION_DOMAIN}/hospitals?lang=bn`,
+        },
+      },
     },
     {
-      url: `${baseUrl}/appointments`,
+      url: `${PRODUCTION_DOMAIN}/diagnostic-centers`,
       lastModified: currentDate,
-      changeFrequency: 'daily',
+      changeFrequency: 'weekly',
       priority: 0.9,
+      alternates: {
+        languages: {
+          en: `${PRODUCTION_DOMAIN}/diagnostic-centers?lang=en`,
+          bn: `${PRODUCTION_DOMAIN}/diagnostic-centers?lang=bn`,
+        },
+      },
     },
     {
-      url: `${baseUrl}/login`,
+      url: `${PRODUCTION_DOMAIN}/diagnostic-tests`,
       lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          en: `${PRODUCTION_DOMAIN}/diagnostic-tests?lang=en`,
+          bn: `${PRODUCTION_DOMAIN}/diagnostic-tests?lang=bn`,
+        },
+      },
     },
     {
-      url: `${baseUrl}/register`,
+      url: `${PRODUCTION_DOMAIN}/privacy`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${PRODUCTION_DOMAIN}/terms`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+  ];
+
+  // 2. Location-Based Discovery Pages
+  const locationRoutes: MetadataRoute.Sitemap = ['moulvibazar', 'sylhet', 'dhaka', 'chittagong'].map(
+    (loc) => ({
+      url: `${PRODUCTION_DOMAIN}/locations/${loc}`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
+      alternates: {
+        languages: {
+          en: `${PRODUCTION_DOMAIN}/locations/${loc}?lang=en`,
+          bn: `${PRODUCTION_DOMAIN}/locations/${loc}?lang=bn`,
+        },
+      },
+    })
+  );
+
+  // 3. Dynamic Verified Doctor Profiles
+  const doctorRoutes: MetadataRoute.Sitemap = INITIAL_DOCTORS.map((doc) => ({
+    url: `${PRODUCTION_DOMAIN}/doctors/${doc.id}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+    alternates: {
+      languages: {
+        en: `${PRODUCTION_DOMAIN}/doctors/${doc.id}?lang=en`,
+        bn: `${PRODUCTION_DOMAIN}/doctors/${doc.id}?lang=bn`,
+      },
     },
-    {
-      url: `${baseUrl}/forgot-password`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.5,
+  }));
+
+  // 4. Dynamic Hospital & Diagnostic Center Profiles
+  const hospitalRoutes: MetadataRoute.Sitemap = INITIAL_ORGANIZATIONS.filter(
+    (org) => org.orgType === 'HOSPITAL'
+  ).map((hosp) => ({
+    url: `${PRODUCTION_DOMAIN}/hospitals/${hosp.id}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+    alternates: {
+      languages: {
+        en: `${PRODUCTION_DOMAIN}/hospitals/${hosp.id}?lang=en`,
+        bn: `${PRODUCTION_DOMAIN}/hospitals/${hosp.id}?lang=bn`,
+      },
     },
-    {
-      url: `${baseUrl}/provider/onboard`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.8,
+  }));
+
+  const diagnosticCenterRoutes: MetadataRoute.Sitemap = INITIAL_ORGANIZATIONS.filter(
+    (org) => org.orgType === 'DIAGNOSTIC_CENTER'
+  ).map((dc) => ({
+    url: `${PRODUCTION_DOMAIN}/diagnostic-centers/${dc.id}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+    alternates: {
+      languages: {
+        en: `${PRODUCTION_DOMAIN}/diagnostic-centers/${dc.id}?lang=en`,
+        bn: `${PRODUCTION_DOMAIN}/diagnostic-centers/${dc.id}?lang=bn`,
+      },
     },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
+  }));
+
+  return [
+    ...staticRoutes,
+    ...locationRoutes,
+    ...doctorRoutes,
+    ...hospitalRoutes,
+    ...diagnosticCenterRoutes,
   ];
 }

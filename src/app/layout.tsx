@@ -6,86 +6,43 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import GlobalMobileNavigation from '@/components/navigation/GlobalMobileNavigation';
 import AdminCustomerBarrier from '@/components/auth/AdminCustomerBarrier';
 
+import { PRODUCTION_DOMAIN, constructMetadata } from '@/config/seo';
+import { generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo-schema';
+
 export const viewport: Viewport = {
-  themeColor: BRAND_COLORS.primary, // Signal Blue #0057FF
+  themeColor: BRAND_COLORS.primary,
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://diagnosticcare.vercel.app'),
-  title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
-  description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians, check real-time chamber serial queues, and book guaranteed appointments in ${BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION}, Sylhet, and nationwide. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
-  applicationName: BRAND_CONSTANTS.BRAND_NAME,
+export const metadata: Metadata = constructMetadata({
+  title: 'Diagnostic Care — Specialist Doctor Discovery & Healthcare Marketplace Bangladesh',
+  description: `Bangladesh's digital doctor discovery, hospital directory, and diagnostic test marketplace. Connect with verified specialist physicians, accredited diagnostic centers, and book guaranteed chamber appointments in Moulvibazar, Sylhet, Dhaka, and nationwide. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
+  canonicalPath: '/',
   keywords: [
-    'Diagnostic Care',
-    'Doctor Booking Bangladesh',
-    'Doctor Appointment Moulvibazar',
-    'Specialist Doctor Chamber',
-    'BMDC Doctor Chamber',
+    'Diagnostic Care Bangladesh',
+    'Find Doctors in Bangladesh',
+    'Specialist Doctor in Dhaka',
+    'Cardiologist in Sylhet',
+    'Gynecologist in Moulvibazar',
+    'Pediatrician in Bangladesh',
+    'Diagnostic Center Moulvibazar',
+    'Blood Test Price in Bangladesh',
+    'Hospitals in Dhaka',
     'Live Chamber Serial Queue',
-    'Cardiologist Moulvibazar',
-    'Gynecologist Moulvibazar',
-    'Pediatrician Moulvibazar',
-    'Digital Prescription Bangladesh',
   ],
-  authors: [{ name: BRAND_CONSTANTS.BRAND_NAME }],
-  creator: BRAND_CONSTANTS.BRAND_NAME,
-  publisher: BRAND_CONSTANTS.BRAND_NAME,
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: BRAND_CONSTANTS.BRAND_NAME,
-  },
-  formatDetection: {
-    telephone: false,
-  },
-  manifest: '/manifest.json',
-  icons: {
-    icon: [
-      { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icons/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
-      { url: '/icons/favicon-64x64.png', sizes: '64x64', type: 'image/png' },
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    shortcut: '/favicon.ico',
-  },
-  openGraph: {
-    title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
-    description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians and real-time chamber serial queues.`,
-    url: 'https://diagnosticcare.com.bd',
-    siteName: BRAND_CONSTANTS.BRAND_NAME,
-    images: [
-      {
-        url: BRAND_LOGOS.ogImage,
-        width: 1200,
-        height: 630,
-        alt: `${BRAND_CONSTANTS.BRAND_NAME} — ${BRAND_CONSTANTS.TAGLINE}`,
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${BRAND_CONSTANTS.BRAND_NAME} — Specialist Doctor Discovery & Chamber Booking`,
-    description: `Bangladesh's digital doctor discovery and instant chamber booking platform. Connect with verified specialist physicians.`,
-    images: [BRAND_LOGOS.ogImage],
-  },
-};
+});
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const organizationSchema = generateOrganizationSchema();
+  const webSiteSchema = generateWebSiteSchema();
+
   return (
     <html lang="en">
       <head>
@@ -99,29 +56,13 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'MedicalBusiness',
-              name: 'Diagnostic Care',
-              alternateName: 'ডায়াগনস্টিক কেয়ার',
-              description:
-                'Bangladesh digital healthcare marketplace connecting patients with verified doctors, diagnostic laboratories, hospitals, and 24/7 emergency services.',
-              url: 'https://diagnosticcare.com.bd',
-              telephone: '01886748564',
-              priceRange: '৳৳',
-              address: {
-                '@type': 'PostalAddress',
-                addressLocality: 'Moulvibazar Sadar',
-                addressRegion: 'Sylhet',
-                addressCountry: 'BD',
-              },
-              areaServed: {
-                '@type': 'Country',
-                name: 'Bangladesh',
-              },
-              availableLanguage: ['en', 'bn'],
-              openingHours: 'Mo,Tu,We,Th,Fr,Sa,Su 00:00-24:00',
-            }),
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteSchema),
           }}
         />
       </head>
