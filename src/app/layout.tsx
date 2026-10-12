@@ -13,8 +13,10 @@ export const viewport: Viewport = {
   themeColor: BRAND_COLORS.primary,
   width: 'device-width',
   initialScale: 1,
+  minimumScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
+  userScalable: true,
 };
 
 export const metadata: Metadata = constructMetadata({

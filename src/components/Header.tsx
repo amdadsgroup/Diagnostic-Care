@@ -228,263 +228,202 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Primary Navigation Bar */}
-      <div
-        className="container"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '10px 16px',
-          gap: '10px',
-        }}
-      >
-        {/* Left: Brand Logo (never shrinks) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          <div
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-            onClick={() => handleNavClick('marketplace')}
-          >
-            <BrandLogo
-              variant="horizontal"
-              size={32}
-              priority
-              altText="Diagnostic Care"
-            />
-          </div>
-        </div>
-
-        {/* Center: Desktop Navigation Bar (All Platform Functions Visible in Web View) */}
-        <nav
-          className="d-desktop-flex"
-          style={{
-            alignItems: 'center',
-            gap: '4px',
-            backgroundColor: 'rgba(248, 250, 252, 0.8)',
-            padding: '4px 6px',
-            borderRadius: '14px',
-            border: '1px solid rgba(226, 232, 240, 0.9)',
-            backdropFilter: 'blur(8px)',
-          }}
-          aria-label="Desktop Primary Navigation"
-        >
-          {/* 1. Home */}
-          <Link
-            href="/"
-            onClick={() => handleNavClick('marketplace')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: (pathname === '/' && activeTab === 'marketplace') ? 800 : 600,
-              color: (pathname === '/' && activeTab === 'marketplace') ? '#FFFFFF' : '#334155',
-              backgroundColor: (pathname === '/' && activeTab === 'marketplace') ? BRAND_COLORS.primary : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <Home size={14} />
-            <span>{language === 'en' ? 'Home' : 'হোম'}</span>
-          </Link>
-
-          {/* 2. Find Doctors */}
-          <Link
-            href="/doctors"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? 800 : 600,
-              color: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? '#FFFFFF' : '#334155',
-              backgroundColor: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? BRAND_COLORS.primary : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <Stethoscope size={14} />
-            <span>{language === 'en' ? 'Doctors' : 'ডাক্তার'}</span>
-          </Link>
-
-          {/* 3. My Appointments / Bookings */}
-          <Link
-            href="/appointments"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? 800 : 600,
-              color: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? '#FFFFFF' : '#334155',
-              backgroundColor: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? BRAND_COLORS.primary : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <CalendarCheck size={14} />
-            <span>{language === 'en' ? 'Appointments' : 'অ্যাপয়েন্টমেন্ট'}</span>
-          </Link>
-
-          {/* 4. Messages & Help Desk */}
-          <button
-            onClick={() => handleNavClick('messages')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '9px',
-              fontSize: '13px',
-              fontWeight: activeTab === 'messages' ? 800 : 600,
-              color: activeTab === 'messages' ? '#FFFFFF' : '#334155',
-              backgroundColor: activeTab === 'messages' ? BRAND_COLORS.primary : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <MessageSquare size={14} />
-            <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
-          </button>
-        </nav>
-
-        {/* Right Side Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          {/* Search Trigger (Desktop only) */}
-          <button
-            onClick={onOpenSearch || (() => handleNavClick('search'))}
-            aria-label="Search Healthcare Services"
-            className="clay-pill d-desktop-flex"
-            style={{
-              gap: '6px',
-              padding: '6px 10px',
-              color: 'var(--brand-text-dark)',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            <Search size={15} color={BRAND_COLORS.primary} />
-            <span className="d-desktop-inline">{language === 'en' ? 'Search' : 'সার্চ'}</span>
-          </button>
-
-          {/* Location Trigger */}
-          <button
-            onClick={onOpenLocation}
-            aria-label="Select Location Hub"
-            className="clay-pill"
-            style={{
-              gap: '4px',
-              padding: '6px 10px',
-              color: 'var(--brand-text-dark)',
-              fontSize: '12px',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            <MapPin size={13} color={BRAND_COLORS.primary} />
-            <span style={{ maxWidth: '85px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {selectedLocation}
-            </span>
-          </button>
-
-          {/* Mobile Quick Language Toggle */}
-          <button
-            onClick={() => {
-              const next = language === 'en' ? 'bn' : 'en';
-              setLanguage(next);
-              if (typeof window !== 'undefined') localStorage.setItem('dc_lang', next);
-            }}
-            aria-label="Switch Language"
-            className="clay-bubble d-mobile-flex"
-            style={{
-              padding: '4px 8px',
-              fontSize: '11px',
-              fontWeight: 800,
-              color: BRAND_COLORS.primary,
-              cursor: 'pointer',
-              lineHeight: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {language === 'en' ? 'বাং' : 'EN'}
-          </button>
-
-          {/* Auth Button */}
-          {currentUser ? (
-            <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '6px' }}>
-              <Link
-                href="/patient/dashboard"
-                className="clay-pill"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  textDecoration: 'none',
-                  gap: '6px',
-                  padding: '6px 10px',
-                  color: '#0F172A',
-                  fontSize: '12.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                <User size={13} color={BRAND_COLORS.primary} />
-                <span
-                  style={{
-                    maxWidth: '90px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {currentUser.fullName || (language === 'en' ? 'Profile' : 'প্রোফাইল')}
-                </span>
-              </Link>
-              {onLogout && (
-                <button
-                  onClick={onLogout}
-                  title={language === 'en' ? 'Sign Out' : 'লগআউট'}
-                  aria-label={language === 'en' ? 'Sign Out' : 'লগআউট'}
-                  className="clay-bubble"
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    backgroundColor: '#FEF2F2',
-                    border: '1.5px solid #FCA5A5',
-                    color: '#DC2626',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <LogOut size={13} />
-                </button>
-              )}
+      {/* Primary Navigation Bar */}
+      <div className="container">
+        <div className="header-nav-container">
+          {/* Left: Brand Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <div
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              onClick={() => handleNavClick('marketplace')}
+            >
+              <BrandLogo
+                variant="horizontal"
+                size={30}
+                priority
+                altText="Diagnostic Care"
+              />
             </div>
-          ) : (
-            onOpenAuth && (
-              <button
-                onClick={() => onOpenAuth('login')}
-                className="btn-secondary d-desktop-only"
-                style={{
-                  gap: '6px',
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                }}
-              >
-                <User size={14} color={BRAND_COLORS.primary} />
-                <span>{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
-              </button>
-            )
-          )}
+          </div>
 
+          {/* Center: Desktop Navigation Bar (Auto-adapting to screen sizes) */}
+          <nav
+            className="d-desktop-flex header-desktop-nav"
+            aria-label="Desktop Primary Navigation"
+          >
+            {/* 1. Home */}
+            <Link
+              href="/"
+              onClick={() => handleNavClick('marketplace')}
+              className="header-nav-btn"
+              style={{
+                fontWeight: (pathname === '/' && activeTab === 'marketplace') ? 800 : 600,
+                color: (pathname === '/' && activeTab === 'marketplace') ? '#FFFFFF' : '#334155',
+                backgroundColor: (pathname === '/' && activeTab === 'marketplace') ? BRAND_COLORS.primary : 'transparent',
+              }}
+            >
+              <Home size={14} />
+              <span>{language === 'en' ? 'Home' : 'হোম'}</span>
+            </Link>
+
+            {/* 2. Find Doctors */}
+            <Link
+              href="/doctors"
+              className="header-nav-btn"
+              style={{
+                fontWeight: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? 800 : 600,
+                color: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? '#FFFFFF' : '#334155',
+                backgroundColor: (pathname === '/doctors' || activeTab === 'search' || activeTab === 'discover') ? BRAND_COLORS.primary : 'transparent',
+              }}
+            >
+              <Stethoscope size={14} />
+              <span>{language === 'en' ? 'Doctors' : 'ডাক্তার'}</span>
+            </Link>
+
+            {/* 3. My Appointments / Bookings */}
+            <Link
+              href="/appointments"
+              className="header-nav-btn"
+              style={{
+                fontWeight: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? 800 : 600,
+                color: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? '#FFFFFF' : '#334155',
+                backgroundColor: (pathname === '/appointments' || activeTab === 'appointments' || activeTab === 'bookings') ? BRAND_COLORS.primary : 'transparent',
+              }}
+            >
+              <CalendarCheck size={14} />
+              <span>{language === 'en' ? 'Appointments' : 'অ্যাপয়েন্টমেন্ট'}</span>
+            </Link>
+
+            {/* 4. Messages & Help Desk */}
+            <button
+              onClick={() => handleNavClick('messages')}
+              className="header-nav-btn"
+              style={{
+                fontWeight: activeTab === 'messages' ? 800 : 600,
+                color: activeTab === 'messages' ? '#FFFFFF' : '#334155',
+                backgroundColor: activeTab === 'messages' ? BRAND_COLORS.primary : 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <MessageSquare size={14} />
+              <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
+            </button>
+          </nav>
+
+          {/* Right Side Actions */}
+          <div className="header-actions-right">
+            {/* Search Trigger (Desktop only) */}
+            <button
+              onClick={onOpenSearch || (() => handleNavClick('search'))}
+              aria-label="Search Healthcare Services"
+              className="clay-pill d-desktop-flex header-search-btn"
+              style={{ color: 'var(--brand-text-dark)' }}
+            >
+              <Search size={15} color={BRAND_COLORS.primary} />
+              <span className="d-desktop-inline">{language === 'en' ? 'Search' : 'সার্চ'}</span>
+            </button>
+
+            {/* Location Trigger */}
+            <button
+              onClick={onOpenLocation}
+              aria-label="Select Location Hub"
+              className="clay-pill header-location-btn"
+              style={{ color: 'var(--brand-text-dark)' }}
+            >
+              <MapPin size={13} color={BRAND_COLORS.primary} />
+              <span className="header-location-text">
+                {selectedLocation}
+              </span>
+            </button>
+
+            {/* Mobile Quick Language Toggle */}
+            <button
+              onClick={() => {
+                const next = language === 'en' ? 'bn' : 'en';
+                setLanguage(next);
+                if (typeof window !== 'undefined') localStorage.setItem('dc_lang', next);
+              }}
+              aria-label="Switch Language"
+              className="clay-bubble d-mobile-flex"
+              style={{
+                padding: '4px 8px',
+                fontSize: '11px',
+                fontWeight: 800,
+                color: BRAND_COLORS.primary,
+                cursor: 'pointer',
+                lineHeight: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {language === 'en' ? 'বাং' : 'EN'}
+            </button>
+
+            {/* Auth Button */}
+            {currentUser ? (
+              <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '6px' }}>
+                <Link
+                  href="/patient/dashboard"
+                  className="clay-pill"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    gap: '6px',
+                    padding: '6px 10px',
+                    color: '#0F172A',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <User size={13} color={BRAND_COLORS.primary} />
+                  <span
+                    style={{
+                      maxWidth: '90px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {currentUser.fullName || (language === 'en' ? 'Profile' : 'প্রোফাইল')}
+                  </span>
+                </Link>
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    title={language === 'en' ? 'Sign Out' : 'লগআউট'}
+                    aria-label={language === 'en' ? 'Sign Out' : 'লগআউট'}
+                    className="clay-bubble"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      backgroundColor: '#FEF2F2',
+                      border: '1.5px solid #FCA5A5',
+                      color: '#DC2626',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <LogOut size={13} />
+                  </button>
+                )}
+              </div>
+            ) : (
+              onOpenAuth && (
+                <button
+                  onClick={() => onOpenAuth('login')}
+                  className="btn-secondary d-desktop-only header-auth-btn"
+                >
+                  <User size={14} color={BRAND_COLORS.primary} />
+                  <span className="auth-btn-full-text">{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
+                  <span className="auth-btn-short-text">{language === 'en' ? 'Sign In' : 'লগইন'}</span>
+                </button>
+              )
+            )}
+
+          </div>
         </div>
       </div>
 

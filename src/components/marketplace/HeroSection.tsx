@@ -99,7 +99,7 @@ export default function HeroSection({
             {/* Main Headline */}
             <h1
               style={{
-                fontSize: 'clamp(20px, 4.6vw, 38px)',
+                fontSize: 'clamp(22px, 3.2vw + 6px, 36px)',
                 fontWeight: 800,
                 lineHeight: 1.25,
                 letterSpacing: '-0.02em',
