@@ -5,6 +5,7 @@ import { BRAND, BRAND_COLORS } from '@/config/brand';
 import { BrandSymbol } from '@/components/brand/BrandSymbol';
 import { CalendarCheck, Lock, Users, Phone, CheckCircle2 } from 'lucide-react';
 import { AppointmentService } from '@/services/appointment.service';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface FamilyMember {
   id: string;
@@ -32,7 +33,7 @@ interface PatientAppointment {
 }
 
 export default function PatientDashboard({
-  patientName = 'সম্মানিত রোগী',
+  patientName,
   phone = '',
   patientId,
 }: {
@@ -40,6 +41,11 @@ export default function PatientDashboard({
   phone?: string;
   patientId?: string;
 }) {
+  const { language, formatCurrency, formatNumber } = useLanguage();
+  const isBn = language === 'bn';
+
+  const defaultDisplayName = patientName || (isBn ? 'সম্মানিত রোগী' : 'Respected Patient');
+
   const [activeTab, setActiveTab] = useState<'appointments' | 'vault' | 'family'>('appointments');
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [appointments, setAppointments] = useState<PatientAppointment[]>([]);
@@ -76,7 +82,7 @@ export default function PatientDashboard({
   // Add Family Member state
   const [showAddMember, setShowAddMember] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
-  const [newMemberRelation, setNewMemberRelation] = useState('পিতা (Father)');
+  const [newMemberRelation, setNewMemberRelation] = useState(isBn ? 'পিতা' : 'Father');
   const [newMemberAge, setNewMemberAge] = useState('');
   const [newMemberGender, setNewMemberGender] = useState<'MALE' | 'FEMALE'>('MALE');
   const [newMemberBlood, setNewMemberBlood] = useState('B+');
@@ -109,11 +115,11 @@ export default function PatientDashboard({
             </div>
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0, 87, 255, 0.35)', padding: '3px 8px', borderRadius: '12px', fontSize: '0.75rem', marginBottom: '4px', color: '#BFDBFE', fontWeight: 600 }}>
-                <CheckCircle2 size={12} color="#60A5FA" /> ভেরিফাইড পেশেন্ট প্রোফাইল
+                <CheckCircle2 size={12} color="#60A5FA" /> {isBn ? 'ভেরিফাইড পেশেন্ট প্রোফাইল' : 'Verified Patient Profile'}
               </div>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{patientName}</h1>
+              <h1 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{defaultDisplayName}</h1>
               <p style={{ opacity: 0.85, fontSize: '0.85rem' }}>
-                {phone ? `মোবাইল: ${phone}` : 'মোবাইল নম্বর যুক্ত করুন'} • সুরক্ষিত স্বাস্থ্য প্রোফাইল
+                {phone ? (isBn ? `মোবাইল: ${formatNumber(phone)}` : `Mobile: ${phone}`) : (isBn ? 'মোবাইল নম্বর যুক্ত করুন' : 'Add mobile number')} • {isBn ? 'সুরক্ষিত স্বাস্থ্য প্রোফাইল' : 'Secure Health Profile'}
               </p>
             </div>
           </div>
@@ -135,14 +141,14 @@ export default function PatientDashboard({
                 textDecoration: 'none',
               }}
             >
-              <Phone size={14} color="#60A5FA" /> হেল্পলাইন: {BRAND.displayPhone}
+              <Phone size={14} color="#60A5FA" /> {isBn ? `হেল্পলাইন: ${formatNumber(BRAND.displayPhone)}` : `Helpline: ${BRAND.displayPhone}`}
             </a>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--slate-200)', paddingBottom: '2px' }}>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--slate-200)', paddingBottom: '2px', overflowX: 'auto' }}>
         <button
           onClick={() => setActiveTab('appointments')}
           style={{
@@ -154,10 +160,16 @@ export default function PatientDashboard({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
+            whiteSpace: 'nowrap',
+            background: 'none',
+            borderTop: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            cursor: 'pointer',
           }}
         >
           <CalendarCheck size={18} color={activeTab === 'appointments' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
-          <span>আমার অ্যাপয়েন্টমেন্টস ({appointments.length})</span>
+          <span>{isBn ? `আমার অ্যাপয়েন্টমেন্টস (${formatNumber(appointments.length)})` : `My Appointments (${appointments.length})`}</span>
         </button>
 
         <button
@@ -171,10 +183,16 @@ export default function PatientDashboard({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
+            whiteSpace: 'nowrap',
+            background: 'none',
+            borderTop: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            cursor: 'pointer',
           }}
         >
           <Lock size={18} color={activeTab === 'vault' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
-          <span>ডিজিটাল হেলথ ভল্ট (প্রেসক্রিপশন ও রিপোর্ট)</span>
+          <span>{isBn ? 'ডিজিটাল হেলথ ভল্ট (প্রেসক্রিপশন ও রিপোর্ট)' : 'Digital Health Vault (Prescriptions & Reports)'}</span>
         </button>
 
         <button
@@ -188,10 +206,16 @@ export default function PatientDashboard({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
+            whiteSpace: 'nowrap',
+            background: 'none',
+            borderTop: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            cursor: 'pointer',
           }}
         >
           <Users size={18} color={activeTab === 'family' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
-          <span>পরিবার সদস্য প্রোফাইল ({familyMembers.length})</span>
+          <span>{isBn ? `পরিবার সদস্য প্রোফাইল (${formatNumber(familyMembers.length)})` : `Family Member Profiles (${familyMembers.length})`}</span>
         </button>
       </div>
 
@@ -203,13 +227,13 @@ export default function PatientDashboard({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <span style={{ background: 'var(--brand-navy-900)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontWeight: 800, fontSize: '0.85rem' }}>
-                    টোকেন #{apt.tokenNumber}
+                    {isBn ? `টোকেন #${formatNumber(apt.tokenNumber)}` : `Token #${apt.tokenNumber}`}
                   </span>
                   <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--slate-500)' }}>
-                    কোড: {apt.bookingCode}
+                    {isBn ? `কোড: ${apt.bookingCode}` : `Code: ${apt.bookingCode}`}
                   </span>
                   <span style={{ background: apt.status === 'CONFIRMED' ? 'var(--brand-emerald-50)' : 'var(--slate-100)', color: apt.status === 'CONFIRMED' ? 'var(--brand-emerald-500)' : 'var(--slate-600)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
-                    {apt.status === 'CONFIRMED' ? '✓ নিশ্চিত' : 'সম্পন্ন'}
+                    {apt.status === 'CONFIRMED' ? (isBn ? '✓ নিশ্চিত' : '✓ Confirmed') : (isBn ? 'সম্পন্ন' : 'Completed')}
                   </span>
                 </div>
 
@@ -223,23 +247,23 @@ export default function PatientDashboard({
                   📍 {apt.chamberName}
                 </p>
                 <p style={{ fontSize: '0.8rem', color: 'var(--slate-500)', marginTop: '2px' }}>
-                  রোগী: <strong>{apt.forWhom}</strong> • সময়: {apt.date}, {apt.time}
+                  {isBn ? 'রোগী:' : 'Patient:'} <strong>{apt.forWhom}</strong> • {isBn ? 'সময়:' : 'Time:'} {apt.date}, {apt.time}
                 </p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                 <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--brand-navy-900)' }}>
-                  ৳{apt.fee}
+                  {formatCurrency(apt.fee)}
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {apt.hasPrescription && (
-                    <button style={{ padding: '6px 12px', background: 'var(--brand-teal-50)', color: 'var(--brand-teal-600)', border: '1px solid var(--brand-teal-500)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600 }}>
-                      📄 প্রেসক্রিপশন দেখুন
+                    <button style={{ padding: '6px 12px', background: 'var(--brand-teal-50)', color: 'var(--brand-teal-600)', border: '1px solid var(--brand-teal-500)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                      {isBn ? '📄 প্রেসক্রিপশন দেখুন' : '📄 View Prescription'}
                     </button>
                   )}
                   {apt.hasReport && (
-                    <button style={{ padding: '6px 12px', background: 'var(--brand-emerald-50)', color: '#065f46', border: '1px solid var(--brand-emerald-500)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600 }}>
-                      🧪 রিপোর্ট ডাউনলোড
+                    <button style={{ padding: '6px 12px', background: 'var(--brand-emerald-50)', color: '#065f46', border: '1px solid var(--brand-emerald-500)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                      {isBn ? '🧪 রিপোর্ট ডাউনলোড' : '🧪 Download Report'}
                     </button>
                   )}
                 </div>
@@ -262,10 +286,12 @@ export default function PatientDashboard({
                 <CalendarCheck size={28} color="var(--slate-500)" />
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--brand-navy-900)', margin: 0 }}>
-                এখনও কোনো অ্যাপয়েন্টমেন্ট বুক করা নেই
+                {isBn ? 'এখনও কোনো অ্যাপয়েন্টমেন্ট বুক করা নেই' : 'No Appointments Booked Yet'}
               </h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--slate-500)', maxWidth: '400px', margin: 0 }}>
-                মৌলভীবাজার ও সিলেটে অভিজ্ঞ বিশেষজ্ঞ ডাক্তার অথবা বিশ্বস্ত ডায়াগনস্টিক সেন্টারের ল্যাব টেস্ট খুব সহজেই বুক করুন।
+                {isBn
+                  ? 'মৌলভীবাজার ও সিলেটে অভিজ্ঞ বিশেষজ্ঞ ডাক্তার অথবা বিশ্বস্ত ডায়াগনস্টিক সেন্টারের ল্যাব টেস্ট খুব সহজেই বুক করুন।'
+                  : 'Easily book verified specialist doctors or trusted diagnostic test laboratories across Moulvibazar & Sylhet.'}
               </p>
             </div>
           )}
@@ -276,7 +302,10 @@ export default function PatientDashboard({
       {activeTab === 'vault' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ background: 'var(--brand-teal-50)', padding: '16px', borderRadius: '10px', border: '1px solid var(--brand-teal-500)', fontSize: '0.9rem', color: 'var(--brand-navy-900)' }}>
-            🔒 <strong>ডিজিটাল হেলথ ভল্ট:</strong> আপনার ও পরিবারের সকল ডাক্তারের প্রেসক্রিপশন ও ল্যাব টেস্ট রিপোর্ট আজীবন এনক্রিপ্টেড ও সুরক্ষিত থাকে। যেকোনো সময় ডাক্তারকে দেখাতে পারবেন।
+            🔒 <strong>{isBn ? 'ডিজিটাল হেলথ ভল্ট:' : 'Digital Health Vault:'}</strong>{' '}
+            {isBn
+              ? 'আপনার ও পরিবারের সকল ডাক্তারের প্রেসক্রিপশন ও ল্যাব টেস্ট রিপোর্ট আজীবন এনক্রিপ্টেড ও সুরক্ষিত থাকে। যেকোনো সময় ডাক্তারকে দেখাতে পারবেন।'
+              : 'Prescriptions and lab test reports for you and your family are permanently encrypted and preserved. Share securely with any doctor anytime.'}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
@@ -284,15 +313,21 @@ export default function PatientDashboard({
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                 <span style={{ fontSize: '1.8rem' }}>📝</span>
                 <div>
-                  <h4 style={{ fontWeight: 800, color: 'var(--brand-navy-900)' }}>ডিজিটাল প্রেসক্রিপশন</h4>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>ডাঃ রফিকুল ইসলাম • ২৫ সেপ্টে, ২০২৬</p>
+                  <h4 style={{ fontWeight: 800, color: 'var(--brand-navy-900)' }}>
+                    {isBn ? 'ডিজিটাল প্রেসক্রিপশন' : 'Digital Prescription'}
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>
+                    {isBn ? 'ডাঃ রফিকুল ইসলাম • ২৫ সেপ্টে, ২০২৬' : 'Dr. Rafiqul Islam • Sep 25, 2026'}
+                  </p>
                 </div>
               </div>
               <p style={{ fontSize: '0.85rem', color: 'var(--slate-700)', marginBottom: '12px' }}>
-                রোগ নির্ণয়: Essential Hypertension (Concor 2.5mg, Rosuva 10mg)
+                {isBn
+                  ? 'রোগ নির্ণয়: Essential Hypertension (Concor 2.5mg, Rosuva 10mg)'
+                  : 'Diagnosis: Essential Hypertension (Concor 2.5mg, Rosuva 10mg)'}
               </p>
-              <button style={{ width: '100%', padding: '8px', background: 'var(--brand-navy-900)', color: 'white', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600 }}>
-                প্রেসক্রিপশন ওপেন করুন (PDF) 📄
+              <button style={{ width: '100%', padding: '8px', background: 'var(--brand-navy-900)', color: 'white', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                {isBn ? 'প্রেসক্রিপশন ওপেন করুন (PDF) 📄' : 'Open Prescription (PDF) 📄'}
               </button>
             </div>
 
@@ -300,15 +335,19 @@ export default function PatientDashboard({
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                 <span style={{ fontSize: '1.8rem' }}>🧪</span>
                 <div>
-                  <h4 style={{ fontWeight: 800, color: 'var(--brand-navy-900)' }}>কমপ্লিট ব্লাড কাউন্ট (CBC)</h4>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>মৌলভীবাজার ডায়াগনস্টিক • ২৬ সেপ্টে, ২০২৬</p>
+                  <h4 style={{ fontWeight: 800, color: 'var(--brand-navy-900)' }}>
+                    {isBn ? 'কমপ্লিট ব্লাড কাউন্ট (CBC)' : 'Complete Blood Count (CBC)'}
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>
+                    {isBn ? 'মৌলভীবাজার ডায়াগনস্টিক • ২৬ সেপ্টে, ২০২৬' : 'Moulvibazar Diagnostic • Sep 26, 2026'}
+                  </p>
                 </div>
               </div>
               <p style={{ fontSize: '0.85rem', color: 'var(--slate-700)', marginBottom: '12px' }}>
-                ভেরিফাইড রিপোর্ট • হিমোগ্লোবিন: 14.2 g/dL (স্বাভাবিক)
+                {isBn ? 'ভেরিফাইড রিপোর্ট • হিমোগ্লোবিন: 14.2 g/dL (স্বাভাবিক)' : 'Verified Report • Hemoglobin: 14.2 g/dL (Normal)'}
               </p>
-              <button style={{ width: '100%', padding: '8px', background: 'var(--brand-teal-600)', color: 'white', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600 }}>
-                অফিসিয়াল রিপোর্ট ডাউনলোড করুন ⬇
+              <button style={{ width: '100%', padding: '8px', background: 'var(--brand-teal-600)', color: 'white', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                {isBn ? 'অফিসিয়াল রিপোর্ট ডাউনলোড করুন ⬇' : 'Download Official Report ⬇'}
               </button>
             </div>
           </div>
@@ -318,16 +357,18 @@ export default function PatientDashboard({
       {/* TAB 3: FAMILY MEMBERS */}
       {activeTab === 'family' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <p style={{ fontSize: '0.9rem', color: 'var(--slate-600)' }}>
-              একটি অ্যাকাউন্ট থেকেই পরিবারের সকল সদস্যের ডাক্তার ও ল্যাব টেস্ট বুকিং করতে পারবেন।
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--slate-600)', margin: 0 }}>
+              {isBn
+                ? 'একটি অ্যাকাউন্ট থেকেই পরিবারের সকল সদস্যের ডাক্তার ও ল্যাব টেস্ট বুকিং করতে পারবেন।'
+                : 'Book doctors and lab tests for all your family members from a single unified account.'}
             </p>
             <button
               onClick={() => setShowAddMember(true)}
               className="btn-primary"
-              style={{ fontSize: '0.85rem', padding: '8px 16px' }}
+              style={{ fontSize: '0.85rem', padding: '8px 16px', cursor: 'pointer' }}
             >
-              + নতুন সদস্য যোগ করুন
+              {isBn ? '+ নতুন সদস্য যোগ করুন' : '+ Add Family Member'}
             </button>
           </div>
 
@@ -343,14 +384,16 @@ export default function PatientDashboard({
                   </span>
                 </div>
                 <p style={{ fontSize: '0.85rem', color: 'var(--slate-600)' }}>
-                  বয়স: {member.age} বছর • {member.gender === 'MALE' ? 'পুরুষ' : 'মহিলা'}
+                  {isBn
+                    ? `বয়স: ${formatNumber(member.age)} বছর • ${member.gender === 'MALE' ? 'পুরুষ' : 'মহিলা'}`
+                    : `Age: ${member.age} years • ${member.gender === 'MALE' ? 'Male' : 'Female'}`}
                 </p>
                 <p style={{ fontSize: '0.85rem', color: 'var(--brand-rose-600)', fontWeight: 700, marginTop: '4px' }}>
-                  রক্তের গ্রুপ: {member.bloodGroup}
+                  {isBn ? `রক্তের গ্রুপ: ${member.bloodGroup}` : `Blood Group: ${member.bloodGroup}`}
                 </p>
                 <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--slate-200)', display: 'flex', gap: '8px' }}>
-                  <button style={{ flex: 1, padding: '6px', background: 'var(--brand-teal-50)', color: 'var(--brand-teal-600)', border: '1px solid var(--brand-teal-500)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600 }}>
-                    ডাক্তার বুক করুন
+                  <button style={{ flex: 1, padding: '6px', background: 'var(--brand-teal-50)', color: 'var(--brand-teal-600)', border: '1px solid var(--brand-teal-500)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    {isBn ? 'ডাক্তার বুক করুন' : 'Book Doctor'}
                   </button>
                 </div>
               </div>
@@ -370,7 +413,7 @@ export default function PatientDashboard({
               >
                 <Users size={28} color="var(--slate-400)" />
                 <p style={{ fontSize: '0.9rem', color: 'var(--slate-600)', margin: 0 }}>
-                  এখনও কোনো পারিবারিক সদস্য যুক্ত করা হয়নি।
+                  {isBn ? 'এখনও কোনো পারিবারিক সদস্য যুক্ত করা হয়নি।' : 'No family members added yet.'}
                 </p>
                 <button
                   onClick={() => setShowAddMember(true)}
@@ -386,7 +429,7 @@ export default function PatientDashboard({
                     marginTop: '4px',
                   }}
                 >
-                  + প্রথম সদস্য যোগ করুন
+                  {isBn ? '+ প্রথম সদস্য যোগ করুন' : '+ Add First Member'}
                 </button>
               </div>
             )}
@@ -397,16 +440,18 @@ export default function PatientDashboard({
             <div className="modal-overlay" onClick={() => setShowAddMember(false)}>
               <div className="modal-container" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                  <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>পরিবারের সদস্য যোগ করুন</div>
+                  <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>
+                    {isBn ? 'পরিবারের সদস্য যোগ করুন' : 'Add Family Member'}
+                  </div>
                   <button className="modal-close" onClick={() => setShowAddMember(false)}>✕</button>
                 </div>
 
                 <form onSubmit={handleAddMember} className="modal-body auth-form">
                   <div className="auth-field">
-                    <label>সদস্যের পূর্ণ নাম *</label>
+                    <label>{isBn ? 'সদস্যের পূর্ণ নাম *' : "Member's Full Name *"}</label>
                     <input
                       type="text"
-                      placeholder="যেমন: মোঃ আব্দুল করিম"
+                      placeholder={isBn ? 'যেমন: মোঃ আব্দুল করিম' : 'e.g. Md. Abdul Karim'}
                       value={newMemberName}
                       onChange={(e) => setNewMemberName(e.target.value)}
                       required
@@ -415,22 +460,22 @@ export default function PatientDashboard({
 
                   <div className="auth-row">
                     <div className="auth-field">
-                      <label>সম্পর্ক *</label>
+                      <label>{isBn ? 'সম্পর্ক *' : 'Relation *'}</label>
                       <select value={newMemberRelation} onChange={(e) => setNewMemberRelation(e.target.value)}>
-                        <option value="পিতা (Father)">পিতা (Father)</option>
-                        <option value="মাতা (Mother)">মাতা (Mother)</option>
-                        <option value="স্ত্রী (Spouse)">স্ত্রী (Spouse)</option>
-                        <option value="সন্তান (Child)">সন্তান (Child)</option>
-                        <option value="ভাই/বোন (Sibling)">ভাই/বোন (Sibling)</option>
-                        <option value="দাদা/দাদী (Grandparent)">দাদা/দাদী (Grandparent)</option>
+                        <option value={isBn ? 'পিতা (Father)' : 'Father'}>{isBn ? 'পিতা (Father)' : 'Father'}</option>
+                        <option value={isBn ? 'মাতা (Mother)' : 'Mother'}>{isBn ? 'মাতা (Mother)' : 'Mother'}</option>
+                        <option value={isBn ? 'স্ত্রী / স্বামী (Spouse)' : 'Spouse'}>{isBn ? 'স্ত্রী / স্বামী (Spouse)' : 'Spouse'}</option>
+                        <option value={isBn ? 'সন্তান (Child)' : 'Child'}>{isBn ? 'সন্তান (Child)' : 'Child'}</option>
+                        <option value={isBn ? 'ভাই/বোন (Sibling)' : 'Sibling'}>{isBn ? 'ভাই/বোন (Sibling)' : 'Sibling'}</option>
+                        <option value={isBn ? 'দাদা/দাদী (Grandparent)' : 'Grandparent'}>{isBn ? 'দাদা/দাদী (Grandparent)' : 'Grandparent'}</option>
                       </select>
                     </div>
 
                     <div className="auth-field">
-                      <label>বয়স *</label>
+                      <label>{isBn ? 'বয়স *' : 'Age *'}</label>
                       <input
                         type="number"
-                        placeholder="বয়স"
+                        placeholder={isBn ? 'বয়স' : 'Age'}
                         value={newMemberAge}
                         onChange={(e) => setNewMemberAge(e.target.value)}
                         min={1}
@@ -442,15 +487,15 @@ export default function PatientDashboard({
 
                   <div className="auth-row">
                     <div className="auth-field">
-                      <label>লিঙ্গ</label>
+                      <label>{isBn ? 'লিঙ্গ' : 'Gender'}</label>
                       <select value={newMemberGender} onChange={(e) => setNewMemberGender(e.target.value as 'MALE' | 'FEMALE')}>
-                        <option value="MALE">পুরুষ</option>
-                        <option value="FEMALE">মহিলা</option>
+                        <option value="MALE">{isBn ? 'পুরুষ' : 'Male'}</option>
+                        <option value="FEMALE">{isBn ? 'মহিলা' : 'Female'}</option>
                       </select>
                     </div>
 
                     <div className="auth-field">
-                      <label>রক্তের গ্রুপ</label>
+                      <label>{isBn ? 'রক্তের গ্রুপ' : 'Blood Group'}</label>
                       <select value={newMemberBlood} onChange={(e) => setNewMemberBlood(e.target.value)}>
                         {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((b) => (
                           <option key={b} value={b}>{b}</option>
@@ -463,12 +508,12 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={() => setShowAddMember(false)}
-                      style={{ padding: '8px 16px', border: '1px solid var(--slate-300)', borderRadius: '6px' }}
+                      style={{ padding: '8px 16px', border: '1px solid var(--slate-300)', borderRadius: '6px', background: 'transparent', cursor: 'pointer' }}
                     >
-                      বাতিল
+                      {isBn ? 'বাতিল' : 'Cancel'}
                     </button>
-                    <button type="submit" className="btn-primary">
-                      সদস্য সংরক্ষণ করুন ✓
+                    <button type="submit" className="btn-primary" style={{ cursor: 'pointer' }}>
+                      {isBn ? 'সদস্য সংরক্ষণ করুন ✓' : 'Save Member ✓'}
                     </button>
                   </div>
                 </form>
