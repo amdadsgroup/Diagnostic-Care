@@ -17,6 +17,26 @@
   --brand-fresh-mint: #EBF3FF;
   --brand-teal: #0060FA;
   --brand-navy: #090D14;             /* Logo Deep Ink Header */
+  --brand-navy-900: #0B2545;
+  --brand-navy-800: #0F2D59;
+  --brand-navy-700: #13396F;
+  --brand-navy-600: #18478A;
+  
+  --brand-teal-50: #F0FDFA;
+  --brand-teal-500: #14B8A6;
+  --brand-teal-700: #0F766E;
+  --brand-teal-800: #115E59;
+  --brand-emerald-600: #059669;
+
+  /* Aliases & Shared Palette */
+  --color-primary: var(--brand-primary, #0060FA);
+  --color-text-primary: var(--brand-text-dark, #090D14);
+  --color-text-secondary: var(--brand-text-secondary, #475569);
+  --color-bg-soft: var(--brand-bg, #F8FAFC);
+  --border-subtle: #E2E8F0;
+  --blue-50: #EFF6FF;
+  --glass-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
   --brand-secondary-blue: #E0F2FE;
   --brand-accent-blue: #00A3FF;
 

@@ -168,25 +168,43 @@ export default function HospitalAuthModal({
       >
         {/* Modal Header */}
         <div style={{
-          background: 'linear-gradient(135deg, var(--brand-navy-900) 0%, #004ed1 100%)',
+          background: 'linear-gradient(135deg, #0B2545 0%, #004ed1 100%)',
           color: '#FFFFFF',
           padding: '22px 24px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          borderTopLeftRadius: '16px',
+          borderTopRightRadius: '16px',
         }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem', fontWeight: 800 }}>
               <Building2 size={24} color="#60A5FA" />
-              <span>{isBn ? 'হাসপাতাল ও প্রোভাইডার এক্সেস হাব' : 'Hospital & Provider Access Hub'}</span>
+              <span style={{ color: '#FFFFFF' }}>{isBn ? 'হাসপাতাল ও প্রোভাইডার এক্সেস হাব' : 'Hospital & Provider Access Hub'}</span>
             </div>
-            <div style={{ fontSize: '0.82rem', opacity: 0.9, marginTop: '4px' }}>
+            <div style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.9)', marginTop: '4px' }}>
               {mode === 'login'
                 ? (isBn ? 'হাসপাতাল, ডায়াগনস্টিক সেন্টার ও ডাক্তার লগইন' : 'Hospital, Diagnostic Center & Doctor Portal Login')
                 : (isBn ? 'নতুন হাসপাতাল অ্যাকাউন্ট তৈরি করুন' : 'Create Hospital & Healthcare Provider Account')}
             </div>
           </div>
-          <button className="modal-close" onClick={onClose} style={{ color: '#FFFFFF', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button 
+            type="button"
+            className="modal-close" 
+            onClick={onClose} 
+            style={{ 
+              color: '#FFFFFF', 
+              background: 'rgba(255, 255, 255, 0.2)', 
+              border: '1.5px solid rgba(255, 255, 255, 0.4)', 
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer' 
+            }}
+          >
             <X size={20} />
           </button>
         </div>
