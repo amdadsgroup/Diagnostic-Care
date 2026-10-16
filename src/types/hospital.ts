@@ -1,15 +1,21 @@
 export type HospitalVerificationStatus = 'draft' | 'pending' | 'under_review' | 'verified' | 'rejected' | 'suspended';
 
+export type InstitutionType = 'hospital' | 'diagnostic_center' | 'combined';
+
 export type HospitalStaffRole =
   | 'hospital_owner'
   | 'hospital_manager'
   | 'branch_manager'
   | 'receptionist'
-  | 'finance_staff';
+  | 'diagnostic_staff'
+  | 'finance_staff'
+  | 'billing_staff'
+  | 'doctor';
 
 export interface HospitalProfile {
   id: string;
   ownerProfileId?: string;
+  institutionType?: InstitutionType;
   name: string;
   nameBn?: string;
   slug: string;
@@ -24,7 +30,9 @@ export interface HospitalProfile {
   hasIcu: boolean;
   hasNicu: boolean;
   hasEmergency247: boolean;
+  hasHomeSampleCollection?: boolean;
   description?: string;
+  descriptionBn?: string;
   logoUrl?: string;
   coverImageUrl?: string;
   verificationStatus: HospitalVerificationStatus;
@@ -32,7 +40,11 @@ export interface HospitalProfile {
   totalReviews: number;
   status: 'active' | 'suspended' | 'pending';
   district?: string;
+  division?: string;
+  upazila?: string;
   addressLine?: string;
+  authorizedPersonName?: string;
+  authorizedPersonPhone?: string;
 }
 
 export interface HospitalBranch {
@@ -75,7 +87,7 @@ export interface HospitalDoctorAssociation {
   branchName?: string;
   departmentId?: string;
   departmentName?: string;
-  status: 'active' | 'pending_consent' | 'rejected' | 'ended';
+  status: 'active' | 'pending_consent' | 'rejected' | 'ended' | 'inactive';
   consultationFee: number;
   followupFee: number;
   chamberRoom?: string;
@@ -158,8 +170,73 @@ export interface HospitalDashboardStats {
   activeDepartments: number;
   publishedServices: number;
   todayAppointmentsCount: number;
+  pendingAppointmentsCount: number;
+  confirmedAppointmentsCount: number;
   upcomingAppointmentsCount: number;
   completedAppointmentsCount: number;
   cancelledAppointmentsCount: number;
+  totalDiagnosticBookings: number;
+  activeDiagnosticTests: number;
+  outstandingBalanceBdt: number;
   profileCompletionPercent: number;
+}
+
+export type DiagnosticBookingStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'sample_collected'
+  | 'processing'
+  | 'report_ready'
+  | 'delivered'
+  | 'cancelled';
+
+export interface DiagnosticBookingItem {
+  id: string;
+  bookingId: string;
+  testId?: string;
+  testName: string;
+  price: number;
+}
+
+export interface DiagnosticBooking {
+  id: string;
+  bookingCode: string;
+  patientId: string;
+  patientName: string;
+  patientPhone: string;
+  diagnosticCenterId: string;
+  branchId?: string;
+  branchName?: string;
+  bookingDate: string;
+  preferredTime?: string;
+  isHomeCollection: boolean;
+  collectionAddress?: string;
+  totalAmount: number;
+  discountAmount: number;
+  netPayable: number;
+  paymentStatus: 'pending' | 'paid' | 'cash_at_desk';
+  status: DiagnosticBookingStatus;
+  items?: DiagnosticBookingItem[];
+  reportUrl?: string;
+  reportCode?: string;
+  reportPublishedAt?: string;
+  createdAt: string;
+}
+
+export interface LabTestItem {
+  id: string;
+  diagnosticCenterId: string;
+  name: string;
+  nameBn?: string;
+  category: string;
+  sampleType?: string;
+  turnaroundHours: number;
+  preparationInstructions?: string;
+  preparationInstructionsBn?: string;
+  price: number;
+  discountPrice?: number;
+  isHomeSampleSupported: boolean;
+  isAvailable: boolean;
+  branchId?: string;
+  branchName?: string;
 }
