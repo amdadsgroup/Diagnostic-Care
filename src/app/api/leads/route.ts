@@ -20,20 +20,17 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      businessName,
-      contactPerson,
-      phone,
-      email,
-      providerType,
-      leadSource,
-      stage,
-      assignedToAgentName,
-      districtName,
-      potentialMonthlyRevenueBDT,
-      notes,
-      nextFollowupDate,
-    } = body;
+    const businessName = body.businessName || body.organizationName;
+    const phone = body.phone || body.contactPhone;
+    const contactPerson = body.contactPerson || body.contactName;
+    const email = body.email;
+    const providerType = body.providerType;
+    const leadSource = body.leadSource || 'WEB_ONBOARDING';
+    const stage = body.stage || 'NEW';
+    const assignedToAgentName = body.assignedToAgentName;
+    const districtName = body.districtName || body.district;
+    const potentialMonthlyRevenueBDT = body.potentialMonthlyRevenueBDT;
+    const nextFollowupDate = body.nextFollowupDate;
 
     if (!businessName || !phone) {
       return NextResponse.json(
@@ -42,18 +39,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const compiledNotes = body.notes || [
+      body.licenseNumber ? `Trade License: ${body.licenseNumber}` : null,
+      body.dghsNumber ? `DGHS: ${body.dghsNumber}` : null,
+      body.address ? `Address: ${body.address}` : null,
+      body.selectedPlanTier ? `Plan: ${body.selectedPlanTier} (${body.billingInterval || 'monthly'})` : null,
+    ].filter(Boolean).join(' | ') || 'New provider lead';
+
     const lead = servicesEngine.createLead({
       businessName,
       contactPerson: contactPerson || 'Authorized Representative',
       phone,
       email,
       providerType: providerType || 'DIAGNOSTIC_CENTER',
-      leadSource: leadSource || 'PHONE_CALL',
-      stage: stage || 'NEW',
+      leadSource,
+      stage,
       assignedToAgentName: assignedToAgentName || 'Lead Team',
       districtName: districtName || 'Moulvibazar',
       potentialMonthlyRevenueBDT: potentialMonthlyRevenueBDT || 10000,
-      notes: notes || 'New provider lead',
+      notes: compiledNotes,
       nextFollowupDate: nextFollowupDate || new Date().toISOString().split('T')[0],
     });
 
@@ -66,7 +70,7 @@ export async function POST(req: NextRequest) {
         contact_person: contactPerson || 'Authorized Representative',
         phone,
         email: email || null,
-        notes: notes || 'New provider lead',
+        notes: compiledNotes,
         lead_status: 'new',
       });
     } catch (dbErr) {

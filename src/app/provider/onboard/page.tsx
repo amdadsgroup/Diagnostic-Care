@@ -51,6 +51,7 @@ export default function ProviderOnboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           providerType,
+          businessName: orgName.trim(),
           organizationName: orgName.trim(),
           contactPerson: contactName.trim(),
           phone: contactPhone.trim(),
@@ -58,14 +59,17 @@ export default function ProviderOnboardPage() {
           licenseNumber: licenseNumber.trim(),
           dghsNumber: dghsNumber.trim(),
           district,
+          districtName: district,
           address: address.trim(),
           selectedPlanTier,
           billingInterval,
         }),
       });
 
+      const resData = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        throw new Error('Failed to submit provider onboarding application.');
+        throw new Error(resData.error || 'Failed to submit provider onboarding application.');
       }
 
       setSuccess(true);
