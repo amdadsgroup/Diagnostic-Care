@@ -69,6 +69,10 @@ import {
   UploadCloud,
   FileCheck,
   ArrowUpRight,
+  Printer,
+  Copy,
+  PhoneCall,
+  ArrowLeft,
 } from 'lucide-react';
 
 export default function HospitalPortalPage() {
@@ -153,6 +157,44 @@ export default function HospitalPortalPage() {
   const [isUploadReportOpen, setIsUploadReportOpen] = useState(false);
   const [uploadBooking, setUploadBooking] = useState<DiagnosticBooking | null>(null);
   const [reportFileUrl, setReportFileUrl] = useState('');
+
+  // Doctor Serial Management & Manual Booking Desk State
+  const [selectedDoctorForSerials, setSelectedDoctorForSerials] = useState<HospitalDoctorAssociation | null>(null);
+  const [doctorSerialStatusFilter, setDoctorSerialStatusFilter] = useState<string>('all');
+  const [doctorSerialSourceFilter, setDoctorSerialSourceFilter] = useState<string>('all');
+  const [doctorSerialSearch, setDoctorSerialSearch] = useState<string>('');
+  const [doctorSerialDateFilter, setDoctorSerialDateFilter] = useState<string>('');
+
+  // Manual Serial Creation Modal (Receptionist Phone / Walk-in Booking)
+  const [isManualSerialOpen, setIsManualSerialOpen] = useState(false);
+  const [manualDoctorId, setManualDoctorId] = useState('');
+  const [manualPatientPhone, setManualPatientPhone] = useState('');
+  const [manualPatientName, setManualPatientName] = useState('');
+  const [manualPatientAge, setManualPatientAge] = useState('');
+  const [manualPatientGender, setManualPatientGender] = useState<'MALE' | 'FEMALE' | 'OTHER'>('MALE');
+  const [manualAppointmentDate, setManualAppointmentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [manualPreferredTime, setManualPreferredTime] = useState('10:00 AM');
+  const [manualBookingSource, setManualBookingSource] = useState<'phone_call' | 'walk_in' | 'manual'>('phone_call');
+  const [manualPaymentStatus, setManualPaymentStatus] = useState<'cash_at_desk' | 'paid' | 'pending'>('cash_at_desk');
+  const [manualNotes, setManualNotes] = useState('');
+  const [manualSubmitting, setManualSubmitting] = useState(false);
+  const [patientLookupLoading, setPatientLookupLoading] = useState(false);
+  const [patientLookupFound, setPatientLookupFound] = useState(false);
+  const [manualBookingSuccess, setManualBookingSuccess] = useState<HospitalAppointment | null>(null);
+
+  // Doctor Schedule & Availability Modal
+  const [isDoctorScheduleOpen, setIsDoctorScheduleOpen] = useState(false);
+  const [scheduleDoctor, setScheduleDoctor] = useState<HospitalDoctorAssociation | null>(null);
+  const [scheduleDays, setScheduleDays] = useState<string[]>(['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu']);
+  const [scheduleStartTime, setScheduleStartTime] = useState('05:00 PM');
+  const [scheduleEndTime, setScheduleEndTime] = useState('09:00 PM');
+  const [scheduleDuration, setScheduleDuration] = useState(15);
+  const [scheduleDailyLimit, setScheduleDailyLimit] = useState(30);
+  const [scheduleRoom, setScheduleRoom] = useState('Room 101');
+  const [scheduleOnLeave, setScheduleOnLeave] = useState(false);
+  const [scheduleLeaveReason, setScheduleLeaveReason] = useState('');
+  const [scheduleOnlineBooking, setScheduleOnlineBooking] = useState(true);
+  const [scheduleManualBooking, setScheduleManualBooking] = useState(true);
 
   // Help & Notification Modals
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
@@ -948,6 +990,114 @@ export default function HospitalPortalPage() {
     setNewStaffEmail('');
     setNewStaffPhone('');
     await loadHospitalData(profile.id);
+  };
+
+  // Handle manual phone change & live patient lookup
+  const handleManualPhoneChange = async (val: string) => {
+    setManualPatientPhone(val);
+    const clean = val.replace(/[\s\-()]/g, '');
+    if (clean.length === 11 && /^01[3-9]\d{8}$/.test(clean)) {
+      setPatientLookupLoading(true);
+      const patient = await HospitalService.searchPatientByPhone(clean);
+      setPatientLookupLoading(false);
+      if (patient && patient.found) {
+        setPatientLookupFound(true);
+        if (patient.fullName && !manualPatientName) setManualPatientName(patient.fullName);
+        if (patient.age && !manualPatientAge) setManualPatientAge(String(patient.age));
+        if (patient.gender && !manualPatientGender) setManualPatientGender(patient.gender);
+      } else {
+        setPatientLookupFound(false);
+      }
+    } else {
+      setPatientLookupFound(false);
+    }
+  };
+
+  // Handle manual serial booking submit
+  const handleCreateManualSerialSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile || !manualDoctorId || !manualPatientName.trim() || !manualPatientPhone.trim()) return;
+
+    setManualSubmitting(true);
+    const doc = doctors.find((d) => d.id === manualDoctorId || d.doctorId === manualDoctorId);
+    const branch = branches.find((b) => b.id === (doc?.branchId || (branchFilter !== 'all' ? branchFilter : undefined))) || branches[0];
+
+    const res = await HospitalService.createManualAppointment({
+      hospitalId: profile.id,
+      branchId: branch?.id || doc?.branchId,
+      branchName: branch?.branchName || doc?.branchName || 'Main Campus',
+      doctorId: doc?.doctorId || doc?.id || manualDoctorId,
+      doctorName: doc?.doctorName || 'Specialist Doctor',
+      doctorSpecialization: doc?.doctorSpecialization || 'Specialist Physician',
+      patientName: manualPatientName.trim(),
+      patientPhone: manualPatientPhone.trim(),
+      patientAge: manualPatientAge ? parseInt(manualPatientAge, 10) : undefined,
+      patientGender: manualPatientGender,
+      appointmentDate: manualAppointmentDate || new Date().toISOString().split('T')[0],
+      preferredTime: manualPreferredTime,
+      consultationFee: doc?.consultationFee || 1000,
+      bookingSource: manualBookingSource,
+      notes: manualNotes,
+      paymentStatus: manualPaymentStatus,
+    });
+
+    setManualSubmitting(false);
+
+    if (res.success && res.appointment) {
+      setAppointments((prev) => [res.appointment!, ...prev]);
+      setManualBookingSuccess(res.appointment);
+      setManualPatientName('');
+      setManualPatientPhone('');
+      setManualPatientAge('');
+      setManualNotes('');
+      setPatientLookupFound(false);
+    } else {
+      alert(res.error || 'Failed to create manual serial');
+    }
+  };
+
+  // Handle save doctor schedule
+  const handleSaveDoctorSchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scheduleDoctor) return;
+
+    await HospitalService.updateDoctorSchedule(scheduleDoctor.id, {
+      daysOfWeek: scheduleDays,
+      visitingStartTime: scheduleStartTime,
+      visitingEndTime: scheduleEndTime,
+      slotDurationMinutes: scheduleDuration,
+      dailySerialLimit: scheduleDailyLimit,
+      chamberRoom: scheduleRoom,
+      isOnLeave: scheduleOnLeave,
+      leaveReason: scheduleLeaveReason,
+      isOnlineEnabled: scheduleOnlineBooking,
+      isManualEnabled: scheduleManualBooking,
+    });
+
+    // Update local state
+    setDoctors((prev) =>
+      prev.map((d) =>
+        d.id === scheduleDoctor.id
+          ? {
+              ...d,
+              daysOfWeek: scheduleDays,
+              visitingStartTime: scheduleStartTime,
+              visitingEndTime: scheduleEndTime,
+              slotDurationMinutes: scheduleDuration,
+              dailySerialLimit: scheduleDailyLimit,
+              chamberRoom: scheduleRoom,
+              isOnLeave: scheduleOnLeave,
+              leaveReason: scheduleLeaveReason,
+              isOnlineEnabled: scheduleOnlineBooking,
+              isManualEnabled: scheduleManualBooking,
+              status: scheduleOnLeave ? 'inactive' : 'active',
+            }
+          : d
+      )
+    );
+
+    setIsDoctorScheduleOpen(false);
+    setScheduleDoctor(null);
   };
 
   // Handle CSV export
@@ -1820,7 +1970,36 @@ export default function HospitalPortalPage() {
         </div>
 
         {/* Right: Helpline, Theme Toggle, Language, Notifications, Admin Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Quick Manual Serial Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (doctors.length > 0 && !manualDoctorId) {
+                setManualDoctorId(doctors[0].id || doctors[0].doctorId);
+              }
+              setIsManualSerialOpen(true);
+            }}
+            title="Create Manual Serial for Phone Calls or Walk-in Patients"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 14px',
+              borderRadius: '9px',
+              backgroundColor: '#10B981',
+              border: 'none',
+              color: '#FFFFFF',
+              fontSize: '12px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+            }}
+          >
+            <PhoneCall size={14} />
+            <span>{language === 'bn' ? 'ম্যানুয়াল সিরিয়াল বুকিং' : 'Create Manual Serial'}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsHelpModalOpen(true)}
@@ -3013,160 +3192,921 @@ export default function HospitalPortalPage() {
           </div>
         )}
 
-        {/* TAB 4: DOCTORS */}
-        {activeTab === 'doctors' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <h2 style={{ fontSize: '18px', fontWeight: 800, color: tokens.textPrimary, margin: 0 }}>
-                  {language === 'bn' ? 'চিকিৎসক অ্যাসোসিয়েশন ও চেম্বার শিডিউল' : 'Associated Doctors & Department Specialties'}
-                </h2>
-                <div style={{ fontSize: '12px', color: tokens.textMuted }}>
-                  Doctors retain independent accounts and verified BMDC credentials for hospital chambers.
+        {/* TAB 4: DOCTORS & SERIAL MANAGEMENT */}
+        {activeTab === 'doctors' && (() => {
+          const todayStr = new Date().toISOString().split('T')[0];
+          const todayAppointments = appointments.filter((a) => a.appointmentDate === todayStr);
+          const todayConfirmedSerials = todayAppointments.filter((a) => a.status === 'confirmed').length;
+          const pendingSerialRequests = appointments.filter((a) => a.status === 'pending').length;
+          const completedAppointmentsCount = appointments.filter((a) => a.status === 'completed').length;
+          const cancelledAppointmentsCount = appointments.filter((a) => a.status === 'cancelled' || a.status === 'no_show').length;
+          const totalDailyCapacity = doctors.reduce((acc, d) => acc + (d.dailySerialLimit || 25), 0);
+          const remainingSlotsToday = Math.max(0, totalDailyCapacity - todayAppointments.length);
+
+          if (selectedDoctorForSerials) {
+            const doc = selectedDoctorForSerials;
+            const docAppointments = appointments.filter(
+              (a) =>
+                a.doctorId === doc.doctorId ||
+                a.doctorId === doc.id ||
+                a.doctorName.toLowerCase().includes(doc.doctorName.toLowerCase())
+            );
+
+            const filteredDocAppointments = docAppointments.filter((apt) => {
+              const matchesSearch =
+                !doctorSerialSearch ||
+                apt.patientName.toLowerCase().includes(doctorSerialSearch.toLowerCase()) ||
+                apt.patientPhone.includes(doctorSerialSearch) ||
+                apt.bookingCode.toLowerCase().includes(doctorSerialSearch.toLowerCase());
+
+              const matchesStatus =
+                doctorSerialStatusFilter === 'all' || apt.status === doctorSerialStatusFilter;
+
+              const matchesSource =
+                doctorSerialSourceFilter === 'all' ||
+                (apt.bookingSource || 'online') === doctorSerialSourceFilter;
+
+              const matchesDate =
+                !doctorSerialDateFilter || apt.appointmentDate === doctorSerialDateFilter;
+
+              return matchesSearch && matchesStatus && matchesSource && matchesDate;
+            });
+
+            const docTodayApts = docAppointments.filter((a) => a.appointmentDate === todayStr);
+            const docTodayConfirmed = docTodayApts.filter((a) => a.status === 'confirmed').length;
+            const docCheckedIn = docTodayApts.filter((a) => a.status === 'checked_in').length;
+            const docInProgress = docTodayApts.filter((a) => a.status === 'in_progress').length;
+            const docCompleted = docTodayApts.filter((a) => a.status === 'completed').length;
+            const docCancelled = docAppointments.filter((a) => a.status === 'cancelled' || a.status === 'no_show').length;
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Individual Doctor Header & Navigation */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '12px',
+                    padding: '16px 20px',
+                    backgroundColor: tokens.cardBg,
+                    borderRadius: '16px',
+                    border: `1px solid ${tokens.cardBorder}`,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDoctorForSerials(null)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 14px',
+                        borderRadius: '9px',
+                        backgroundColor: tokens.cardBgSubtle,
+                        border: `1px solid ${tokens.cardBorder}`,
+                        color: tokens.textPrimary,
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <ArrowLeft size={14} />
+                      <span>{language === 'bn' ? 'সকল ডাক্তারের তালিকা' : 'Back to All Doctors'}</span>
+                    </button>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h2 style={{ fontSize: '18px', fontWeight: 800, color: tokens.textPrimary, margin: 0 }}>
+                          {doc.doctorName}
+                        </h2>
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: doc.status === 'active' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                            color: doc.status === 'active' ? '#10B981' : '#F59E0B',
+                          }}
+                        >
+                          {doc.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: tokens.textMuted, marginTop: '2px' }}>
+                        {doc.doctorSpecialization} • BMDC: <strong style={{ color: tokens.primary }}>{doc.bmdcRegistrationNumber}</strong> • {doc.branchName || 'Main Campus'} ({doc.chamberRoom || 'Room 101'})
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setManualDoctorId(doc.id || doc.doctorId);
+                        setIsManualSerialOpen(true);
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 16px',
+                        borderRadius: '10px',
+                        backgroundColor: '#10B981',
+                        border: 'none',
+                        color: '#FFFFFF',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+                      }}
+                    >
+                      <PhoneCall size={14} />
+                      <span>{language === 'bn' ? 'ম্যানুয়াল সিরিয়াল দিন' : 'Create Manual Serial'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setScheduleDoctor(doc);
+                        setScheduleDays(doc.daysOfWeek || ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu']);
+                        setScheduleStartTime(doc.visitingStartTime || '05:00 PM');
+                        setScheduleEndTime(doc.visitingEndTime || '09:00 PM');
+                        setScheduleDuration(doc.slotDurationMinutes || 15);
+                        setScheduleDailyLimit(doc.dailySerialLimit || 30);
+                        setScheduleRoom(doc.chamberRoom || 'Room 101');
+                        setScheduleOnLeave(doc.isOnLeave || doc.status === 'inactive');
+                        setScheduleOnlineBooking(doc.isOnlineEnabled ?? true);
+                        setScheduleManualBooking(doc.isManualEnabled ?? true);
+                        setIsDoctorScheduleOpen(true);
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 14px',
+                        borderRadius: '10px',
+                        backgroundColor: tokens.cardBgSubtle,
+                        border: `1px solid ${tokens.cardBorder}`,
+                        color: tokens.textPrimary,
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Clock size={14} />
+                      <span>{language === 'bn' ? 'শিডিউল কনফিগার' : 'Configure Schedule'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Individual Doctor 6 Summary Metrics */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
+                  {[
+                    { label: "Today's Serials", val: docTodayApts.length, color: BRAND_COLORS.primary, icon: Calendar },
+                    { label: 'Confirmed Serials', val: docTodayConfirmed, color: '#10B981', icon: CheckCircle2 },
+                    { label: 'Checked In', val: docCheckedIn, color: '#06B6D4', icon: UserCheck },
+                    { label: 'In Consultation', val: docInProgress, color: '#8B5CF6', icon: Stethoscope },
+                    { label: 'Completed', val: docCompleted, color: '#059669', icon: ShieldCheck },
+                    { label: 'Cancelled / No-Show', val: docCancelled, color: '#EF4444', icon: AlertTriangle },
+                  ].map((card, i) => {
+                    const Icon = card.icon;
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          backgroundColor: tokens.cardBg,
+                          padding: '14px 16px',
+                          borderRadius: '14px',
+                          border: `1px solid ${tokens.cardBorder}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '10px',
+                            backgroundColor: `${card.color}15`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: card.color,
+                          }}
+                        >
+                          <Icon size={18} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '11px', color: tokens.textMuted, fontWeight: 600 }}>{card.label}</div>
+                          <div style={{ fontSize: '18px', fontWeight: 900, color: tokens.textPrimary, marginTop: '2px' }}>
+                            {card.val}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Filters Bar: Search, Status, Date, Source */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                    padding: '12px 16px',
+                    backgroundColor: tokens.cardBg,
+                    borderRadius: '14px',
+                    border: `1px solid ${tokens.cardBorder}`,
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <div style={{ position: 'relative' }}>
+                      <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: tokens.textMuted }} />
+                      <input
+                        type="text"
+                        value={doctorSerialSearch}
+                        onChange={(e) => setDoctorSerialSearch(e.target.value)}
+                        placeholder="Search patient, phone, serial code..."
+                        style={{
+                          padding: '7px 12px 7px 30px',
+                          borderRadius: '8px',
+                          border: `1px solid ${tokens.cardBorder}`,
+                          backgroundColor: tokens.cardBgSubtle,
+                          color: tokens.textPrimary,
+                          fontSize: '12px',
+                          outline: 'none',
+                          minWidth: '220px',
+                        }}
+                      />
+                    </div>
+
+                    <input
+                      type="date"
+                      value={doctorSerialDateFilter}
+                      onChange={(e) => setDoctorSerialDateFilter(e.target.value)}
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        border: `1px solid ${tokens.cardBorder}`,
+                        backgroundColor: tokens.cardBgSubtle,
+                        color: tokens.textPrimary,
+                        fontSize: '12px',
+                        outline: 'none',
+                      }}
+                    />
+
+                    {doctorSerialDateFilter && (
+                      <button
+                        type="button"
+                        onClick={() => setDoctorSerialDateFilter('')}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          backgroundColor: tokens.cardBgSubtle,
+                          border: `1px solid ${tokens.cardBorder}`,
+                          color: tokens.textMuted,
+                          fontSize: '11px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Clear Date
+                      </button>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <select
+                      value={doctorSerialSourceFilter}
+                      onChange={(e) => setDoctorSerialSourceFilter(e.target.value)}
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        border: `1px solid ${tokens.cardBorder}`,
+                        backgroundColor: tokens.cardBgSubtle,
+                        color: tokens.textPrimary,
+                        fontSize: '12px',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="all">All Sources</option>
+                      <option value="online">Online Booking</option>
+                      <option value="phone_call">Phone Call</option>
+                      <option value="walk_in">Reception Walk-in</option>
+                      <option value="manual">Manual Booking</option>
+                    </select>
+
+                    <select
+                      value={doctorSerialStatusFilter}
+                      onChange={(e) => setDoctorSerialStatusFilter(e.target.value)}
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        border: `1px solid ${tokens.cardBorder}`,
+                        backgroundColor: tokens.cardBgSubtle,
+                        color: tokens.textPrimary,
+                        fontSize: '12px',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="checked_in">Checked In</option>
+                      <option value="in_progress">In Consultation</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="no_show">No Show</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Individual Doctor Serial Table */}
+                {filteredDocAppointments.length === 0 ? (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      padding: '48px 24px',
+                      backgroundColor: tokens.cardBg,
+                      borderRadius: '16px',
+                      border: `1px dashed ${tokens.cardBorder}`,
+                    }}
+                  >
+                    <Calendar size={36} color={tokens.textMuted} style={{ marginBottom: '10px', opacity: 0.6 }} />
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 6px 0', color: tokens.textPrimary }}>
+                      {language === 'bn' ? 'কোনো সিরিয়াল পাওয়া যায়নি' : 'No Serials Found For This Doctor'}
+                    </h3>
+                    <p style={{ fontSize: '13px', color: tokens.textMuted, margin: '0 0 16px 0' }}>
+                      {language === 'bn' ? 'ফোনে কল করা রোগী অথবা রিসেপশনের রোগীদের জন্য সরাসরি সিরিয়াল তৈরি করুন।' : 'Book phone-in or walk-in patients directly to issue a serial token.'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setManualDoctorId(doc.id || doc.doctorId);
+                        setIsManualSerialOpen(true);
+                      }}
+                      style={{
+                        padding: '9px 18px',
+                        borderRadius: '8px',
+                        backgroundColor: '#10B981',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <PhoneCall size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                      <span>{language === 'bn' ? 'ম্যানুয়াল সিরিয়াল দিন' : 'Create Manual Serial'}</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      backgroundColor: tokens.cardBg,
+                      backdropFilter: tokens.backdropBlur,
+                      borderRadius: '16px',
+                      border: `1px solid ${tokens.cardBorder}`,
+                      boxShadow: tokens.cardShadow,
+                      overflowX: 'auto',
+                    }}
+                  >
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: tokens.tableHeaderBg, borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted }}>SERIAL #</th>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted }}>PATIENT</th>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DATE & TIME</th>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted }}>BOOKING SOURCE</th>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted }}>FEE & PAYMENT</th>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted }}>STATUS</th>
+                          <th style={{ padding: '12px 16px', color: tokens.textMuted, textAlign: 'right' }}>ACTIONS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredDocAppointments.map((apt, idx) => {
+                          const serialDisplay = apt.serialNumber ? `Serial ${String(apt.serialNumber).padStart(2, '0')}` : `Serial ${String(idx + 1).padStart(2, '0')}`;
+                          const isOnline = !apt.bookingSource || apt.bookingSource === 'online';
+                          const isPhone = apt.bookingSource === 'phone_call';
+                          const isWalkin = apt.bookingSource === 'walk_in';
+
+                          return (
+                            <tr key={apt.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                              <td style={{ padding: '14px 16px' }}>
+                                <span
+                                  style={{
+                                    display: 'inline-block',
+                                    fontSize: '12px',
+                                    fontWeight: 900,
+                                    padding: '4px 10px',
+                                    borderRadius: '8px',
+                                    backgroundColor: 'rgba(0, 96, 250, 0.12)',
+                                    color: BRAND_COLORS.primary,
+                                    border: '1px solid rgba(0, 96, 250, 0.25)',
+                                  }}
+                                >
+                                  {serialDisplay}
+                                </span>
+                                <div style={{ fontSize: '10.5px', color: tokens.textMuted, marginTop: '3px' }}>
+                                  {apt.bookingCode}
+                                </div>
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <div style={{ fontWeight: 800, color: tokens.textPrimary }}>{apt.patientName}</div>
+                                <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.patientPhone}</div>
+                                {apt.patientAge && (
+                                  <div style={{ fontSize: '10px', color: tokens.textMuted }}>Age: {apt.patientAge} {apt.patientGender ? `(${apt.patientGender})` : ''}</div>
+                                )}
+                              </td>
+                              <td style={{ padding: '14px 16px', color: tokens.textPrimary }}>
+                                <div style={{ fontWeight: 600 }}>{apt.appointmentDate}</div>
+                                <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.startTime}</div>
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    padding: '3px 8px',
+                                    borderRadius: '6px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    backgroundColor: isPhone
+                                      ? 'rgba(16, 185, 129, 0.12)'
+                                      : isWalkin
+                                      ? 'rgba(139, 92, 246, 0.12)'
+                                      : 'rgba(0, 96, 250, 0.12)',
+                                    color: isPhone ? '#10B981' : isWalkin ? '#8B5CF6' : BRAND_COLORS.primary,
+                                  }}
+                                >
+                                  {isPhone && <PhoneCall size={11} />}
+                                  {isWalkin && <Building2 size={11} />}
+                                  {isOnline && <Layers size={11} />}
+                                  <span>{isPhone ? 'Phone Call' : isWalkin ? 'Reception Walk-in' : 'Online Booking'}</span>
+                                </span>
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <div style={{ fontWeight: 800, color: tokens.textPrimary }}>৳{apt.consultationFee}</div>
+                                <div
+                                  style={{
+                                    fontSize: '10.5px',
+                                    fontWeight: 700,
+                                    color: apt.paymentStatus === 'paid' ? '#10B981' : '#F59E0B',
+                                  }}
+                                >
+                                  {apt.paymentStatus ? apt.paymentStatus.toUpperCase().replace('_', ' ') : 'UNPAID'}
+                                </div>
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 800,
+                                    padding: '3px 8px',
+                                    borderRadius: '6px',
+                                    backgroundColor:
+                                      apt.status === 'confirmed'
+                                        ? 'rgba(16, 185, 129, 0.12)'
+                                        : apt.status === 'checked_in'
+                                        ? 'rgba(6, 182, 212, 0.12)'
+                                        : apt.status === 'in_progress'
+                                        ? 'rgba(139, 92, 246, 0.12)'
+                                        : apt.status === 'completed'
+                                        ? 'rgba(5, 150, 105, 0.12)'
+                                        : apt.status === 'cancelled' || apt.status === 'no_show'
+                                        ? 'rgba(239, 68, 68, 0.12)'
+                                        : 'rgba(245, 158, 11, 0.12)',
+                                    color:
+                                      apt.status === 'confirmed'
+                                        ? '#10B981'
+                                        : apt.status === 'checked_in'
+                                        ? '#06B6D4'
+                                        : apt.status === 'in_progress'
+                                        ? '#8B5CF6'
+                                        : apt.status === 'completed'
+                                        ? '#059669'
+                                        : apt.status === 'cancelled' || apt.status === 'no_show'
+                                        ? '#EF4444'
+                                        : '#F59E0B',
+                                  }}
+                                >
+                                  {apt.status.toUpperCase().replace('_', ' ')}
+                                </span>
+                              </td>
+                              <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                                <div style={{ display: 'inline-flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                                  {apt.status === 'confirmed' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateAppointmentStatus(apt.id, 'checked_in')}
+                                      style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#06B6D4', color: '#FFFFFF', fontSize: '10.5px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                      Check In
+                                    </button>
+                                  )}
+                                  {apt.status === 'checked_in' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateAppointmentStatus(apt.id, 'in_progress')}
+                                      style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#8B5CF6', color: '#FFFFFF', fontSize: '10.5px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                      Call Next
+                                    </button>
+                                  )}
+                                  {apt.status === 'in_progress' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateAppointmentStatus(apt.id, 'completed')}
+                                      style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#059669', color: '#FFFFFF', fontSize: '10.5px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                      Complete
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRescheduleApt(apt);
+                                      setRescheduleDate(apt.appointmentDate);
+                                      setRescheduleTime(apt.startTime);
+                                      setIsRescheduleOpen(true);
+                                    }}
+                                    style={{ padding: '4px 8px', borderRadius: '6px', border: `1px solid ${tokens.cardBorder}`, backgroundColor: tokens.cardBgSubtle, color: tokens.textSecondary, fontSize: '10.5px', fontWeight: 600, cursor: 'pointer' }}
+                                  >
+                                    Reschedule
+                                  </button>
+                                  {apt.status !== 'cancelled' && apt.status !== 'completed' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateAppointmentStatus(apt.id, 'no_show')}
+                                      style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', fontSize: '10.5px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                      No Show
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // MODE B: ALL DOCTORS SERIAL OVERVIEW
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: tokens.textPrimary, margin: 0 }}>
+                    {language === 'bn' ? 'ডাক্তার সিরিয়াল ও চেম্বার কিউ ম্যানেজমেন্ট' : 'Doctor Serial & Chamber Queue Management'}
+                  </h2>
+                  <div style={{ fontSize: '12px', color: tokens.textMuted }}>
+                    Inspect individual doctor serial desks, manage schedules, and issue phone-in appointment tokens.
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (doctors.length > 0 && !manualDoctorId) {
+                        setManualDoctorId(doctors[0].id || doctors[0].doctorId);
+                      }
+                      setIsManualSerialOpen(true);
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 16px',
+                      borderRadius: '10px',
+                      backgroundColor: '#10B981',
+                      border: 'none',
+                      color: '#FFFFFF',
+                      fontSize: '12.5px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+                    }}
+                  >
+                    <PhoneCall size={15} />
+                    <span>{language === 'bn' ? 'ম্যানুয়াল সিরিয়াল দিন (কল / ডেস্ক)' : 'Create Manual Serial'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsAddDoctorOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 16px',
+                      borderRadius: '10px',
+                      backgroundColor: BRAND_COLORS.primary,
+                      border: 'none',
+                      color: '#FFFFFF',
+                      fontSize: '12.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={15} />
+                    <span>{language === 'bn' ? 'নতুন ডাক্তার সংযুক্ত করুন' : 'Invite / Link Doctor'}</span>
+                  </button>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsAddDoctorOpen(true)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '9px 16px',
-                  borderRadius: '10px',
-                  backgroundColor: BRAND_COLORS.primary,
-                  border: 'none',
-                  color: '#FFFFFF',
-                  fontSize: '12.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                <Plus size={15} />
-                <span>{language === 'bn' ? 'নতুন ডাক্তার সংযুক্ত করুন' : 'Invite / Link Doctor'}</span>
-              </button>
-            </div>
+              {/* Top 7 Summary Cards as per Section 3 */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px' }}>
+                {[
+                  { label: 'Total Doctors', val: doctors.length, color: BRAND_COLORS.primary, icon: Stethoscope },
+                  { label: "Today's Total Serials", val: todayAppointments.length, color: '#0060FA', icon: Calendar },
+                  { label: "Today's Confirmed", val: todayConfirmedSerials, color: '#10B981', icon: CheckCircle2 },
+                  { label: 'Pending Requests', val: pendingSerialRequests, color: '#F59E0B', icon: Clock },
+                  { label: 'Completed Appointments', val: completedAppointmentsCount, color: '#8B5CF6', icon: ShieldCheck },
+                  { label: 'Cancelled / No-Shows', val: cancelledAppointmentsCount, color: '#EF4444', icon: AlertTriangle },
+                  { label: 'Remaining Slots Today', val: remainingSlotsToday, color: '#059669', icon: Sparkles },
+                ].map((stat, i) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        backgroundColor: tokens.cardBg,
+                        padding: '16px',
+                        borderRadius: '16px',
+                        border: `1px solid ${tokens.cardBorder}`,
+                        boxShadow: tokens.cardShadow,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '12px',
+                          backgroundColor: `${stat.color}15`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: stat.color,
+                        }}
+                      >
+                        <Icon size={20} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: tokens.textMuted, fontWeight: 600 }}>{stat.label}</div>
+                        <div style={{ fontSize: '20px', fontWeight: 900, color: tokens.textPrimary, marginTop: '2px' }}>
+                          {stat.val}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-            {doctors.length === 0 ? (
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '48px 24px',
-                  backgroundColor: tokens.cardBg,
-                  borderRadius: '16px',
-                  border: `1px dashed ${tokens.cardBorder}`,
-                }}
-              >
-                <Stethoscope size={36} color={tokens.textMuted} style={{ marginBottom: '10px', opacity: 0.6 }} />
-                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 6px 0', color: tokens.textPrimary }}>
-                  {language === 'bn' ? 'কোনো ডাক্তার এখনও যুক্ত করা হয়নি' : 'No Doctors Associated Yet'}
-                </h3>
-                <p style={{ fontSize: '13px', color: tokens.textMuted, margin: '0 0 16px 0' }}>
-                  {language === 'bn' ? 'আপনার হাসপাতালে প্র্যাকটিসকারী বিএমডিসি নিবন্ধিত ডাক্তারদের লিঙ্ক করুন।' : 'Link verified BMDC physicians practicing at your hospital chambers.'}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setIsAddDoctorOpen(true)}
+              {/* Doctor Directory Table */}
+              {doctors.length === 0 ? (
+                <div
                   style={{
-                    padding: '8px 18px',
-                    borderRadius: '8px',
-                    backgroundColor: BRAND_COLORS.primary,
-                    color: '#FFFFFF',
-                    border: 'none',
-                    fontSize: '12.5px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
+                    textAlign: 'center',
+                    padding: '48px 24px',
+                    backgroundColor: tokens.cardBg,
+                    borderRadius: '16px',
+                    border: `1px dashed ${tokens.cardBorder}`,
                   }}
                 >
-                  <Plus size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                  <span>{language === 'bn' ? 'ডাক্তার ইনভাইট করুন' : 'Invite Specialist'}</span>
-                </button>
-              </div>
-            ) : (
-              <div
-                style={{
-                  backgroundColor: tokens.cardBg,
-                  backdropFilter: tokens.backdropBlur,
-                  borderRadius: '16px',
-                  border: `1px solid ${tokens.cardBorder}`,
-                  boxShadow: tokens.cardShadow,
-                  overflowX: 'auto',
-                }}
-              >
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: tokens.tableHeaderBg, borderBottom: `1px solid ${tokens.tableBorder}` }}>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DOCTOR NAME</th>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>SPECIALTY & BMDC</th>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>BRANCH & ROOM</th>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>CONSULTATION FEE</th>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>STATUS</th>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted, textAlign: 'right' }}>ACTION</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {doctors.map((doc) => (
-                      <tr key={doc.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ fontWeight: 800, color: tokens.textPrimary }}>{doc.doctorName}</div>
-                          <div style={{ fontSize: '11px', color: tokens.textMuted }}>{doc.departmentName}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ color: tokens.textPrimary, fontWeight: 600 }}>{doc.doctorSpecialization}</div>
-                          <div style={{ fontSize: '11px', color: tokens.primary, fontWeight: 700 }}>{doc.bmdcRegistrationNumber}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ color: tokens.textPrimary, fontWeight: 600 }}>{doc.branchName || 'Main Campus'}</div>
-                          <div style={{ fontSize: '11px', color: tokens.textMuted }}>{doc.chamberRoom || 'Chamber Room'}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px', fontWeight: 800, color: tokens.textPrimary }}>
-                          ৳{doc.consultationFee} <span style={{ fontSize: '11px', color: tokens.textMuted, fontWeight: 500 }}>(Followup ৳{doc.followupFee})</span>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <span
-                            style={{
-                              fontSize: '11px',
-                              fontWeight: 800,
-                              padding: '3px 8px',
-                              borderRadius: '6px',
-                              backgroundColor: doc.status === 'active' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                              color: doc.status === 'active' ? '#10B981' : '#F59E0B',
-                            }}
-                          >
-                            {doc.status.toUpperCase()}
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right' }}>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              const newStatus = doc.status === 'active' ? 'inactive' : 'active';
-                              await HospitalService.updateDoctorStatus(doc.id, newStatus);
-                              setDoctors((prev) => prev.map((d) => (d.id === doc.id ? { ...d, status: newStatus } : d)));
-                            }}
-                            style={{
-                              padding: '5px 10px',
-                              borderRadius: '7px',
-                              border: `1px solid ${tokens.cardBorder}`,
-                              backgroundColor: tokens.cardBgSubtle,
-                              color: doc.status === 'active' ? '#EF4444' : '#10B981',
-                              fontSize: '11px',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {doc.status === 'active' ? (language === 'bn' ? 'ছুটি / নিষ্ক্রিয়' : 'Set Leave') : (language === 'bn' ? 'সক্রিয় করুন' : 'Activate')}
-                          </button>
-                        </td>
+                  <Stethoscope size={36} color={tokens.textMuted} style={{ marginBottom: '10px', opacity: 0.6 }} />
+                  <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 6px 0', color: tokens.textPrimary }}>
+                    {language === 'bn' ? 'কোনো ডাক্তার এখনও যুক্ত করা হয়নি' : 'No Doctors Associated Yet'}
+                  </h3>
+                  <p style={{ fontSize: '13px', color: tokens.textMuted, margin: '0 0 16px 0' }}>
+                    {language === 'bn' ? 'আপনার হাসপাতালে প্র্যাকটিসকারী বিএমডিসি নিবন্ধিত ডাক্তারদের লিঙ্ক করুন।' : 'Link verified BMDC physicians practicing at your hospital chambers.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddDoctorOpen(true)}
+                    style={{
+                      padding: '8px 18px',
+                      borderRadius: '8px',
+                      backgroundColor: BRAND_COLORS.primary,
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontSize: '12.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    <span>{language === 'bn' ? 'ডাক্তার ইনভাইট করুন' : 'Invite Specialist'}</span>
+                  </button>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    backgroundColor: tokens.cardBg,
+                    backdropFilter: tokens.backdropBlur,
+                    borderRadius: '16px',
+                    border: `1px solid ${tokens.cardBorder}`,
+                    boxShadow: tokens.cardShadow,
+                    overflowX: 'auto',
+                  }}
+                >
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: tokens.tableHeaderBg, borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                        <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DOCTOR & BMDC</th>
+                        <th style={{ padding: '12px 16px', color: tokens.textMuted }}>SPECIALTY & CHAMBER</th>
+                        <th style={{ padding: '12px 16px', color: tokens.textMuted }}>VISITING HOURS & FEE</th>
+                        <th style={{ padding: '12px 16px', color: tokens.textMuted }}>TODAY'S SERIALS</th>
+                        <th style={{ padding: '12px 16px', color: tokens.textMuted }}>STATUS</th>
+                        <th style={{ padding: '12px 16px', color: tokens.textMuted, textAlign: 'right' }}>SERIAL DESK ACTIONS</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
+                    </thead>
+                    <tbody>
+                      {doctors.map((doc) => {
+                        const docTodayCount = appointments.filter(
+                          (a) =>
+                            (a.doctorId === doc.doctorId || a.doctorId === doc.id || a.doctorName === doc.doctorName) &&
+                            a.appointmentDate === todayStr
+                        ).length;
+                        const docCapacity = doc.dailySerialLimit || 25;
+                        const docRemaining = Math.max(0, docCapacity - docTodayCount);
+
+                        return (
+                          <tr key={doc.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                            <td style={{ padding: '14px 16px' }}>
+                              <div style={{ fontWeight: 800, color: tokens.textPrimary, fontSize: '13.5px' }}>
+                                {doc.doctorName}
+                              </div>
+                              <div style={{ fontSize: '11px', color: tokens.primary, fontWeight: 700, marginTop: '2px' }}>
+                                BMDC: {doc.bmdcRegistrationNumber}
+                              </div>
+                            </td>
+                            <td style={{ padding: '14px 16px' }}>
+                              <div style={{ color: tokens.textPrimary, fontWeight: 600 }}>{doc.doctorSpecialization}</div>
+                              <div style={{ fontSize: '11px', color: tokens.textMuted }}>
+                                {doc.branchName || 'Main Campus'} • {doc.chamberRoom || 'Room 101'}
+                              </div>
+                            </td>
+                            <td style={{ padding: '14px 16px' }}>
+                              <div style={{ color: tokens.textPrimary, fontWeight: 700 }}>৳{doc.consultationFee}</div>
+                              <div style={{ fontSize: '11px', color: tokens.textMuted }}>
+                                {doc.visitingStartTime || '05:00 PM'} - {doc.visitingEndTime || '09:00 PM'}
+                              </div>
+                            </td>
+                            <td style={{ padding: '14px 16px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span
+                                  style={{
+                                    fontSize: '12px',
+                                    fontWeight: 900,
+                                    padding: '3px 8px',
+                                    borderRadius: '6px',
+                                    backgroundColor: docTodayCount > 0 ? 'rgba(0, 96, 250, 0.12)' : tokens.cardBgSubtle,
+                                    color: docTodayCount > 0 ? BRAND_COLORS.primary : tokens.textMuted,
+                                  }}
+                                >
+                                  {docTodayCount} / {docCapacity}
+                                </span>
+                                <span style={{ fontSize: '11px', color: docRemaining > 0 ? '#10B981' : '#EF4444', fontWeight: 600 }}>
+                                  {docRemaining > 0 ? `${docRemaining} left` : 'Full'}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '14px 16px' }}>
+                              <span
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: 800,
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  backgroundColor: doc.status === 'active' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                                  color: doc.status === 'active' ? '#10B981' : '#F59E0B',
+                                }}
+                              >
+                                {doc.status.toUpperCase()}
+                              </span>
+                            </td>
+                            <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                              <div style={{ display: 'inline-flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedDoctorForSerials(doc)}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '5px 11px',
+                                    borderRadius: '7px',
+                                    backgroundColor: BRAND_COLORS.primary,
+                                    color: '#FFFFFF',
+                                    border: 'none',
+                                    fontSize: '11.5px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <Eye size={12} />
+                                  <span>{language === 'bn' ? 'সিরিয়াল দেখুন' : 'View Serials'}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setManualDoctorId(doc.id || doc.doctorId);
+                                    setIsManualSerialOpen(true);
+                                  }}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '5px 10px',
+                                    borderRadius: '7px',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                                    color: '#10B981',
+                                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                                    fontSize: '11.5px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <PhoneCall size={12} />
+                                  <span>{language === 'bn' ? 'সিরিয়াল বুক' : 'Book Serial'}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setScheduleDoctor(doc);
+                                    setScheduleDays(doc.daysOfWeek || ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu']);
+                                    setScheduleStartTime(doc.visitingStartTime || '05:00 PM');
+                                    setScheduleEndTime(doc.visitingEndTime || '09:00 PM');
+                                    setScheduleDuration(doc.slotDurationMinutes || 15);
+                                    setScheduleDailyLimit(doc.dailySerialLimit || 30);
+                                    setScheduleRoom(doc.chamberRoom || 'Room 101');
+                                    setScheduleOnLeave(doc.isOnLeave || doc.status === 'inactive');
+                                    setScheduleOnlineBooking(doc.isOnlineEnabled ?? true);
+                                    setScheduleManualBooking(doc.isManualEnabled ?? true);
+                                    setIsDoctorScheduleOpen(true);
+                                  }}
+                                  style={{
+                                    padding: '5px 9px',
+                                    borderRadius: '7px',
+                                    backgroundColor: tokens.cardBgSubtle,
+                                    border: `1px solid ${tokens.cardBorder}`,
+                                    color: tokens.textSecondary,
+                                    fontSize: '11.5px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Schedule
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const newStatus = doc.status === 'active' ? 'inactive' : 'active';
+                                    await HospitalService.updateDoctorStatus(doc.id, newStatus);
+                                    setDoctors((prev) => prev.map((d) => (d.id === doc.id ? { ...d, status: newStatus } : d)));
+                                  }}
+                                  style={{
+                                    padding: '5px 9px',
+                                    borderRadius: '7px',
+                                    border: `1px solid ${tokens.cardBorder}`,
+                                    backgroundColor: tokens.cardBgSubtle,
+                                    color: doc.status === 'active' ? '#EF4444' : '#10B981',
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  {doc.status === 'active' ? 'Leave' : 'Active'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* TAB 5: APPOINTMENTS DESK */}
         {activeTab === 'appointments' && (
@@ -3174,22 +4114,49 @@ export default function HospitalPortalPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <h2 style={{ fontSize: '18px', fontWeight: 800, color: tokens.textPrimary, margin: 0 }}>
-                  {language === 'bn' ? 'অ্যাপয়েন্টমেন্ট কিউ ও বুকিং ডেস্ক' : 'Chamber Appointments & Serial Queue Desk'}
+                  {language === 'bn' ? 'অ্যাপয়েন্টমেন্ট কিউ ও সিরিয়াল বুকিং ডেস্ক' : 'Chamber Appointments & Serial Queue Desk'}
                 </h2>
                 <div style={{ fontSize: '12px', color: tokens.textMuted }}>
-                  Manage patient check-ins, consultation workflows, rescheduling, and cancellations.
+                  Manage patient check-ins, consultation workflows, serial calls, rescheduling, and cancellations.
                 </div>
               </div>
 
-              {/* Search & Status Filter */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {/* Action & Filter Controls */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (doctors.length > 0 && !manualDoctorId) {
+                      setManualDoctorId(doctors[0].id || doctors[0].doctorId);
+                    }
+                    setIsManualSerialOpen(true);
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '7px 14px',
+                    borderRadius: '8px',
+                    backgroundColor: '#10B981',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(16, 185, 129, 0.25)',
+                  }}
+                >
+                  <PhoneCall size={13} />
+                  <span>{language === 'bn' ? 'ম্যানুয়াল সিরিয়াল দিন' : 'Create Manual Serial'}</span>
+                </button>
+
                 <div style={{ position: 'relative' }}>
                   <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: tokens.textMuted }} />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search patient, code, doctor..."
+                    placeholder="Search patient, phone, doctor..."
                     style={{
                       padding: '7px 12px 7px 30px',
                       borderRadius: '8px',
@@ -3218,8 +4185,11 @@ export default function HospitalPortalPage() {
                   <option value="all">All Statuses</option>
                   <option value="pending">Pending</option>
                   <option value="confirmed">Confirmed</option>
+                  <option value="checked_in">Checked In</option>
+                  <option value="in_progress">In Consultation</option>
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
+                  <option value="no_show">No Show</option>
                 </select>
               </div>
             </div>
@@ -3239,7 +4209,7 @@ export default function HospitalPortalPage() {
                   {language === 'bn' ? 'কোনো অ্যাপয়েন্টমেন্ট পাওয়া যায়নি' : 'No Appointments Found'}
                 </h3>
                 <p style={{ fontSize: '13px', color: tokens.textMuted, margin: 0 }}>
-                  {language === 'bn' ? 'রোগীদের অনলাইন বুকিং এখানে রিয়েল-টাইমে প্রদর্শিত হবে।' : 'Patient chamber bookings will appear here in real-time as they are scheduled.'}
+                  {language === 'bn' ? 'রোগীদের অনলাইন বুকিং এবং রিসেপশন সিরিয়াল এখানে রিয়েল-টাইমে প্রদর্শিত হবে।' : 'Patient chamber bookings and manual serials will appear here in real-time as they are scheduled.'}
                 </p>
               </div>
             ) : (
@@ -3256,110 +4226,189 @@ export default function HospitalPortalPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
                   <thead>
                     <tr style={{ backgroundColor: tokens.tableHeaderBg, borderBottom: `1px solid ${tokens.tableBorder}` }}>
-                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>BOOKING CODE</th>
+                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>SERIAL / CODE</th>
                       <th style={{ padding: '12px 16px', color: tokens.textMuted }}>PATIENT</th>
                       <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DOCTOR & CHAMBER</th>
                       <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DATE & TIME</th>
+                      <th style={{ padding: '12px 16px', color: tokens.textMuted }}>SOURCE</th>
                       <th style={{ padding: '12px 16px', color: tokens.textMuted }}>FEE & PAYMENT</th>
                       <th style={{ padding: '12px 16px', color: tokens.textMuted }}>STATUS</th>
                       <th style={{ padding: '12px 16px', color: tokens.textMuted, textAlign: 'right' }}>ACTIONS</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAppointments.map((apt) => (
-                      <tr key={apt.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
-                        <td style={{ padding: '14px 16px', fontWeight: 800, color: tokens.primary }}>{apt.bookingCode}</td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ fontWeight: 700, color: tokens.textPrimary }}>{apt.patientName}</div>
-                          <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.patientPhone}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ fontWeight: 700, color: tokens.textPrimary }}>{apt.doctorName}</div>
-                          <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.chamberRoom || 'Room 101'}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px', color: tokens.textPrimary }}>
-                          <div>{apt.appointmentDate}</div>
-                          <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.startTime}</div>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ fontWeight: 700, color: tokens.textPrimary }}>৳{apt.consultationFee}</div>
-                          <div style={{ fontSize: '10.5px', color: apt.paymentStatus === 'paid' ? '#10B981' : '#F59E0B', fontWeight: 700 }}>
-                            {apt.paymentStatus.toUpperCase()}
-                          </div>
-                        </td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <span
-                            style={{
-                              fontSize: '11px',
-                              fontWeight: 800,
-                              padding: '3px 8px',
-                              borderRadius: '6px',
-                              backgroundColor:
-                                apt.status === 'confirmed'
-                                  ? 'rgba(16, 185, 129, 0.12)'
-                                  : apt.status === 'completed'
-                                  ? 'rgba(139, 92, 246, 0.12)'
-                                  : apt.status === 'cancelled'
-                                  ? 'rgba(239, 68, 68, 0.12)'
-                                  : 'rgba(245, 158, 11, 0.12)',
-                              color:
-                                apt.status === 'confirmed'
-                                  ? '#10B981'
-                                  : apt.status === 'completed'
-                                  ? '#8B5CF6'
-                                  : apt.status === 'cancelled'
-                                  ? '#EF4444'
-                                  : '#F59E0B',
-                            }}
-                          >
-                            {apt.status.toUpperCase()}
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right' }}>
-                          <div style={{ display: 'inline-flex', gap: '6px' }}>
-                            {apt.status === 'pending' && (
-                              <button
-                                type="button"
-                                onClick={() => handleUpdateAppointmentStatus(apt.id, 'confirmed')}
-                                style={{ padding: '5px 9px', borderRadius: '6px', border: 'none', backgroundColor: '#10B981', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
-                              >
-                                Confirm
-                              </button>
-                            )}
-                            {apt.status === 'confirmed' && (
-                              <button
-                                type="button"
-                                onClick={() => handleUpdateAppointmentStatus(apt.id, 'completed')}
-                                style={{ padding: '5px 9px', borderRadius: '6px', border: 'none', backgroundColor: BRAND_COLORS.primary, color: '#FFFFFF', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
-                              >
-                                Complete
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setRescheduleApt(apt);
-                                setRescheduleDate(apt.appointmentDate);
-                                setRescheduleTime(apt.startTime);
-                                setIsRescheduleOpen(true);
+                    {filteredAppointments.map((apt, idx) => {
+                      const isPhone = apt.bookingSource === 'phone_call';
+                      const isWalkin = apt.bookingSource === 'walk_in';
+                      const isOnline = !apt.bookingSource || apt.bookingSource === 'online';
+                      const serialText = apt.serialNumber ? `Serial ${String(apt.serialNumber).padStart(2, '0')}` : `Serial ${String(idx + 1).padStart(2, '0')}`;
+
+                      return (
+                        <tr key={apt.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                          <td style={{ padding: '14px 16px' }}>
+                            <span
+                              style={{
+                                display: 'inline-block',
+                                fontSize: '11.5px',
+                                fontWeight: 900,
+                                padding: '3px 8px',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(0, 96, 250, 0.12)',
+                                color: BRAND_COLORS.primary,
+                                border: '1px solid rgba(0, 96, 250, 0.25)',
                               }}
-                              style={{ padding: '5px 9px', borderRadius: '6px', border: `1px solid ${tokens.cardBorder}`, backgroundColor: tokens.cardBgSubtle, color: tokens.textSecondary, fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}
                             >
-                              Reschedule
-                            </button>
-                            {apt.status !== 'cancelled' && (
+                              {serialText}
+                            </span>
+                            <div style={{ fontSize: '10.5px', color: tokens.textMuted, marginTop: '2px' }}>
+                              {apt.bookingCode}
+                            </div>
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <div style={{ fontWeight: 700, color: tokens.textPrimary }}>{apt.patientName}</div>
+                            <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.patientPhone}</div>
+                            {apt.patientAge && (
+                              <div style={{ fontSize: '10px', color: tokens.textMuted }}>Age: {apt.patientAge}</div>
+                            )}
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <div style={{ fontWeight: 700, color: tokens.textPrimary }}>{apt.doctorName}</div>
+                            <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.chamberRoom || 'Room 101'} • {apt.branchName}</div>
+                          </td>
+                          <td style={{ padding: '14px 16px', color: tokens.textPrimary }}>
+                            <div>{apt.appointmentDate}</div>
+                            <div style={{ fontSize: '11px', color: tokens.textMuted }}>{apt.startTime}</div>
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                padding: '3px 7px',
+                                borderRadius: '6px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                backgroundColor: isPhone
+                                  ? 'rgba(16, 185, 129, 0.12)'
+                                  : isWalkin
+                                  ? 'rgba(139, 92, 246, 0.12)'
+                                  : 'rgba(0, 96, 250, 0.12)',
+                                color: isPhone ? '#10B981' : isWalkin ? '#8B5CF6' : BRAND_COLORS.primary,
+                              }}
+                            >
+                              {isPhone && <PhoneCall size={10} />}
+                              {isWalkin && <Building2 size={10} />}
+                              {isOnline && <Layers size={10} />}
+                              <span>{isPhone ? 'Phone Call' : isWalkin ? 'Walk-in' : 'Online'}</span>
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <div style={{ fontWeight: 700, color: tokens.textPrimary }}>৳{apt.consultationFee}</div>
+                            <div style={{ fontSize: '10.5px', color: apt.paymentStatus === 'paid' ? '#10B981' : '#F59E0B', fontWeight: 700 }}>
+                              {apt.paymentStatus ? apt.paymentStatus.toUpperCase().replace('_', ' ') : 'UNPAID'}
+                            </div>
+                          </td>
+                          <td style={{ padding: '14px 16px' }}>
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                padding: '3px 8px',
+                                borderRadius: '6px',
+                                backgroundColor:
+                                  apt.status === 'confirmed'
+                                    ? 'rgba(16, 185, 129, 0.12)'
+                                    : apt.status === 'checked_in'
+                                    ? 'rgba(6, 182, 212, 0.12)'
+                                    : apt.status === 'in_progress'
+                                    ? 'rgba(139, 92, 246, 0.12)'
+                                    : apt.status === 'completed'
+                                    ? 'rgba(5, 150, 105, 0.12)'
+                                    : apt.status === 'cancelled' || apt.status === 'no_show'
+                                    ? 'rgba(239, 68, 68, 0.12)'
+                                    : 'rgba(245, 158, 11, 0.12)',
+                                color:
+                                  apt.status === 'confirmed'
+                                    ? '#10B981'
+                                    : apt.status === 'checked_in'
+                                    ? '#06B6D4'
+                                    : apt.status === 'in_progress'
+                                    ? '#8B5CF6'
+                                    : apt.status === 'completed'
+                                    ? '#059669'
+                                    : apt.status === 'cancelled' || apt.status === 'no_show'
+                                    ? '#EF4444'
+                                    : '#F59E0B',
+                              }}
+                            >
+                              {apt.status.toUpperCase().replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                            <div style={{ display: 'inline-flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                              {apt.status === 'pending' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateAppointmentStatus(apt.id, 'confirmed')}
+                                  style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#10B981', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  Confirm
+                                </button>
+                              )}
+                              {apt.status === 'confirmed' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateAppointmentStatus(apt.id, 'checked_in')}
+                                  style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#06B6D4', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  Check In
+                                </button>
+                              )}
+                              {apt.status === 'checked_in' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateAppointmentStatus(apt.id, 'in_progress')}
+                                  style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#8B5CF6', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  Call Next
+                                </button>
+                              )}
+                              {apt.status === 'in_progress' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateAppointmentStatus(apt.id, 'completed')}
+                                  style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: '#059669', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  Complete
+                                </button>
+                              )}
                               <button
                                 type="button"
-                                onClick={() => handleUpdateAppointmentStatus(apt.id, 'cancelled')}
-                                style={{ padding: '5px 9px', borderRadius: '6px', border: 'none', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                                onClick={() => {
+                                  setRescheduleApt(apt);
+                                  setRescheduleDate(apt.appointmentDate);
+                                  setRescheduleTime(apt.startTime);
+                                  setIsRescheduleOpen(true);
+                                }}
+                                style={{ padding: '4px 8px', borderRadius: '6px', border: `1px solid ${tokens.cardBorder}`, backgroundColor: tokens.cardBgSubtle, color: tokens.textSecondary, fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}
                               >
-                                Cancel
+                                Reschedule
                               </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              {apt.status !== 'cancelled' && apt.status !== 'completed' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateAppointmentStatus(apt.id, 'no_show')}
+                                  style={{ padding: '4px 8px', borderRadius: '6px', border: 'none', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  No Show
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -4892,7 +5941,762 @@ export default function HospitalPortalPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL 7: HELPLINE & CUSTOMER CARE COMPLIANCE MODAL */}
+      {/* MODAL 7: CREATE MANUAL SERIAL (PHONE CALL / RECEPTION DESK) */}
+      {/* ========================================================================= */}
+      {isManualSerialOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: '16px',
+            overflowY: 'auto',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+              borderRadius: '20px',
+              padding: '28px',
+              maxWidth: '560px',
+              width: '100%',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#10B981',
+                  }}
+                >
+                  <PhoneCall size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: tokens.textPrimary }}>
+                    {language === 'bn' ? 'ম্যানুয়াল সিরিয়াল বুকিং (কল / ডেস্ক)' : 'Create Manual Chamber Serial'}
+                  </h3>
+                  <div style={{ fontSize: '11px', color: tokens.textMuted }}>
+                    Quick serial generation for phone calls or patient reception walk-ins.
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsManualSerialOpen(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: tokens.textMuted }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateManualSerialSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Doctor Selection */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                  Select Doctor *
+                </label>
+                <select
+                  required
+                  value={manualDoctorId}
+                  onChange={(e) => setManualDoctorId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    border: `1px solid ${tokens.inputBorder}`,
+                    backgroundColor: tokens.inputBg,
+                    color: tokens.textPrimary,
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <option value="">-- Choose Specialist Doctor --</option>
+                  {doctors.map((d) => (
+                    <option key={d.id} value={d.id || d.doctorId}>
+                      {d.doctorName} ({d.doctorSpecialization}) — ৳{d.consultationFee}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Patient Phone with Auto-Lookup */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary }}>
+                    Patient Mobile Number *
+                  </label>
+                  {patientLookupLoading && (
+                    <span style={{ fontSize: '11px', color: tokens.primary }}>Searching patient database...</span>
+                  )}
+                  {patientLookupFound && (
+                    <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      <CheckCircle2 size={12} /> Existing Patient Found
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={manualPatientPhone}
+                  onChange={(e) => handleManualPhoneChange(e.target.value)}
+                  placeholder="01XXXXXXXXX"
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    border: `1px solid ${patientLookupFound ? '#10B981' : tokens.inputBorder}`,
+                    backgroundColor: tokens.inputBg,
+                    color: tokens.textPrimary,
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* Patient Name */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                  Patient Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={manualPatientName}
+                  onChange={(e) => setManualPatientName(e.target.value)}
+                  placeholder="e.g. Md. Shafiqul Alam"
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    border: `1px solid ${tokens.inputBorder}`,
+                    backgroundColor: tokens.inputBg,
+                    color: tokens.textPrimary,
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* Age & Gender */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Patient Age (Optional)
+                  </label>
+                  <input
+                    type="number"
+                    value={manualPatientAge}
+                    onChange={(e) => setManualPatientAge(e.target.value)}
+                    placeholder="e.g. 42"
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      border: `1px solid ${tokens.inputBorder}`,
+                      backgroundColor: tokens.inputBg,
+                      color: tokens.textPrimary,
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Gender
+                  </label>
+                  <select
+                    value={manualPatientGender}
+                    onChange={(e) => setManualPatientGender(e.target.value as any)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      border: `1px solid ${tokens.inputBorder}`,
+                      backgroundColor: tokens.inputBg,
+                      color: tokens.textPrimary,
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Date & Preferred Time */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Appointment Date *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={manualAppointmentDate}
+                    onChange={(e) => setManualAppointmentDate(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      border: `1px solid ${tokens.inputBorder}`,
+                      backgroundColor: tokens.inputBg,
+                      color: tokens.textPrimary,
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Visiting Time
+                  </label>
+                  <input
+                    type="text"
+                    value={manualPreferredTime}
+                    onChange={(e) => setManualPreferredTime(e.target.value)}
+                    placeholder="e.g. 10:30 AM"
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      border: `1px solid ${tokens.inputBorder}`,
+                      backgroundColor: tokens.inputBg,
+                      color: tokens.textPrimary,
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Booking Source & Payment Status */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Booking Channel
+                  </label>
+                  <select
+                    value={manualBookingSource}
+                    onChange={(e) => setManualBookingSource(e.target.value as any)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      border: `1px solid ${tokens.inputBorder}`,
+                      backgroundColor: tokens.inputBg,
+                      color: tokens.textPrimary,
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <option value="phone_call">Phone Call (Hospital Helpline)</option>
+                    <option value="walk_in">Reception Desk Walk-in</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Payment Status
+                  </label>
+                  <select
+                    value={manualPaymentStatus}
+                    onChange={(e) => setManualPaymentStatus(e.target.value as any)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      border: `1px solid ${tokens.inputBorder}`,
+                      backgroundColor: tokens.inputBg,
+                      color: tokens.textPrimary,
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <option value="cash_at_desk">Cash at Reception Desk</option>
+                    <option value="paid">Prepaid / Online Paid</option>
+                    <option value="pending">Payment Pending</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                  Administrative Note (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={manualNotes}
+                  onChange={(e) => setManualNotes(e.target.value)}
+                  placeholder="e.g. Follow-up consultation or urgent emergency slot"
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    border: `1px solid ${tokens.inputBorder}`,
+                    backgroundColor: tokens.inputBg,
+                    color: tokens.textPrimary,
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsManualSerialOpen(false)}
+                  style={{
+                    padding: '9px 16px',
+                    borderRadius: '10px',
+                    backgroundColor: tokens.cardBgSubtle,
+                    border: `1px solid ${tokens.cardBorder}`,
+                    color: tokens.textSecondary,
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={manualSubmitting}
+                  style={{
+                    padding: '9px 20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#10B981',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    fontSize: '12.5px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                  }}
+                >
+                  {manualSubmitting ? 'Issuing Serial Token...' : 'Issue Serial Token & Confirm'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 8: MANUAL SERIAL BOOKING SUCCESS & PRINTABLE SLIP */}
+      {/* ========================================================================= */}
+      {manualBookingSuccess && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 110,
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+              borderRadius: '20px',
+              padding: '28px',
+              maxWidth: '460px',
+              width: '100%',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '54px',
+                height: '54px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                color: '#10B981',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '12px',
+              }}
+            >
+              <CheckCircle2 size={32} />
+            </div>
+
+            <h3 style={{ fontSize: '18px', fontWeight: 900, color: tokens.textPrimary, margin: '0 0 4px 0' }}>
+              {language === 'bn' ? 'সিরিয়াল বুকিং সম্পন্ন হয়েছে!' : 'Serial Token Confirmed!'}
+            </h3>
+            <p style={{ fontSize: '12.5px', color: tokens.textMuted, margin: '0 0 16px 0' }}>
+              Chamber serial generated and atomically recorded in hospital database.
+            </p>
+
+            {/* Printable Serial Slip */}
+            <div
+              id="printable-serial-slip"
+              style={{
+                backgroundColor: tokens.cardBgSubtle,
+                border: `2px dashed ${BRAND_COLORS.primary}`,
+                borderRadius: '14px',
+                padding: '20px',
+                textAlign: 'left',
+                marginBottom: '16px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${tokens.cardBorder}`, paddingBottom: '10px', marginBottom: '12px' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: 900, color: tokens.textPrimary }}>{profile?.name}</div>
+                  <div style={{ fontSize: '10.5px', color: tokens.textMuted }}>{manualBookingSuccess.branchName}</div>
+                </div>
+                <div
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 900,
+                    color: BRAND_COLORS.primary,
+                    backgroundColor: 'rgba(0, 96, 250, 0.12)',
+                    padding: '4px 12px',
+                    borderRadius: '8px',
+                  }}
+                >
+                  {manualBookingSuccess.serialNumber ? `Serial #${String(manualBookingSuccess.serialNumber).padStart(2, '0')}` : 'Serial Confirmed'}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
+                <div>
+                  <span style={{ color: tokens.textMuted }}>Doctor:</span>{' '}
+                  <strong style={{ color: tokens.textPrimary }}>{manualBookingSuccess.doctorName}</strong>
+                </div>
+                <div>
+                  <span style={{ color: tokens.textMuted }}>Patient:</span>{' '}
+                  <strong style={{ color: tokens.textPrimary }}>{manualBookingSuccess.patientName}</strong> ({manualBookingSuccess.patientPhone})
+                </div>
+                <div>
+                  <span style={{ color: tokens.textMuted }}>Chamber Room:</span>{' '}
+                  <strong>{manualBookingSuccess.chamberRoom || 'Room 101'}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div>
+                    <span style={{ color: tokens.textMuted }}>Date:</span> <strong>{manualBookingSuccess.appointmentDate}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: tokens.textMuted }}>Time:</span> <strong>{manualBookingSuccess.startTime}</strong>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${tokens.cardBorder}`, paddingTop: '8px', marginTop: '4px' }}>
+                  <div>
+                    <span style={{ color: tokens.textMuted }}>Booking Code:</span>{' '}
+                    <strong style={{ color: tokens.primary }}>{manualBookingSuccess.bookingCode}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: tokens.textMuted }}>Fee:</span>{' '}
+                    <strong>৳{manualBookingSuccess.consultationFee}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const slip = `Diagnostic Care Serial Slip:\nDoctor: ${manualBookingSuccess.doctorName}\nPatient: ${manualBookingSuccess.patientName}\nSerial: #${manualBookingSuccess.serialNumber || '01'}\nDate: ${manualBookingSuccess.appointmentDate} (${manualBookingSuccess.startTime})\nChamber: ${manualBookingSuccess.chamberRoom || 'Room 101'}\nCode: ${manualBookingSuccess.bookingCode}\nHelpline: 01886-748564`;
+                  navigator.clipboard.writeText(slip);
+                  alert('Serial details copied to clipboard!');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  backgroundColor: tokens.cardBgSubtle,
+                  border: `1px solid ${tokens.cardBorder}`,
+                  color: tokens.textPrimary,
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Copy size={14} />
+                <span>Copy SMS</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  window.print();
+                }}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  backgroundColor: tokens.cardBgSubtle,
+                  border: `1px solid ${tokens.cardBorder}`,
+                  color: tokens.textPrimary,
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Printer size={14} />
+                <span>Print Slip</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setManualBookingSuccess(null)}
+                style={{
+                  flex: 1.2,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontSize: '12.5px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 9: DOCTOR SCHEDULE & AVAILABILITY CONFIGURATION */}
+      {/* ========================================================================= */}
+      {isDoctorScheduleOpen && scheduleDoctor && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: '16px',
+            overflowY: 'auto',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+              borderRadius: '20px',
+              padding: '28px',
+              maxWidth: '540px',
+              width: '100%',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: tokens.textPrimary }}>
+                  {language === 'bn' ? 'ডাক্তার চেম্বার শিডিউল ও সময়সূচি' : 'Doctor Chamber Schedule & Capacity'}
+                </h3>
+                <div style={{ fontSize: '11.5px', color: tokens.textMuted }}>
+                  {scheduleDoctor.doctorName} • BMDC: {scheduleDoctor.bmdcRegistrationNumber}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDoctorScheduleOpen(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: tokens.textMuted }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDoctorSchedule} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Consultation Days */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '6px' }}>
+                  Consultation Days
+                </label>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day) => {
+                    const isSelected = scheduleDays.includes(day);
+                    return (
+                      <button
+                        type="button"
+                        key={day}
+                        onClick={() => {
+                          if (isSelected) {
+                            setScheduleDays(scheduleDays.filter((d) => d !== day));
+                          } else {
+                            setScheduleDays([...scheduleDays, day]);
+                          }
+                        }}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          border: `1px solid ${isSelected ? BRAND_COLORS.primary : tokens.cardBorder}`,
+                          backgroundColor: isSelected ? 'rgba(0, 96, 250, 0.12)' : tokens.cardBgSubtle,
+                          color: isSelected ? BRAND_COLORS.primary : tokens.textSecondary,
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {day}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Visiting Hours */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Chamber Start Time
+                  </label>
+                  <input
+                    type="text"
+                    value={scheduleStartTime}
+                    onChange={(e) => setScheduleStartTime(e.target.value)}
+                    placeholder="05:00 PM"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Chamber End Time
+                  </label>
+                  <input
+                    type="text"
+                    value={scheduleEndTime}
+                    onChange={(e) => setScheduleEndTime(e.target.value)}
+                    placeholder="09:00 PM"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              {/* Limits and Duration */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Daily Serial Capacity Limit
+                  </label>
+                  <input
+                    type="number"
+                    value={scheduleDailyLimit}
+                    onChange={(e) => setScheduleDailyLimit(parseInt(e.target.value, 10) || 25)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    Chamber Room No.
+                  </label>
+                  <input
+                    type="text"
+                    value={scheduleRoom}
+                    onChange={(e) => setScheduleRoom(e.target.value)}
+                    placeholder="Room 204"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              {/* Leave Status */}
+              <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: tokens.cardBgSubtle, border: `1px solid ${tokens.cardBorder}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '12.5px', color: tokens.textPrimary }}>Doctor Leave / Unavailable</div>
+                    <div style={{ fontSize: '11px', color: tokens.textMuted }}>Temporarily halt new serial bookings for this doctor</div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={scheduleOnLeave}
+                    onChange={(e) => setScheduleOnLeave(e.target.checked)}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                  />
+                </div>
+                {scheduleOnLeave && (
+                  <input
+                    type="text"
+                    value={scheduleLeaveReason}
+                    onChange={(e) => setScheduleLeaveReason(e.target.value)}
+                    placeholder="Leave reason (e.g. Attending Medical Conference)"
+                    style={{ width: '100%', marginTop: '8px', padding: '7px 10px', borderRadius: '8px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '12px', boxSizing: 'border-box' }}
+                  />
+                )}
+              </div>
+
+              {/* Channel Toggles */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: tokens.textPrimary }}>
+                  <input
+                    type="checkbox"
+                    checked={scheduleOnlineBooking}
+                    onChange={(e) => setScheduleOnlineBooking(e.target.checked)}
+                  />
+                  <span>Online Booking Open</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: tokens.textPrimary }}>
+                  <input
+                    type="checkbox"
+                    checked={scheduleManualBooking}
+                    onChange={(e) => setScheduleManualBooking(e.target.checked)}
+                  />
+                  <span>Reception Booking Open</span>
+                </label>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsDoctorScheduleOpen(false)}
+                  style={{ padding: '9px 16px', borderRadius: '10px', backgroundColor: tokens.cardBgSubtle, border: `1px solid ${tokens.cardBorder}`, color: tokens.textSecondary, fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: '9px 20px', borderRadius: '10px', backgroundColor: BRAND_COLORS.primary, border: 'none', color: '#FFFFFF', fontSize: '12.5px', fontWeight: 800, cursor: 'pointer' }}
+                >
+                  Save Schedule & Limits
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 10: HELPLINE & CUSTOMER CARE COMPLIANCE MODAL */}
       {/* ========================================================================= */}
       {isHelpModalOpen && (
         <div

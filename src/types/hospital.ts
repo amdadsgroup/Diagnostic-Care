@@ -93,23 +93,45 @@ export interface HospitalDoctorAssociation {
   chamberRoom?: string;
   startDate: string;
   endDate?: string;
+  phone?: string;
+  email?: string;
+  qualifications?: string;
+  experienceYears?: number;
+  daysOfWeek?: string[];
+  visitingStartTime?: string;
+  visitingEndTime?: string;
+  slotDurationMinutes?: number;
+  dailySerialLimit?: number;
+  isOnlineEnabled?: boolean;
+  isManualEnabled?: boolean;
+  isOnLeave?: boolean;
+  leaveReason?: string;
+  verificationStatus?: 'verified' | 'pending' | 'unverified';
 }
 
 export interface HospitalAppointment {
   id: string;
   bookingCode: string;
+  serialNumber?: number;
+  doctorId?: string;
+  branchId?: string;
   patientName: string;
   patientPhone: string;
+  patientAge?: number;
+  patientGender?: 'MALE' | 'FEMALE' | 'OTHER';
   doctorName: string;
   doctorSpecialization?: string;
   branchName: string;
   appointmentDate: string;
   startTime: string;
-  status: 'pending' | 'confirmed' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'rescheduled';
+  status: 'pending' | 'confirmed' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'rescheduled' | 'no_show' | 'rejected';
   consultationFee: number;
-  paymentStatus: 'pending' | 'paid' | 'cash_at_desk';
+  paymentStatus: 'pending' | 'paid' | 'cash_at_desk' | 'unpaid';
+  bookingSource?: 'online' | 'manual' | 'phone_call' | 'walk_in';
+  notes?: string;
   chamberRoom?: string;
   cancellationReason?: string;
+  createdAt?: string;
 }
 
 export interface HospitalServiceItem {

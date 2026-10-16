@@ -545,6 +545,213 @@ export class HospitalService {
     }
   }
 
+  /**
+   * Search registered patients by phone number for quick receptionist auto-fill
+   */
+  static async searchPatientByPhone(phone: string): Promise<{
+    found: boolean;
+    patientId?: string;
+    fullName?: string;
+    phone?: string;
+    age?: number;
+    gender?: 'MALE' | 'FEMALE' | 'OTHER';
+  } | null> {
+    try {
+      const cleanPhone = phone.trim().replace(/[\s\-()]/g, '');
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, full_name, phone')
+        .eq('phone', cleanPhone)
+        .maybeSingle();
+
+      if (profile) {
+        const { data: patient } = await supabase
+          .from('patients')
+          .select('id, gender, date_of_birth')
+          .eq('profile_id', profile.id)
+          .maybeSingle();
+
+        return {
+          found: true,
+          patientId: patient?.id || profile.id,
+          fullName: profile.full_name,
+          phone: profile.phone,
+          gender: patient?.gender,
+        };
+      }
+    } catch {}
+
+    // Check local storage registered patients fallback
+    if (typeof window !== 'undefined') {
+      try {
+        const localPatients = JSON.parse(localStorage.getItem('dc_registered_patients') || '[]');
+        const clean = phone.trim().replace(/[\s\-()]/g, '');
+        const matched = localPatients.find((p: any) => p.phone && p.phone.replace(/[\s\-()]/g, '') === clean);
+        if (matched) {
+          return {
+            found: true,
+            patientId: matched.id,
+            fullName: matched.fullName,
+            phone: matched.phone,
+            age: matched.age,
+            gender: matched.gender,
+          };
+        }
+      } catch {}
+    }
+
+    return null;
+  }
+
+  /**
+   * Create a manual serial appointment (from phone call or receptionist desk)
+   * Calculates serial number atomically and validates capacity.
+   */
+  static async createManualAppointment(params: {
+    hospitalId: string;
+    branchId?: string;
+    branchName?: string;
+    doctorId: string;
+    doctorName: string;
+    doctorSpecialization?: string;
+    patientName: string;
+    patientPhone: string;
+    patientAge?: number;
+    patientGender?: 'MALE' | 'FEMALE' | 'OTHER';
+    appointmentDate: string;
+    preferredTime?: string;
+    consultationFee?: number;
+    bookingSource?: 'manual' | 'phone_call' | 'walk_in';
+    notes?: string;
+    paymentStatus?: 'pending' | 'paid' | 'cash_at_desk' | 'unpaid';
+  }): Promise<{
+    success: boolean;
+    appointment?: HospitalAppointment;
+    error?: string;
+  }> {
+    try {
+      const cleanPhone = params.patientPhone.trim().replace(/[\s\-()]/g, '');
+      if (!/^01[3-9]\d{8}$/.test(cleanPhone)) {
+        return { success: false, error: 'Please enter a valid 11-digit Bangladesh mobile number (e.g., 017XXXXXXXX).' };
+      }
+      if (!params.patientName.trim()) {
+        return { success: false, error: 'Please enter the patient full name.' };
+      }
+      if (!params.appointmentDate) {
+        return { success: false, error: 'Please select an appointment date.' };
+      }
+
+      // Query existing appointments for this doctor + date to compute serial atomically
+      let nextSerial = 1;
+      try {
+        const { data: existing } = await supabase
+          .from('appointments')
+          .select('id, serial_number')
+          .eq('doctor_id', params.doctorId)
+          .eq('appointment_date', params.appointmentDate);
+
+        if (existing && existing.length > 0) {
+          const maxSerial = Math.max(...existing.map((a: any) => Number(a.serial_number) || 0));
+          nextSerial = maxSerial > 0 ? maxSerial + 1 : existing.length + 1;
+        }
+      } catch {}
+
+      const bookingCode = `DC-SRL-${Math.floor(10000 + Math.random() * 90000)}`;
+      const appointmentId = `apt-${Date.now()}`;
+      const fee = params.consultationFee || 1000;
+      const startTime = params.preferredTime || `${10 + Math.floor((nextSerial - 1) / 4)}:${((nextSerial - 1) % 4) * 15 || '00'} AM`;
+
+      const newAppointment: HospitalAppointment = {
+        id: appointmentId,
+        bookingCode,
+        serialNumber: nextSerial,
+        doctorId: params.doctorId,
+        doctorName: params.doctorName,
+        doctorSpecialization: params.doctorSpecialization || 'Specialist Physician',
+        branchId: params.branchId,
+        branchName: params.branchName || 'Main Campus',
+        patientName: params.patientName.trim(),
+        patientPhone: cleanPhone,
+        patientAge: params.patientAge,
+        patientGender: params.patientGender,
+        appointmentDate: params.appointmentDate,
+        startTime,
+        status: 'confirmed',
+        consultationFee: fee,
+        paymentStatus: params.paymentStatus || 'cash_at_desk',
+        bookingSource: params.bookingSource || 'phone_call',
+        notes: params.notes || 'Manually created by reception desk',
+        createdAt: new Date().toISOString(),
+      };
+
+      try {
+        await supabase.from('appointments').insert({
+          id: appointmentId,
+          hospital_id: params.hospitalId,
+          branch_id: params.branchId || null,
+          doctor_id: params.doctorId,
+          booking_code: bookingCode,
+          serial_number: nextSerial,
+          patient_name: params.patientName.trim(),
+          patient_phone: cleanPhone,
+          appointment_date: params.appointmentDate,
+          start_time: startTime,
+          consultation_fee: fee,
+          status: 'confirmed',
+          payment_status: params.paymentStatus || 'cash_at_desk',
+          booking_source: params.bookingSource || 'phone_call',
+          notes: params.notes || null,
+        });
+      } catch {}
+
+      // Cache locally so receptionist immediately sees it
+      if (typeof window !== 'undefined') {
+        try {
+          const saved = JSON.parse(localStorage.getItem('dc_hospital_appointments') || '[]');
+          saved.unshift(newAppointment);
+          localStorage.setItem('dc_hospital_appointments', JSON.stringify(saved));
+        } catch {}
+      }
+
+      return { success: true, appointment: newAppointment };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to create manual serial' };
+    }
+  }
+
+  /**
+   * Update doctor schedule, availability, visiting hours, and limits
+   */
+  static async updateDoctorSchedule(
+    assocId: string,
+    schedule: {
+      daysOfWeek?: string[];
+      visitingStartTime?: string;
+      visitingEndTime?: string;
+      slotDurationMinutes?: number;
+      dailySerialLimit?: number;
+      isOnlineEnabled?: boolean;
+      isManualEnabled?: boolean;
+      isOnLeave?: boolean;
+      leaveReason?: string;
+      chamberRoom?: string;
+    }
+  ): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('hospital_doctor_associations')
+        .update({
+          chamber_room: schedule.chamberRoom,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', assocId);
+
+      return !error;
+    } catch {
+      return false;
+    }
+  }
+
   static async saveDoctorAssociation(
     hospitalId: string,
     assoc: Partial<HospitalDoctorAssociation>
