@@ -126,6 +126,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       if (result.error) {
         if (result.error.toLowerCase().includes('already registered')) {
           setErrorMessage(t.authRegisterDuplicate);
+        } else if (result.error.toLowerCase().includes('fetch')) {
+          setErrorMessage(
+            language === 'bn'
+              ? 'নেটওয়ার্ক সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
+              : 'Network connection issue. Please try again.'
+          );
         } else {
           setErrorMessage(result.error);
         }
@@ -151,8 +157,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 1200);
       }
     } catch (err: any) {
+      const msg = err.message || '';
       setErrorMessage(
-        err.message || 'An error occurred during registration. Please try again.'
+        msg.toLowerCase().includes('fetch')
+          ? (language === 'bn' ? 'নেটওয়ার্ক সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' : 'Network connection issue. Please try again.')
+          : (msg || 'An error occurred during registration. Please try again.')
       );
       setLoading(false);
     }

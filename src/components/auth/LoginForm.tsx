@@ -124,8 +124,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         }, 400);
       }
     } catch (err: any) {
+      const msg = err.message || '';
       setErrorMessage(
-        err.message || t.authLoginNetworkError || 'An unexpected error occurred during login.'
+        msg.toLowerCase().includes('fetch')
+          ? (t.authLoginNetworkError || 'Network connection issue. Please try again.')
+          : (msg || t.authLoginNetworkError || 'An unexpected error occurred during login.')
       );
       setLoading(false);
     }

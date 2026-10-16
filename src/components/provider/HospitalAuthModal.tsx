@@ -102,7 +102,12 @@ export default function HospitalAuthModal({
         window.location.href = result.redirectPath || '/?tab=portal';
       }, 500);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Login failed. Please check credentials.');
+      const msg = err.message || '';
+      setErrorMessage(
+        msg.toLowerCase().includes('fetch')
+          ? (isBn ? 'নেটওয়ার্ক সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' : 'Network connection issue. Please try again.')
+          : (msg || 'Login failed. Please check credentials.')
+      );
       setLoading(false);
     }
   };
@@ -154,7 +159,12 @@ export default function HospitalAuthModal({
         window.location.href = '/?tab=portal&role=DIAGNOSTIC_ADMIN';
       }, 700);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Registration failed.');
+      const msg = err.message || '';
+      setErrorMessage(
+        msg.toLowerCase().includes('fetch')
+          ? (isBn ? 'নেটওয়ার্ক সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' : 'Network connection issue. Please try again.')
+          : (msg || 'Registration failed.')
+      );
       setLoading(false);
     }
   };
