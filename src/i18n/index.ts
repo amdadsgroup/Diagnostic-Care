@@ -80,30 +80,50 @@ const DOT_KEY_MAP: Record<string, TranslationKeys> = {
 /**
  * Translate a key into the given language.
  * Supports camelCase key or dot-notation ('auth.login.title').
+ * Supports variable interpolation: {variable} or {{variable}}.
  */
 export function translate(
   lang: SupportedLanguage,
   key: string,
-  fallback?: string
+  fallback?: string,
+  params?: Record<string, string | number>
 ): string {
   const dictionary = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  const enDictionary = TRANSLATIONS.en;
   
+  let result: string | undefined;
+
   if (key in dictionary) {
-    return (dictionary as any)[key];
+    result = (dictionary as any)[key];
+  } else {
+    const mappedKey = DOT_KEY_MAP[key];
+    if (mappedKey && mappedKey in dictionary) {
+      result = (dictionary as any)[mappedKey];
+    } else if (key in enDictionary) {
+      result = (enDictionary as any)[key];
+    } else if (mappedKey && mappedKey in enDictionary) {
+      result = (enDictionary as any)[mappedKey];
+    }
   }
 
-  const mappedKey = DOT_KEY_MAP[key];
-  if (mappedKey && mappedKey in dictionary) {
-    return dictionary[mappedKey];
+  let text = result !== undefined && result !== '' ? result : (fallback || key);
+
+  if (params && typeof text === 'string') {
+    Object.entries(params).forEach(([paramKey, paramValue]) => {
+      const valStr = String(paramValue);
+      // Support {key} and {{key}}
+      text = text.replace(new RegExp(`\\{\\{?\\s*${paramKey}\\s*\\}\\}?`, 'g'), valStr);
+    });
   }
 
-  return fallback || key;
+  return text;
 }
 
 /**
  * Convert numbers to Bengali digits if language is 'bn'
  */
 export function formatLocalizedNumber(num: number | string, lang: SupportedLanguage): string {
+  if (num === null || num === undefined) return '';
   if (lang !== 'bn') return String(num);
   const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
   return String(num).replace(/[0-9]/g, (w) => bengaliDigits[+w]);
@@ -113,6 +133,54 @@ export function formatLocalizedNumber(num: number | string, lang: SupportedLangu
  * Format currency with BDT symbol localized
  */
 export function formatLocalizedCurrency(amount: number, lang: SupportedLanguage): string {
-  const formatted = formatLocalizedNumber(amount.toLocaleString('en-US'), lang);
-  return lang === 'bn' ? `৳${formatted}` : `৳${amount.toLocaleString('en-US')}`;
+  const safeAmount = Number.isFinite(amount) ? amount : 0;
+  const formatted = formatLocalizedNumber(safeAmount.toLocaleString('en-US'), lang);
+  return lang === 'bn' ? `৳${formatted}` : `৳${safeAmount.toLocaleString('en-US')}`;
+}
+
+/**
+ * Format localized date
+ */
+export function formatLocalizedDate(
+  dateInput: string | number | Date,
+  lang: SupportedLanguage,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  try {
+    if (!dateInput) return '';
+    const d = typeof dateInput === 'string' || typeof dateInput === 'number' ? new Date(dateInput) : dateInput;
+    if (isNaN(d.getTime())) return String(dateInput);
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      ...options,
+    };
+    return d.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-US', defaultOptions);
+  } catch {
+    return String(dateInput);
+  }
+}
+
+/**
+ * Format localized time
+ */
+export function formatLocalizedTime(
+  dateInput: string | number | Date,
+  lang: SupportedLanguage,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  try {
+    if (!dateInput) return '';
+    const d = typeof dateInput === 'string' || typeof dateInput === 'number' ? new Date(dateInput) : dateInput;
+    if (isNaN(d.getTime())) return String(dateInput);
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      ...options,
+    };
+    return d.toLocaleTimeString(lang === 'bn' ? 'bn-BD' : 'en-US', defaultOptions);
+  } catch {
+    return String(dateInput);
+  }
 }

@@ -4,6 +4,7 @@ import React from 'react';
 import { QueueState, Appointment, UserRole } from '@/types';
 import { SupportedLanguage, BRAND_CONSTANTS } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import { Users, Clock, ArrowRight, CheckCircle2, Phone, AlertCircle } from 'lucide-react';
 
 interface LiveQueueCardProps {
@@ -12,7 +13,7 @@ interface LiveQueueCardProps {
   specialization: string;
   chamberName: string;
   appointments: Appointment[];
-  language: SupportedLanguage;
+  language?: SupportedLanguage;
   currentRole: UserRole;
   onCallNext: () => void;
   onUpdateStatus: (appointmentId: string, status: Appointment['status']) => void;
@@ -24,12 +25,14 @@ export const LiveQueueCard: React.FC<LiveQueueCardProps> = ({
   specialization,
   chamberName,
   appointments,
-  language,
+  language: propLanguage,
   currentRole,
   onCallNext,
   onUpdateStatus,
 }) => {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const canManage = currentRole === 'DOCTOR' || currentRole === 'DOCTOR_ASSISTANT' || currentRole === 'SUPER_ADMIN';
 
   // Find currently serving appointment

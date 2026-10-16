@@ -3,14 +3,24 @@
 import React, { useState, useEffect } from 'react';
 import { BRAND } from '@/config/brand';
 import { SearchResult } from '@/types/extended';
+import { useLanguage } from '@/context/LanguageContext';
 
-const MOULVIBAZAR_UPAZILAS = [
-  { id: 'ALL', bn: 'সমগ্র মৌলভীবাজার', en: 'All Moulvibazar' },
-  { id: 'Sadar', bn: 'সদর (Sadar)', en: 'Sadar' },
-  { id: 'Sreemangal', bn: 'শ্রীমঙ্গল (Sreemangal)', en: 'Sreemangal' },
-  { id: 'Kamalganj', bn: 'কমলগঞ্জ (Kamalganj)', en: 'Kamalganj' },
-  { id: 'Kulaura', bn: 'কুলাউড়া (Kulaura)', en: 'Kulaura' },
-  { id: 'Rajnagar', bn: 'রাজনগর (Rajnagar)', en: 'Rajnagar' },
+const MOULVIBAZAR_UPAZILAS_KEYS = [
+  { id: 'ALL', labelKey: 'searchFilterAllMoulvibazar' as const },
+  { id: 'Sadar', labelKey: 'searchFilterSadar' as const },
+  { id: 'Sreemangal', labelKey: 'searchFilterSreemangal' as const },
+  { id: 'Kamalganj', labelKey: 'searchFilterKamalganj' as const },
+  { id: 'Kulaura', labelKey: 'searchFilterKulaura' as const },
+  { id: 'Rajnagar', labelKey: 'searchFilterRajnagar' as const },
+];
+
+const SPECIALTY_KEYS = [
+  { id: 'ALL', labelKey: 'searchFilterAllDoctors' as const },
+  { id: 'Cardiology', labelKey: 'searchFilterCardiology' as const },
+  { id: 'Medicine', labelKey: 'searchFilterMedicine' as const },
+  { id: 'Gynecologist', labelKey: 'searchFilterGynecology' as const },
+  { id: 'Pediatrics', labelKey: 'searchFilterPediatrics' as const },
+  { id: 'Orthopedics', labelKey: 'searchFilterOrthopedics' as const },
 ];
 
 export default function AdvancedSearchFilter({
@@ -18,6 +28,7 @@ export default function AdvancedSearchFilter({
 }: {
   onSelectResult?: (result: SearchResult) => void;
 }) {
+  const { t, language } = useLanguage();
   const [query, setQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('ALL');
   const [selectedUpazila, setSelectedUpazila] = useState('ALL');
@@ -52,6 +63,20 @@ export default function AdvancedSearchFilter({
     fetchResults();
   }, [query, selectedSpecialty, selectedUpazila, availableToday, maxPrice]);
 
+  /** Helper: get the type label for a search result */
+  const getTypeLabel = (type: string) => {
+    if (type === 'DOCTOR') return t.searchFilterTypeDoctor;
+    if (type === 'TEST') return t.searchFilterTypeTest;
+    return t.searchFilterTypeCenter;
+  };
+
+  /** Helper: get the CTA button label for a search result */
+  const getCtaLabel = (type: string) => {
+    if (type === 'DOCTOR') return t.searchFilterBookSerial;
+    if (type === 'TEST') return t.searchFilterBookTest;
+    return t.searchFilterViewProfile;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Search Header Container */}
@@ -63,7 +88,7 @@ export default function AdvancedSearchFilter({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="ডাক্তারের নাম বা বিশেষজ্ঞ বিভাগ লিখুন (যেমন: ডাঃ আনিসুর রহমান, হৃদরোগ, মেডিসিন)..."
+              placeholder={t.searchFilterPlaceholder}
               style={{
                 width: '100%',
                 padding: '12px 16px',
@@ -79,36 +104,29 @@ export default function AdvancedSearchFilter({
             className="btn-primary"
             style={{ padding: '0 24px', fontSize: '1rem' }}
           >
-            {loading ? 'খোঁজা হচ্ছে...' : '🔍 খুঁজুন'}
+            {loading ? t.searchFilterSearching : t.searchFilterSearchBtn}
           </button>
         </div>
 
         {/* Type Filter Tabs: Doctor Specialties */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-          {[
-            { id: 'ALL', label: 'সকল ডাক্তার (All Doctors)' },
-            { id: 'Cardiology', label: '❤️ কার্ডিওলজি (হৃদরোগ)' },
-            { id: 'Medicine', label: '🩺 মেডিসিন ও ডায়াবেটিস' },
-            { id: 'Gynecologist', label: '🤰 স্ত্রী ও প্রসূতিরোগ' },
-            { id: 'Pediatrics', label: '👶 শিশু বিশেষজ্ঞ' },
-            { id: 'Orthopedics', label: '🦴 অর্থোপেডিকস' },
-          ].map((t) => (
+          {SPECIALTY_KEYS.map((spec) => (
             <button
-              key={t.id}
-              onClick={() => setSelectedSpecialty(t.id)}
+              key={spec.id}
+              onClick={() => setSelectedSpecialty(spec.id)}
               style={{
                 padding: '8px 14px',
                 borderRadius: '20px',
                 fontSize: '0.85rem',
                 fontWeight: 600,
                 border: '1px solid',
-                borderColor: selectedSpecialty === t.id ? 'var(--brand-teal-600)' : 'var(--slate-300)',
-                background: selectedSpecialty === t.id ? 'var(--brand-teal-50)' : 'white',
-                color: selectedSpecialty === t.id ? 'var(--brand-teal-600)' : 'var(--slate-700)',
+                borderColor: selectedSpecialty === spec.id ? 'var(--brand-teal-600)' : 'var(--slate-300)',
+                background: selectedSpecialty === spec.id ? 'var(--brand-teal-50)' : 'white',
+                color: selectedSpecialty === spec.id ? 'var(--brand-teal-600)' : 'var(--slate-700)',
                 cursor: 'pointer',
               }}
             >
-              {t.label}
+              {t[spec.labelKey]}
             </button>
           ))}
         </div>
@@ -117,9 +135,9 @@ export default function AdvancedSearchFilter({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', paddingTop: '14px', borderTop: '1px solid var(--slate-200)' }}>
           {/* Upazila Selection */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--slate-600)' }}>উপজেলা:</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--slate-600)' }}>{t.searchFilterUpazilaLabel}</span>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              {MOULVIBAZAR_UPAZILAS.map((upz) => (
+              {MOULVIBAZAR_UPAZILAS_KEYS.map((upz) => (
                 <button
                   key={upz.id}
                   onClick={() => setSelectedUpazila(upz.id)}
@@ -132,7 +150,7 @@ export default function AdvancedSearchFilter({
                     color: selectedUpazila === upz.id ? 'white' : 'var(--slate-700)',
                   }}
                 >
-                  {upz.bn}
+                  {t[upz.labelKey]}
                 </button>
               ))}
             </div>
@@ -146,12 +164,12 @@ export default function AdvancedSearchFilter({
               onChange={(e) => setAvailableToday(e.target.checked)}
               style={{ width: '16px', height: '16px', cursor: 'pointer' }}
             />
-            আজকের স্লট উপলব্ধ (Available Today)
+            {t.searchFilterAvailableToday}
           </label>
 
           {/* Price Range Slider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--slate-600)' }}>সর্বোচ্চ ফি:</span>
+            <span style={{ fontSize: '0.82rem', color: 'var(--slate-600)' }}>{t.searchFilterMaxFee}</span>
             <input
               type="range"
               min={300}
@@ -172,18 +190,18 @@ export default function AdvancedSearchFilter({
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--brand-navy-900)' }}>
-            অনুসন্ধানের ফলাফল ({results.length} টি প্রাপ্ত)
+            {t.searchFilterResultsTitle} ({results.length} {t.searchFilterResultsCount})
           </h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>
-            লোকেশন: মৌলভীবাজার ও সিলেট অঞ্চল
+            {t.searchFilterLocationLabel}
           </span>
         </div>
 
         {results.length === 0 ? (
           <div className="portal-card" style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--slate-500)' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🔍</div>
-            <h4 style={{ fontWeight: 700, color: 'var(--brand-navy-900)' }}>কোনো ফলাফল পাওয়া যায়নি</h4>
-            <p style={{ fontSize: '0.85rem', marginTop: '4px' }}>অনুগ্রহ করে ফিল্টার পরিবর্তন করে বা ভিন্ন কিওয়ার্ড লিখে পুনরায় চেষ্টা করুন।</p>
+            <h4 style={{ fontWeight: 700, color: 'var(--brand-navy-900)' }}>{t.searchFilterNoResults}</h4>
+            <p style={{ fontSize: '0.85rem', marginTop: '4px' }}>{t.searchFilterNoResultsHint}</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
@@ -201,7 +219,7 @@ export default function AdvancedSearchFilter({
               >
                 {item.isSponsored && (
                   <span style={{ position: 'absolute', top: '12px', right: '12px', background: 'var(--brand-amber-50)', color: '#b45309', border: '1px solid var(--brand-amber-500)', fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>
-                    ★ স্পন্সরড
+                    {t.searchFilterSponsored}
                   </span>
                 )}
 
@@ -215,7 +233,7 @@ export default function AdvancedSearchFilter({
                       background: item.type === 'DOCTOR' ? 'var(--brand-teal-50)' : item.type === 'TEST' ? 'var(--brand-emerald-50)' : 'var(--slate-100)',
                       color: item.type === 'DOCTOR' ? 'var(--brand-teal-600)' : item.type === 'TEST' ? '#065f46' : 'var(--slate-700)',
                     }}>
-                      {item.type === 'DOCTOR' ? 'ডাক্তার' : item.type === 'TEST' ? 'ডায়াগনস্টিক টেস্ট' : 'সেন্টার'}
+                      {getTypeLabel(item.type)}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>
                       ★ {item.rating} ({item.reviewCount})
@@ -234,7 +252,7 @@ export default function AdvancedSearchFilter({
 
                   {item.nextSlot && (
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--brand-emerald-50)', color: '#065f46', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>
-                      ⚡ নিকটতম স্লট: {item.nextSlot}
+                      {t.searchFilterNextSlot} {item.nextSlot}
                     </div>
                   )}
                 </div>
@@ -242,7 +260,7 @@ export default function AdvancedSearchFilter({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--slate-100)' }}>
                   {item.price ? (
                     <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--slate-500)', display: 'block' }}>ফি</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--slate-500)', display: 'block' }}>{t.searchFilterFeeLabel}</span>
                       <strong style={{ fontSize: '1.2rem', color: 'var(--brand-navy-900)' }}>৳{item.price}</strong>
                     </div>
                   ) : <div />}
@@ -260,7 +278,7 @@ export default function AdvancedSearchFilter({
                     className="btn-primary"
                     style={{ fontSize: '0.82rem', padding: '8px 14px' }}
                   >
-                    {item.type === 'DOCTOR' ? 'সিরিয়াল বুক করুন →' : item.type === 'TEST' ? 'টেস্ট বুক করুন →' : 'প্রোফাইল দেখুন →'}
+                    {getCtaLabel(item.type)}
                   </button>
                 </div>
               </div>

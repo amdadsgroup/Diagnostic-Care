@@ -4,6 +4,7 @@ import React from 'react';
 import { Appointment, QueueState, DoctorAssistant } from '@/types';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import { ShieldCheck, ShieldAlert, Users, Phone, Clock, ArrowRight, CheckCircle2, UserCheck, Lock } from 'lucide-react';
 
 interface DoctorAssistantViewProps {
@@ -14,7 +15,7 @@ interface DoctorAssistantViewProps {
   branchName: string;
   appointments: Appointment[];
   queue: QueueState;
-  language: SupportedLanguage;
+  language?: SupportedLanguage;
   onCallNext: () => void;
   onUpdateStatus: (appointmentId: string, status: Appointment['status']) => void;
 }
@@ -27,11 +28,13 @@ export const DoctorAssistantView: React.FC<DoctorAssistantViewProps> = ({
   branchName,
   appointments,
   queue,
-  language,
+  language: propLanguage,
   onCallNext,
   onUpdateStatus,
 }) => {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
   // Filter appointments specifically for this assistant's assigned doctor association
   const doctorAppointments = appointments.filter(

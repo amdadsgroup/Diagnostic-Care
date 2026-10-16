@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import { UserRole, ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
 import { INITIAL_APP_STATE } from '@/lib/store';
 import { Header } from '@/components/Header';
@@ -122,8 +123,7 @@ function UrlSyncHandler({
 }
 
 export default function HomePage() {
-  // English is the default language as strictly required
-  const [language, setLanguage] = useState<SupportedLanguage>('en');
+  const { language, setLanguage, t, formatCurrency, formatNumber, formatDate } = useLanguage();
   const [currentRole, setCurrentRole] = useState<UserRole>('PATIENT');
   const [activeTab, setActiveTab] = useState<ActiveNavTab>('marketplace');
 
@@ -155,14 +155,9 @@ export default function HomePage() {
   const [isDiagnosticCartOpen, setIsDiagnosticCartOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
-  // Restore language & location and detect PWA shortcut action from URL + Load Supabase data
+  // Restore location and detect PWA shortcut action from URL + Load Supabase data
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('dc_lang') as SupportedLanguage | null;
-      if (saved === 'en' || saved === 'bn') {
-        setLanguage(saved);
-      }
-
       const savedLoc = localStorage.getItem('dc_user_location');
       if (savedLoc) {
         setSelectedLocation(savedLoc);
@@ -234,13 +229,6 @@ export default function HomePage() {
 
   const handleLanguageChange = (lang: SupportedLanguage) => {
     setLanguage(lang);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('dc_lang', lang);
-      document.documentElement.lang = lang;
-    }
-    if (currentUser) {
-      AuthService.updateLanguagePreference(currentUser.id, lang);
-    }
   };
 
   const handleLogout = async () => {
@@ -250,7 +238,6 @@ export default function HomePage() {
     setActiveTab('marketplace');
   };
 
-  const t = TRANSLATIONS[language];
   const todayKey = 'assoc-anisur-popular_' + new Date().toISOString().split('T')[0];
   const activeQueue = appState.queues[todayKey] || Object.values(appState.queues)[0];
 

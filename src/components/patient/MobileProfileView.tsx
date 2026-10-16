@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { SupportedLanguage, BRAND_CONSTANTS } from '@/config/brand';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   User,
   Phone,
@@ -25,8 +26,8 @@ import {
 } from 'lucide-react';
 
 interface MobileProfileViewProps {
-  language: SupportedLanguage;
-  onLanguageChange: (lang: SupportedLanguage) => void;
+  language?: SupportedLanguage;
+  onLanguageChange?: (lang: SupportedLanguage) => void;
   selectedLocation: string;
   onOpenLocationModal: () => void;
   onOpenNotificationsModal: () => void;
@@ -38,8 +39,8 @@ interface MobileProfileViewProps {
 }
 
 export default function MobileProfileView({
-  language,
-  onLanguageChange,
+  language: propLanguage,
+  onLanguageChange: propOnLanguageChange,
   selectedLocation,
   onOpenLocationModal,
   onOpenNotificationsModal,
@@ -49,6 +50,12 @@ export default function MobileProfileView({
   currentUser,
   appointmentsCount = 0,
 }: MobileProfileViewProps) {
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const onLanguageChange = (l: SupportedLanguage) => {
+    if (propOnLanguageChange) propOnLanguageChange(l);
+    langContext.setLanguage(l);
+  };
   const [isStandalone, setIsStandalone] = useState(false);
   const [platformName, setPlatformName] = useState('Mobile Browser');
   const [cacheClearStatus, setCacheClearStatus] = useState<string | null>(null);

@@ -3,6 +3,7 @@
 import React from 'react';
 import { SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ShieldCheck,
   Award,
@@ -15,8 +16,10 @@ import {
   HeartPulse,
 } from 'lucide-react';
 
-export default function TrustSection({ language }: { language: SupportedLanguage }) {
-  const t = TRANSLATIONS[language];
+export default function TrustSection({ language: propLanguage }: { language?: SupportedLanguage }) {
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
   const metrics = [
     {

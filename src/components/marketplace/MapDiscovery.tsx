@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { SupportedLanguage, BRAND_CONSTANTS } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   MapPin,
   Navigation,
@@ -112,13 +113,15 @@ const SAMPLE_FACILITIES: FacilityPin[] = [
 ];
 
 export default function MapDiscovery({
-  language,
+  language: propLanguage,
   onSelectFacility,
 }: {
-  language: SupportedLanguage;
+  language?: SupportedLanguage;
   onSelectFacility?: (facility: FacilityPin) => void;
 }) {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const [filterType, setFilterType] = useState<string>('ALL');
   const [selectedFacility, setSelectedFacility] = useState<FacilityPin>(SAMPLE_FACILITIES[0]);
 

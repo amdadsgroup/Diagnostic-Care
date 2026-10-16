@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { SocialIcon } from '@/components/brand/SocialIcon';
 import {
@@ -24,13 +25,19 @@ import {
 import HospitalAuthModal from '@/components/provider/HospitalAuthModal';
 
 interface FooterProps {
-  language: SupportedLanguage;
+  language?: SupportedLanguage;
   setLanguage?: (lang: SupportedLanguage) => void;
   onNavigateTab?: (tab: string, category?: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigateTab }) => {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const currentLanguage = language || langContext.language || 'en';
+  const handleSetLanguage = (l: SupportedLanguage) => {
+    if (setLanguage) setLanguage(l);
+    langContext.setLanguage(l);
+  };
+  const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
   const [isHospitalAuthOpen, setIsHospitalAuthOpen] = useState(false);
   const [hospitalAuthMode, setHospitalAuthMode] = useState<'login' | 'register'>('login');
 
@@ -642,32 +649,42 @@ export const Footer: React.FC<FooterProps> = ({ language, setLanguage, onNavigat
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <span>{BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Hub • Bangladesh</span>
-            {setLanguage && (
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                <Globe size={12} color="#60A5FA" />
-                <button
-                  onClick={() => setLanguage('en')}
-                  style={{
-                    color: language === 'en' ? '#60A5FA' : '#94A3B8',
-                    fontWeight: language === 'en' ? 700 : 400,
-                    cursor: 'pointer',
-                  }}
-                >
-                  English
-                </button>
-                <span>/</span>
-                <button
-                  onClick={() => setLanguage('bn')}
-                  style={{
-                    color: language === 'bn' ? '#60A5FA' : '#94A3B8',
-                    fontWeight: language === 'bn' ? 700 : 400,
-                    cursor: 'pointer',
-                  }}
-                >
-                  বাংলা
-                </button>
-              </div>
-            )}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <Globe size={12} color="#60A5FA" />
+              <button
+                type="button"
+                onClick={() => handleSetLanguage('en')}
+                aria-pressed={currentLanguage === 'en'}
+                aria-label="Switch language to English"
+                style={{
+                  color: currentLanguage === 'en' ? '#60A5FA' : '#94A3B8',
+                  fontWeight: currentLanguage === 'en' ? 700 : 400,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '2px 4px',
+                }}
+              >
+                English
+              </button>
+              <span style={{ color: '#475569' }}>/</span>
+              <button
+                type="button"
+                onClick={() => handleSetLanguage('bn')}
+                aria-pressed={currentLanguage === 'bn'}
+                aria-label="বাংলা ভাষায় পরিবর্তন করুন"
+                style={{
+                  color: currentLanguage === 'bn' ? '#60A5FA' : '#94A3B8',
+                  fontWeight: currentLanguage === 'bn' ? 700 : 400,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '2px 4px',
+                }}
+              >
+                বাংলা
+              </button>
+            </div>
           </div>
         </div>
       </div>

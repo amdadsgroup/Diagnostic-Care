@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { BrandSymbol } from '@/components/brand/BrandSymbol';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Search,
   MapPin,
@@ -22,7 +23,7 @@ import {
 } from 'lucide-react';
 
 interface HeroSectionProps {
-  language: SupportedLanguage;
+  language?: SupportedLanguage;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   selectedDistrict: string;
@@ -33,7 +34,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({
-  language,
+  language: propLanguage,
   searchQuery,
   setSearchQuery,
   selectedDistrict,
@@ -42,7 +43,9 @@ export default function HeroSection({
   onOpenHelpline,
   onSelectCategory,
 }: HeroSectionProps) {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const [activeSearchTab, setActiveSearchTab] = useState<string>('ALL');
 
   const popularSearches = [

@@ -200,6 +200,30 @@ body {
   overflow-x: hidden;
 }
 
+/* Localized Bengali Typography Enhancement */
+html[lang="bn"],
+html[data-lang="bn"],
+[lang="bn"] {
+  font-family: var(--font-bangla);
+}
+
+html[lang="bn"] body,
+html[data-lang="bn"] body {
+  font-family: var(--font-bangla);
+  line-height: 1.62;
+}
+
+html[lang="bn"] button,
+html[lang="bn"] input,
+html[lang="bn"] select,
+html[lang="bn"] textarea,
+html[data-lang="bn"] button,
+html[data-lang="bn"] input,
+html[data-lang="bn"] select,
+html[data-lang="bn"] textarea {
+  font-family: var(--font-bangla);
+}
+
 /* Custom Healthcare Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

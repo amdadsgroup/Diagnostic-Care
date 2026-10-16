@@ -46,8 +46,13 @@ export default function RootLayout({
   const webSiteSchema = generateWebSiteSchema();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var l=localStorage.getItem('dc_lang');if(!l){var m=document.cookie.match(/(?:^|; )dc_lang=([^;]*)/);if(m)l=m[1];}if(l==='bn'||l==='en'){document.documentElement.lang=l;document.documentElement.setAttribute('data-lang',l);}}catch(e){}})();`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

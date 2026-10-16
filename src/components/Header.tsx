@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import { UserRole } from '@/types';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import {
@@ -23,8 +24,8 @@ import {
 } from 'lucide-react';
 
 interface HeaderProps {
-  language: SupportedLanguage;
-  setLanguage: (lang: SupportedLanguage) => void;
+  language?: SupportedLanguage;
+  setLanguage?: (lang: SupportedLanguage) => void;
   currentRole?: UserRole;
   setCurrentRole?: (role: UserRole) => void;
   activeTab: string;
@@ -55,7 +56,13 @@ export const Header: React.FC<HeaderProps> = ({
   currentUser,
   onLogout,
 }) => {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const currentLanguage = language || langContext.language || 'en';
+  const handleSetLanguage = (l: SupportedLanguage) => {
+    if (setLanguage) setLanguage(l);
+    langContext.setLanguage(l);
+  };
+  const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -189,35 +196,41 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Globe size={11} color="#5EEAD4" style={{ margin: '0 2px' }} />
               <button
-                onClick={() => {
-                  setLanguage('en');
-                  if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'en');
-                }}
+                type="button"
+                onClick={() => handleSetLanguage('en')}
+                aria-pressed={currentLanguage === 'en'}
+                aria-label="Switch language to English"
                 style={{
-                  color: language === 'en' ? '#FFFFFF' : '#EBF3FF',
-                  background: language === 'en' ? 'var(--brand-primary)' : 'transparent',
+                  color: currentLanguage === 'en' ? '#FFFFFF' : '#EBF3FF',
+                  background: currentLanguage === 'en' ? 'var(--brand-primary)' : 'transparent',
                   fontWeight: 700,
                   fontSize: '10.5px',
                   padding: '2px 7px',
                   borderRadius: '9999px',
                   lineHeight: 1.2,
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 EN
               </button>
               <button
-                onClick={() => {
-                  setLanguage('bn');
-                  if (typeof window !== 'undefined') localStorage.setItem('dc_lang', 'bn');
-                }}
+                type="button"
+                onClick={() => handleSetLanguage('bn')}
+                aria-pressed={currentLanguage === 'bn'}
+                aria-label="বাংলা ভাষায় পরিবর্তন করুন"
                 style={{
-                  color: language === 'bn' ? '#FFFFFF' : '#EBF3FF',
-                  background: language === 'bn' ? 'var(--brand-primary)' : 'transparent',
+                  color: currentLanguage === 'bn' ? '#FFFFFF' : '#EBF3FF',
+                  background: currentLanguage === 'bn' ? 'var(--brand-primary)' : 'transparent',
                   fontWeight: 700,
                   fontSize: '10.5px',
                   padding: '2px 7px',
                   borderRadius: '9999px',
                   lineHeight: 1.2,
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 বাংলা
@@ -339,12 +352,12 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Mobile Quick Language Toggle */}
             <button
+              type="button"
               onClick={() => {
-                const next = language === 'en' ? 'bn' : 'en';
-                setLanguage(next);
-                if (typeof window !== 'undefined') localStorage.setItem('dc_lang', next);
+                const next = currentLanguage === 'en' ? 'bn' : 'en';
+                handleSetLanguage(next);
               }}
-              aria-label="Switch Language"
+              aria-label={currentLanguage === 'en' ? 'Switch to Bangla' : 'Switch to English'}
               className="clay-bubble d-mobile-flex"
               style={{
                 padding: '4px 8px',
@@ -355,9 +368,10 @@ export const Header: React.FC<HeaderProps> = ({
                 lineHeight: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
+                border: 'none',
               }}
             >
-              {language === 'en' ? 'বাং' : 'EN'}
+              {currentLanguage === 'en' ? 'বাং' : 'EN'}
             </button>
 
             {/* Auth Button */}

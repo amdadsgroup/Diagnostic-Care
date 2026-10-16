@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
+import { useLanguage } from '@/context/LanguageContext';
 import { Clock, Shield, AlertTriangle, CheckCircle, X, Phone, User, Calendar, CreditCard } from 'lucide-react';
 
 interface SlotBookingModalProps {
   slot: ScheduleSlot;
   association: DoctorAssociation;
-  language: SupportedLanguage;
+  language?: SupportedLanguage;
   onClose: () => void;
   currentUser?: any;
   onConfirmBooking: (appointmentData: {
@@ -24,12 +25,14 @@ interface SlotBookingModalProps {
 export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
   slot,
   association,
-  language,
+  language: propLanguage,
   onClose,
   currentUser,
   onConfirmBooking,
 }) => {
-  const t = TRANSLATIONS[language];
+  const langContext = useLanguage();
+  const language = propLanguage || langContext.language || 'en';
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const [secondsRemaining, setSecondsRemaining] = useState<number>(300); // 5 minutes = 300s
   const [patientName, setPatientName] = useState(currentUser?.fullName || '');
   const [patientPhone, setPatientPhone] = useState(currentUser?.phone || '');
