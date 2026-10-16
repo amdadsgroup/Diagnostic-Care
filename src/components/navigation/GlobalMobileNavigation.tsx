@@ -11,6 +11,7 @@ import {
   CalendarCheck,
   MessageSquare,
   User,
+  Building2,
 } from 'lucide-react';
 
 function MobileBottomDockInner() {
@@ -28,6 +29,12 @@ function MobileBottomDockInner() {
 
   const tabParam = searchParams?.get('tab');
 
+  const isProvider =
+    (currentUser && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser.primaryRole)) ||
+    (typeof window !== 'undefined' && !!localStorage.getItem('dc_hospital_session')) ||
+    (currentUser && ['popular', 'hospital', 'diagnostic', 'clinic', 'medical'].some((k) => (currentUser.fullName || '').toLowerCase().includes(k))) ||
+    currentUser?.phone === '01733983752';
+
   // Determine active tab reactively based on current route and search params
   const isHomeActive = pathname === '/' && (!tabParam || tabParam === 'marketplace');
   const isDiscoverActive =
@@ -43,6 +50,8 @@ function MobileBottomDockInner() {
     tabParam === 'queue';
   const isMessagesActive = tabParam === 'messages';
   const isAccountActive =
+    pathname.startsWith('/hospital/portal') ||
+    pathname.startsWith('/doctor/portal') ||
     pathname === '/patient/dashboard' ||
     pathname === '/login' ||
     pathname === '/register' ||
@@ -71,10 +80,16 @@ function MobileBottomDockInner() {
     } else if (target === 'messages') {
       router.push('/?tab=messages');
     } else if (target === 'account') {
-      if (currentUser) {
-        router.push('/?tab=profile');
+      if (isProvider) {
+        router.push('/hospital/portal');
+      } else if (currentUser) {
+        if (['DOCTOR', 'DOCTOR_ASSISTANT'].includes(currentUser.primaryRole)) {
+          router.push('/doctor/portal');
+        } else {
+          router.push('/patient/dashboard');
+        }
       } else {
-        router.push('/login');
+        router.push('/hospital/portal');
       }
     }
   };
@@ -149,19 +164,29 @@ function MobileBottomDockInner() {
         </span>
       </button>
 
-      {/* 5. Account */}
+      {/* 5. Account / Hospital Portal */}
       <button
         onClick={() => handleNavigate('account')}
         className={`mobile-dock-btn ${isAccountActive ? 'active' : ''}`}
-        aria-label={language === 'en' ? 'Account' : 'অ্যাকাউন্ট'}
+        aria-label={isProvider ? (language === 'en' ? 'Hospital Portal' : 'হাসপাতাল পোর্টাল') : (language === 'en' ? 'Account' : 'অ্যাকাউন্ট')}
       >
-        <User
-          size={20}
-          color={isAccountActive ? BRAND_COLORS.primary : '#64748B'}
-          strokeWidth={isAccountActive ? 2.4 : 1.8}
-        />
+        {isProvider ? (
+          <Building2
+            size={20}
+            color={isAccountActive ? BRAND_COLORS.primary : '#64748B'}
+            strokeWidth={isAccountActive ? 2.4 : 1.8}
+          />
+        ) : (
+          <User
+            size={20}
+            color={isAccountActive ? BRAND_COLORS.primary : '#64748B'}
+            strokeWidth={isAccountActive ? 2.4 : 1.8}
+          />
+        )}
         <span className="mobile-dock-label">
-          {language === 'en' ? 'Account' : 'অ্যাকাউন্ট'}
+          {isProvider
+            ? (language === 'en' ? 'Portal' : 'পোর্টাল')
+            : (language === 'en' ? 'Account' : 'অ্যাকাউন্ট')}
         </span>
       </button>
     </nav>

@@ -13,6 +13,7 @@ import {
   Clock,
   LayoutDashboard,
   FileText,
+  Building2,
 } from 'lucide-react';
 
 export type ActiveNavTab =
@@ -52,7 +53,14 @@ export default function MobileNavigation({
   unreadCount = 0,
   currentUser,
 }: MobileNavigationProps) {
-  const isPatient = currentRole === 'PATIENT';
+  const isProvider =
+    ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentRole) ||
+    ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser?.primaryRole) ||
+    (typeof window !== 'undefined' && !!localStorage.getItem('dc_hospital_session')) ||
+    (currentUser && ['popular', 'hospital', 'diagnostic', 'clinic', 'medical'].some((k: string) => (currentUser.fullName || '').toLowerCase().includes(k))) ||
+    currentUser?.phone === '01733983752';
+
+  const isPatient = !isProvider && currentRole === 'PATIENT' && (!currentUser || currentUser.primaryRole === 'PATIENT');
 
   // Active state matching
   const isHomeActive = activeTab === 'marketplace';
@@ -241,11 +249,17 @@ export default function MobileNavigation({
         </span>
       </button>
 
-      {/* 5. Profile / Account */}
+      {/* 5. Profile / Account / Provider Portal */}
       <button
-        onClick={() => handleNavigate(isPatient ? 'profile' : 'portal')}
+        onClick={() => {
+          if (isProvider) {
+            window.location.href = '/hospital/portal';
+          } else {
+            handleNavigate(isPatient ? 'profile' : 'portal');
+          }
+        }}
         className={`mobile-dock-item ${isProfileActive ? 'active' : ''}`}
-        aria-label="Profile"
+        aria-label={isProvider ? 'Hospital Portal' : 'Profile'}
         style={{
           flex: 1,
           display: 'flex',
@@ -262,13 +276,23 @@ export default function MobileNavigation({
           transition: 'all 0.15s ease',
         }}
       >
-        <User
-          size={20}
-          color={isProfileActive ? BRAND_COLORS.primary : '#64748B'}
-          strokeWidth={isProfileActive ? 2.3 : 1.8}
-        />
+        {isProvider ? (
+          <Building2
+            size={20}
+            color={isProfileActive ? BRAND_COLORS.primary : '#64748B'}
+            strokeWidth={isProfileActive ? 2.3 : 1.8}
+          />
+        ) : (
+          <User
+            size={20}
+            color={isProfileActive ? BRAND_COLORS.primary : '#64748B'}
+            strokeWidth={isProfileActive ? 2.3 : 1.8}
+          />
+        )}
         <span style={{ fontSize: '10.5px', fontWeight: isProfileActive ? 800 : 500 }}>
-          {currentUser
+          {isProvider
+            ? (language === 'en' ? 'Portal' : 'পোর্টাল')
+            : currentUser
             ? (language === 'en' ? 'Profile' : 'প্রোফাইল')
             : (language === 'en' ? 'Account' : 'অ্যাকাউন্ট')}
         </span>

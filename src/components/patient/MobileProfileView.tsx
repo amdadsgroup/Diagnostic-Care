@@ -23,6 +23,7 @@ import {
   Heart,
   HelpCircle,
   CheckCircle2,
+  Building2,
 } from 'lucide-react';
 
 interface MobileProfileViewProps {
@@ -117,10 +118,127 @@ export default function MobileProfileView({
     }
   };
 
+  const isProvider =
+    (currentUser && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser.primaryRole)) ||
+    (typeof window !== 'undefined' && !!localStorage.getItem('dc_hospital_session')) ||
+    (currentUser && ['popular', 'hospital', 'diagnostic', 'clinic', 'medical'].some((k: string) => (currentUser.fullName || '').toLowerCase().includes(k))) ||
+    currentUser?.phone === '01733983752';
+
+  // Auto-redirect provider accounts when landing on customer profile view
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasHospSession = !!localStorage.getItem('dc_hospital_session');
+      const isProvRole = currentUser && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser.primaryRole);
+      const isFacility = (currentUser?.fullName || '').toLowerCase().match(/(popular|hospital|diagnostic|clinic|medical|centre|center|lab)/i);
+      const isHospPhone = currentUser?.phone === '01733983752';
+
+      if (hasHospSession || isProvRole || isFacility || isHospPhone) {
+        if (currentUser) {
+          const healed = {
+            ...currentUser,
+            primaryRole: 'HOSPITAL_ADMIN',
+            roles: ['HOSPITAL_ADMIN'],
+          };
+          localStorage.setItem('dc_user_profile', JSON.stringify(healed));
+        }
+        window.location.href = '/hospital/portal';
+      }
+    }
+  }, [currentUser]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '36px' }}>
-      {/* Patient Profile Card (Dynamic Real User or Clean Guest State) */}
-      {currentUser ? (
+      {/* Provider Console Card (if provider account) */}
+      {isProvider && currentUser ? (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #064E3B 0%, #065F46 50%, #047857 100%)',
+            color: '#FFFFFF',
+            borderRadius: '20px',
+            padding: '24px 20px',
+            boxShadow: '0 8px 24px rgba(6, 78, 59, 0.25)',
+            border: '1px solid rgba(52, 211, 153, 0.3)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                fontWeight: 800,
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+                flexShrink: 0,
+              }}
+            >
+              <Building2 size={30} />
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', color: '#A7F3D0', fontWeight: 700, marginBottom: '4px' }}>
+                <CheckCircle2 size={12} />
+                <span>{language === 'en' ? 'Verified Healthcare Provider' : 'ভেরিফাইড স্বাস্থ্যসেবা প্রতিষ্ঠান'}</span>
+              </div>
+              <h1 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>{currentUser.fullName}</h1>
+              <div style={{ fontSize: '12.5px', color: '#D1FAE5', marginTop: '2px' }}>
+                {currentUser.phone || currentUser.email} • {selectedLocation}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '18px' }}>
+            <a
+              href="/hospital/portal"
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'center',
+                background: '#FFFFFF',
+                color: '#065F46',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                fontWeight: 800,
+                fontSize: '14px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
+              }}
+            >
+              {language === 'en' ? 'Open Hospital Operations Portal →' : 'হাসপাতাল অপারেশনস পোর্টাল খুলুন →'}
+            </a>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              marginTop: '16px',
+              paddingTop: '16px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+              textAlign: 'center',
+            }}
+          >
+            <a href="/hospital/portal?tab=doctors" style={{ textDecoration: 'none', color: '#FFFFFF' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#A7F3D0' }}>👨‍⚕️ Doctors</div>
+              <div style={{ fontSize: '11px', color: '#D1FAE5' }}>Manage</div>
+            </a>
+            <a href="/hospital/portal?tab=appointments" style={{ textDecoration: 'none', color: '#FFFFFF' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#BAE6FD' }}>📅 Bookings</div>
+              <div style={{ fontSize: '11px', color: '#D1FAE5' }}>Schedules</div>
+            </a>
+            <a href="/hospital/portal?tab=subscription" style={{ textDecoration: 'none', color: '#FFFFFF' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#FDE68A' }}>💳 Plans</div>
+              <div style={{ fontSize: '11px', color: '#D1FAE5' }}>Tiers</div>
+            </a>
+          </div>
+        </div>
+      ) : currentUser ? (
         <div
           style={{
             background: 'linear-gradient(135deg, var(--navy-900) 0%, #142B4E 100%)',

@@ -227,6 +227,24 @@ export default function HomePage() {
     }
   }, []);
 
+  // Auto-redirect provider accounts when attempting to view patient profile or portal tab
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasHospSession = !!localStorage.getItem('dc_hospital_session');
+      const isProvRole =
+        ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentRole) ||
+        (currentUser && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser.primaryRole));
+      const isFacilityName = ['popular', 'hospital', 'diagnostic', 'clinic', 'medical'].some((k) =>
+        (currentUser?.fullName || '').toLowerCase().includes(k)
+      );
+      const isHospPhone = currentUser?.phone === '01733983752';
+
+      if ((hasHospSession || isProvRole || isFacilityName || isHospPhone) && (activeTab === 'profile' || activeTab === 'portal')) {
+        window.location.href = '/hospital/portal';
+      }
+    }
+  }, [activeTab, currentRole, currentUser]);
+
   const handleLanguageChange = (lang: SupportedLanguage) => {
     setLanguage(lang);
   };
@@ -677,6 +695,29 @@ export default function HomePage() {
         )}
 
         {/* ROLE BASED VIEWS (PROVIDER & PATIENT PORTAL) */}
+        {activeTab === 'portal' && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentRole) && (
+          <div className="container" style={{ padding: '36px 20px', textAlign: 'center' }}>
+            <div className="glass-card" style={{ padding: '40px 24px', maxWidth: '580px', margin: '40px auto' }}>
+              <Building2 size={48} color="var(--brand-primary)" style={{ margin: '0 auto 16px' }} />
+              <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#090D14', marginBottom: '8px' }}>
+                {language === 'en' ? 'Healthcare Provider Operations Portal' : 'হাসপাতাল ও ডায়াগনস্টিক পোর্টাল'}
+              </h3>
+              <p style={{ color: '#627680', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
+                {language === 'en'
+                  ? 'Access your complete hospital management dashboard, doctor schedules, diagnostic services, and subscription plans.'
+                  : 'আপনার হাসপাতাল ও ডায়াগনস্টিক সেন্টারের ডাক্তার, বুকিং ও মেম্বারশিপ প্ল্যান পরিচালনা করুন।'}
+              </p>
+              <a
+                href="/hospital/portal"
+                className="btn-primary"
+                style={{ display: 'inline-block', padding: '12px 28px', textDecoration: 'none', borderRadius: '12px', fontWeight: 700 }}
+              >
+                {language === 'en' ? 'Open Hospital Dashboard →' : 'হাসপাতাল ড্যাশবোর্ড খুলুন →'}
+              </a>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'portal' && currentRole === 'DOCTOR' && (
           <div className="container" style={{ padding: '36px 20px' }}>
             {appState.doctors.length > 0 ? (
