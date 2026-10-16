@@ -154,6 +154,50 @@ export default function CustomerDashboardView() {
         setIsLoading(false);
         return;
       }
+
+      // Role gate: redirect healthcare providers, doctors and admins to their portal
+      const isProviderRole = ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'DIAGNOSTIC_STAFF', 'HOSPITAL_STAFF'].includes(user.primaryRole);
+      let hasProviderSession = false;
+      let isFacilityName = false;
+      if (typeof window !== 'undefined') {
+        hasProviderSession = !!localStorage.getItem('dc_hospital_session');
+        const facilityKeywords = ['popular', 'hospital', 'diagnostic', 'clinic', 'medical', 'centre', 'center', 'lab', 'care'];
+        const nameLower = (user.fullName || '').toLowerCase();
+        isFacilityName = facilityKeywords.some((kw) => nameLower.includes(kw));
+      }
+
+      if (isProviderRole || hasProviderSession || isFacilityName) {
+        if (typeof window !== 'undefined') {
+          const updatedUser: AuthUserProfile = {
+            ...user,
+            primaryRole: 'HOSPITAL_ADMIN',
+            roles: ['HOSPITAL_ADMIN'],
+          };
+          localStorage.setItem('dc_user_profile', JSON.stringify(updatedUser));
+          if (!localStorage.getItem('dc_hospital_session')) {
+            localStorage.setItem('dc_hospital_session', JSON.stringify({
+              id: user.id,
+              name: user.fullName || 'Healthcare Provider',
+              phone: user.phone || '01886748564',
+              email: user.email || '',
+              district: 'Moulvibazar',
+              status: 'active',
+              role: 'HOSPITAL_ADMIN',
+            }));
+          }
+        }
+        window.location.href = '/hospital/portal';
+        return;
+      }
+      if (['DOCTOR', 'DOCTOR_ASSISTANT'].includes(user.primaryRole)) {
+        window.location.href = '/doctor/portal';
+        return;
+      }
+      if (user.primaryRole === 'SUPER_ADMIN') {
+        window.location.href = '/admin';
+        return;
+      }
+
       setCurrentUser(user);
       await loadAllCustomerData(user.id);
     } catch (err) {

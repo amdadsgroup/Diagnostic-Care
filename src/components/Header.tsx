@@ -378,7 +378,15 @@ export const Header: React.FC<HeaderProps> = ({
             {currentUser ? (
               <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '6px' }}>
                 <Link
-                  href="/patient/dashboard"
+                  href={
+                    ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'DIAGNOSTIC_STAFF', 'HOSPITAL_STAFF'].includes(currentUser.primaryRole)
+                      ? '/hospital/portal'
+                      : ['DOCTOR', 'DOCTOR_ASSISTANT'].includes(currentUser.primaryRole)
+                        ? '/doctor/portal'
+                        : currentUser.primaryRole === 'SUPER_ADMIN'
+                          ? '/admin'
+                          : '/patient/dashboard'
+                  }
                   className="clay-pill"
                   style={{
                     display: 'inline-flex',

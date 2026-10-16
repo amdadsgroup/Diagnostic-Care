@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
@@ -12,7 +13,13 @@ import FormField from '@/components/auth/FormField';
 import { AuthError, AuthSuccess } from '@/components/auth/AuthAlerts';
 
 export default function ProviderOnboardPage() {
+  const router = useRouter();
   const { language } = useLanguage();
+
+  useEffect(() => {
+    // Single unified pathway for all providers: redirect to portal
+    window.location.replace('/hospital/portal?mode=register');
+  }, []);
 
   const [providerType, setProviderType] = useState<'HOSPITAL' | 'DIAGNOSTIC_CENTER'>('DIAGNOSTIC_CENTER');
   const [orgName, setOrgName] = useState('');

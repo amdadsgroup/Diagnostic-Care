@@ -99,7 +99,7 @@ export default function HospitalAuthModal({
         if (result.profile && onSuccess) {
           onSuccess(result.profile);
         }
-        window.location.href = result.redirectPath || '/?tab=portal';
+        window.location.href = '/hospital/portal';
       }, 500);
     } catch (err: any) {
       const msg = err.message || '';
@@ -156,7 +156,7 @@ export default function HospitalAuthModal({
         if (result.profile && onSuccess) {
           onSuccess(result.profile);
         }
-        window.location.href = '/?tab=portal&role=DIAGNOSTIC_ADMIN';
+        window.location.href = '/hospital/portal';
       }, 700);
     } catch (err: any) {
       const msg = err.message || '';

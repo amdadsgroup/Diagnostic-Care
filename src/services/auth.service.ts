@@ -601,20 +601,19 @@ export class AuthService {
   static getRoleRedirectPath(role: UserRole): string {
     switch (role) {
       case 'DOCTOR':
-        return '/?tab=portal&role=DOCTOR';
       case 'DOCTOR_ASSISTANT':
-        return '/?tab=portal&role=DOCTOR_ASSISTANT';
+        return '/doctor/portal';
       case 'DIAGNOSTIC_ADMIN':
       case 'DIAGNOSTIC_STAFF':
       case 'HOSPITAL_ADMIN':
       case 'HOSPITAL_STAFF':
       case 'CLINIC_ADMIN':
-        return '/?tab=portal&role=DIAGNOSTIC_ADMIN';
+        return '/hospital/portal';
       case 'SUPER_ADMIN':
         return '/admin';
       case 'PATIENT':
       default:
-        return '/?tab=marketplace';
+        return '/patient/dashboard';
     }
   }
 

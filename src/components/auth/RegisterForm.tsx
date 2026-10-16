@@ -169,6 +169,37 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} noValidate style={{ width: '100%' }}>
+      {/* Healthcare Provider Callout */}
+      <div
+        style={{
+          marginBottom: '16px',
+          padding: '10px 14px',
+          borderRadius: '10px',
+          backgroundColor: 'rgba(0, 96, 250, 0.06)',
+          border: '1px solid rgba(0, 96, 250, 0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
+        }}
+      >
+        <div style={{ fontSize: '12px', color: '#1E293B', fontWeight: 600 }}>
+          {language === 'bn' ? 'হাসপাতাল বা ডায়াগনস্টিক সেন্টারের অ্যাকাউন্ট?' : 'Hospital or Diagnostic Center Account?'}
+        </div>
+        <a
+          href="/hospital/portal?mode=register"
+          style={{
+            fontSize: '12px',
+            color: BRAND_COLORS.primary,
+            fontWeight: 800,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {language === 'bn' ? 'প্রোভাইডার পোর্টাল →' : 'Provider Portal →'}
+        </a>
+      </div>
+
       {errorMessage && <AuthError message={errorMessage} onDismiss={() => setErrorMessage('')} />}
       {successMessage && <AuthSuccess message={successMessage} />}
 
