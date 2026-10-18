@@ -1,16 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useLanguage } from '@/context/LanguageContext';
-import {
-  INITIAL_ORGANIZATIONS,
-  INITIAL_DOCTORS,
-  INITIAL_DOCTOR_ASSOCIATIONS,
-} from '@/lib/mock-data';
+import { supabase } from '@/lib/supabase/client';
 import { BRAND_COLORS, BRAND_CONSTANTS } from '@/config/brand';
 import {
   MapPin,
@@ -21,16 +17,94 @@ import {
   ShieldCheck,
   ArrowRight,
   ChevronLeft,
-  Search,
   CheckCircle2,
-  Clock,
-  Sparkles,
 } from 'lucide-react';
 
 const CITY_INFO: Record<
   string,
   { en: string; bn: string; division: string; descEn: string; descBn: string }
 > = {
+  dhaka: {
+    en: 'Dhaka Division',
+    bn: 'ঢাকা বিভাগ',
+    division: 'Dhaka Division (National Gateway)',
+    descEn:
+      'Discover leading tertiary hospitals, accredited diagnostic complexes, and renowned BMDC specialist doctors across Dhaka metropolitan and surrounding districts.',
+    descBn:
+      'ঢাকা মেট্রোপলিটন ও পার্শ্ববর্তী জেলাসমূহের শীর্ষ হাসপাতাল, স্বনামধন্য ডায়াগনস্টিক কমপ্লেক্স এবং অভিজ্ঞ বিশেষজ্ঞ চিকিৎসকদের তালিকা।',
+  },
+  chattogram: {
+    en: 'Chattogram Division',
+    bn: 'চট্টগ্রাম বিভাগ',
+    division: 'Chattogram Division',
+    descEn:
+      'Healthcare directories, diagnostic test pricing, and specialist chambers across Chattogram, Cox\'s Bazar, and regional districts.',
+    descBn:
+      'চট্টগ্রাম, কক্সবাজার ও পার্শ্ববর্তী অঞ্চলের অনুমোদিত হাসপাতাল, ল্যাবরেটরি ও বিশেষজ্ঞ চিকিৎসকদের চেম্বার অনুসন্ধান করুন।',
+  },
+  chittagong: {
+    en: 'Chattogram Division',
+    bn: 'চট্টগ্রাম বিভাগ',
+    division: 'Chattogram Division',
+    descEn:
+      'Healthcare directories, diagnostic test pricing, and specialist chambers across Chattogram, Cox\'s Bazar, and regional districts.',
+    descBn:
+      'চট্টগ্রাম, কক্সবাজার ও পার্শ্ববর্তী অঞ্চলের অনুমোদিত হাসপাতাল, ল্যাবরেটরি ও বিশেষজ্ঞ চিকিৎসকদের চেম্বার অনুসন্ধান করুন।',
+  },
+  rajshahi: {
+    en: 'Rajshahi Division',
+    bn: 'রাজশাহী বিভাগ',
+    division: 'Rajshahi Division',
+    descEn:
+      'Search medical institutions, specialized diagnostic centers, and consultant doctor serials across Rajshahi, Bogura, and northern districts.',
+    descBn:
+      'রাজশাহী, বগুড়া ও উত্তরাঞ্চলের জেলাসমূহের অনুমোদিত মেডিকেল প্রতিষ্ঠান, ডায়াগনস্টিক ল্যাব ও বিশেষজ্ঞ ডাক্তার তালিকা।',
+  },
+  khulna: {
+    en: 'Khulna Division',
+    bn: 'খুলনা বিভাগ',
+    division: 'Khulna Division',
+    descEn:
+      'Explore clinical facilities, hospital beds, and certified pathology centers across Khulna, Jashore, and southwestern districts.',
+    descBn:
+      'খুলনা, যশোর ও দক্ষিণ-পশ্চিমাঞ্চলের রেজিস্টার্ড ক্লিনিক, ডায়াগনস্টিক ল্যাব ও বিশেষজ্ঞ ডাক্তারদের চেম্বার তথ্য।',
+  },
+  barishal: {
+    en: 'Barishal Division',
+    bn: 'বরিশাল বিভাগ',
+    division: 'Barishal Division',
+    descEn:
+      'Verified hospitals, emergency ambulance networks, and diagnostic services across Barishal, Patuakhali, and coastal districts.',
+    descBn:
+      'বরিশাল, পটুয়াখালী ও উপকূলীয় জেলাসমূহের হাসপাতাল, জরুরি অ্যাম্বুলেন্স এবং ডায়াগনস্টিক সেন্টারের বিস্তারিত তথ্য।',
+  },
+  sylhet: {
+    en: 'Sylhet Division',
+    bn: 'সিলেট বিভাগ',
+    division: 'Sylhet Division',
+    descEn:
+      'Find leading hospitals, accredited diagnostic labs, and renowned medical consultants across Sylhet, Moulvibazar, Habiganj, and Sunamganj.',
+    descBn:
+      'সিলেটের সুবহানীঘাট, সুবিদবাজার ও জিন্দাবাজারের শীর্ষ হাসপাতাল এবং বিশেষজ্ঞ ডাক্তারদের চেম্বারের শিডিউল।',
+  },
+  rangpur: {
+    en: 'Rangpur Division',
+    bn: 'রংপুর বিভাগ',
+    division: 'Rangpur Division',
+    descEn:
+      'Explore healthcare infrastructure, verified diagnostic laboratories, and doctor consultation chambers in Rangpur, Dinajpur, and surrounding districts.',
+    descBn:
+      'রংপুর, দিনাজপুর ও পার্শ্ববর্তী উত্তরাঞ্চলের অনুমোদিত স্বাস্থ্য কেন্দ্র, ডায়াগনস্টিক ল্যাব ও বিশেষজ্ঞ ডাক্তার।',
+  },
+  mymensingh: {
+    en: 'Mymensingh Division',
+    bn: 'ময়মনসিংহ বিভাগ',
+    division: 'Mymensingh Division',
+    descEn:
+      'Search hospitals, diagnostic clinics, and doctor appointments across Mymensingh, Jamalpur, Netrokona, and Sherpur.',
+    descBn:
+      'ময়মনসিংহ, জামালপুর, নেত্রকোণা ও শেরপুরের হাসপাতাল, ডায়াগনস্টিক সেন্টার ও বিশেষজ্ঞ ডাক্তারদের তথ্য।',
+  },
   moulvibazar: {
     en: 'Moulvibazar',
     bn: 'মৌলভীবাজার',
@@ -38,42 +112,32 @@ const CITY_INFO: Record<
     descEn:
       'Explore verified diagnostic test centers, specialist doctor chambers, and hospital facilities across Moulvibazar Sadar, Sreemangal, Kamalganj, and Kulaura.',
     descBn:
-      'মৌলভীবাজার সদর, শ্রীমঙ্গল ও কুলাউড়ার যাচাইকৃত ডায়াগনস্টিক সেন্টার, স্পেশালিস্ট ডাক্তার এবং হাসপাতালের তথ্য জানুন।',
-  },
-  sylhet: {
-    en: 'Sylhet',
-    bn: 'সিলেট',
-    division: 'Sylhet Division',
-    descEn:
-      'Find leading general hospitals, MRI & CT scan laboratories, and BMDC-registered professors across Subidbazar, Zindabazar, and Osmani Medical Road in Sylhet.',
-    descBn:
-      'সিলেটের সুবহানীঘাট, সুবিদবাজার ও জিন্দাবাজারের শীর্ষ হাসপাতাল এবং বিশেষজ্ঞ ডাক্তারদের চেম্বারের শিডিউল।',
-  },
-  dhaka: {
-    en: 'Dhaka',
-    bn: 'ঢাকা',
-    division: 'Dhaka Division',
-    descEn:
-      'Discover accredited diagnostic complexes, tertiary hospitals, and clinical specialists in Dhaka. Connect with 24/7 patient customer care.',
-    descBn:
-      'ঢাকার শীর্ষ ডায়াগনস্টিক সেন্টার, স্পেশালাইজড হাসপাতাল এবং অভিজ্ঞ ডাক্তারদের তালিকা।',
-  },
-  chittagong: {
-    en: 'Chittagong',
-    bn: 'চট্টগ্রাম',
-    division: 'Chittagong Division',
-    descEn:
-      'Healthcare directories, diagnostic test pricing, and specialist chambers across Chattogram metropolitan and district hubs.',
-    descBn:
-      'চট্টগ্রামের বিশ্বস্ত হাসপাতাল, ল্যাবরেটরি ও বিশেষজ্ঞ চিকিৎসকদের চেম্বার অনুসন্ধান করুন।',
+      'মৌলভীবাজার সদর, শ্রীমঙ্গল, কুলাউড়া ও কমলগঞ্জের অনুমোদিত হাসপাতাল, ডায়াগনস্টিক ল্যাব এবং বিশেষজ্ঞ ডাক্তারদের তালিকা।',
   },
 };
+
+import { getCachedData } from '@/lib/cache';
+import { CardSkeleton } from '@/components/ui/CardSkeleton';
 
 export default function LocationCityPage() {
   const params = useParams();
   const rawCity = (params?.city as string) || 'moulvibazar';
   const cityKey = rawCity.toLowerCase();
   const { language, setLanguage } = useLanguage();
+
+  // Fast cache hydration
+  const cachedHospitals = typeof window !== 'undefined' ? getCachedData<any[]>('hospitals_directory_active_all', true) : null;
+  const cachedCenters = typeof window !== 'undefined' ? getCachedData<any[]>('diagnostic_centers_directory_active_all', true) : null;
+  const cachedDoctors = typeof window !== 'undefined' ? getCachedData<any[]>('doctors_list_active_all', true) : null;
+
+  const initHosp = cachedHospitals ? cachedHospitals.filter((h: any) => h.name.toLowerCase().includes(cityKey) || (cityKey === 'moulvibazar' && h.name.includes('Moulvibazar'))) : [];
+  const initCenters = cachedCenters ? cachedCenters.filter((d: any) => d.name.toLowerCase().includes(cityKey) || (cityKey === 'moulvibazar' && d.name.includes('Moulvibazar'))) : [];
+  const initDocs = cachedDoctors || [];
+
+  const [cityHospitals, setCityHospitals] = useState<any[]>(initHosp);
+  const [cityDiagnosticCenters, setCityDiagnosticCenters] = useState<any[]>(initCenters);
+  const [cityDoctors, setCityDoctors] = useState<any[]>(initDocs);
+  const [isLoading, setIsLoading] = useState(!cachedHospitals && !cachedCenters && !cachedDoctors);
 
   const cityData = CITY_INFO[cityKey] || {
     en: cityKey.charAt(0).toUpperCase() + cityKey.slice(1),
@@ -83,30 +147,63 @@ export default function LocationCityPage() {
     descBn: `${rawCity}-এর স্বাস্থ্যসেবা ও ডাক্তারদের তালিকা।`,
   };
 
-  // Filter organizations by city
-  const cityOrgs = INITIAL_ORGANIZATIONS.filter((org) => {
-    return org.branches.some(
-      (b) =>
-        b.districtName.toLowerCase().includes(cityKey) ||
-        b.addressLine.toLowerCase().includes(cityKey) ||
-        b.name.toLowerCase().includes(cityKey) ||
-        org.name.toLowerCase().includes(cityKey)
-    );
-  });
+  useEffect(() => {
+    async function loadCityData() {
+      try {
+        const [hospRes, diagRes, docRes] = await Promise.all([
+          supabase
+            .from('hospitals')
+            .select('id, name, name_bn, slug, phone, total_beds, icu_beds, has_emergency_24_7, verification_status')
+            .eq('status', 'active'),
+          supabase
+            .from('diagnostic_centers')
+            .select('id, name, name_bn, slug, phone, has_home_sample_collection, verification_status')
+            .eq('status', 'active'),
+          supabase
+            .from('doctors')
+            .select('id, specialization, qualifications, bmdc_registration_number, profiles(full_name, avatar_url)')
+            .eq('status', 'active'),
+        ]);
 
-  const cityHospitals = cityOrgs.filter((org) => org.orgType === 'HOSPITAL');
-  const cityDiagnosticCenters = cityOrgs.filter(
-    (org) => org.orgType === 'DIAGNOSTIC_CENTER'
-  );
+        if (hospRes.data) {
+          setCityHospitals(
+            hospRes.data.filter((h: any) =>
+              h.name.toLowerCase().includes(cityKey) || (cityKey === 'moulvibazar' && h.name.includes('Moulvibazar'))
+            )
+          );
+        }
 
-  // Filter doctors having chambers in this city
-  const cityDoctorIds = new Set(
-    INITIAL_DOCTOR_ASSOCIATIONS.filter((assoc) =>
-      cityOrgs.some((org) => org.id === assoc.organizationId)
-    ).map((a) => a.doctorId)
-  );
+        if (diagRes.data) {
+          setCityDiagnosticCenters(
+            diagRes.data.filter((d: any) =>
+              d.name.toLowerCase().includes(cityKey) || (cityKey === 'moulvibazar' && d.name.includes('Moulvibazar'))
+            )
+          );
+        }
 
-  const cityDoctors = INITIAL_DOCTORS.filter((doc) => cityDoctorIds.has(doc.id));
+        if (docRes.data) {
+          setCityDoctors(
+            docRes.data.map((d: any) => {
+              const profile = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
+              return {
+                id: d.id,
+                fullName: profile?.full_name || 'Specialist Doctor',
+                specialization: d.specialization,
+                qualifications: d.qualifications,
+                bmdcNumber: d.bmdc_registration_number,
+              };
+            })
+          );
+        }
+      } catch (err) {
+        console.warn('City data fetch notice:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadCityData();
+  }, [cityKey]);
 
   return (
     <div
@@ -126,19 +223,18 @@ export default function LocationCityPage() {
       {/* Hero Banner */}
       <section
         style={{
-          background: 'linear-gradient(135deg, #022c22 0%, #064e3b 50%, #0f766e 100%)',
-          padding: '48px 24px',
+          backgroundColor: '#0F172A',
+          padding: '48px 20px',
           color: '#FFFFFF',
-          position: 'relative',
-          overflow: 'hidden',
+          borderBottom: '1px solid #1E293B',
         }}
       >
-        <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
             <Link
               href="/doctors"
               style={{
-                color: '#99F6E4',
+                color: '#93C5FD',
                 fontSize: '13px',
                 fontWeight: 600,
                 textDecoration: 'none',
@@ -150,47 +246,47 @@ export default function LocationCityPage() {
               <ChevronLeft size={16} />
               {language === 'bn' ? 'সকল বিভাগ' : 'All Locations'}
             </Link>
-            <span style={{ color: 'rgba(255,255,255,0.4)' }}>/</span>
+            <span style={{ color: '#475569' }}>/</span>
             <span style={{ color: '#FFFFFF', fontSize: '13px', fontWeight: 600 }}>
               {cityData.en} ({cityData.bn})
             </span>
           </div>
 
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', backgroundColor: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)', marginBottom: '16px' }}>
-            <MapPin size={14} color="#5EEAD4" />
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#CCFBF1', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '6px', backgroundColor: '#1E293B', marginBottom: '14px', border: '1px solid #334155' }}>
+            <MapPin size={14} color="#60A5FA" />
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#93C5FD', textTransform: 'uppercase' }}>
               {cityData.division} • Verified Regional Hub
             </span>
           </div>
 
-          <h1 style={{ fontSize: '36px', fontWeight: 900, lineHeight: 1.2, margin: '0 0 12px 0' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1.25, margin: '0 0 10px 0' }}>
             {language === 'bn'
               ? `${cityData.bn}-এর ডাক্তার, হাসপাতাল ও ডায়াগনস্টিক সেন্টার`
               : `Doctors, Hospitals & Diagnostic Centers in ${cityData.en}`}
           </h1>
 
-          <p style={{ fontSize: '16px', color: '#CCFBF1', maxWidth: '780px', margin: '0 0 24px 0', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '15px', color: '#94A3B8', maxWidth: '780px', margin: '0 0 24px 0', lineHeight: 1.6 }}>
             {language === 'bn' ? cityData.descBn : cityData.descEn}
           </p>
 
-          {/* Quick Stats Badges */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)' }}>
-              <Stethoscope size={18} color="#5EEAD4" />
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>
-                {cityDoctors.length > 0 ? `${cityDoctors.length} Verified Doctors` : 'Growing Network'}
+          {/* Quick Counts */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #334155' }}>
+              <Stethoscope size={16} color="#60A5FA" />
+              <span style={{ fontSize: '13px', fontWeight: 600 }}>
+                {isLoading && cityDoctors.length === 0 ? '...' : cityDoctors.length} {language === 'bn' ? 'ডাক্তার' : 'Doctors'}
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)' }}>
-              <Building2 size={18} color="#5EEAD4" />
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>
-                {cityHospitals.length} Hospitals
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #334155' }}>
+              <Building2 size={16} color="#60A5FA" />
+              <span style={{ fontSize: '13px', fontWeight: 600 }}>
+                {isLoading && cityHospitals.length === 0 ? '...' : cityHospitals.length} {language === 'bn' ? 'হাসপাতাল' : 'Hospitals'}
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)' }}>
-              <Microscope size={18} color="#5EEAD4" />
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>
-                {cityDiagnosticCenters.length} Diagnostic Centers
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #334155' }}>
+              <Microscope size={16} color="#60A5FA" />
+              <span style={{ fontSize: '13px', fontWeight: 600 }}>
+                {isLoading && cityDiagnosticCenters.length === 0 ? '...' : cityDiagnosticCenters.length} {language === 'bn' ? 'ডায়াগনস্টিক সেন্টার' : 'Diagnostic Centers'}
               </span>
             </div>
           </div>
@@ -198,336 +294,151 @@ export default function LocationCityPage() {
       </section>
 
       {/* Main Content Area */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px' }}>
-        {/* Section 1: Hospitals in this City */}
-        <div style={{ marginBottom: '48px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 16px' }}>
+        {/* Hospitals in this City */}
+        <div style={{ marginBottom: '44px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
             <div>
-              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
                 {language === 'bn' ? `${cityData.bn}-এর হাসপাতালসমূহ` : `Hospitals in ${cityData.en}`}
               </h2>
-              <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
                 {language === 'bn'
                   ? '২৪/৭ ইমার্জেন্সি ও ইন-পেশেন্ট সুবিধাসহ অনুমোদিত হাসপাতাল'
-                  : 'Licensed healthcare institutions with emergency and clinical inpatient facilities'}
+                  : 'Licensed healthcare institutions with clinical facilities'}
               </p>
             </div>
             <Link
               href="/hospitals"
               style={{
-                fontSize: '14px',
-                fontWeight: 700,
-                color: '#059669',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#0060FA',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
               }}
             >
-              {language === 'bn' ? 'সকল দেখুন' : 'View all'} <ArrowRight size={16} />
+              <span>{language === 'bn' ? 'সকল দেখুন' : 'View All'}</span>
+              <ArrowRight size={14} />
             </Link>
           </div>
 
           {cityHospitals.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
               {cityHospitals.map((hosp) => (
                 <div
                   key={hosp.id}
                   style={{
                     backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
+                    borderRadius: '10px',
+                    padding: '20px',
                     border: '1px solid #E2E8F0',
-                    padding: '24px',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                   }}
                 >
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '4px 10px', borderRadius: '20px' }}>
-                        {hosp.branches[0]?.districtName || cityData.en}
-                      </span>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <ShieldCheck size={14} /> Verified
-                      </span>
-                    </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: '0 0 8px 0' }}>
-                      {hosp.name}
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A', margin: '0 0 6px 0' }}>
+                      {language === 'bn' && hosp.name_bn ? hosp.name_bn : hosp.name}
                     </h3>
-                    <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 16px 0', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                      <MapPin size={16} color="#94A3B8" style={{ flexShrink: 0, marginTop: '2px' }} />
-                      {hosp.branches[0]?.addressLine || 'Main Road'}
-                    </p>
+                    <div style={{ fontSize: '12.5px', color: '#64748B', marginBottom: '14px' }}>
+                      Total Beds: <strong>{hosp.total_beds || 'N/A'}</strong> • ICU: <strong>{hosp.icu_beds || 'N/A'}</strong>
+                    </div>
                   </div>
-                  <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Phone size={14} color={'#059669'} /> {hosp.contactPhone}
-                    </span>
-                    <Link
-                      href={`/hospitals/${hosp.id}`}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#0F172A',
-                        color: '#FFFFFF',
-                        borderRadius: '10px',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        textDecoration: 'none',
-                      }}
-                    >
-                      {language === 'bn' ? 'বিস্তারিত' : 'View Profile'}
-                    </Link>
-                  </div>
+                  <Link
+                    href={`/hospitals/${hosp.id}`}
+                    className="btn-primary"
+                    style={{ padding: '8px', fontSize: '12.5px', textAlign: 'center' }}
+                  >
+                    <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'View Facility'}</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
               ))}
             </div>
+          ) : isLoading ? (
+            <CardSkeleton count={3} type="facility" />
           ) : (
-            <div style={{ padding: '32px', backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-              <p style={{ color: '#64748B', margin: '0 0 8px 0' }}>
-                {language === 'bn'
-                  ? `${cityData.bn}-এ আমাদের হাসপাতাল অনবোর্ডিং কার্যক্রম চলমান রয়েছে।`
-                  : `Hospital partner onboarding is actively expanding in ${cityData.en}.`}
-              </p>
-              <Link href="/hospitals" style={{ color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
-                Browse all verified hospitals nationwide &rarr;
-              </Link>
+            <div style={{ padding: '24px', backgroundColor: '#FFFFFF', borderRadius: '10px', border: '1px solid #E2E8F0', textAlign: 'center', color: '#64748B', fontSize: '13.5px' }}>
+              {language === 'bn' ? 'এই এলাকায় কোনো হাসপাতাল নিবন্ধিত নেই।' : `No hospitals registered yet in ${cityData.en}.`}
             </div>
           )}
         </div>
 
-        {/* Section 2: Diagnostic Centers in this City */}
-        <div style={{ marginBottom: '48px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        {/* Diagnostic Centers in this City */}
+        <div style={{ marginBottom: '44px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
             <div>
-              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
                 {language === 'bn' ? `${cityData.bn}-এর ডায়াগনস্টিক সেন্টারসমূহ` : `Diagnostic Centers in ${cityData.en}`}
               </h2>
-              <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
                 {language === 'bn'
-                  ? 'রক্ত পরীক্ষা, সিটি স্ক্যান, এমআরআই ও এক্স-রে এর জন্য অনুমোদিত ল্যাব'
-                  : 'Accredited clinical laboratories for pathology, imaging, ultrasound, and blood tests'}
+                  ? 'প্যাথলজি ল্যাব ও টেস্ট সার্ভিস'
+                  : 'Certified pathology and imaging facilities'}
               </p>
             </div>
             <Link
               href="/diagnostic-centers"
               style={{
-                fontSize: '14px',
-                fontWeight: 700,
-                color: '#059669',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#0060FA',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
               }}
             >
-              {language === 'bn' ? 'সকল দেখুন' : 'View all'} <ArrowRight size={16} />
+              <span>{language === 'bn' ? 'সকল দেখুন' : 'View All'}</span>
+              <ArrowRight size={14} />
             </Link>
           </div>
 
           {cityDiagnosticCenters.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
-              {cityDiagnosticCenters.map((diag) => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+              {cityDiagnosticCenters.map((dc) => (
                 <div
-                  key={diag.id}
+                  key={dc.id}
                   style={{
                     backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
+                    borderRadius: '10px',
+                    padding: '20px',
                     border: '1px solid #E2E8F0',
-                    padding: '24px',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                   }}
                 >
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563EB', backgroundColor: '#EFF6FF', padding: '4px 10px', borderRadius: '20px' }}>
-                        Diagnostic Lab
-                      </span>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <ShieldCheck size={14} /> Verified
-                      </span>
-                    </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: '0 0 8px 0' }}>
-                      {diag.name}
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A', margin: '0 0 6px 0' }}>
+                      {language === 'bn' && dc.name_bn ? dc.name_bn : dc.name}
                     </h3>
-                    <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 16px 0', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                      <MapPin size={16} color="#94A3B8" style={{ flexShrink: 0, marginTop: '2px' }} />
-                      {diag.branches[0]?.addressLine || 'Main Branch'}
-                    </p>
+                    <div style={{ fontSize: '12.5px', color: '#64748B', marginBottom: '14px' }}>
+                      {dc.has_home_sample_collection ? 'Home Sample Collection Available' : 'In-Center Testing'}
+                    </div>
                   </div>
-                  <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Phone size={14} color={'#059669'} /> {diag.contactPhone}
-                    </span>
-                    <Link
-                      href={`/diagnostic-centers/${diag.id}`}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#059669',
-                        color: '#FFFFFF',
-                        borderRadius: '10px',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        textDecoration: 'none',
-                      }}
-                    >
-                      {language === 'bn' ? 'টেস্ট তালিকা' : 'View Tests'}
-                    </Link>
-                  </div>
+                  <Link
+                    href={`/diagnostic-centers/${dc.id}`}
+                    className="btn-primary"
+                    style={{ padding: '8px', fontSize: '12.5px', textAlign: 'center' }}
+                  >
+                    <span>{language === 'bn' ? 'টেস্ট তালিকা দেখুন' : 'View Tests'}</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
               ))}
             </div>
+          ) : isLoading ? (
+            <CardSkeleton count={3} type="facility" />
           ) : (
-            <div style={{ padding: '32px', backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-              <p style={{ color: '#64748B', margin: '0 0 8px 0' }}>
-                {language === 'bn'
-                  ? `${cityData.bn}-এ আমাদের ডায়াগনস্টিক পার্টনার নেটওয়ার্ক সম্প্রসারণ হচ্ছে।`
-                  : `Diagnostic center network in ${cityData.en} is actively expanding.`}
-              </p>
-              <Link href="/diagnostic-centers" style={{ color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
-                Explore nationwide diagnostic centers &rarr;
-              </Link>
+            <div style={{ padding: '24px', backgroundColor: '#FFFFFF', borderRadius: '10px', border: '1px solid #E2E8F0', textAlign: 'center', color: '#64748B', fontSize: '13.5px' }}>
+              {language === 'bn' ? 'এই এলাকায় কোনো ডায়াগনস্টিক সেন্টার নিবন্ধিত নেই।' : `No diagnostic centers registered yet in ${cityData.en}.`}
             </div>
           )}
-        </div>
-
-        {/* Section 3: Specialist Doctors in this City */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <div>
-              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
-                {language === 'bn' ? `${cityData.bn}-এর বিশেষজ্ঞ ডাক্তারগণ` : `Specialist Doctors in ${cityData.en}`}
-              </h2>
-              <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
-                {language === 'bn'
-                  ? 'বিএমডিসি নিবন্ধিত অধ্যাপক, সহকারী অধ্যাপক এবং কনসালটেন্ট'
-                  : 'BMDC-registered clinical professors and specialist consultants available for consultation'}
-              </p>
-            </div>
-            <Link
-              href="/doctors"
-              style={{
-                fontSize: '14px',
-                fontWeight: 700,
-                color: '#059669',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              {language === 'bn' ? 'সকল দেখুন' : 'View all'} <ArrowRight size={16} />
-            </Link>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
-            {(cityDoctors.length > 0 ? cityDoctors : INITIAL_DOCTORS.slice(0, 3)).map((doc) => (
-              <div
-                key={doc.id}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '16px',
-                  border: '1px solid #E2E8F0',
-                  padding: '24px',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F766E', backgroundColor: '#CCFBF1', padding: '4px 10px', borderRadius: '20px' }}>
-                      {doc.specialization}
-                    </span>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <CheckCircle2 size={14} /> BMDC: {doc.bmdcNumber}
-                    </span>
-                  </div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
-                    {doc.fullName}
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#059669', fontWeight: 600, margin: '0 0 8px 0' }}>
-                    {doc.title}
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 16px 0' }}>
-                    {doc.qualifications}
-                  </p>
-                </div>
-
-                <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: '#64748B' }}>
-                    {doc.experienceYears}+ years exp
-                  </span>
-                  <Link
-                    href={`/doctors/${doc.id}`}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#0F172A',
-                      color: '#FFFFFF',
-                      borderRadius: '10px',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    {language === 'bn' ? 'অ্যাপয়েন্টমেন্ট' : 'Book Chamber'}
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Regional Support Card */}
-        <div
-          style={{
-            marginTop: '56px',
-            backgroundColor: '#F0FDF4',
-            border: '1px solid #BBF7D0',
-            borderRadius: '20px',
-            padding: '32px',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '24px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#166534', fontWeight: 700, fontSize: '13px', marginBottom: '8px' }}>
-              <Sparkles size={16} /> 24/7 Patient Assistance Hotline
-            </div>
-            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#14532D', margin: '0 0 6px 0' }}>
-              Need Help Finding a Doctor or Hospital in {cityData.en}?
-            </h3>
-            <p style={{ fontSize: '14px', color: '#15803D', margin: 0, maxWidth: '600px' }}>
-              Our dedicated medical coordinators can help verify chamber schedules, test availability, and home sample collection across {cityData.en}.
-            </p>
-          </div>
-          <a
-            href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '14px 24px',
-              backgroundColor: '#166534',
-              color: '#FFFFFF',
-              borderRadius: '14px',
-              fontWeight: 800,
-              fontSize: '15px',
-              textDecoration: 'none',
-              boxShadow: '0 4px 14px rgba(22, 101, 52, 0.25)',
-            }}
-          >
-            <Phone size={18} /> Call {BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}
-          </a>
         </div>
       </div>
 

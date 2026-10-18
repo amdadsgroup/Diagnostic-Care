@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { constructMetadata } from '@/config/seo';
-import { INITIAL_ORGANIZATIONS } from '@/lib/mock-data';
+import { supabase } from '@/lib/supabase/client';
 import { generateHospitalSchema, generateBreadcrumbSchema } from '@/lib/seo-schema';
 
 interface HospitalLayoutProps {
@@ -14,7 +14,18 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const hospital = INITIAL_ORGANIZATIONS.find((org) => org.id === id);
+  let hospital: any = null;
+
+  try {
+    const { data } = await supabase
+      .from('hospitals')
+      .select('*')
+      .or(`id.eq.${id},slug.eq.${id}`)
+      .maybeSingle();
+    hospital = data;
+  } catch {
+    // fallback
+  }
 
   if (!hospital) {
     return constructMetadata({
@@ -24,18 +35,14 @@ export async function generateMetadata({
     });
   }
 
-  const branch = hospital.branches[0];
-  const locationText = branch ? `${branch.districtName} (${branch.addressLine})` : 'Bangladesh';
-
   return constructMetadata({
-    title: `${hospital.name} — Hospital Facilities & Departments in ${locationText}`,
-    description: `Contact and visit ${hospital.name}. Location: ${locationText}. 24/7 Emergency medical care, ICU facilities, inpatient admissions, and specialist doctor consultation. Hotline: ${hospital.contactPhone}.`,
+    title: `${hospital.name} — Hospital Facilities & Departments`,
+    description: `Contact and visit ${hospital.name}. 24/7 Emergency medical care, ICU facilities, inpatient admissions, and specialist doctor consultations. Hotline: ${hospital.phone || '01886748564'}.`,
     canonicalPath: `/hospitals/${hospital.id}`,
     keywords: [
       hospital.name,
       `${hospital.name} Contact`,
       `${hospital.name} Address`,
-      `Hospital in ${branch?.districtName || 'Bangladesh'}`,
       '24/7 Emergency Care',
       'ICU Hospital BD',
     ],
@@ -47,17 +54,22 @@ export default async function HospitalProfileLayout({
   params,
 }: HospitalLayoutProps) {
   const { id } = await params;
-  const hospital = INITIAL_ORGANIZATIONS.find((org) => org.id === id) || INITIAL_ORGANIZATIONS[0];
-  const branch = hospital.branches[0];
+  let hospital: any = null;
 
-  const hospitalSchema = generateHospitalSchema({
-    id: hospital.id,
-    name: hospital.name,
-    address: branch?.addressLine,
-    district: branch?.districtName,
-    phone: hospital.contactPhone,
-    hasIcu: true,
-  });
+  try {
+    const { data } = await supabase
+      .from('hospitals')
+      .select('*')
+      .or(`id.eq.${id},slug.eq.${id}`)
+      .maybeSingle();
+    hospital = data;
+  } catch {
+    // fallback
+  }
+
+  if (!hospital) {
+    return <>{children}</>;
+  }
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: '/' },
@@ -67,12 +79,6 @@ export default async function HospitalProfileLayout({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(hospitalSchema),
-        }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

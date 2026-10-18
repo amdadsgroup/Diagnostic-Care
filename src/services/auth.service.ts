@@ -366,6 +366,199 @@ export class AuthService {
   }
 
   /**
+   * Register a new Doctor account.
+   * Creates an authenticated user with DOCTOR role and registers specialist doctor record.
+   */
+  static async registerDoctor(params: {
+    fullName: string;
+    bmdcNumber: string;
+    phone: string;
+    email?: string;
+    password: string;
+    specialty: string;
+    qualifications?: string;
+    consultationFee?: number;
+    language?: 'en' | 'bn';
+  }): Promise<{
+    user: any;
+    profile: AuthUserProfile | null;
+    error: string | null;
+  }> {
+    try {
+      const cleanPhone = this.normalizePhoneNumber(params.phone);
+      if (!this.isValidBangladeshPhone(cleanPhone)) {
+        return {
+          user: null,
+          profile: null,
+          error: 'Please enter a valid 11-digit Bangladesh mobile number (e.g. 01XXXXXXXXX).',
+        };
+      }
+
+      if (!params.fullName || params.fullName.trim().length < 3) {
+        return {
+          user: null,
+          profile: null,
+          error: "Doctor's full name must be at least 3 characters.",
+        };
+      }
+
+      if (!params.bmdcNumber || params.bmdcNumber.trim().length < 3) {
+        return {
+          user: null,
+          profile: null,
+          error: 'Please enter a valid BMDC Registration Number (e.g. A-12345).',
+        };
+      }
+
+      if (!params.password || params.password.length < 8) {
+        return {
+          user: null,
+          profile: null,
+          error: 'Password must be at least 8 characters long.',
+        };
+      }
+
+      // Check if phone or email already registered
+      let existingUser = null;
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('id, phone, email, full_name')
+          .or(`phone.eq.${cleanPhone}${params.email ? `,email.eq.${params.email.trim().toLowerCase()}` : ''}`)
+          .maybeSingle();
+        existingUser = data;
+      } catch (err) {
+        if (typeof window !== 'undefined') {
+          const localDoctors = JSON.parse(localStorage.getItem('dc_registered_doctors') || '[]');
+          existingUser = localDoctors.find(
+            (p: any) => p.phone === cleanPhone || (params.email && p.email === params.email.trim().toLowerCase())
+          );
+        }
+      }
+
+      if (existingUser) {
+        return {
+          user: null,
+          profile: null,
+          error: 'This mobile number or email is already registered. Please sign in.',
+        };
+      }
+
+      const authEmail = params.email && params.email.trim().length > 0
+        ? params.email.trim().toLowerCase()
+        : `${cleanPhone}@doctor.diagnosticcare.com.bd`;
+
+      const selectedLanguage = params.language || 'en';
+
+      let authUser: any = null;
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: authEmail,
+          password: params.password,
+          options: {
+            data: {
+              full_name: params.fullName.trim(),
+              phone: cleanPhone,
+              role: 'DOCTOR',
+              bmdc_number: params.bmdcNumber.trim(),
+              specialty: params.specialty.trim(),
+              qualifications: params.qualifications?.trim() || 'MBBS',
+              language: selectedLanguage,
+            },
+          },
+        });
+
+        if (authError) {
+          if (!authError.message.toLowerCase().includes('fetch')) {
+            return { user: null, profile: null, error: authError.message };
+          }
+        } else if (authData?.user) {
+          authUser = authData.user;
+          try {
+            await supabase.from('profiles').upsert({
+              id: authUser.id,
+              phone: cleanPhone,
+              email: params.email ? params.email.trim().toLowerCase() : authEmail,
+              full_name: params.fullName.trim(),
+              role: 'DOCTOR',
+              language_preference: selectedLanguage,
+              status: 'active',
+            });
+            await supabase.from('doctors').upsert({
+              id: authUser.id,
+              profile_id: authUser.id,
+              specialization: params.specialty.trim(),
+              qualifications: params.qualifications?.trim() || 'MBBS',
+              bmdc_registration_number: params.bmdcNumber.trim(),
+              consultation_fee: Number(params.consultationFee) || 800,
+              rating: 5.0,
+              total_reviews: 0,
+              status: 'active',
+            });
+            await supabase.from('user_roles').upsert({
+              user_id: authUser.id,
+              role: 'DOCTOR',
+              is_primary: true,
+            });
+          } catch {}
+        }
+      } catch (err) {
+        console.warn('Supabase offline or unreachable, proceeding with client storage:', err);
+      }
+
+      const assignedId = authUser?.id || `doc_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const userProfile: AuthUserProfile = {
+        id: assignedId,
+        email: authEmail,
+        phone: cleanPhone,
+        fullName: params.fullName.trim(),
+        languagePreference: selectedLanguage,
+        primaryRole: 'DOCTOR',
+        roles: ['DOCTOR'],
+        status: 'active',
+      };
+
+      if (typeof window !== 'undefined') {
+        const localDoctors = JSON.parse(localStorage.getItem('dc_registered_doctors') || '[]');
+        localDoctors.push({
+          id: assignedId,
+          fullName: params.fullName.trim(),
+          bmdcNumber: params.bmdcNumber.trim(),
+          specialty: params.specialty.trim(),
+          qualifications: params.qualifications?.trim() || 'MBBS',
+          consultationFee: Number(params.consultationFee) || 800,
+          phone: cleanPhone,
+          email: authEmail,
+          password: params.password,
+          profile: userProfile,
+          createdAt: new Date().toISOString(),
+        });
+        localStorage.setItem('dc_registered_doctors', JSON.stringify(localDoctors));
+        localStorage.setItem('dc_user_profile', JSON.stringify(userProfile));
+        localStorage.setItem('dc_doctor_id', assignedId);
+        localStorage.setItem('dc_doctor_name', params.fullName.trim());
+        localStorage.setItem('dc_doctor_profile', JSON.stringify({
+          id: assignedId,
+          fullName: params.fullName.trim(),
+          bmdcNumber: params.bmdcNumber.trim(),
+          specialty: params.specialty.trim(),
+          qualifications: params.qualifications?.trim() || 'MBBS',
+          consultationFee: Number(params.consultationFee) || 800,
+          phone: cleanPhone,
+          email: authEmail,
+          rating: 5.0,
+          status: 'active',
+        }));
+      }
+
+      return { user: authUser || { id: assignedId, email: authEmail }, profile: userProfile, error: null };
+    } catch (err: any) {
+      return { user: null, profile: null, error: err.message || 'Doctor registration failed.' };
+    }
+  }
+
+
+  /**
    * Log in user with either Mobile Number or Email + Password
    */
   static async signIn(
@@ -453,6 +646,38 @@ export class AuthService {
               user: { id: matchedProvider.id, email: matchedProvider.email },
               profile: matchedProvider.profile,
               redirectPath: '/hospital/portal',
+              error: null,
+            };
+          } else {
+            return {
+              user: null,
+              profile: null,
+              redirectPath: '/',
+              error: 'The mobile number/email or password you entered is incorrect. Please try again.',
+            };
+          }
+        }
+
+        const localDoctors = JSON.parse(localStorage.getItem('dc_registered_doctors') || '[]');
+        const matchedDoctor = localDoctors.find(
+          (d: any) => (cleanPhone && d.phone === cleanPhone) || d.email?.toLowerCase() === targetEmail
+        );
+        if (matchedDoctor) {
+          if (matchedDoctor.password === password) {
+            localStorage.setItem('dc_user_profile', JSON.stringify(matchedDoctor.profile));
+            localStorage.setItem('dc_doctor_session', JSON.stringify({
+              id: matchedDoctor.id,
+              name: matchedDoctor.fullName,
+              phone: matchedDoctor.phone,
+              email: matchedDoctor.email,
+              specialty: matchedDoctor.specialty,
+              role: 'DOCTOR',
+              mustChangePassword: !!matchedDoctor.mustChangePassword,
+            }));
+            return {
+              user: { id: matchedDoctor.id, email: matchedDoctor.email },
+              profile: matchedDoctor.profile,
+              redirectPath: '/doctor/portal',
               error: null,
             };
           } else {
@@ -627,6 +852,7 @@ export class AuthService {
         localStorage.removeItem('dc_user_profile');
         localStorage.removeItem('dc_hospital_session');
         localStorage.removeItem('dc_patient_session');
+        localStorage.removeItem('dc_doctor_session');
       }
       const { error } = await supabase.auth.signOut();
       return { error: error ? error.message : null };
@@ -686,12 +912,37 @@ export class AuthService {
         return { success: false, error: 'Password must be at least 8 characters.' };
       }
 
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
+      // 1. Try Supabase Auth password update
+      let supabaseError = null;
+      try {
+        const { error } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+        if (error && !error.message?.toLowerCase().includes('fetch')) {
+          supabaseError = error.message;
+        }
+      } catch (e: any) {
+        console.warn('Supabase updateUser notice:', e);
+      }
 
-      if (error) {
-        return { success: false, error: error.message };
+      // 2. Also sync local registered doctor credentials if present
+      if (typeof window !== 'undefined') {
+        const localDocs = JSON.parse(localStorage.getItem('dc_registered_doctors') || '[]');
+        const currentProfile = JSON.parse(localStorage.getItem('dc_user_profile') || 'null');
+        if (currentProfile) {
+          const updatedDocs = localDocs.map((doc: any) => {
+            if (doc.id === currentProfile.id || doc.email?.toLowerCase() === currentProfile.email?.toLowerCase()) {
+              return { ...doc, password: newPassword, mustChangePassword: false };
+            }
+            return doc;
+          });
+          localStorage.setItem('dc_registered_doctors', JSON.stringify(updatedDocs));
+          localStorage.removeItem(`dc_must_change_password_${currentProfile.id}`);
+        }
+      }
+
+      if (supabaseError) {
+        return { success: false, error: supabaseError };
       }
 
       return { success: true, error: null };
@@ -730,6 +981,10 @@ export class AuthService {
    */
   static healProfile(profile: AuthUserProfile): AuthUserProfile {
     if (typeof window === 'undefined' || !profile) return profile;
+    // Strictly preserve DOCTOR role
+    if (profile.primaryRole === 'DOCTOR' || profile.roles?.includes('DOCTOR') || profile.doctorId) {
+      return profile;
+    }
     const isFacilityName = ['popular', 'hospital', 'diagnostic', 'clinic', 'medical', 'lab', 'care'].some((k) =>
       (profile.fullName || '').toLowerCase().includes(k)
     );
@@ -794,6 +1049,23 @@ export class AuthService {
             return this.healProfile(hospUser);
           } catch {}
         }
+        const savedDoctor = localStorage.getItem('dc_doctor_session');
+        if (savedDoctor) {
+          try {
+            const d = JSON.parse(savedDoctor);
+            return {
+              id: d.id,
+              email: d.email,
+              phone: d.phone,
+              fullName: d.name,
+              languagePreference: 'en',
+              primaryRole: 'DOCTOR',
+              roles: ['DOCTOR'],
+              status: 'active',
+              doctorId: d.id,
+            };
+          } catch {}
+        }
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -831,10 +1103,11 @@ export class AuthService {
         .eq('user_id', user.id);
 
       const roles = (rolesData || []).map((r) => r.role.toUpperCase() as UserRole);
-      const primaryRole =
+      let primaryRole =
         roles.find((_, idx) => rolesData?.[idx]?.is_primary) ||
         roles[0] ||
         (user.user_metadata?.role as UserRole) ||
+        (profile?.role as UserRole) ||
         'PATIENT';
 
       let patientId: string | undefined;
@@ -850,20 +1123,33 @@ export class AuthService {
       const { data: doctor } = await supabase
         .from('doctors')
         .select('id')
-        .eq('profile_id', user.id)
+        .or(`id.eq.${user.id},profile_id.eq.${user.id}`)
         .maybeSingle();
-      if (doctor) doctorId = doctor.id;
+      if (doctor) {
+        doctorId = doctor.id;
+        primaryRole = 'DOCTOR';
+      }
+
+      if (user.user_metadata?.role === 'DOCTOR' || profile?.role === 'DOCTOR') {
+        primaryRole = 'DOCTOR';
+      } else if (
+        user.user_metadata?.role === 'HOSPITAL_ADMIN' ||
+        profile?.role === 'HOSPITAL_ADMIN' ||
+        profile?.role === 'DIAGNOSTIC_ADMIN'
+      ) {
+        primaryRole = 'HOSPITAL_ADMIN';
+      }
 
       return this.healProfile({
         id: user.id,
         email: user.email,
         phone: profile?.phone || user.user_metadata?.phone,
-        fullName: profile?.full_name || user.user_metadata?.full_name || 'Patient',
+        fullName: profile?.full_name || user.user_metadata?.full_name || 'User',
         fullNameBn: profile?.full_name_bn,
         avatarUrl: profile?.avatar_url,
         languagePreference: (profile?.language_preference as 'en' | 'bn') || 'en',
         primaryRole,
-        roles: roles.length > 0 ? roles : ['PATIENT'],
+        roles: roles.length > 0 ? (roles.includes(primaryRole) ? roles : [...roles, primaryRole]) : [primaryRole],
         status: profile?.status || 'active',
         patientId,
         doctorId,

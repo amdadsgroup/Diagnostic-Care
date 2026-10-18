@@ -1,6 +1,5 @@
 import { MetadataRoute } from 'next';
 import { PRODUCTION_DOMAIN } from '@/config/seo';
-import { INITIAL_DOCTORS, INITIAL_ORGANIZATIONS } from '@/lib/mock-data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date().toISOString();
@@ -68,6 +67,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     },
     {
+      url: `${PRODUCTION_DOMAIN}/provider/register`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${PRODUCTION_DOMAIN}/provider/login`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
       url: `${PRODUCTION_DOMAIN}/privacy`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
@@ -81,63 +92,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // 2. Location-Based Discovery Pages
-  const locationRoutes: MetadataRoute.Sitemap = ['moulvibazar', 'sylhet', 'dhaka', 'chittagong'].map(
-    (loc) => ({
-      url: `${PRODUCTION_DOMAIN}/locations/${loc}`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-      alternates: {
-        languages: {
-          en: `${PRODUCTION_DOMAIN}/locations/${loc}?lang=en`,
-          bn: `${PRODUCTION_DOMAIN}/locations/${loc}?lang=bn`,
-        },
-      },
-    })
-  );
-
-  // 3. Dynamic Verified Doctor Profiles
-  const doctorRoutes: MetadataRoute.Sitemap = INITIAL_DOCTORS.map((doc) => ({
-    url: `${PRODUCTION_DOMAIN}/doctors/${doc.id}`,
+  // 2. Location-Based Regional Discovery Pages (All 8 Administrative Divisions of Bangladesh)
+  const locationRoutes: MetadataRoute.Sitemap = [
+    'dhaka',
+    'chattogram',
+    'rajshahi',
+    'khulna',
+    'barishal',
+    'sylhet',
+    'rangpur',
+    'mymensingh',
+    'moulvibazar',
+  ].map((loc) => ({
+    url: `${PRODUCTION_DOMAIN}/locations/${loc}`,
     lastModified: currentDate,
     changeFrequency: 'weekly' as const,
-    priority: 0.9,
+    priority: loc === 'dhaka' ? 0.9 : 0.8,
     alternates: {
       languages: {
-        en: `${PRODUCTION_DOMAIN}/doctors/${doc.id}?lang=en`,
-        bn: `${PRODUCTION_DOMAIN}/doctors/${doc.id}?lang=bn`,
-      },
-    },
-  }));
-
-  // 4. Dynamic Hospital & Diagnostic Center Profiles
-  const hospitalRoutes: MetadataRoute.Sitemap = INITIAL_ORGANIZATIONS.filter(
-    (org) => org.orgType === 'HOSPITAL'
-  ).map((hosp) => ({
-    url: `${PRODUCTION_DOMAIN}/hospitals/${hosp.id}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly' as const,
-    priority: 0.85,
-    alternates: {
-      languages: {
-        en: `${PRODUCTION_DOMAIN}/hospitals/${hosp.id}?lang=en`,
-        bn: `${PRODUCTION_DOMAIN}/hospitals/${hosp.id}?lang=bn`,
-      },
-    },
-  }));
-
-  const diagnosticCenterRoutes: MetadataRoute.Sitemap = INITIAL_ORGANIZATIONS.filter(
-    (org) => org.orgType === 'DIAGNOSTIC_CENTER'
-  ).map((dc) => ({
-    url: `${PRODUCTION_DOMAIN}/diagnostic-centers/${dc.id}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly' as const,
-    priority: 0.85,
-    alternates: {
-      languages: {
-        en: `${PRODUCTION_DOMAIN}/diagnostic-centers/${dc.id}?lang=en`,
-        bn: `${PRODUCTION_DOMAIN}/diagnostic-centers/${dc.id}?lang=bn`,
+        en: `${PRODUCTION_DOMAIN}/locations/${loc}?lang=en`,
+        bn: `${PRODUCTION_DOMAIN}/locations/${loc}?lang=bn`,
       },
     },
   }));
@@ -145,8 +119,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticRoutes,
     ...locationRoutes,
-    ...doctorRoutes,
-    ...hospitalRoutes,
-    ...diagnosticCenterRoutes,
   ];
 }

@@ -191,6 +191,7 @@ export default function AuthModal({
           {mode === 'login' && (
             <LoginForm
               isModal
+              targetAudience="patient"
               onClose={onClose}
               onSuccess={handleSuccess}
               onNavigateToRegister={() => setMode('register')}

@@ -312,7 +312,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 color: 'rgba(255, 255, 255, 0.7)',
               }}
             >
-              <span>{BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Sadar • Sylhet</span>
+              <span>National Healthcare Platform • Bangladesh</span>
               <span>© {BRAND_CONSTANTS.COPYRIGHT_YEAR} {BRAND_CONSTANTS.BRAND_NAME}</span>
             </div>
           </div>

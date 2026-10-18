@@ -3,7 +3,7 @@
 // Brand: Diagnostic Care — Your Healthcare Marketplace
 // Helpline: 01886748564 | Moulvibazar & Bangladesh Nationwide
 
-const CACHE_VERSION = 'diagnostic-care-v2.1.0';
+const CACHE_VERSION = 'diagnostic-care-v2.2.0';
 const STATIC_CACHE = `dc-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dc-dynamic-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -46,6 +46,7 @@ function isSensitiveRequest(url) {
 
 // 1. Install & Pre-cache App Shell
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
       return cache.addAll(APP_SHELL).catch((err) => {
@@ -53,7 +54,6 @@ self.addEventListener('install', (event) => {
       });
     })
   );
-  // Do NOT blindly call skipWaiting() here so in-flight patient bookings are preserved
 });
 
 // 2. Activate & Purge Stale Caches
@@ -152,6 +152,9 @@ self.addEventListener('fetch', (event) => {
             caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
           }
           return networkResponse;
+        }).catch((err) => {
+          console.warn('[SW] Static asset fetch bypassed/failed:', url, err);
+          return cached || new Response('', { status: 404, statusText: 'Not Found' });
         });
       })
     );

@@ -2,120 +2,104 @@
 
 :root {
   /* ==========================================================================
-     Diagnostic Care — Healthcare Glassmorphism Design Tokens
-     Translucent glass panels, frosted blurs, subtle highlights & teal palette
+     Diagnostic Care — Minimal, Modern Healthcare Design System
+     Clean solid surfaces, crisp borders, readable typography & high contrast
      ========================================================================== */
   
-  /* Primary Healthcare Logo Palette (Extracted directly from Diagnostic Care Logo) */
+  /* Primary Healthcare Logo Palette */
   --brand-primary: #0060FA;          /* Primary Logo Signal Blue */
   --brand-primary-hover: #004ED1;    /* Deep Cobalt */
   --brand-primary-active: #003FA8;
-  --brand-primary-light: #EBF3FF;    /* Ice Blue Tint */
-  --brand-primary-glow: rgba(0, 96, 250, 0.22);
+  --brand-primary-light: #EFF6FF;    /* Ice Blue Tint */
+  --brand-primary-glow: rgba(0, 96, 250, 0.12);
   
   --brand-deep-teal: #004ED1;
-  --brand-fresh-mint: #EBF3FF;
+  --brand-fresh-mint: #EFF6FF;
   --brand-teal: #0060FA;
   --brand-navy: #090D14;             /* Logo Deep Ink Header */
-  --brand-navy-900: #0B2545;
-  --brand-navy-800: #0F2D59;
-  --brand-navy-700: #13396F;
-  --brand-navy-600: #18478A;
+  --brand-navy-900: #0F172A;
+  --brand-navy-800: #1E293B;
+  --brand-navy-700: #334155;
+  --brand-navy-600: #475569;
   
   --brand-teal-50: #F0FDFA;
-  --brand-teal-500: #14B8A6;
+  --brand-teal-500: #0D9488;
   --brand-teal-700: #0F766E;
   --brand-teal-800: #115E59;
   --brand-emerald-600: #059669;
 
   /* Aliases & Shared Palette */
   --color-primary: var(--brand-primary, #0060FA);
-  --color-text-primary: var(--brand-text-dark, #090D14);
-  --color-text-secondary: var(--brand-text-secondary, #475569);
-  --color-bg-soft: var(--brand-bg, #F8FAFC);
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-bg-soft: #F8FAFC;
   --border-subtle: #E2E8F0;
   --blue-50: #EFF6FF;
-  --glass-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
   --brand-secondary-blue: #E0F2FE;
-  --brand-accent-blue: #00A3FF;
+  --brand-accent-blue: #0284C7;
 
-  /* Canvas & Glass Surfaces */
-  --brand-bg: #F8FAFC;               /* Soft Healthcare Background */
+  /* Canvas & Crisp Surfaces */
+  --brand-bg: #F8FAFC;               /* Clean Slate-50 Background */
   --canvas-bg: #F8FAFC;
   
-  --glass-surface: rgba(255, 255, 255, 0.72);
-  --glass-surface-subtle: rgba(255, 255, 255, 0.55);
-  --glass-surface-card: rgba(255, 255, 255, 0.75);
-  --glass-surface-elevated: rgba(255, 255, 255, 0.88);
-  --glass-surface-modal: rgba(255, 255, 255, 0.96);
-  --glass-surface-sunken: rgba(240, 246, 255, 0.75);
+  --glass-surface: #FFFFFF;
+  --glass-surface-subtle: #F8FAFC;
+  --glass-surface-card: #FFFFFF;
+  --glass-surface-elevated: #FFFFFF;
+  --glass-surface-modal: #FFFFFF;
+  --glass-surface-sunken: #F1F5F9;
 
-  --brand-surface: var(--glass-surface);
-  --brand-surface-card: var(--glass-surface-card);
-  --brand-surface-subtle: var(--glass-surface-subtle);
+  --brand-surface: #FFFFFF;
+  --brand-surface-card: #FFFFFF;
+  --brand-surface-subtle: #F8FAFC;
 
-  /* Glass Borders */
-  --glass-border: rgba(255, 255, 255, 0.85);
-  --glass-border-subtle: rgba(255, 255, 255, 0.60);
-  --glass-border-teal: rgba(0, 96, 250, 0.18);
-  --glass-border-strong: rgba(0, 96, 250, 0.35);
+  /* Crisp Subtle Borders */
+  --glass-border: #E2E8F0;
+  --glass-border-subtle: #F1F5F9;
+  --glass-border-teal: #BFDBFE;
+  --glass-border-strong: #93C5FD;
 
-  --brand-border: var(--glass-border);
-  --brand-border-subtle: var(--glass-border-subtle);
-  --brand-border-brand: var(--glass-border-teal);
+  --brand-border: #E2E8F0;
+  --brand-border-subtle: #F1F5F9;
+  --brand-border-brand: #BFDBFE;
 
-  /* High Contrast Healthcare Typography (WCAG 2.2 AA) */
-  --brand-text: #090D14;             /* Primary Dark Text (Logo Ink) */
-  --brand-text-dark: #090D14;        /* Headings */
+  /* High Contrast Healthcare Typography (WCAG 2.2 AAA compliant) */
+  --brand-text: #0F172A;             /* Primary Dark Text */
+  --brand-text-dark: #0F172A;        /* Headings */
   --brand-text-secondary: #475569;   /* Secondary Body Text */
   --brand-text-muted: #64748B;       /* Subtle Text */
   --brand-text-light: #94A3B8;
 
-  /* Semantic Status Tokens (Distinct from Brand Blue) */
+  /* Semantic Status Tokens */
   --brand-success: #10B981;
-  --brand-success-bg: rgba(16, 185, 129, 0.12);
+  --brand-success-bg: #ECFDF5;
   --brand-warning: #F59E0B;
-  --brand-warning-bg: rgba(245, 158, 11, 0.12);
+  --brand-warning-bg: #FFFBEB;
   --brand-danger: #EF4444;
-  --brand-danger-bg: rgba(239, 68, 68, 0.12);
+  --brand-danger-bg: #FEF2F2;
   --brand-info: #0060FA;
-  --brand-info-bg: rgba(0, 96, 250, 0.10);
+  --brand-info-bg: #EFF6FF;
 
-  /* Glassmorphism Blur Filters */
-  --blur-nav: blur(16px);
-  --blur-card: blur(12px);
-  --blur-modal: blur(20px);
-  --blur-subtle: blur(8px);
+  /* Minimal Blur Filters (Restricted to Floating Bars) */
+  --blur-nav: blur(12px);
+  --blur-card: none;
+  --blur-modal: blur(8px);
+  --blur-subtle: none;
 
-  /* Glassmorphism Ambient Shadows */
-  --glass-shadow-sm: 0 4px 16px -2px rgba(0, 96, 250, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
-  --glass-shadow-card: 
-    0 12px 32px -4px rgba(0, 96, 250, 0.07),
-    0 4px 12px -2px rgba(0, 0, 0, 0.03),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
-  --glass-shadow-hover: 
-    0 20px 42px -6px rgba(0, 96, 250, 0.14),
-    0 8px 16px -3px rgba(0, 0, 0, 0.04),
-    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
-  --glass-shadow-modal: 
-    0 25px 60px -10px rgba(9, 13, 20, 0.22),
-    0 12px 24px -4px rgba(0, 0, 0, 0.08),
-    inset 0 1px 2px 0 rgba(255, 255, 255, 0.95);
-  --glass-shadow-btn: 
-    0 8px 22px -2px rgba(0, 96, 250, 0.35),
-    inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  --glass-shadow-pill: 
-    0 4px 14px rgba(0, 96, 250, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.85);
-  --glass-shadow-input: 
-    inset 0 2px 4px rgba(0, 96, 250, 0.04),
-    0 1px 2px rgba(255, 255, 255, 0.8);
+  /* Clean, Subtle Shadows */
+  --glass-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --glass-shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --glass-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --glass-shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --glass-shadow-btn: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --glass-shadow-pill: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --glass-shadow-input: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
 
   /* Border Radii */
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-pill: 9999px;
 
   /* Backward Compatibility Aliases */
@@ -208,11 +192,6 @@ html {
 body {
   font-family: var(--font-sans);
   background-color: var(--brand-bg);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(235, 243, 255, 0.6) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(0, 96, 250, 0.08) 0px, transparent 40%),
-    radial-gradient(at 50% 100%, rgba(235, 243, 255, 0.45) 0px, transparent 50%);
-  background-attachment: fixed;
   color: var(--brand-text);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -246,23 +225,21 @@ html[data-lang="bn"] textarea {
 
 /* Custom Healthcare Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(244, 248, 250, 0.8);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 96, 250, 0.25);
+  background: #CBD5E1;
   border-radius: 9999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 96, 250, 0.45);
+  background: #94A3B8;
 }
 
 a {
@@ -275,7 +252,7 @@ button {
   cursor: pointer;
   border: none;
   background: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease-in-out;
 }
 
 input, select, textarea {
@@ -285,11 +262,11 @@ input, select, textarea {
 /* Container - Fluid Auto-Scaling by Device Display */
 .container {
   width: 100%;
-  max-width: min(1320px, 100%);
+  max-width: min(1240px, 100%);
   margin-left: auto;
   margin-right: auto;
-  padding-left: clamp(12px, 2.5vw, 24px);
-  padding-right: clamp(12px, 2.5vw, 24px);
+  padding-left: clamp(14px, 2.5vw, 24px);
+  padding-right: clamp(14px, 2.5vw, 24px);
   box-sizing: border-box;
 }
 
@@ -302,41 +279,36 @@ input, select, textarea {
 
 @media (max-width: 640px) {
   .container {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }
 
 /* ==========================================================================
-   Refined Frosted Glass Header & Navigation
+   Clean Minimal Header & Navigation
    ========================================================================== */
 .header-glass {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: var(--blur-nav);
-  -webkit-backdrop-filter: var(--blur-nav);
+  background: #FFFFFF;
   border-bottom: 1px solid var(--glass-border);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 10px 30px -5px rgba(0, 96, 250, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95);
-  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
 }
 
 /* Ambient Medical Background Grid */
 .medical-grid-bg {
   background-color: var(--brand-bg);
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(0, 96, 250, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 90% 80%, rgba(235, 243, 255, 0.6) 0%, transparent 45%);
 }
 
 .healthcare-hero-bg {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(244, 248, 250, 0.7) 100%);
+  background-color: #FFFFFF;
   border-bottom: 1px solid var(--glass-border);
 }
 
 /* ==========================================================================
-   Master Glassmorphism Cards & Panels
+   Clean Solid Minimal Cards & Panels
    ========================================================================== */
 .glass-panel,
 .glass-card,
@@ -345,15 +317,12 @@ input, select, textarea {
 .service-card,
 .portal-card,
 .clay-card {
-  background: var(--glass-surface-card);
-  backdrop-filter: var(--blur-card);
-  -webkit-backdrop-filter: var(--blur-card);
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow-card);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   position: relative;
-  overflow: hidden;
 }
 
 .glass-card:hover,
@@ -362,9 +331,7 @@ input, select, textarea {
 .healthcare-card:hover,
 .service-card:hover,
 .clay-card-interactive:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.82);
-  border-color: rgba(0, 96, 250, 0.35);
+  border-color: #CBD5E1;
   box-shadow: var(--glass-shadow-hover);
 }
 
@@ -375,10 +342,8 @@ input, select, textarea {
 
 .glass-card-sm,
 .clay-card-sm {
-  background: var(--glass-surface-card);
-  backdrop-filter: var(--blur-subtle);
-  -webkit-backdrop-filter: var(--blur-subtle);
-  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow-sm);
 }
@@ -386,109 +351,102 @@ input, select, textarea {
 .glass-inset,
 .clay-inset,
 .clay-sunken {
-  background: var(--glass-surface-sunken);
+  background: #F8FAFC;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(0, 96, 250, 0.12);
-  box-shadow: var(--glass-shadow-input);
+  border: 1px solid #E2E8F0;
+  box-shadow: none;
 }
-
 /* ==========================================================================
-   Glass Buttons & Controls
+   Clean Minimal Buttons & Controls
    ========================================================================== */
 .btn-primary,
 .glass-btn-primary {
-  background: linear-gradient(135deg, #0060FA 0%, #004ED1 100%) !important;
+  background: #0060FA !important;
   color: #FFFFFF !important;
-  padding: 12px 24px;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.94rem;
-  letter-spacing: -0.01em;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: var(--glass-shadow-btn);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #0060FA;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
 }
 
 .btn-primary:hover,
 .glass-btn-primary:hover {
-  background: linear-gradient(135deg, #004ED1 0%, #003FA8 100%) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px -2px rgba(0, 96, 250, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.6);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: #004ED1 !important;
+  border-color: #004ED1 !important;
+  transform: none;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
 }
 
 .btn-primary:active,
 .glass-btn-primary:active {
-  transform: translateY(1px) scale(0.98);
-  box-shadow: 0 4px 12px rgba(0, 96, 250, 0.3);
+  transform: scale(0.99);
 }
 
 .btn-cyan,
 .btn-teal {
-  background: linear-gradient(135deg, #0060FA 0%, #14B8A6 100%) !important;
+  background: #0060FA !important;
   color: #FFFFFF !important;
-  padding: 11px 22px;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.92rem;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: var(--glass-shadow-btn);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #0060FA;
+  transition: background-color 0.15s ease;
   cursor: pointer;
 }
 
 .btn-cyan:hover,
 .btn-teal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0, 96, 250, 0.35);
+  background: #004ED1 !important;
+  border-color: #004ED1 !important;
 }
 
 .btn-outline,
 .btn-secondary,
 .glass-btn-secondary {
-  background: rgba(255, 255, 255, 0.72) !important;
-  backdrop-filter: var(--blur-subtle);
-  -webkit-backdrop-filter: var(--blur-subtle);
-  color: var(--brand-text-dark) !important;
-  border: 1px solid var(--glass-border) !important;
-  padding: 11px 22px;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.92rem;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #CBD5E1 !important;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: var(--glass-shadow-sm);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
 }
 
 .btn-outline:hover,
 .btn-secondary:hover,
 .glass-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.92) !important;
-  transform: translateY(-2px);
-  box-shadow: var(--glass-shadow-card);
-  color: var(--brand-primary) !important;
-  border-color: rgba(0, 96, 250, 0.35) !important;
+  background: #F8FAFC !important;
+  border-color: #94A3B8 !important;
+  color: #0060FA !important;
+  transform: none;
 }
 
 .btn-brand-subtle {
-  background: var(--brand-fresh-mint) !important;
-  color: var(--brand-primary) !important;
-  border: 1px solid rgba(0, 96, 250, 0.2);
-  border-radius: var(--radius-pill);
-  font-weight: 700;
+  background: #EFF6FF !important;
+  color: #0060FA !important;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1198,6 +1156,12 @@ input, select, textarea {
   }
 }
 
+@media (max-width: 768px) {
+  .header-auth-btn {
+    display: none !important;
+  }
+}
+
 .auth-btn-full-text {
   display: inline;
 }
@@ -1403,6 +1367,15 @@ body {
 
 @media (min-width: 769px) {
   .d-desktop-inline { display: inline-block !important; }
+}
+
+@media (max-width: 540px) {
+  .hero-search-btn-label {
+    display: none !important;
+  }
+  .hero-search-btn {
+    padding: 11px 14px !important;
+  }
 }
 
 /* Fallback for browsers without backdrop-filter support */

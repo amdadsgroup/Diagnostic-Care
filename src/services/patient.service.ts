@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
 import { StorageService } from './storage.service';
-import { INITIAL_DOCTORS, INITIAL_ORGANIZATIONS } from '@/lib/mock-data';
 import { Doctor, Organization } from '@/types';
 
 export interface CustomerFullProfile {
@@ -598,26 +597,15 @@ export class PatientService {
         return [];
       }
 
-      return data.map((fav: any) => {
-        let doctor: Doctor | undefined;
-        let organization: Organization | undefined;
-
-        if (fav.entity_type === 'doctor') {
-          doctor = INITIAL_DOCTORS.find((d) => d.id === fav.entity_id || d.userId === fav.entity_id);
-        } else {
-          organization = INITIAL_ORGANIZATIONS.find((o) => o.id === fav.entity_id);
-        }
-
-        return {
-          id: fav.id,
-          profileId: fav.profile_id,
-          entityType: fav.entity_type,
-          entityId: fav.entity_id,
-          createdAt: fav.created_at,
-          doctor,
-          organization,
-        };
-      });
+      return data.map((fav: any) => ({
+        id: fav.id,
+        profileId: fav.profile_id,
+        entityType: fav.entity_type,
+        entityId: fav.entity_id,
+        createdAt: fav.created_at,
+        doctor: undefined,
+        organization: undefined,
+      }));
     } catch {
       return [];
     }

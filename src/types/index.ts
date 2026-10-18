@@ -444,3 +444,47 @@ export interface MarketingPromotion {
   isActive: boolean;
 }
 
+export type QROwnerType =
+  | 'doctor'
+  | 'hospital'
+  | 'diagnostic_center'
+  | 'clinic'
+  | 'DOCTOR'
+  | 'HOSPITAL'
+  | 'DIAGNOSTIC_CENTER'
+  | 'CLINIC';
+
+export interface QRCodeRecord {
+  id: string;
+  ownerType: QROwnerType;
+  ownerId: string;
+  publicSlug: string;
+  publicUrl: string;
+  title: string;
+  subtitle?: string;
+  totalScans: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QRScanEvent {
+  id: string;
+  qrCodeId?: string;
+  ownerType: QROwnerType;
+  ownerId: string;
+  channel: string;
+  referrer?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+export interface DoctorWishlistItem {
+  id: string;
+  patientProfileId: string;
+  doctorId: string;
+  createdAt: string;
+  doctor?: Doctor;
+}
+
+

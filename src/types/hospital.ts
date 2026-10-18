@@ -262,3 +262,26 @@ export interface LabTestItem {
   branchId?: string;
   branchName?: string;
 }
+
+export interface DoctorInstitutionInvitation {
+  id: string;
+  hospitalId: string;
+  hospitalName: string;
+  doctorEmail: string;
+  doctorId?: string;
+  doctorName?: string;
+  departmentId?: string;
+  departmentName?: string;
+  branchId?: string;
+  branchName?: string;
+  proposedRole?: string;
+  consultationFee?: number;
+  chamberRoom?: string;
+  visitingHours?: string;
+  daysOfWeek?: string[];
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled' | 'revoked';
+  token?: string;
+  createdAt: string;
+  respondedAt?: string;
+}
+

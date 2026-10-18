@@ -24,6 +24,9 @@ import {
   HelpCircle,
   CheckCircle2,
   Building2,
+  Stethoscope,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
 
 interface MobileProfileViewProps {
@@ -127,6 +130,10 @@ export default function MobileProfileView({
   // Auto-redirect provider accounts when landing on customer profile view
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if (currentUser && ['DOCTOR', 'DOCTOR_ASSISTANT'].includes(currentUser.primaryRole)) {
+        window.location.href = '/doctor/portal';
+        return;
+      }
       const hasHospSession = !!localStorage.getItem('dc_hospital_session');
       const isProvRole = currentUser && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser.primaryRole);
       const isFacility = (currentUser?.fullName || '').toLowerCase().match(/(popular|hospital|diagnostic|clinic|medical|centre|center|lab)/i);
@@ -391,6 +398,109 @@ export default function MobileProfileView({
             >
               {language === 'en' ? 'Register' : 'রেজিস্ট্রেশন'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Healthcare Provider Access Card (Mobile Direct Pathway) */}
+      {!currentUser && (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #091E3A 0%, #172554 60%, #1E3A8A 100%)',
+            color: '#FFFFFF',
+            borderRadius: '20px',
+            padding: '20px 18px',
+            border: '1.5px solid rgba(96, 165, 250, 0.45)',
+            boxShadow: '0 8px 24px rgba(30, 58, 138, 0.25)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.25)',
+                border: '1px solid rgba(147, 197, 253, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#93C5FD',
+                flexShrink: 0,
+              }}
+            >
+              <Stethoscope size={22} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  color: '#93C5FD',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>{language === 'en' ? 'Healthcare Provider Access' : 'স্বাস্থ্যসেবা প্রোভাইডার অ্যাক্সেস'}</span>
+              </div>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '2px 0 0', color: '#FFFFFF', lineHeight: 1.3 }}>
+                {language === 'en' ? 'Doctor & Hospital Partner Portal' : 'ডাক্তার ও হাসপাতাল পার্টনার পোর্টাল'}
+              </h3>
+            </div>
+          </div>
+
+          <p style={{ fontSize: '12.5px', color: '#CBD5E1', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+            {language === 'en'
+              ? 'Dedicated sign-in & account creation gateway for BMDC specialist doctors, hospitals, clinics, and diagnostic centers.'
+              : 'বিএমডিসি বিশেষজ্ঞ চিকিৎসক, হাসপাতাল, ক্লিনিক ও ডায়াগনস্টিক সেন্টারের সেন্ট্রাল সাইন-ইন ও একাউন্ট তৈরির পথ।'}
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <a
+              href="/provider/login"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                backgroundColor: '#0060FA',
+                color: '#FFFFFF',
+                padding: '11px 12px',
+                borderRadius: '12px',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                textAlign: 'center',
+                boxShadow: '0 4px 12px rgba(0, 96, 250, 0.4)',
+              }}
+            >
+              <LogIn size={14} />
+              <span>{language === 'en' ? 'Provider Sign In' : 'প্রোভাইডার লগইন'}</span>
+            </a>
+            <a
+              href="/provider/login?mode=register"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: '#FFFFFF',
+                padding: '11px 12px',
+                borderRadius: '12px',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                textAlign: 'center',
+              }}
+            >
+              <UserPlus size={14} />
+              <span>{language === 'en' ? 'Create Account' : 'একাউন্ট তৈরি'}</span>
+            </a>
           </div>
         </div>
       )}

@@ -8,7 +8,7 @@ import PasswordInput from './PasswordInput';
 import FormField from './FormField';
 import { AuthError, AuthSuccess } from './AuthAlerts';
 import LoadingButton from './LoadingButton';
-import { Check, ShieldCheck, PhoneCall } from 'lucide-react';
+import { Check, ShieldCheck, PhoneCall, Building2, ArrowRight } from 'lucide-react';
 import { BRAND_COLORS } from '@/config/brand';
 
 interface RegisterFormProps {
@@ -651,6 +651,44 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             {t.authRegisterLoginLink}
           </a>
         )}
+      </div>
+
+      {/* Doctor & Hospital Registration Switcher */}
+      <div
+        style={{
+          marginTop: '16px',
+          padding: '12px 14px',
+          borderRadius: '12px',
+          backgroundColor: '#F8FAFC',
+          border: '1px solid #E2E8F0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '8px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Building2 size={16} color={BRAND_COLORS.primary} />
+          <span style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>
+            {language === 'bn' ? 'ডাক্তার বা সেবাদানকারী প্রতিষ্ঠান?' : 'Doctor or Healthcare Provider?'}
+          </span>
+        </div>
+        <a
+          href="/provider/login?mode=register"
+          style={{
+            fontSize: '12px',
+            fontWeight: 800,
+            color: BRAND_COLORS.primary,
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          <span>{language === 'bn' ? 'ডাক্তার ও হাসপাতাল একাউন্ট তৈরি' : 'Doctor & Hospital Account'}</span>
+          <ArrowRight size={13} />
+        </a>
       </div>
 
       {/* Security & Customer Care Badges */}

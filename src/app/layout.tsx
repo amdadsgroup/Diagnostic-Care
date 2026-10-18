@@ -20,20 +20,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = constructMetadata({
-  title: 'Diagnostic Care — Specialist Doctor Discovery & Healthcare Marketplace Bangladesh',
-  description: `Bangladesh's digital doctor discovery, hospital directory, and diagnostic test marketplace. Connect with verified specialist physicians, accredited diagnostic centers, and book guaranteed chamber appointments in Moulvibazar, Sylhet, Dhaka, and nationwide. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
+  title: 'Diagnostic Care — Nationwide Digital Healthcare Marketplace Bangladesh',
+  description: `Bangladesh's nationwide digital doctor discovery, hospital directory, and diagnostic test marketplace. Connect with verified specialist physicians, accredited diagnostic centers, and book guaranteed chamber appointments across all 8 divisions. Helpline: ${BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}`,
   canonicalPath: '/',
   keywords: [
     'Diagnostic Care Bangladesh',
     'Find Doctors in Bangladesh',
     'Specialist Doctor in Dhaka',
+    'Specialist Doctor in Chattogram',
     'Cardiologist in Sylhet',
-    'Gynecologist in Moulvibazar',
     'Pediatrician in Bangladesh',
-    'Diagnostic Center Moulvibazar',
+    'Diagnostic Center Bangladesh',
+    'Diagnostic Centers in Dhaka',
     'Blood Test Price in Bangladesh',
     'Hospitals in Dhaka',
-    'Live Chamber Serial Queue',
+    'Live Chamber Serial Queue Bangladesh',
   ],
 });
 

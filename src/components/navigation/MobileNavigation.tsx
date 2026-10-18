@@ -254,6 +254,8 @@ export default function MobileNavigation({
         onClick={() => {
           if (isProvider) {
             window.location.href = '/hospital/portal';
+          } else if (currentUser && ['DOCTOR', 'DOCTOR_ASSISTANT'].includes(currentUser.primaryRole)) {
+            window.location.href = '/doctor/portal';
           } else {
             handleNavigate(isPatient ? 'profile' : 'portal');
           }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
+import { BRAND_COLORS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { useLanguage } from '@/context/LanguageContext';
 import { UserRole } from '@/types';
@@ -13,7 +13,6 @@ import {
   MapPin,
   Globe,
   User,
-  Phone,
   ChevronDown,
   LogOut,
   Home,
@@ -21,7 +20,9 @@ import {
   CalendarCheck,
   MessageSquare,
   Building2,
+  QrCode,
 } from 'lucide-react';
+import QRScannerModal from '@/components/qr/QRScannerModal';
 
 interface HeaderProps {
   language?: SupportedLanguage;
@@ -51,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenOnboard,
   onOpenSearch,
   onOpenLocation,
-  selectedLocation = 'Moulvibazar',
+  selectedLocation = 'Dhaka',
   onSelectCategory,
   currentUser,
   onLogout,
@@ -64,6 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
   const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -92,16 +94,15 @@ export const Header: React.FC<HeaderProps> = ({
       id="main-header"
       className="header-glass"
     >
-      {/* Top Utility Bar (Desktop only) */}
+      {/* Top Utility Bar (Mobile & Desktop) */}
       <div
-        className="d-desktop-only"
         style={{
           backgroundColor: 'rgba(21, 49, 59, 0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           color: '#F4F8FA',
-          padding: '6px 0',
-          fontSize: '11.5px',
+          padding: '5px 0',
+          fontSize: '11px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
@@ -111,11 +112,12 @@ export const Header: React.FC<HeaderProps> = ({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '0 24px',
+            padding: '0 16px',
+            gap: '8px',
           }}
         >
-          {/* Left: Location */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {/* Left on Desktop: Location */}
+          <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '14px' }}>
             <button
               onClick={onOpenLocation}
               style={{
@@ -138,51 +140,34 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Right: Emergency 24/7 Helpline, Provider Hub & Language */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Hospital & Doctor Access Trigger */}
+          {/* Left/Center: Doctor & Hospital Provider Pathway (Visible on Mobile & Desktop) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Link
-              href="/hospital/portal"
+              href="/provider/login"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '5px',
-                background: 'rgba(59, 130, 246, 0.25)',
-                border: '1px solid rgba(96, 165, 250, 0.45)',
+                background: 'rgba(59, 130, 246, 0.28)',
+                border: '1px solid rgba(96, 165, 250, 0.55)',
                 color: '#93C5FD',
-                padding: '2px 9px',
+                padding: '2.5px 10px',
                 borderRadius: '9999px',
                 fontSize: '11px',
                 fontWeight: 700,
                 textDecoration: 'none',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.15s ease',
               }}
             >
               <Building2 size={12} color="#93C5FD" />
-              <span>{language === 'en' ? 'Hospital & Doctor Portal' : 'হাসপাতাল ও ডাক্তার পোর্টাল'}</span>
+              <span>{language === 'en' ? 'Doctor & Hospital Login' : 'ডাক্তার ও হাসপাতাল লগইন'}</span>
             </Link>
+          </div>
 
-            <a
-              href={`tel:${BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}`}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                color: '#EBF3FF',
-                fontWeight: 700,
-                textDecoration: 'none',
-                background: 'rgba(0, 96, 250, 0.35)',
-                padding: '2px 10px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(94, 234, 212, 0.35)',
-              }}
-            >
-              <Phone size={11} color="#5EEAD4" />
-              <span>24/7 Helpline: <strong>{BRAND_CONSTANTS.CUSTOMER_CARE_DISPLAY}</strong></span>
-            </a>
-
-            {/* Language Switcher */}
+          {/* Right: Language Switcher */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
                 display: 'inline-flex',
@@ -308,20 +293,19 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
 
             {/* 4. Messages & Help Desk */}
-            <button
-              onClick={() => handleNavClick('messages')}
+            <Link
+              href="/messages"
               className="header-nav-btn"
               style={{
-                fontWeight: activeTab === 'messages' ? 800 : 600,
-                color: activeTab === 'messages' ? '#FFFFFF' : '#334155',
-                backgroundColor: activeTab === 'messages' ? BRAND_COLORS.primary : 'transparent',
-                border: 'none',
-                cursor: 'pointer',
+                fontWeight: (pathname === '/messages' || activeTab === 'messages') ? 800 : 600,
+                color: (pathname === '/messages' || activeTab === 'messages') ? '#FFFFFF' : '#334155',
+                backgroundColor: (pathname === '/messages' || activeTab === 'messages') ? BRAND_COLORS.primary : 'transparent',
+                textDecoration: 'none',
               }}
             >
               <MessageSquare size={14} />
               <span>{language === 'en' ? 'Help Desk' : 'হেল্প ডেস্ক'}</span>
-            </button>
+            </Link>
           </nav>
 
           {/* Right Side Actions */}
@@ -337,6 +321,28 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="d-desktop-inline">{language === 'en' ? 'Search' : 'সার্চ'}</span>
             </button>
 
+            {/* Scan QR Button */}
+            <button
+              onClick={() => setIsScannerOpen(true)}
+              aria-label={currentLanguage === 'en' ? 'Scan QR Code' : 'কিউআর কোড স্ক্যান করুন'}
+              className="clay-pill header-scan-btn"
+              style={{
+                color: '#0060FA',
+                borderColor: 'rgba(0, 96, 250, 0.3)',
+                background: 'rgba(235, 243, 255, 0.75)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '5px 10px',
+                fontSize: '12px',
+                fontWeight: 700,
+              }}
+            >
+              <QrCode size={14} color="#0060FA" />
+              <span>{currentLanguage === 'en' ? 'Scan QR' : 'স্ক্যান'}</span>
+            </button>
+
             {/* Location Trigger */}
             <button
               onClick={onOpenLocation}
@@ -350,33 +356,9 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* Mobile Quick Language Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                const next = currentLanguage === 'en' ? 'bn' : 'en';
-                handleSetLanguage(next);
-              }}
-              aria-label={currentLanguage === 'en' ? 'Switch to Bangla' : 'Switch to English'}
-              className="clay-bubble d-mobile-flex"
-              style={{
-                padding: '4px 8px',
-                fontSize: '11px',
-                fontWeight: 800,
-                color: BRAND_COLORS.primary,
-                cursor: 'pointer',
-                lineHeight: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: 'none',
-              }}
-            >
-              {currentLanguage === 'en' ? 'বাং' : 'EN'}
-            </button>
-
             {/* Auth Button */}
             {currentUser ? (
-              <div className="d-desktop-flex" style={{ alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Link
                   href={
                     ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'DIAGNOSTIC_STAFF', 'HOSPITAL_STAFF'].includes(currentUser.primaryRole)
@@ -436,11 +418,19 @@ export const Header: React.FC<HeaderProps> = ({
               onOpenAuth && (
                 <button
                   onClick={() => onOpenAuth('login')}
-                  className="btn-secondary d-desktop-only header-auth-btn"
+                  className="btn-secondary header-auth-btn d-desktop-flex"
+                  style={{
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '6px 14px',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
-                  <User size={14} color={BRAND_COLORS.primary} />
-                  <span className="auth-btn-full-text">{language === 'en' ? 'Sign In / Register' : 'লগইন / সাইন আপ'}</span>
-                  <span className="auth-btn-short-text">{language === 'en' ? 'Sign In' : 'লগইন'}</span>
+                  <span>{language === 'en' ? 'Sign In' : 'লগইন'}</span>
                 </button>
               )
             )}
@@ -449,6 +439,14 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
+      {/* QR Scanner Modal */}
+      {isScannerOpen && (
+        <QRScannerModal
+          isOpen={isScannerOpen}
+          onClose={() => setIsScannerOpen(false)}
+          language={currentLanguage}
+        />
+      )}
     </header>
   );
 };

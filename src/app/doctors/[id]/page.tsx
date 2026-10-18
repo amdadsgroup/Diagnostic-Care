@@ -14,6 +14,7 @@ import { AppointmentService } from '@/services/appointment.service';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { Doctor, DoctorAssociation, ScheduleSlot, Appointment } from '@/types';
 import { BRAND_COLORS } from '@/config/brand';
+import { getCachedData } from '@/lib/cache';
 import {
   Calendar,
   Clock,
@@ -32,7 +33,14 @@ import {
   User,
   ArrowRight,
   Sparkles,
+  RefreshCw,
+  Heart,
+  QrCode,
+  Share2,
 } from 'lucide-react';
+import QRCodeStudio from '@/components/qr/QRCodeStudio';
+import { QRService } from '@/services/qr.service';
+import { WishlistService } from '@/services/wishlist.service';
 
 export default function DoctorDetailPage() {
   const params = useParams();
@@ -41,16 +49,23 @@ export default function DoctorDetailPage() {
   const { language, setLanguage, formatCurrency } = useLanguage();
 
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
+  const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
+  const [isQrStudioOpen, setIsQrStudioOpen] = useState<boolean>(false);
+  const [wishlistToast, setWishlistToast] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Moulvibazar');
 
-  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  // Fast cache hydration from doctor directory
+  const cachedDoctors = typeof window !== 'undefined' ? getCachedData<Doctor[]>('doctors_list_active_all', true) : null;
+  const initialDoctor = cachedDoctors ? (cachedDoctors.find(d => d.id === doctorId || d.bmdcNumber === doctorId) || null) : null;
+
+  const [doctor, setDoctor] = useState<Doctor | null>(initialDoctor);
   const [associations, setAssociations] = useState<DoctorAssociation[]>([]);
   const [selectedAssoc, setSelectedAssoc] = useState<DoctorAssociation | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialDoctor);
 
   // Booking Modal State
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
@@ -99,6 +114,61 @@ export default function DoctorDetailPage() {
         setIsLoading(false);
       });
   }, [doctorId]);
+
+  // Check wishlist status & scan attribution
+  useEffect(() => {
+    if (!doctorId) return;
+
+    // Check wishlist state
+    WishlistService.isDoctorWishlisted(currentUser?.id, doctorId).then((status) => {
+      setIsWishlisted(status);
+    });
+
+    const handleWishlistChange = () => {
+      WishlistService.isDoctorWishlisted(currentUser?.id, doctorId).then(setIsWishlisted);
+    };
+    window.addEventListener('dc_wishlist_updated', handleWishlistChange);
+
+    // Track QR scan event if referred via QR code
+    if (typeof window !== 'undefined') {
+      const search = window.location.search;
+      if (search.includes('ref=qr') || search.includes('src=qr')) {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        QRService.recordScanEvent({
+          ownerType: 'DOCTOR',
+          ownerId: doctorId,
+          channel: 'qr_redirect',
+        }).catch(() => {});
+      }
+    }
+
+    return () => {
+      window.removeEventListener('dc_wishlist_updated', handleWishlistChange);
+    };
+  }, [doctorId, currentUser]);
+
+  // Wishlist toggle handler
+  const handleToggleWishlist = async () => {
+    if (!doctor) return;
+    if (!currentUser) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    try {
+      const added = await WishlistService.toggleWishlist(currentUser.id, doctor);
+      setIsWishlisted(added);
+      setWishlistToast(
+        added
+          ? (language === 'en' ? 'Saved to your Wishlist!' : 'আপনার পছন্দের তালিকায় যুক্ত হয়েছে!')
+          : (language === 'en' ? 'Removed from Wishlist' : 'পছন্দের তালিকা থেকে সরানো হয়েছে')
+      );
+      setTimeout(() => setWishlistToast(null), 3000);
+    } catch {
+      setWishlistToast(language === 'en' ? 'Could not update wishlist' : 'তালিকা আপডেট করা যায়নি');
+      setTimeout(() => setWishlistToast(null), 3000);
+    }
+  };
 
   // Load slots whenever selected date or branch changes
   useEffect(() => {
@@ -202,14 +272,40 @@ export default function DoctorDetailPage() {
             setCurrentUser(null);
           }}
         />
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div className="spinner" style={{ margin: '0 auto 16px' }} />
-            <p style={{ color: '#64748B', fontWeight: 600 }}>
-              {language === 'en' ? 'Loading doctor profile...' : 'ডাক্তারের প্রোফাইল লোড হচ্ছে...'}
-            </p>
+        <main style={{ flex: 1, maxWidth: '1100px', width: '100%', margin: '0 auto', padding: '32px 16px 64px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', color: '#0060FA', fontSize: '13px', fontWeight: 600 }}>
+            <RefreshCw size={16} className="animate-spin" />
+            <span>{language === 'en' ? 'Retrieving specialist credentials and chambers...' : 'বিশেষজ্ঞ চিকিৎসকের তথ্য প্রস্তুত করা হচ্ছে...'}</span>
           </div>
-        </div>
+
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+              <div className="skeleton-box" style={{ width: '80px', height: '80px', borderRadius: '50%', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div className="skeleton-box" style={{ width: '220px', height: '24px', marginBottom: '10px' }} />
+                <div className="skeleton-box" style={{ width: '160px', height: '16px', marginBottom: '8px' }} />
+                <div className="skeleton-box" style={{ width: '280px', height: '14px' }} />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '24px' }}>
+              <div className="skeleton-box" style={{ width: '140px', height: '20px', marginBottom: '16px' }} />
+              <div className="skeleton-box" style={{ width: '100%', height: '70px', borderRadius: '8px', marginBottom: '12px' }} />
+              <div className="skeleton-box" style={{ width: '100%', height: '70px', borderRadius: '8px' }} />
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '24px' }}>
+              <div className="skeleton-box" style={{ width: '160px', height: '20px', marginBottom: '16px' }} />
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                {[1, 2, 3, 4].map(n => (
+                  <div key={n} className="skeleton-box" style={{ width: '60px', height: '60px', borderRadius: '8px' }} />
+                ))}
+              </div>
+              <div className="skeleton-box" style={{ width: '100%', height: '44px', borderRadius: '8px' }} />
+            </div>
+          </div>
+        </main>
         <Footer language={language} />
       </div>
     );
@@ -543,6 +639,96 @@ export default function DoctorDetailPage() {
                       : 'বিএমডিসি তথ্য ও সনদ স্বাস্থ্য অধিদপ্তরের ডাটাবেজের সাথে ভেরিফাইড।'}
                   </span>
                 </div>
+
+                {/* Quick Actions: Wishlist & QR Studio */}
+                <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={handleToggleWishlist}
+                    id="btn-toggle-doctor-wishlist"
+                    style={{
+                      flex: 1,
+                      minWidth: '150px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '10px 16px',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: isWishlisted ? '1px solid rgba(225, 29, 72, 0.4)' : '1px solid rgba(203, 213, 225, 0.8)',
+                      background: isWishlisted ? 'rgba(255, 228, 230, 0.7)' : 'rgba(255, 255, 255, 0.8)',
+                      color: isWishlisted ? '#E11D48' : '#334155',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <Heart size={16} fill={isWishlisted ? '#E11D48' : 'none'} color={isWishlisted ? '#E11D48' : '#64748B'} />
+                    {isWishlisted
+                      ? (language === 'en' ? 'Saved to Wishlist' : 'পছন্দে সংরক্ষিত')
+                      : (language === 'en' ? 'Save to Wishlist' : 'পছন্দ তালিকায় রাখুন')}
+                  </button>
+
+                  <button
+                    onClick={() => setIsQrStudioOpen(true)}
+                    id="btn-open-doctor-qr-studio"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '10px 16px',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: '1px solid rgba(0, 96, 250, 0.3)',
+                      background: 'rgba(235, 243, 255, 0.8)',
+                      color: '#0060FA',
+                      boxShadow: '0 2px 8px rgba(0, 96, 250, 0.08)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <QrCode size={16} color="#0060FA" />
+                    {language === 'en' ? 'Doctor QR & Print' : 'ডাক্তার কিউআর ও প্রিন্ট'}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (typeof navigator !== 'undefined' && navigator.share) {
+                        navigator.share({
+                          title: doctor.fullName,
+                          text: `Consult with ${doctor.fullName} (${doctor.specialization}) on Diagnostic Care`,
+                          url: window.location.href,
+                        }).catch(() => {});
+                      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                        navigator.clipboard.writeText(window.location.href);
+                        setWishlistToast(language === 'en' ? 'Profile link copied to clipboard!' : 'প্রোফাইল লিংক কপি করা হয়েছে!');
+                        setTimeout(() => setWishlistToast(null), 3000);
+                      }
+                    }}
+                    id="btn-share-doctor-profile"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '10px 14px',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      border: '1px solid rgba(203, 213, 225, 0.8)',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      color: '#475569',
+                      transition: 'all 0.2s ease',
+                    }}
+                    title={language === 'en' ? 'Share profile' : 'প্রোফাইল শেয়ার করুন'}
+                  >
+                    <Share2 size={16} />
+                  </button>
+                </div>
               </div>
 
               {/* Chambers & Branch Associations */}
@@ -863,6 +1049,109 @@ export default function DoctorDetailPage() {
             setIsLocationModalOpen(false);
           }}
         />
+      )}
+
+      {/* Wishlist Toast Notification */}
+      {wishlistToast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 9999,
+            background: 'rgba(15, 23, 42, 0.92)',
+            color: '#FFFFFF',
+            padding: '12px 20px',
+            borderRadius: '12px',
+            fontSize: '13.5px',
+            fontWeight: 600,
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            backdropFilter: 'blur(10px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          <Sparkles size={16} color="#38BDF8" />
+          <span>{wishlistToast}</span>
+        </div>
+      )}
+
+      {/* QR Code Studio Modal */}
+      {isQrStudioOpen && doctor && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            overflowY: 'auto',
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsQrStudioOpen(false);
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              maxWidth: '920px',
+              width: '100%',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.3)',
+              position: 'relative',
+              padding: '24px',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E2E8F0' }}>
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A' }}>
+                  {language === 'en' ? 'Doctor Official QR Card & Print Studio' : 'ডাক্তারের অফিসিয়াল কিউআর কোড ও প্রিন্ট স্টুডিও'}
+                </h3>
+                <p style={{ fontSize: '12.5px', color: '#64748B', marginTop: '2px' }}>
+                  {language === 'en' ? 'Generate prescriptions, chamber signs, or digital sharing cards' : 'প্রেসক্রিপশন, চেম্বারের নেমপ্লেট বা ডিজিটাল শেয়ারিং কার্ড তৈরি করুন'}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsQrStudioOpen(false)}
+                style={{
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  color: '#64748B',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <QRCodeStudio
+              details={{
+                ownerType: 'doctor',
+                ownerId: doctor.id,
+                name: doctor.fullName,
+                specialty: doctor.specialization,
+                designation: doctor.qualifications,
+                publicUrl: typeof window !== 'undefined' ? `${window.location.origin}/doctors/${doctor.id}?ref=qr` : `https://diagnosticcare.vercel.app/doctors/${doctor.id}?ref=qr`,
+                isVerified: doctor.verificationStatus === 'VERIFIED',
+              }}
+              onClose={() => setIsQrStudioOpen(false)}
+            />
+          </div>
+        </div>
       )}
 
       <Footer language={language} />

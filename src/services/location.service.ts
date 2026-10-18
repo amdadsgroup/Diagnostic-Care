@@ -1,9 +1,10 @@
 import { supabase } from '@/lib/supabase/client';
 import { Division, District, Upazila } from '@/types';
+import { BANGLADESH_DIVISIONS, BANGLADESH_DISTRICTS } from '@/data/bangladesh-divisions';
 
 export class LocationService {
   /**
-   * Fetch all active divisions
+   * Fetch all 8 active administrative divisions of Bangladesh
    */
   static async getDivisions(): Promise<Division[]> {
     try {
@@ -13,30 +14,31 @@ export class LocationService {
         .eq('status', 'active')
         .order('name');
 
-      if (error || !data || data.length === 0) {
-        // Fallback default Sylhet, Dhaka, Chittagong if offline/initial
-        return [
-          { id: 'div-sylhet', nameEn: 'Sylhet', nameBn: 'সিলেট' },
-          { id: 'div-dhaka', nameEn: 'Dhaka', nameBn: 'ঢাকা' },
-          { id: 'div-chittagong', nameEn: 'Chittagong', nameBn: 'চট্টগ্রাম' },
-        ];
+      if (!error && data && data.length >= 8) {
+        return data.map((d) => ({
+          id: d.id,
+          nameEn: d.name,
+          nameBn: d.name_bn,
+        }));
       }
 
-      return data.map((d) => ({
+      // Authoritative 8 divisions dataset
+      return BANGLADESH_DIVISIONS.map((d) => ({
         id: d.id,
-        nameEn: d.name,
-        nameBn: d.name_bn,
+        nameEn: d.nameEn,
+        nameBn: d.nameBn,
       }));
     } catch {
-      return [
-        { id: 'div-sylhet', nameEn: 'Sylhet', nameBn: 'সিলেট' },
-        { id: 'div-dhaka', nameEn: 'Dhaka', nameBn: 'ঢাকা' },
-      ];
+      return BANGLADESH_DIVISIONS.map((d) => ({
+        id: d.id,
+        nameEn: d.nameEn,
+        nameBn: d.nameBn,
+      }));
     }
   }
 
   /**
-   * Fetch districts by division or all
+   * Fetch districts by division or all 64 districts
    */
   static async getDistricts(divisionId?: string): Promise<District[]> {
     try {
@@ -51,25 +53,37 @@ export class LocationService {
       }
 
       const { data, error } = await query;
-      if (error || !data || data.length === 0) {
-        return [
-          { id: 'dist-moulvibazar', divisionId: 'div-sylhet', nameEn: 'Moulvibazar', nameBn: 'মৌলভীবাজার' },
-          { id: 'dist-sylhet', divisionId: 'div-sylhet', nameEn: 'Sylhet', nameBn: 'সিলেট' },
-          { id: 'dist-habiganj', divisionId: 'div-sylhet', nameEn: 'Habiganj', nameBn: 'হবিগঞ্জ' },
-          { id: 'dist-sunamganj', divisionId: 'div-sylhet', nameEn: 'Sunamganj', nameBn: 'সুনামগঞ্জ' },
-        ];
+      if (!error && data && data.length > 0) {
+        return data.map((d) => ({
+          id: d.id,
+          divisionId: d.division_id,
+          nameEn: d.name,
+          nameBn: d.name_bn,
+        }));
       }
 
-      return data.map((d) => ({
+      // Authoritative 64 districts fallback
+      const filtered = divisionId
+        ? BANGLADESH_DISTRICTS.filter((d) => d.divisionId === divisionId || d.divisionSlug === divisionId)
+        : BANGLADESH_DISTRICTS;
+
+      return filtered.map((d) => ({
         id: d.id,
-        divisionId: d.division_id,
-        nameEn: d.name,
-        nameBn: d.name_bn,
+        divisionId: d.divisionId,
+        nameEn: d.nameEn,
+        nameBn: d.nameBn,
       }));
     } catch {
-      return [
-        { id: 'dist-moulvibazar', divisionId: 'div-sylhet', nameEn: 'Moulvibazar', nameBn: 'মৌলভীবাজার' },
-      ];
+      const filtered = divisionId
+        ? BANGLADESH_DISTRICTS.filter((d) => d.divisionId === divisionId || d.divisionSlug === divisionId)
+        : BANGLADESH_DISTRICTS;
+
+      return filtered.map((d) => ({
+        id: d.id,
+        divisionId: d.divisionId,
+        nameEn: d.nameEn,
+        nameBn: d.nameBn,
+      }));
     }
   }
 

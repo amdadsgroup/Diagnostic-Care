@@ -339,6 +339,17 @@ export default function DoctorPortal({
                 </div>
               );
             })}
+            {isLoading && queue.length === 0 && (
+              <div style={{ padding: '8px 0' }}>
+                <div className="skeleton-box" style={{ width: '100%', height: '52px', borderRadius: '8px', marginBottom: '8px' }} />
+                <div className="skeleton-box" style={{ width: '100%', height: '52px', borderRadius: '8px' }} />
+              </div>
+            )}
+            {!isLoading && queue.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
+                আজকের কোনো রোগী সিরিয়ালে নেই।
+              </div>
+            )}
           </div>
         </div>
       </div>

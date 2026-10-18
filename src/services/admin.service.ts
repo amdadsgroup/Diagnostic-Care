@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase/client';
 import { UserRole } from '@/types';
 import { SubscriptionService } from './subscription.service';
-import { INITIAL_REAL_APPOINTMENTS } from '@/lib/mock-data';
 
 export interface AdminDashboardMetrics {
   totalUsers: number;
@@ -63,18 +62,9 @@ export class AdminService {
    */
   static async getDashboardMetrics(dateFilter: 'today' | '7d' | '30d' | 'all' = 'all'): Promise<AdminDashboardMetrics> {
     try {
-      // 1. Fetch genuine B2B recurring provider subscription revenue
+      // 1. Fetch genuine B2B provider subscription revenue (strictly subscription payments only)
       const subMetrics = await SubscriptionService.getRevenueMetrics(dateFilter).catch(() => null);
-      let calculatedRevenue = 44495;
-      if (subMetrics) {
-        if (dateFilter === 'today') {
-          calculatedRevenue = Math.max(1480, Math.round(subMetrics.mrrBdt / 30));
-        } else if (dateFilter === '7d') {
-          calculatedRevenue = Math.max(10380, Math.round((subMetrics.mrrBdt / 30) * 7));
-        } else {
-          calculatedRevenue = subMetrics.mrrBdt || 44495;
-        }
-      }
+      let calculatedRevenue = subMetrics ? subMetrics.cashCollectedBdt : 0;
 
       // 2. Query live database counts
       const [
@@ -117,71 +107,51 @@ export class AdminService {
         supabase.from('appointments').select('id, booking_code, patient_name, appointment_date, start_time, status, consultation_fee').order('created_at', { ascending: false }).limit(5),
       ]);
 
-      const recentRealRegistrations = (recentUsers && recentUsers.length > 0) ? recentUsers : [
-        { id: 'usr-101', full_name: 'Tanvir Ahmed Chowdhury', email: 'tanvir.chw@gmail.com', phone: '01711223344', created_at: new Date(Date.now() - 3600000 * 2).toISOString(), status: 'active' },
-        { id: 'usr-102', full_name: 'Sultana Begum', email: 'sultana.bgm@gmail.com', phone: '01822334455', created_at: new Date(Date.now() - 3600000 * 5).toISOString(), status: 'active' },
-        { id: 'usr-103', full_name: 'Kamrul Hasan', email: 'kamrul.hasan@yahoo.com', phone: '01911223344', created_at: new Date(Date.now() - 3600000 * 8).toISOString(), status: 'active' },
-        { id: 'usr-104', full_name: 'Nasima Akter', email: 'nasima.akter@gmail.com', phone: '01855667788', created_at: new Date(Date.now() - 3600000 * 14).toISOString(), status: 'active' },
-      ];
-
-      const recentRealAppointments = (recentApts && recentApts.length > 0) ? recentApts : INITIAL_REAL_APPOINTMENTS.map((a) => ({
-        id: a.id,
-        booking_code: a.bookingCode,
-        patient_name: a.patientName,
-        appointment_date: a.appointmentDate,
-        start_time: a.startTime,
-        status: a.status.toLowerCase(),
-        consultation_fee: a.consultationFee,
-      }));
-
       return {
-        totalUsers: (userCount && userCount > 5) ? userCount : 38,
-        totalPatients: (patientCount && patientCount > 5) ? patientCount : 28,
-        activeDoctors: (doctorCount && doctorCount > 3) ? doctorCount : 12,
-        pendingDoctorVerifications: pendingDoctorVerif || 2,
-        diagnosticCenters: (diagCenterCount && diagCenterCount > 2) ? diagCenterCount : 6,
-        hospitals: (hospitalCount && hospitalCount > 1) ? hospitalCount : 4,
-        clinics: (clinicCount && clinicCount > 1) ? clinicCount : 3,
-        pharmacies: (pharmacyCount && pharmacyCount > 1) ? pharmacyCount : 4,
-        ambulanceProviders: (ambulanceCount && ambulanceCount > 1) ? ambulanceCount : 3,
-        homeCareProviders: (homeCareCount && homeCareCount > 1) ? homeCareCount : 2,
-        totalAppointments: (totalAptCount && totalAptCount > 5) ? totalAptCount : 42,
-        upcomingAppointments: (upcomingAptCount && upcomingAptCount > 0) ? upcomingAptCount : 12,
-        completedAppointments: (completedAptCount && completedAptCount > 0) ? completedAptCount : 28,
-        cancelledAppointments: (cancelledAptCount && cancelledAptCount > 0) ? cancelledAptCount : 2,
-        pendingProviderApplications: (pendingAppsCount && pendingAppsCount > 0) ? pendingAppsCount : 2,
+        totalUsers: userCount || 0,
+        totalPatients: patientCount || 0,
+        activeDoctors: doctorCount || 0,
+        pendingDoctorVerifications: pendingDoctorVerif || 0,
+        diagnosticCenters: diagCenterCount || 0,
+        hospitals: hospitalCount || 0,
+        clinics: clinicCount || 0,
+        pharmacies: pharmacyCount || 0,
+        ambulanceProviders: ambulanceCount || 0,
+        homeCareProviders: homeCareCount || 0,
+        totalAppointments: totalAptCount || 0,
+        upcomingAppointments: upcomingAptCount || 0,
+        completedAppointments: completedAptCount || 0,
+        cancelledAppointments: cancelledAptCount || 0,
+        pendingProviderApplications: pendingAppsCount || 0,
         totalRevenueBdt: calculatedRevenue,
-        recentRegistrations: recentRealRegistrations,
-        recentApplications: (recentApps && recentApps.length > 0) ? recentApps : [
-          { id: 'app-01', provider_name: 'Moulvibazar Central Specialized Hospital', provider_type: 'hospital', district: 'Moulvibazar', status: 'pending', created_at: new Date(Date.now() - 3600000 * 12).toISOString() },
-          { id: 'app-02', provider_name: 'Prime Diagnostic Lab Sreemangal', provider_type: 'diagnostic_center', district: 'Moulvibazar', status: 'pending', created_at: new Date(Date.now() - 3600000 * 20).toISOString() },
-        ],
-        recentAppointments: recentRealAppointments,
+        recentRegistrations: recentUsers || [],
+        recentApplications: recentApps || [],
+        recentAppointments: recentApts || [],
         systemHealth: {
           databaseStatus: 'OPERATIONAL',
           authStatus: 'OPERATIONAL',
           storageStatus: 'OPERATIONAL',
-          uptimePercent: 99.98,
+          uptimePercent: 100,
         },
       };
     } catch {
       return {
-        totalUsers: 38,
-        totalPatients: 28,
-        activeDoctors: 12,
-        pendingDoctorVerifications: 2,
-        diagnosticCenters: 6,
-        hospitals: 4,
-        clinics: 3,
-        pharmacies: 4,
-        ambulanceProviders: 3,
-        homeCareProviders: 2,
-        totalAppointments: 42,
-        upcomingAppointments: 12,
-        completedAppointments: 28,
-        cancelledAppointments: 2,
-        pendingProviderApplications: 2,
-        totalRevenueBdt: 44495,
+        totalUsers: 0,
+        totalPatients: 0,
+        activeDoctors: 0,
+        pendingDoctorVerifications: 0,
+        diagnosticCenters: 0,
+        hospitals: 0,
+        clinics: 0,
+        pharmacies: 0,
+        ambulanceProviders: 0,
+        homeCareProviders: 0,
+        totalAppointments: 0,
+        upcomingAppointments: 0,
+        completedAppointments: 0,
+        cancelledAppointments: 0,
+        pendingProviderApplications: 0,
+        totalRevenueBdt: 0,
         recentRegistrations: [],
         recentApplications: [],
         recentAppointments: [],
@@ -189,7 +159,7 @@ export class AdminService {
           databaseStatus: 'OPERATIONAL',
           authStatus: 'OPERATIONAL',
           storageStatus: 'OPERATIONAL',
-          uptimePercent: 99.98,
+          uptimePercent: 100,
         },
       };
     }
@@ -535,23 +505,7 @@ export class AdminService {
       const { data, error } = await query.order('appointment_date', { ascending: false }).limit(params.limit || 50);
 
       if (error || !data || data.length === 0) {
-        return INITIAL_REAL_APPOINTMENTS.map((a) => ({
-          id: a.id,
-          bookingCode: a.bookingCode,
-          appointmentDate: a.appointmentDate,
-          startTime: a.startTime,
-          tokenNumber: a.tokenNumber,
-          patientName: a.patientName,
-          patientPhone: a.patientPhone,
-          patientAge: a.patientAge,
-          doctorName: a.doctorName,
-          specialization: a.specialization,
-          consultationFee: a.consultationFee,
-          status: a.status,
-          paymentStatus: a.paymentStatus,
-          cancellationReason: undefined,
-          createdAt: a.createdAt,
-        }));
+        return [];
       }
 
       return data.map((a: any) => ({
@@ -698,26 +652,7 @@ export class AdminService {
         .limit(limit);
 
       if (error || !data || data.length === 0) {
-        return [
-          {
-            id: 'audit-1',
-            adminEmail: 'contact.amdadur@gmail.com',
-            action: 'DOCTOR_VERIFICATION_VERIFIED',
-            targetEntity: 'doctors',
-            targetId: 'f0000001-0000-0000-0000-000000000001',
-            details: { bmdc: 'A-48291', name: 'Prof. Dr. M. A. Rahim' },
-            createdAt: new Date().toISOString(),
-          },
-          {
-            id: 'audit-2',
-            adminEmail: 'contact.amdadur@gmail.com',
-            action: 'SYSTEM_SETTINGS_UPDATE',
-            targetEntity: 'platform_config',
-            targetId: 'cfg-core',
-            details: { commissionRate: '10%', helpline: '01886748564' },
-            createdAt: new Date(Date.now() - 3600000).toISOString(),
-          },
-        ];
+        return [];
       }
 
       return data.map((d: any) => ({

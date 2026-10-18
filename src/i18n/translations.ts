@@ -5,7 +5,7 @@ export const TRANSLATIONS = {
     marketplaceLabel: 'National Digital Healthcare Marketplace',
     helplineTitle: '24/7 Healthcare Helpline',
     helplinePhone: '01886748564',
-    locationBadge: 'Moulvibazar Hub • Sylhet Division',
+    locationBadge: 'National Healthcare Platform • Bangladesh',
     verifiedBadge: 'Verified Healthcare Provider',
     emergencyLive: 'Emergency Hotline 24/7',
 
@@ -53,7 +53,7 @@ export const TRANSLATIONS = {
     telemetryQueueActive: 'Live Queue Token Ticker',
     telemetryTurnaround: 'Avg. Pathology Lab Report Turnaround',
     telemetryAmbulanceReady: 'Emergency Ambulances On-Call',
-    telemetryHubCoverage: 'Initial Launch Hub: Moulvibazar Sadar & Sylhet',
+    telemetryHubCoverage: 'National Network: All 8 Divisions of Bangladesh',
 
     // Trust & Verification
     trustTitle: 'Engineered for Trust, Clinical Accuracy & Patient Privacy',
@@ -86,7 +86,7 @@ export const TRANSLATIONS = {
 
     // Doctor Discovery
     sectionDoctorsTitle: 'Specialist Doctors & Evening Chambers',
-    sectionDoctorsSubtitle: 'Book real-time consultation slots with BMDC registered consultants in Moulvibazar and Sylhet.',
+    sectionDoctorsSubtitle: 'Book real-time consultation slots with BMDC registered consultants across Bangladesh.',
     slotConsultationFee: 'Consultation Fee',
     slotAvailable: 'Available',
     slotHeld: 'Held (5m)',
@@ -142,7 +142,7 @@ export const TRANSLATIONS = {
 
     // Interactive Map Discovery
     mapTitle: 'Geographic Healthcare Coverage & Facility Explorer',
-    mapSubtitle: 'Locate nearby verified diagnostic centers, hospitals, pharmacies, and emergency hubs across Moulvibazar and Sylhet.',
+    mapSubtitle: 'Locate nearby verified diagnostic centers, hospitals, pharmacies, and emergency hubs across Bangladesh.',
     mapFilterAll: 'All Facilities',
     mapFilterHospitals: 'Hospitals',
     mapFilterCenters: 'Diagnostic Centers',
@@ -221,7 +221,7 @@ export const TRANSLATIONS = {
     searchFilterMaxFee: 'Max Fee:',
     searchFilterResultsTitle: 'Search Results',
     searchFilterResultsCount: 'found',
-    searchFilterLocationLabel: 'Location: Moulvibazar & Sylhet Region',
+    searchFilterLocationLabel: 'Location: Across Bangladesh',
     searchFilterNoResults: 'No results found',
     searchFilterNoResultsHint: 'Please try changing the filters or entering different keywords.',
     searchFilterTypeDoctor: 'Doctor',
@@ -244,7 +244,7 @@ export const TRANSLATIONS = {
     // Footer
     footerDesc: 'A national unified healthcare marketplace and digital medical operating system. Connecting patients with verified diagnostic centers, specialist consultants, pathology laboratories, and emergency services across Bangladesh.',
     footerHelplineCta: 'Need immediate healthcare booking assistance?',
-    footerHelplineSub: 'Our dedicated clinical operations team in Moulvibazar is available 24/7.',
+    footerHelplineSub: 'Our dedicated clinical operations team is available nationwide 24/7.',
     footerCallNow: 'Call Customer Care',
     footerServicesCol: 'Healthcare Services',
     footerCoverageCol: 'Operational Coverage',
@@ -359,6 +359,23 @@ export const TRANSLATIONS = {
     commonEncryptedBadge: '256-Bit Encrypted Healthcare Session',
     commonBmdcBadge: 'BMDC Verified Medical Standards',
     commonDghsBadge: 'DGHS Compliance Framework',
+
+    // QR Code & Patient Wishlist
+    qrScanTitle: 'Scan Healthcare QR Code',
+    qrScanSubtitle: 'Point your camera at a doctor prescription card, hospital desk, or diagnostic flyer',
+    qrScanAction: 'Scan QR Code',
+    qrDownloadPng: 'Download High-Res PNG',
+    qrDownloadSvg: 'Download Print Vector SVG',
+    qrPrintCard: 'Print QR Card',
+    qrPresetPrescription: 'Prescription Label',
+    qrPresetVisitingCard: 'Visiting Card',
+    qrPresetPoster: 'Chamber Poster',
+    qrPresetA4Sheet: 'A4 Multi-Print Sheet',
+    qrPresetCustom: 'Custom Sizing',
+    wishlistSaveDoctor: 'Save to Wishlist',
+    wishlistSavedDoctor: 'Saved to Wishlist',
+    wishlistMyWishlist: 'My Wishlist',
+    wishlistEmptyNotice: 'No doctors saved to your wishlist yet.',
   },
   bn: {
     brandName: 'ডায়াগনস্টিক কেয়ার',
@@ -366,7 +383,7 @@ export const TRANSLATIONS = {
     marketplaceLabel: 'জাতীয় ডিজিটাল হেলথকেয়ার মার্কেটপ্লেস',
     helplineTitle: '২৪/৭ পেশাদার হেল্পলাইন',
     helplinePhone: '০১৮৮৬৭৪৮৫৬৪',
-    locationBadge: 'মৌলভীবাজার হাব • সিলেট বিভাগ',
+    locationBadge: 'জাতীয় স্বাস্থ্যসেবা প্ল্যাটফর্ম • বাংলাদেশ',
     verifiedBadge: 'ভেরিফাইড স্বাস্থ্যসেবা প্রতিষ্ঠান',
     emergencyLive: 'জরুরি হেল্পলাইন ২৪/৭',
 
@@ -414,7 +431,7 @@ export const TRANSLATIONS = {
     telemetryQueueActive: 'লাইভ সিরিয়াল টোকেন মনিটর',
     telemetryTurnaround: 'গড় প্যাথলজি রিপোর্ট ডেলিভারি সময়',
     telemetryAmbulanceReady: 'প্রস্তুত জরুরি অ্যাম্বুলেন্স',
-    telemetryHubCoverage: 'প্রারম্ভিক হাব: মৌলভীবাজার সদর ও সিলেট',
+    telemetryHubCoverage: 'কভারেজ: বাংলাদেশের ৮টি প্রশাসনিক বিভাগ',
 
     // Trust & Verification
     trustTitle: 'রোগীর আস্থা, সঠিক ডায়াগনসিস এবং ডাটা সুরক্ষায় প্রতিশ্রুতিবদ্ধ',
@@ -447,7 +464,7 @@ export const TRANSLATIONS = {
 
     // Doctor Discovery
     sectionDoctorsTitle: 'বিশেষজ্ঞ ডাক্তার ও সান্ধ্যকালীন চেম্বার',
-    sectionDoctorsSubtitle: 'মৌলভীবাজার ও সিলেটে বিএমডিসি নিবন্ধিত বিশেষজ্ঞ ডাক্তারদের সরাসরি চেম্বার স্লট বুকিং করুন।',
+    sectionDoctorsSubtitle: 'বাংলাদেশে বিএমডিসি নিবন্ধিত বিশেষজ্ঞ ডাক্তারদের সরাসরি চেম্বার স্লট বুকিং করুন।',
     slotConsultationFee: 'পরামর্শ ফি',
     slotAvailable: 'খালি আছে',
     slotHeld: 'রিজার্ভড (৫ মিনিট)',
@@ -503,7 +520,7 @@ export const TRANSLATIONS = {
 
     // Interactive Map Discovery
     mapTitle: 'ভৌগোলিক স্বাস্থ্যসেবা নেটওয়ার্ক ও ম্যাপ এক্সপ্লোরার',
-    mapSubtitle: 'মৌলভীবাজার সদর, শ্রীমঙ্গল ও সিলেটের সকল ভেরিফাইড ডায়াগনস্টিক সেন্টার ও হাসপাতাল খুঁজুন।',
+    mapSubtitle: 'সমগ্র বাংলাদেশে ভেরিফাইড ডায়াগনস্টিক সেন্টার, হাসপাতাল ও জরুরি স্বাস্থ্যসেবা খুঁজুন।',
     mapFilterAll: 'সকল প্রতিষ্ঠান',
     mapFilterHospitals: 'হাসপাতাল',
     mapFilterCenters: 'ডায়াগনস্টিক সেন্টার',
@@ -582,7 +599,7 @@ export const TRANSLATIONS = {
     searchFilterMaxFee: 'সর্বোচ্চ ফি:',
     searchFilterResultsTitle: 'অনুসন্ধানের ফলাফল',
     searchFilterResultsCount: 'টি প্রাপ্ত',
-    searchFilterLocationLabel: 'লোকেশন: মৌলভীবাজার ও সিলেট অঞ্চল',
+    searchFilterLocationLabel: 'লোকেশন: সমগ্র বাংলাদেশ',
     searchFilterNoResults: 'কোনো ফলাফল পাওয়া যায়নি',
     searchFilterNoResultsHint: 'অনুগ্রহ করে ফিল্টার পরিবর্তন করে বা ভিন্ন কিওয়ার্ড লিখে পুনরায় চেষ্টা করুন।',
     searchFilterTypeDoctor: 'ডাক্তার',
@@ -720,6 +737,23 @@ export const TRANSLATIONS = {
     commonEncryptedBadge: '২৫৬-বিট এনক্রিপ্টেড সুরক্ষিত হেলথ সেশন',
     commonBmdcBadge: 'বিএমডিসি ভেরিফাইড মেডিকেল মানদণ্ড',
     commonDghsBadge: 'ডিজিএইচএস স্বাস্থ্যসেবা কমপ্লায়েন্স',
+
+    // QR Code & Patient Wishlist
+    qrScanTitle: 'হেলথকেয়ার কিউআর কোড স্ক্যান করুন',
+    qrScanSubtitle: 'ডাক্তারের প্রেসক্রিপশন কার্ড, হাসপাতাল বা ডায়াগনস্টিক সেন্টারের কিউআর কোডে ক্যামেরা তাক করুন',
+    qrScanAction: 'কিউআর স্ক্যান করুন',
+    qrDownloadPng: 'উচ্চমানের পিএনজি ডাউনলোড',
+    qrDownloadSvg: 'প্রিন্ট ভেক্টর এসভিজি ডাউনলোড',
+    qrPrintCard: 'কিউআর কার্ড প্রিন্ট করুন',
+    qrPresetPrescription: 'প্রেসক্রিপশন লেবেল',
+    qrPresetVisitingCard: 'ভিজিটিং কার্ড',
+    qrPresetPoster: 'চেম্বার পোস্টার',
+    qrPresetA4Sheet: 'এ৪ মাল্টি-প্রিন্ট শিট',
+    qrPresetCustom: 'কাস্টম সাইজ',
+    wishlistSaveDoctor: 'পছন্দ তালিকায় রাখুন',
+    wishlistSavedDoctor: 'পছন্দে সংরক্ষিত',
+    wishlistMyWishlist: 'আমার পছন্দের ডাক্তার',
+    wishlistEmptyNotice: 'এখনও পছন্দের তালিকায় কোনো ডাক্তার যোগ করা হয়নি।',
   },
 } as const;
 

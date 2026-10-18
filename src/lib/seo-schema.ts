@@ -18,20 +18,12 @@ export function generateOrganizationSchema() {
     description:
       'Diagnostic Care is Bangladesh’s digital healthcare marketplace connecting patients with verified doctors, accredited diagnostic centers, hospitals, and 24/7 emergency services.',
     telephone: BRAND_CONSTANTS.CUSTOMER_CARE_PHONE,
-    email: 'support@diagnosticcare.com',
+    email: BRAND_CONSTANTS.COMPANY_EMAIL,
     priceRange: '৳৳',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Chowmohana, Syed Mujtoba Ali Road',
-      addressLocality: 'Moulvibazar Sadar',
-      addressRegion: 'Sylhet',
-      postalCode: '3200',
+      addressLocality: 'Dhaka',
       addressCountry: 'BD',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '24.4829',
-      longitude: '91.7649',
     },
     openingHoursSpecification: [
       {
@@ -46,10 +38,14 @@ export function generateOrganizationSchema() {
       'https://www.linkedin.com/company/diagnostic-care-bd',
     ],
     areaServed: [
-      { '@type': 'AdministrativeArea', name: 'Sylhet' },
-      { '@type': 'AdministrativeArea', name: 'Moulvibazar' },
-      { '@type': 'AdministrativeArea', name: 'Dhaka' },
-      { '@type': 'AdministrativeArea', name: 'Chittagong' },
+      { '@type': 'AdministrativeArea', name: 'Dhaka Division' },
+      { '@type': 'AdministrativeArea', name: 'Chattogram Division' },
+      { '@type': 'AdministrativeArea', name: 'Rajshahi Division' },
+      { '@type': 'AdministrativeArea', name: 'Khulna Division' },
+      { '@type': 'AdministrativeArea', name: 'Barishal Division' },
+      { '@type': 'AdministrativeArea', name: 'Sylhet Division' },
+      { '@type': 'AdministrativeArea', name: 'Rangpur Division' },
+      { '@type': 'AdministrativeArea', name: 'Mymensingh Division' },
       { '@type': 'Country', name: 'Bangladesh' },
     ],
   };

@@ -12,6 +12,7 @@ import {
   MessageSquare,
   User,
   Building2,
+  QrCode,
 } from 'lucide-react';
 
 function MobileBottomDockInner() {
@@ -42,13 +43,14 @@ function MobileBottomDockInner() {
     pathname.startsWith('/doctors/') ||
     tabParam === 'search' ||
     tabParam === 'discover';
+  const isScanActive = pathname === '/scan';
   const isBookingsActive =
     pathname === '/appointments' ||
     pathname.startsWith('/appointments/') ||
     tabParam === 'appointments' ||
     tabParam === 'bookings' ||
     tabParam === 'queue';
-  const isMessagesActive = tabParam === 'messages';
+  const isMessagesActive = pathname === '/messages' || tabParam === 'messages';
   const isAccountActive =
     pathname.startsWith('/hospital/portal') ||
     pathname.startsWith('/doctor/portal') ||
@@ -58,7 +60,7 @@ function MobileBottomDockInner() {
     tabParam === 'profile' ||
     tabParam === 'reports';
 
-  const handleNavigate = (target: 'home' | 'discover' | 'bookings' | 'messages' | 'account') => {
+  const handleNavigate = (target: 'home' | 'discover' | 'scan' | 'bookings' | 'messages' | 'account') => {
     if (target === 'home') {
       if (pathname === '/' && (!tabParam || tabParam === 'marketplace')) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -71,6 +73,8 @@ function MobileBottomDockInner() {
       } else {
         router.push('/doctors');
       }
+    } else if (target === 'scan') {
+      router.push('/scan');
     } else if (target === 'bookings') {
       if (pathname === '/appointments') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -78,7 +82,11 @@ function MobileBottomDockInner() {
         router.push('/appointments');
       }
     } else if (target === 'messages') {
-      router.push('/?tab=messages');
+      if (pathname === '/messages') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        router.push('/messages');
+      }
     } else if (target === 'account') {
       if (isProvider) {
         router.push('/hospital/portal');
@@ -89,7 +97,7 @@ function MobileBottomDockInner() {
           router.push('/patient/dashboard');
         }
       } else {
-        router.push('/hospital/portal');
+        router.push('/login');
       }
     }
   };
@@ -128,11 +136,40 @@ function MobileBottomDockInner() {
           strokeWidth={isDiscoverActive ? 2.4 : 1.8}
         />
         <span className="mobile-dock-label">
-          {language === 'en' ? 'Discover' : 'ডিসকভার'}
+          {language === 'en' ? 'Doctors' : 'ডাক্তার'}
         </span>
       </button>
 
-      {/* 3. Bookings */}
+      {/* 3. Scan QR */}
+      <button
+        onClick={() => handleNavigate('scan')}
+        className={`mobile-dock-btn ${isScanActive ? 'active' : ''}`}
+        aria-label={language === 'en' ? 'Scan QR' : 'স্ক্যান'}
+      >
+        <div
+          style={{
+            background: isScanActive ? '#0060FA' : 'rgba(0, 96, 250, 0.12)',
+            borderRadius: '12px',
+            padding: '5px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '2px',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          <QrCode
+            size={18}
+            color={isScanActive ? '#FFFFFF' : '#0060FA'}
+            strokeWidth={2.2}
+          />
+        </div>
+        <span className="mobile-dock-label" style={{ fontWeight: isScanActive ? 800 : 600, color: isScanActive ? '#0060FA' : '#64748B' }}>
+          {language === 'en' ? 'Scan QR' : 'স্ক্যান'}
+        </span>
+      </button>
+
+      {/* 4. Bookings */}
       <button
         onClick={() => handleNavigate('bookings')}
         className={`mobile-dock-btn ${isBookingsActive ? 'active' : ''}`}
@@ -145,22 +182,6 @@ function MobileBottomDockInner() {
         />
         <span className="mobile-dock-label">
           {language === 'en' ? 'Bookings' : 'বুকিংস'}
-        </span>
-      </button>
-
-      {/* 4. Messages */}
-      <button
-        onClick={() => handleNavigate('messages')}
-        className={`mobile-dock-btn ${isMessagesActive ? 'active' : ''}`}
-        aria-label={language === 'en' ? 'Messages' : 'মেসেজ'}
-      >
-        <MessageSquare
-          size={20}
-          color={isMessagesActive ? BRAND_COLORS.primary : '#64748B'}
-          strokeWidth={isMessagesActive ? 2.4 : 1.8}
-        />
-        <span className="mobile-dock-label">
-          {language === 'en' ? 'Messages' : 'মেসেজ'}
         </span>
       </button>
 

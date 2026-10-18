@@ -475,6 +475,139 @@ export class HospitalService {
   }
 
   /**
+   * Action A: Create a brand new central Doctor Account with initial password & hospital affiliation
+   */
+  static async createDoctorAccount(params: {
+    hospitalId: string;
+    hospitalName: string;
+    fullName: string;
+    email: string;
+    password: string;
+    phone: string;
+    specialty: string;
+    qualifications?: string;
+    bmdcNumber?: string;
+    departmentId?: string;
+    departmentName?: string;
+    branchId?: string;
+    branchName?: string;
+    consultationFee?: number;
+    chamberRoom?: string;
+    daysOfWeek?: string[];
+    visitingStartTime?: string;
+    visitingEndTime?: string;
+    dailySerialLimit?: number;
+  }): Promise<{ success: boolean; message: string; doctorId?: string; code?: string }> {
+    try {
+      const res = await fetch('/api/hospital/doctors/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+      const data = await res.json();
+
+      if (data.success && typeof window !== 'undefined') {
+        // Also register in local doctor directory for instant fallback logins
+        const localDocs = JSON.parse(localStorage.getItem('dc_registered_doctors') || '[]');
+        localDocs.push({
+          id: data.doctorId,
+          fullName: params.fullName,
+          email: params.email.trim().toLowerCase(),
+          password: params.password,
+          phone: params.phone,
+          specialty: params.specialty,
+          mustChangePassword: true,
+          profile: {
+            id: data.doctorId,
+            email: params.email.trim().toLowerCase(),
+            phone: params.phone,
+            fullName: params.fullName,
+            languagePreference: 'en',
+            primaryRole: 'DOCTOR',
+            roles: ['DOCTOR'],
+            status: 'active',
+            doctorId: data.doctorId,
+          },
+        });
+        localStorage.setItem('dc_registered_doctors', JSON.stringify(localDocs));
+      }
+
+      return data;
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Network error creating doctor account.' };
+    }
+  }
+
+  /**
+   * Action B: Invite an existing doctor by registered email address
+   */
+  static async inviteDoctorByEmail(params: {
+    hospitalId: string;
+    hospitalName: string;
+    email: string;
+    departmentId?: string;
+    departmentName?: string;
+    branchId?: string;
+    branchName?: string;
+    proposedRole?: string;
+    consultationFee?: number;
+    chamberRoom?: string;
+    visitingHours?: string;
+    daysOfWeek?: string[];
+  }): Promise<{ success: boolean; message: string; invitation?: any; code?: string }> {
+    try {
+      const res = await fetch('/api/hospital/doctors/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+      const data = await res.json();
+
+      if (data.success && data.invitation && typeof window !== 'undefined') {
+        const localInvs = JSON.parse(localStorage.getItem('dc_hospital_doctor_invitations') || '[]');
+        localInvs.unshift(data.invitation);
+        localStorage.setItem('dc_hospital_doctor_invitations', JSON.stringify(localInvs));
+      }
+
+      return data;
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Network error sending doctor invitation.' };
+    }
+  }
+
+  /**
+   * Get all sent doctor invitations for a hospital
+   */
+  static async getHospitalDoctorInvitations(hospitalId: string): Promise<any[]> {
+    try {
+      if (typeof window !== 'undefined') {
+        const localInvs = JSON.parse(localStorage.getItem('dc_hospital_doctor_invitations') || '[]');
+        return localInvs.filter((i: any) => i.hospitalId === hospitalId || !hospitalId);
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Cancel a pending doctor invitation
+   */
+  static async cancelDoctorInvitation(invitationId: string): Promise<boolean> {
+    try {
+      if (typeof window !== 'undefined') {
+        const localInvs = JSON.parse(localStorage.getItem('dc_hospital_doctor_invitations') || '[]');
+        const updated = localInvs.map((i: any) => (i.id === invitationId ? { ...i, status: 'cancelled' } : i));
+        localStorage.setItem('dc_hospital_doctor_invitations', JSON.stringify(updated));
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+
+  /**
    * 7. Hospital Appointments Desk
    */
   static async getAppointments(hospitalId: string): Promise<HospitalAppointment[]> {

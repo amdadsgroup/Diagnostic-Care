@@ -381,8 +381,7 @@ export class SubscriptionService {
       const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        // Return seeded fallback subscriptions for UI verification
-        return this.getFallbackSubscriptions();
+        return [];
       }
 
       return data.map((d: any) => ({
@@ -432,7 +431,7 @@ export class SubscriptionService {
         updatedAt: d.updated_at,
       }));
     } catch {
-      return this.getFallbackSubscriptions();
+      return [];
     }
   }
 
@@ -653,105 +652,5 @@ export class SubscriptionService {
       console.warn('Subscription audit log write notice:', e);
     }
   }
-
-  /**
-   * Fallback seed subscriptions for resilient testing and zero-downtime offline review
-   */
-  private static getFallbackSubscriptions(): ProviderSubscription[] {
-    const now = new Date();
-    const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const in365Days = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
-    const in4Days = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000).toISOString();
-
-    return [
-      {
-        id: 'sub-pop-01',
-        providerType: 'diagnostic_center',
-        providerId: 'a0000000-0000-0000-0000-000000000001',
-        providerName: 'পপুলার ডায়াগনস্টিক সেন্টার (মৌলভীবাজার ব্রাঞ্চ)',
-        providerDistrict: 'Moulvibazar',
-        providerPhone: '01886748564',
-        planId: 'plan-premium-monthly',
-        plan: DEFAULT_PLANS[4], // Premium Monthly
-        status: 'active',
-        billingInterval: 'monthly',
-        priceBdt: 3500,
-        currentPeriodStart: now.toISOString(),
-        currentPeriodEnd: in30Days,
-        nextRenewalDate: in30Days,
-        autoRenew: true,
-        billingContactName: 'ডা. এ. কে. এম. শাহ আলম',
-        billingContactEmail: 'popular.mb@diagnosticcare.com',
-        billingContactPhone: '01886748564',
-        createdAt: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: now.toISOString(),
-      },
-      {
-        id: 'sub-ibn-02',
-        providerType: 'hospital',
-        providerId: 'a0000000-0000-0000-0000-000000000002',
-        providerName: 'ইবনে সিনা স্পেশালাইজড ক্লিনিক ও ডায়াগনস্টিক',
-        providerDistrict: 'Sylhet',
-        providerPhone: '01711223344',
-        planId: 'plan-pro-annual',
-        plan: DEFAULT_PLANS[3], // Pro Annual
-        status: 'active',
-        billingInterval: 'annual',
-        priceBdt: 15000,
-        currentPeriodStart: now.toISOString(),
-        currentPeriodEnd: in365Days,
-        nextRenewalDate: in365Days,
-        autoRenew: true,
-        billingContactName: 'তাহমিদ আহমেদ (অপারেশনস হেড)',
-        billingContactEmail: 'finance@ibnsina-care.com',
-        billingContactPhone: '01711223344',
-        createdAt: new Date(now.getTime() - 120 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: now.toISOString(),
-      },
-      {
-        id: 'sub-syl-03',
-        providerType: 'hospital',
-        providerId: 'a0000000-0000-0000-0000-000000000003',
-        providerName: 'সিলেট সেন্ট্রাল জেনারেল হাসপাতাল',
-        providerDistrict: 'Sylhet',
-        providerPhone: '01822334455',
-        planId: 'plan-enterprise-monthly',
-        plan: DEFAULT_PLANS[6], // Enterprise
-        status: 'active',
-        billingInterval: 'monthly',
-        priceBdt: 8000,
-        currentPeriodStart: now.toISOString(),
-        currentPeriodEnd: in30Days,
-        nextRenewalDate: in4Days, // Expiring soon
-        autoRenew: true,
-        billingContactName: 'ম্যানেজিং ডিরেক্টর চৌধুরী',
-        billingContactEmail: 'admin@sylhetcentralhospital.org',
-        billingContactPhone: '01822334455',
-        createdAt: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: now.toISOString(),
-      },
-      {
-        id: 'sub-med-04',
-        providerType: 'diagnostic_center',
-        providerId: 'a0000000-0000-0000-0000-000000000004',
-        providerName: 'মেডিনোভা মেডিকেল সার্ভিসেস',
-        providerDistrict: 'Moulvibazar',
-        providerPhone: '01911223344',
-        planId: 'plan-basic-monthly',
-        plan: DEFAULT_PLANS[0], // Basic Monthly
-        status: 'payment_overdue',
-        billingInterval: 'monthly',
-        priceBdt: 500,
-        currentPeriodStart: new Date(now.getTime() - 35 * 24 * 60 * 60 * 1000).toISOString(),
-        currentPeriodEnd: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        nextRenewalDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        autoRenew: true,
-        billingContactName: 'ফারুক হোসেন',
-        billingContactEmail: 'medinova.mb@gmail.com',
-        billingContactPhone: '01911223344',
-        createdAt: new Date(now.getTime() - 65 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: now.toISOString(),
-      },
-    ];
-  }
 }
+

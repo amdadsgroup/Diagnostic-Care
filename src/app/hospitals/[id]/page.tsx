@@ -1,26 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useLanguage } from '@/context/LanguageContext';
-import { INITIAL_ORGANIZATIONS, INITIAL_DOCTOR_ASSOCIATIONS } from '@/lib/mock-data';
+import { supabase } from '@/lib/supabase/client';
 import { BRAND_COLORS, BRAND_CONSTANTS } from '@/config/brand';
+import { getCachedData } from '@/lib/cache';
 import {
   Building2,
   MapPin,
   Phone,
   ShieldCheck,
-  Clock,
   Bed,
   Stethoscope,
   ChevronLeft,
-  ArrowRight,
-  HeartPulse,
   Mail,
   CheckCircle2,
+  RefreshCw,
 } from 'lucide-react';
 
 export default function HospitalDetailPage() {
@@ -28,16 +27,126 @@ export default function HospitalDetailPage() {
   const id = (params?.id as string) || '';
   const { language, setLanguage } = useLanguage();
 
-  const hospital =
-    INITIAL_ORGANIZATIONS.find((org) => org.id === id) ||
-    INITIAL_ORGANIZATIONS.find((org) => org.orgType === 'HOSPITAL') ||
-    INITIAL_ORGANIZATIONS[0];
+  const cachedHospitals = typeof window !== 'undefined' ? getCachedData<any[]>('hospitals_directory_active_all', true) : null;
+  const initialHosp = cachedHospitals ? (cachedHospitals.find(h => h.id === id || h.slug === id) || null) : null;
 
-  const affiliatedAssocs = INITIAL_DOCTOR_ASSOCIATIONS.filter(
-    (a) => a.organizationId === hospital.id
-  );
+  const [hospital, setHospital] = useState<any | null>(initialHosp);
+  const [affiliatedDoctors, setAffiliatedDoctors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(!initialHosp);
 
-  const mainBranch = hospital.branches[0];
+  useEffect(() => {
+    async function loadHospital() {
+      try {
+        const { data, error } = await supabase
+          .from('hospitals')
+          .select('*')
+          .or(`id.eq.${id},slug.eq.${id}`)
+          .maybeSingle();
+
+        if (!error && data) {
+          setHospital(data);
+
+          // Fetch doctors scheduled or associated with this hospital
+          const { data: schedData } = await supabase
+            .from('doctor_schedules')
+            .select(`
+              id,
+              consultation_fee,
+              doctors (
+                id,
+                specialization,
+                qualifications,
+                profiles (
+                  full_name
+                )
+              )
+            `)
+            .eq('provider_id', data.id)
+            .eq('is_active', true);
+
+          if (schedData) {
+            setAffiliatedDoctors(
+              schedData.map((s: any) => ({
+                id: s.doctors?.id || s.id,
+                fullName: s.doctors?.profiles?.full_name || 'Specialist Doctor',
+                specialization: s.doctors?.specialization || 'Consultant',
+                qualifications: s.doctors?.qualifications || '',
+                consultationFee: s.consultation_fee || 800,
+              }))
+            );
+          }
+        }
+      } catch (err) {
+        console.warn('Hospital detail fetch notice:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (id) {
+      loadHospital();
+    }
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
+        <Header language={language} setLanguage={setLanguage} activeTab="marketplace" setActiveTab={() => {}} />
+        <main style={{ flex: 1, maxWidth: '1100px', width: '100%', margin: '0 auto', padding: '32px 16px 80px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', color: '#0060FA', fontSize: '13px', fontWeight: 600 }}>
+            <RefreshCw size={16} className="animate-spin" />
+            <span>{language === 'bn' ? 'হাসপাতালের তথ্য প্রস্তুত করা হচ্ছে...' : 'Loading hospital facilities and departments...'}</span>
+          </div>
+
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '16px' }}>
+              <div className="skeleton-box" style={{ width: '64px', height: '64px', borderRadius: '12px', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div className="skeleton-box" style={{ width: '280px', height: '24px', marginBottom: '10px' }} />
+                <div className="skeleton-box" style={{ width: '180px', height: '16px' }} />
+              </div>
+            </div>
+            <div className="skeleton-box" style={{ width: '100%', height: '40px', borderRadius: '8px' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+            {[1, 2, 3].map(n => (
+              <div key={n} style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '24px' }}>
+                <div className="skeleton-box" style={{ width: '140px', height: '20px', marginBottom: '12px' }} />
+                <div className="skeleton-box" style={{ width: '100%', height: '50px', borderRadius: '8px' }} />
+              </div>
+            ))}
+          </div>
+        </main>
+        <Footer language={language} />
+      </div>
+    );
+  }
+
+  if (!hospital) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
+        <Header language={language} setLanguage={setLanguage} activeTab="marketplace" setActiveTab={() => {}} />
+        <main style={{ flex: 1, maxWidth: '600px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '48px 24px' }}>
+            <Building2 size={36} color="#94A3B8" style={{ margin: '0 auto 16px auto' }} />
+            <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+              {language === 'bn' ? 'হাসপাতালটি পাওয়া যায়নি' : 'Hospital Not Found'}
+            </h2>
+            <p style={{ color: '#64748B', fontSize: '13.5px', marginBottom: '24px' }}>
+              {language === 'bn'
+                ? 'অনুরোধকৃত হাসপাতালটি মুছে ফেলা হয়েছে অথবা আইডি ভুল রয়েছে।'
+                : 'The requested hospital profile does not exist or may have been updated.'}
+            </p>
+            <Link href="/hospitals" className="btn-primary" style={{ padding: '8px 18px', fontSize: '13px' }}>
+              {language === 'bn' ? 'সকল হাসপাতাল দেখুন' : 'Browse All Hospitals'}
+            </Link>
+          </div>
+        </main>
+        <Footer language={language} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
@@ -48,7 +157,7 @@ export default function HospitalDetailPage() {
         setActiveTab={() => {}}
       />
 
-      <main style={{ flex: 1, maxWidth: '1100px', width: '100%', margin: '0 auto', padding: '32px 20px 80px' }}>
+      <main style={{ flex: 1, maxWidth: '1100px', width: '100%', margin: '0 auto', padding: '32px 16px 80px' }}>
         {/* Back Link */}
         <Link
           href="/hospitals"
@@ -58,209 +167,167 @@ export default function HospitalDetailPage() {
             gap: '6px',
             color: '#64748B',
             fontSize: '13px',
-            fontWeight: 700,
+            fontWeight: 600,
             textDecoration: 'none',
             marginBottom: '20px',
           }}
         >
           <ChevronLeft size={16} />
-          <span>{language === 'bn' ? 'সকল হাসপাতালে ফিরে যান' : 'Back to Hospitals'}</span>
+          <span>{language === 'bn' ? 'সকল হাসপাতালে ফিরে যান' : 'Back to Hospitals Directory'}</span>
         </Link>
 
-        {/* Hospital Hero Banner */}
+        {/* Header Card */}
         <div
           style={{
             backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            padding: '32px',
-            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
+            borderRadius: '12px',
             border: '1px solid #E2E8F0',
-            marginBottom: '30px',
-            position: 'relative',
-            overflow: 'hidden',
+            padding: '28px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            marginBottom: '24px',
           }}
         >
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'flex-start' }}>
-            <div
-              style={{
-                width: '72px',
-                height: '72px',
-                borderRadius: '18px',
-                backgroundColor: 'rgba(0, 96, 250, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: BRAND_COLORS.primary,
-                flexShrink: 0,
-              }}
-            >
-              <Building2 size={36} />
-            </div>
-
-            <div style={{ flex: '1 1 320px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    backgroundColor: '#DCFCE7',
-                    color: '#15803D',
-                    padding: '3px 9px',
-                    borderRadius: '9999px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                  }}
-                >
-                  <ShieldCheck size={12} />
-                  DGHS Accredited
-                </span>
-                <span style={{ fontSize: '12px', color: '#64748B' }}>
-                  License: {hospital.tradeLicenseNumber || 'TRAD/2026/091'}
-                </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '10px',
+                  backgroundColor: '#EFF6FF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#0060FA',
+                  flexShrink: 0,
+                }}
+              >
+                <Building2 size={30} />
               </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                    {language === 'bn' && hospital.name_bn ? hospital.name_bn : hospital.name}
+                  </h1>
+                  {hospital.dghs_registration_number && (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        backgroundColor: '#ECFDF5',
+                        color: '#047857',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        border: '1px solid #A7F3D0',
+                      }}
+                    >
+                      <ShieldCheck size={13} />
+                      <span>DGHS Reg: {hospital.dghs_registration_number}</span>
+                    </span>
+                  )}
+                </div>
 
-              <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#0F172A', margin: '0 0 10px' }}>
-                {hospital.name}
-              </h1>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontSize: '14px', marginBottom: '16px' }}>
-                <MapPin size={16} color="#0060FA" />
-                <span>{mainBranch?.addressLine || 'Sylhet, Bangladesh'}</span>
-              </div>
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                <a
-                  href={`tel:${hospital.contactPhone}`}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: BRAND_COLORS.primary,
-                    color: '#FFFFFF',
-                    padding: '10px 18px',
-                    borderRadius: '10px',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                  }}
-                >
-                  <Phone size={15} />
-                  <span>Call Hospital: {hospital.contactPhone}</span>
-                </a>
-
-                <Link
-                  href="/hospital/portal"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: '#F1F5F9',
-                    color: '#0F172A',
-                    padding: '10px 18px',
-                    borderRadius: '10px',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                  }}
-                >
-                  <span>Hospital Staff Portal</span>
-                  <ArrowRight size={14} />
-                </Link>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontSize: '13px', marginTop: '6px' }}>
+                  <MapPin size={14} color="#0060FA" />
+                  <span>{hospital.name.includes('Moulvibazar') ? 'Moulvibazar, Sylhet Division' : 'Bangladesh'}</span>
+                </div>
               </div>
             </div>
+
+            {hospital.phone && (
+              <a
+                href={`tel:${hospital.phone}`}
+                className="btn-primary"
+                style={{ padding: '9px 18px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Phone size={14} />
+                <span>Call Hospital: {hospital.phone}</span>
+              </a>
+            )}
           </div>
         </div>
 
-        {/* Clinical Facilities & Key Features */}
+        {/* Hospital Facilities Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '16px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '14px',
             marginBottom: '32px',
           }}
         >
-          {[
-            { label: '24/7 Emergency Care', desc: 'Always open for trauma & emergency admissions', icon: HeartPulse, color: '#EF4444' },
-            { label: 'ICU & Critical Care', desc: 'State of the art multi-bed intensive care unit', icon: Bed, color: '#0060FA' },
-            { label: 'Specialist Chambers', desc: 'Daily outpatient consultations & serial booking', icon: Stethoscope, color: '#10B981' },
-            { label: 'Verified DGHS Status', desc: 'Official government healthcare registration', icon: ShieldCheck, color: '#8B5CF6' },
-          ].map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={idx}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '16px',
-                  padding: '18px',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
-                }}
-              >
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: `${item.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color, marginBottom: '10px' }}>
-                  <Icon size={20} />
-                </div>
-                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>{item.label}</div>
-                <div style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>{item.desc}</div>
-              </div>
-            );
-          })}
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '10px', padding: '16px', border: '1px solid #E2E8F0' }}>
+            <div style={{ color: '#64748B', fontSize: '12px' }}>Total Beds</div>
+            <strong style={{ fontSize: '18px', color: '#0F172A' }}>{hospital.total_beds || 'N/A'}</strong>
+          </div>
+
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '10px', padding: '16px', border: '1px solid #E2E8F0' }}>
+            <div style={{ color: '#64748B', fontSize: '12px' }}>ICU Beds</div>
+            <strong style={{ fontSize: '18px', color: '#0060FA' }}>{hospital.icu_beds || 'N/A'}</strong>
+          </div>
+
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '10px', padding: '16px', border: '1px solid #E2E8F0' }}>
+            <div style={{ color: '#64748B', fontSize: '12px' }}>Emergency Care</div>
+            <strong style={{ fontSize: '18px', color: hospital.has_emergency_24_7 ? '#10B981' : '#64748B' }}>
+              {hospital.has_emergency_24_7 ? '24/7 Available' : 'Standard Hours'}
+            </strong>
+          </div>
+
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '10px', padding: '16px', border: '1px solid #E2E8F0' }}>
+            <div style={{ color: '#64748B', fontSize: '12px' }}>NICU Unit</div>
+            <strong style={{ fontSize: '18px', color: hospital.has_nicu ? '#10B981' : '#64748B' }}>
+              {hospital.has_nicu ? 'Equipped' : 'Not Available'}
+            </strong>
+          </div>
         </div>
 
-        {/* Affiliated Specialist Doctors */}
+        {/* Affiliated Doctors Section */}
         <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Stethoscope size={20} color="#0060FA" />
-            <span>{language === 'bn' ? 'হাসপাতালে উপস্থিত বিশেষজ্ঞ চিকিৎসকগণ' : 'Specialist Doctors with Chambers at this Hospital'}</span>
+          <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '16px' }}>
+            {language === 'bn' ? 'চেম্বার চিকিৎসকবৃন্দ' : 'Consulting Physicians'}
           </h2>
 
-          {affiliatedAssocs.length > 0 ? (
+          {affiliatedDoctors.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-              {affiliatedAssocs.map((assoc) => (
+              {affiliatedDoctors.map((doc) => (
                 <div
-                  key={assoc.id}
+                  key={doc.id}
                   style={{
                     backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
-                    padding: '20px',
+                    borderRadius: '10px',
+                    padding: '18px',
                     border: '1px solid #E2E8F0',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
                   }}
                 >
-                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>
-                    {assoc.doctor?.fullName || 'Specialist Consultant'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                      {doc.fullName}
+                    </h3>
+                    <CheckCircle2 size={14} color="#10B981" />
                   </div>
-                  <div style={{ fontSize: '13px', color: '#0060FA', fontWeight: 600, marginBottom: '8px' }}>
-                    {assoc.doctor?.specialization || 'Clinical Specialist'}
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0060FA', marginTop: '2px' }}>
+                    {doc.specialization}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#64748B', marginBottom: '12px' }}>
-                    Chamber: {assoc.chamberRoomNumber} • Fee: ৳{assoc.consultationFee}
+                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
+                    {doc.qualifications}
                   </div>
-                  <Link
-                    href={`/doctors/${assoc.doctorId}`}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: BRAND_COLORS.primary,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <span>View Chamber Schedule & Book</span>
-                    <ArrowRight size={14} />
-                  </Link>
+                  <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#64748B' }}>Fee: ৳{doc.consultationFee}</span>
+                    <Link href={`/doctors/${doc.id}`} className="btn-primary" style={{ padding: '6px 12px', fontSize: '12px' }}>
+                      Book Serial
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div style={{ backgroundColor: '#FFFFFF', padding: '24px', borderRadius: '16px', border: '1px solid #E2E8F0', color: '#64748B', fontSize: '14px' }}>
+            <div style={{ padding: '24px', backgroundColor: '#FFFFFF', borderRadius: '10px', border: '1px solid #E2E8F0', color: '#64748B', fontSize: '13.5px', textAlign: 'center' }}>
               {language === 'bn'
-                ? 'অনলাইন সিরিয়াল বুকিং বর্তমানে চালুকৃত ডাক্তারদের জন্য উন্মুক্ত রয়েছে।'
-                : 'Doctors are available for walk-in OPD consultations and emergency intake 24/7. Call hospital helpline for appointment serial details.'}
+                ? 'এই হাসপাতালে কোনো ডাক্তার চেম্বার শিডিউল এখনো অনলাইন করা হয়নি।'
+                : 'No doctor chamber schedules currently registered online for this hospital.'}
             </div>
           )}
         </div>

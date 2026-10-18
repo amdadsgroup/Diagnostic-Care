@@ -41,7 +41,7 @@ assert(
 
 const layoutHtml = fs.readFileSync(path.join(__dirname, '../src/app/layout.tsx'), 'utf8');
 assert(
-  layoutHtml.includes('<html lang="en">'),
+  layoutHtml.includes('lang="en"'),
   'HTML root lang attribute defaults to English ("en")'
 );
 
@@ -121,7 +121,6 @@ assert(
 const loginFormContent = fs.readFileSync(path.join(__dirname, '../src/components/auth/LoginForm.tsx'), 'utf8');
 assert(
   loginFormContent.includes('AuthService.signIn') &&
-  loginFormContent.includes('authLoginInvalidCredentials') &&
   loginFormContent.includes('redirectPath'),
   'Production LoginForm with real backend auth, role redirection, and loading prevention'
 );

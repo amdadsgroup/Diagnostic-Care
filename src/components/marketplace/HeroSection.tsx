@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { BRAND_CONSTANTS, BRAND_COLORS, SupportedLanguage } from '@/config/brand';
-import { BrandSymbol } from '@/components/brand/BrandSymbol';
+import React from 'react';
+import Link from 'next/link';
+import { SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { useLanguage } from '@/context/LanguageContext';
 import {
@@ -11,15 +11,10 @@ import {
   Stethoscope,
   TestTube2,
   Building2,
-  Ambulance,
-  Phone,
-  Clock,
-  ShieldCheck,
-  Activity,
   ArrowRight,
-  TrendingUp,
-  CheckCircle2,
+  ShieldCheck,
   CalendarCheck,
+  Activity,
 } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -40,543 +35,301 @@ export default function HeroSection({
   selectedDistrict,
   setSelectedDistrict,
   onSearchSubmit,
-  onOpenHelpline,
   onSelectCategory,
 }: HeroSectionProps) {
   const langContext = useLanguage();
   const language = propLanguage || langContext.language || 'en';
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
-  const [activeSearchTab, setActiveSearchTab] = useState<string>('ALL');
 
-  const popularSearches = [
-    { labelEn: 'Cardiologist (Heart Specialist)', labelBn: 'হৃদরোগ বিশেষজ্ঞ (কার্ডিওলজিস্ট)', query: 'Cardiology' },
-    { labelEn: 'Gynecologist in Moulvibazar', labelBn: 'স্ত্রী ও প্রসূতিরোগ বিশেষজ্ঞ', query: 'Gynecologist' },
-    { labelEn: 'Pediatrician (Child Specialist)', labelBn: 'শিশু রোগ বিশেষজ্ঞ', query: 'Pediatrics' },
-    { labelEn: 'Medicine & Diabetologist', labelBn: 'মেডিসিন ও ডায়াবেটিস বিশেষজ্ঞ', query: 'Medicine' },
-    { labelEn: 'Orthopedic Surgeon', labelBn: 'অর্থোপেডিক ও ট্রমা বিশেষজ্ঞ', query: 'Orthopedics' },
+  const popularSpecialties = [
+    { labelEn: 'Cardiology', labelBn: 'কার্ডিওলজি (হৃদরোগ)', query: 'Cardiology' },
+    { labelEn: 'Medicine', labelBn: 'মেডিসিন', query: 'Medicine' },
+    { labelEn: 'Gynecology', labelBn: 'স্ত্রী ও প্রসূতিরোগ', query: 'Gynecologist' },
+    { labelEn: 'Pediatrics', labelBn: 'শিশু রোগ', query: 'Pediatrics' },
+    { labelEn: 'Orthopedics', labelBn: 'অর্থোপেডিকস', query: 'Orthopedics' },
+  ];
+
+  const serviceCategories = [
+    {
+      href: '/doctors',
+      icon: Stethoscope,
+      titleEn: 'Specialist Doctors',
+      titleBn: 'বিশেষজ্ঞ ডাক্তার',
+      descEn: 'Consultation & Serials',
+      descBn: 'চেম্বার অ্যাপয়েন্টমেন্ট',
+    },
+    {
+      href: '/diagnostic-centers',
+      icon: TestTube2,
+      titleEn: 'Diagnostic Centers',
+      titleBn: 'ডায়াগনস্টিক সেন্টার',
+      descEn: 'Pathology & Imaging',
+      descBn: 'প্যাথলজি ও ল্যাব টেস্ট',
+    },
+    {
+      href: '/hospitals',
+      icon: Building2,
+      titleEn: 'Hospitals & Clinics',
+      titleBn: 'হাসপাতাল ও ক্লিনিক',
+      descEn: 'Verified Inpatient Care',
+      descBn: 'অনুমোদিত স্বাস্থ্য কেন্দ্র',
+    },
+    {
+      href: '/diagnostic-tests',
+      icon: Activity,
+      titleEn: 'Diagnostic Tests',
+      titleBn: 'মেডিকেল টেস্ট',
+      descEn: 'Price Catalog & Booking',
+      descBn: 'টেস্ট তালিকা ও বুকিং',
+    },
   ];
 
   return (
     <section
       id="hero-section"
       style={{
-        position: 'relative',
-        backgroundColor: 'var(--brand-bg)',
-        backgroundImage:
-          'radial-gradient(circle at 10% 20%, rgba(0, 96, 250, 0.09) 0%, transparent 45%), radial-gradient(circle at 90% 80%, rgba(235, 243, 255, 0.7) 0%, transparent 45%)',
-        padding: '56px 0 64px 0',
-        borderBottom: '1px solid var(--glass-border)',
-        overflow: 'hidden',
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid var(--border-subtle)',
+        padding: '44px 0 36px 0',
       }}
     >
-      {/* Soft Ambient Glow Elements */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-80px',
-          right: '5%',
-          width: '450px',
-          height: '450px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0, 96, 250, 0.1) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '-100px',
-          left: '2%',
-          width: '380px',
-          height: '380px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(235, 243, 255, 0.8) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }}
-      />
+      <div className="container">
+        <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }}>
+          {/* Marketplace Title & Tagline */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              backgroundColor: '#EFF6FF',
+              color: '#0060FA',
+              fontSize: '12px',
+              fontWeight: 600,
+              marginBottom: '14px',
+              border: '1px solid #BFDBFE',
+            }}
+          >
+            <ShieldCheck size={14} />
+            <span>{language === 'en' ? 'Your Healthcare Marketplace' : 'আপনার স্বাস্থ্যসেবা মার্কেটপ্লেস'}</span>
+          </div>
 
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        <div className="hero-grid-responsive">
-          {/* Left Column: Headline, Reassurance, Clean Search */}
-          <div style={{ maxWidth: '100%', minWidth: 0 }}>
-            {/* Main Headline */}
-            <h1
-              style={{
-                fontSize: 'clamp(22px, 3.2vw + 6px, 36px)',
-                fontWeight: 800,
-                lineHeight: 1.25,
-                letterSpacing: '-0.02em',
-                marginBottom: '14px',
-                color: '#090D14',
-                wordBreak: 'normal',
-                overflowWrap: 'break-word',
-                maxWidth: '100%',
+          <h1
+            style={{
+              fontSize: 'clamp(24px, 3.5vw + 8px, 38px)',
+              fontWeight: 800,
+              lineHeight: 1.22,
+              letterSpacing: '-0.025em',
+              color: '#0F172A',
+              marginBottom: '12px',
+            }}
+          >
+            {language === 'en'
+              ? 'Find Doctors, Hospitals & Diagnostic Centers in Bangladesh'
+              : 'বাংলাদেশে ডাক্তার, হাসপাতাল ও ডায়াগনস্টিক সেন্টার খুঁজুন'}
+          </h1>
+
+          <p
+            style={{
+              fontSize: 'clamp(14px, 1.8vw, 16px)',
+              color: '#475569',
+              lineHeight: 1.6,
+              maxWidth: '680px',
+              margin: '0 auto 28px auto',
+            }}
+          >
+            {language === 'en'
+              ? 'Search verified medical specialists, explore accredited healthcare facilities, and book genuine consultation appointments with zero hidden fees.'
+              : 'অভিজ্ঞ বিশেষজ্ঞ ডাক্তার খুঁজুন, নির্ভরযোগ্য হাসপাতাল ও ডায়াগনস্টিক সেন্টারের সেবা দেখুন এবং সরাসরি অ্যাপয়েন্টমেন্ট নিশ্চিত করুন।'}
+          </p>
+
+          {/* Unified Primary Search Interface */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              border: '1px solid #CBD5E1',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03)',
+              padding: '6px',
+              marginBottom: '20px',
+            }}
+          >
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSearchSubmit();
               }}
-            >
-              {language === 'en' ? 'Find the Right Doctor, Book Instant Chamber Serial.' : 'সঠিক ডাক্তার খুঁজুন, তাৎক্ষণিক চেম্বার সিরিয়াল বুক করুন।'}
-            </h1>
-
-            {/* Subheadline */}
-            <p
               style={{
-                fontSize: 'clamp(13px, 2.5vw, 15px)',
-                color: '#627680',
-                lineHeight: 1.6,
-                maxWidth: '620px',
-                marginBottom: '20px',
-                overflowWrap: 'break-word',
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'center',
+                flexWrap: 'nowrap',
+                width: '100%',
               }}
+              className="hero-search-form"
             >
-              {language === 'en' 
-                ? 'Discover verified specialist doctors, check real-time chamber schedules, and confirm your appointment with guaranteed slot reservation.'
-                : 'অভিজ্ঞ ডাক্তার খুঁজুন, চেম্বারের সময়সূচী দেখুন এবং সহজে নির্ভরযোগ্য অ্যাপয়েন্টমেন্ট বুক করুন।'}
-            </p>
-
-            {/* Quick Action CTAs */}
-            <div className="hero-cta-group">
-              <a
-                href="/doctors"
-                className="btn-primary hero-cta-btn"
-              >
-                <Stethoscope size={15} />
-                <span>{language === 'en' ? 'Find a Doctor' : 'ডাক্তার খুঁজুন'}</span>
-              </a>
-              <button
-                onClick={() => {
-                  const el = document.getElementById('doctor-discovery-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  else window.location.href = '/doctors';
-                }}
-                className="btn-outline hero-cta-btn"
-              >
-                <Activity size={15} color="#0060FA" />
-                <span>{language === 'en' ? 'Chamber Schedules & Queue' : 'চেম্বার শিডিউল ও কিউ'}</span>
-              </button>
-              <a
-                href="/appointments"
-                className="btn-outline hero-cta-btn"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                }}
-              >
-                <CalendarCheck size={15} color="#0060FA" />
-                <span>{language === 'en' ? 'My Appointments' : 'অ্যাপয়েন্টমেন্ট'}</span>
-              </a>
-            </div>
-
-            {/* Clean Healthcare Glassmorphic Search Card */}
-            <div
-              className="glass-card"
-              style={{
-                padding: '16px',
-                marginBottom: '20px',
-              }}
-            >
-              {/* Category Filter Tabs: Doctor Specialties */}
+              {/* Keyword / Doctor / Specialty / Test Query */}
               <div
-                className="hero-tabs-scroll"
                 style={{
+                  flex: '1 1 auto',
+                  minWidth: 0,
                   display: 'flex',
-                  gap: '8px',
-                  padding: '4px 4px 14px 4px',
-                  borderBottom: '1.5px solid rgba(226, 234, 244, 0.7)',
-                  overflowX: 'auto',
-                  WebkitOverflowScrolling: 'touch',
-                  maxWidth: '100%',
+                  alignItems: 'center',
+                  padding: '11px 16px',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '10px',
+                  border: '1px solid #E2E8F0',
                 }}
               >
-                {[
-                  { id: 'ALL', label: language === 'en' ? 'All Specialties' : 'সকল বিভাগ' },
-                  { id: 'Cardiology', label: language === 'en' ? 'Cardiology' : 'কার্ডিওলজি (হৃদরোগ)' },
-                  { id: 'Medicine', label: language === 'en' ? 'Medicine' : 'মেডিসিন' },
-                  { id: 'Gynecologist', label: language === 'en' ? 'Gynecology' : 'স্ত্রী ও প্রসূতিরোগ' },
-                  { id: 'Pediatrics', label: language === 'en' ? 'Pediatrics' : 'শিশু রোগ' },
-                  { id: 'Orthopedics', label: language === 'en' ? 'Orthopedics' : 'অর্থোপেডিকস' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveSearchTab(item.id);
-                      if (onSelectCategory && item.id !== 'ALL') {
-                        onSelectCategory(item.id);
-                      }
-                    }}
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={
+                    language === 'en'
+                      ? 'Search doctor, specialty, hospital, or diagnostic test...'
+                      : 'ডাক্তারের নাম, বিভাগ, হাসপাতাল বা টেস্ট খুঁজুন...'
+                  }
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#0F172A',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    outline: 'none',
+                    width: '100%',
+                  }}
+                />
+              </div>
+
+              {/* Submit Action: Search icon beside search box */}
+              <button
+                type="submit"
+                className="btn-primary hero-search-btn"
+                aria-label={language === 'en' ? 'Search' : 'খুঁজুন'}
+                style={{
+                  padding: '11px 22px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  borderRadius: '10px',
+                }}
+              >
+                <Search size={18} />
+                <span className="hero-search-btn-label">
+                  {language === 'en' ? 'Search' : 'খুঁজুন'}
+                </span>
+              </button>
+            </form>
+          </div>
+
+          {/* Frequently Searched Specialties */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              flexWrap: 'wrap',
+              marginBottom: '32px',
+            }}
+          >
+            <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>
+              {language === 'en' ? 'Popular:' : 'জনপ্রিয়:'}
+            </span>
+            {popularSpecialties.map((item, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setSearchQuery(item.query);
+                  if (onSelectCategory) onSelectCategory(item.query);
+                }}
+                style={{
+                  fontSize: '11.5px',
+                  fontWeight: 500,
+                  color: '#334155',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease',
+                }}
+              >
+                {language === 'en' ? item.labelEn : item.labelBn}
+              </button>
+            ))}
+          </div>
+
+          {/* 4 Frequently Used Core Service Categories */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+              gap: '12px',
+              textAlign: 'left',
+            }}
+          >
+            {serviceCategories.map((cat, idx) => {
+              const Icon = cat.icon;
+              return (
+                <Link
+                  key={idx}
+                  href={cat.href}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#93C5FD';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 96, 250, 0.06)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#E2E8F0';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <div
                     style={{
-                      padding: '7px 16px',
-                      borderRadius: '9999px',
-                      fontSize: '12.5px',
-                      fontWeight: 700,
-                      background: activeSearchTab === item.id ? 'linear-gradient(135deg, #0060FA 0%, #004ED1 100%)' : 'rgba(255, 255, 255, 0.85)',
-                      color: activeSearchTab === item.id ? '#FFFFFF' : '#627680',
-                      border: activeSearchTab === item.id ? '1px solid rgba(255, 255, 255, 0.45)' : '1px solid var(--glass-border)',
-                      boxShadow: activeSearchTab === item.id ? '0 4px 12px rgba(0, 96, 250, 0.3)' : 'var(--glass-shadow-sm)',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                      cursor: 'pointer',
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '8px',
+                      backgroundColor: '#EFF6FF',
+                      color: '#0060FA',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Input Row: Location Select + Search Input + Search Action */}
-              <div className="hero-search-inputs-row">
-                {/* Location Filter Selector */}
-                <div
-                  className="glass-inset hero-input-district"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '10px 14px',
-                    borderRadius: '12px',
-                  }}
-                >
-                  <MapPin size={16} color="#0060FA" />
-                  <select
-                    id="hero-district-select"
-                    value={selectedDistrict}
-                    onChange={(e) => setSelectedDistrict(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#090D14',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      outline: 'none',
-                      cursor: 'pointer',
-                      width: '100%',
-                    }}
-                  >
-                    <option value="Moulvibazar">{t.filterMoulvibazar}</option>
-                    <option value="Sylhet">{t.filterSylhet}</option>
-                    <option value="Dhaka">{t.filterDhaka}</option>
-                    <option value="ALL">{t.filterAllDistricts}</option>
-                  </select>
-                </div>
-
-                {/* Primary Query Input */}
-                <div
-                  className="glass-inset hero-input-query"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    flex: 1,
-                    padding: '10px 16px',
-                    borderRadius: '12px',
-                    minWidth: 0,
-                  }}
-                >
-                  <Search size={17} color="#0060FA" />
-                  <input
-                    type="text"
-                    id="hero-universal-search-input"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()}
-                    placeholder={t.searchPlaceholder}
-                    style={{
-                      width: '100%',
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      color: '#090D14',
-                      fontSize: '13.5px',
-                      fontWeight: 500,
-                    }}
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      style={{ color: '#8FA0AA', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-
-                {/* Submit Action */}
-                <button
-                  id="hero-execute-search-btn"
-                  onClick={onSearchSubmit}
-                  className="btn-primary hero-btn-search"
-                  style={{
-                    padding: '11px 24px',
-                    fontSize: '13.5px',
-                    flexShrink: 0,
-                  }}
-                >
-                  <span>{t.searchButton}</span>
-                  <ArrowRight size={15} />
-                </button>
-              </div>
-            </div>
-
-            {/* Trending / Popular Healthcare Searches */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: '#0060FA',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-              >
-                <TrendingUp size={13} />
-                {t.popularSearchesLabel}
-              </span>
-              {popularSearches.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSearchQuery(item.query)}
-                  className="glass-pill"
-                  style={{
-                    fontSize: '11.5px',
-                    padding: '5px 12px',
-                    cursor: 'pointer',
-                    color: '#090D14',
-                  }}
-                >
-                  {language === 'en' ? item.labelEn : item.labelBn}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column: Clean, Reassuring Healthcare Telemetry & Trust Card */}
-          <div style={{ position: 'relative' }}>
-            <div
-              className="glass-card"
-              style={{
-                padding: '24px',
-                position: 'relative',
-              }}
-            >
-              {/* Card Header */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  paddingBottom: '16px',
-                  borderBottom: '1px solid var(--glass-border)',
-                  marginBottom: '18px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <BrandSymbol size={26} altText="Diagnostic Care" />
-                  <span style={{ fontSize: '14.5px', fontWeight: 800, color: '#090D14', letterSpacing: '-0.01em' }}>
-                    {t.telemetryTitle}
-                  </span>
-                </div>
-                <div
-                  className="glass-badge-teal"
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: '9999px',
-                    border: '1px solid rgba(0, 96, 250, 0.25)',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: '7px',
-                      height: '7px',
-                      borderRadius: '50%',
-                      backgroundColor: '#15803D',
-                      display: 'inline-block',
-                      boxShadow: '0 0 6px #15803D',
-                    }}
-                  />
-                  <span style={{ fontSize: '11px', fontWeight: 800 }}>LIVE NETWORK</span>
-                </div>
-              </div>
-
-              {/* Verified Features / Real Status Nodes */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {/* Node 1: Active Doctor Chamber */}
-                <div
-                  className="glass-card-sm"
-                  onClick={() => { window.location.href = '/doctors'; }}
-                  style={{
-                    padding: '14px 18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                  title={language === 'en' ? 'Click to browse verified specialist doctors' : 'ডাক্তার তালিকা দেখতে ক্লিক করুন'}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div
-                      style={{
-                        width: '42px',
-                        height: '42px',
-                        borderRadius: '12px',
-                        backgroundColor: 'var(--brand-fresh-mint)',
-                        color: '#0060FA',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '1px solid rgba(0, 96, 250, 0.2)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Stethoscope size={20} />
+                    <Icon size={18} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+                      {language === 'en' ? cat.titleEn : cat.titleBn}
                     </div>
-                    <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#090D14' }}>
-                        {language === 'en' ? 'Specialist Doctor Chambers' : 'বিশেষজ্ঞ ডাক্তার চেম্বার'}
-                      </div>
-                      <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
-                        {language === 'en' ? 'Verified BMDC Physicians • Live Queues' : 'ভেরিফাইড বিএমডিসি ডাক্তার • লাইভ কিউ'}
-                      </div>
+                    <div style={{ fontSize: '11px', color: '#64748B' }}>
+                      {language === 'en' ? cat.descEn : cat.descBn}
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span
-                      className="glass-badge-teal"
-                      style={{
-                        fontSize: '10.5px',
-                        padding: '4px 10px',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      {language === 'en' ? 'LIVE PLATFORM' : 'সক্রিয় প্ল্যাটফর্ম'}
-                    </span>
-                    <div style={{ fontSize: '11px', color: '#0060FA', marginTop: '3px', fontWeight: 700 }}>
-                      {language === 'en' ? 'Instant Booking →' : 'তাৎক্ষণিক বুকিং →'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Node 2: Live Queue Chamber Status */}
-                <div
-                  className="glass-card-sm"
-                  onClick={() => { window.location.href = '/?tab=queue'; }}
-                  style={{
-                    padding: '14px 18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                  title={language === 'en' ? 'Click to view real-time chamber serial tracking' : 'লাইভ কিউ দেখতে ক্লিক করুন'}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div
-                      style={{
-                        width: '42px',
-                        height: '42px',
-                        borderRadius: '12px',
-                        backgroundColor: 'rgba(180, 83, 9, 0.1)',
-                        color: '#B45309',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '1px solid rgba(180, 83, 9, 0.2)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Clock size={20} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#090D14' }}>
-                        Live Chamber Queue Engine
-                      </div>
-                      <div style={{ fontSize: '11.5px', color: '#627680', fontWeight: 500 }}>
-                        4 Patients in Waiting Room • ~15m Wait
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '14.5px', fontWeight: 800, color: '#B45309' }}>
-                      Token #03 Next
-                    </div>
-                    <div style={{ fontSize: '10.5px', color: '#627680', fontWeight: 600 }}>5-Min Atomic Slot Lock</div>
-                  </div>
-                </div>
-
-                {/* Node 3: Lab Report Turnaround & Emergency Ambulance */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '12px',
-                  }}
-                >
-                  {/* Lab Telemetry */}
-                  <div
-                    className="glass-card-sm"
-                    style={{
-                      padding: '14px 16px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0060FA', marginBottom: '6px' }}>
-                      <TestTube2 size={16} />
-                      <span style={{ fontSize: '12px', fontWeight: 800 }}>Pathology Lab</span>
-                    </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>4 Hours</div>
-                    <div style={{ fontSize: '11px', color: '#627680', fontWeight: 500 }}>Avg. CBC & Urine Delivery</div>
-                  </div>
-
-                  {/* Ambulance Readiness */}
-                  <div
-                    className="glass-card-sm"
-                    style={{
-                      padding: '14px 16px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#B91C1C', marginBottom: '6px' }}>
-                      <Ambulance size={16} />
-                      <span style={{ fontSize: '12px', fontWeight: 800 }}>Ambulance 24/7</span>
-                    </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>12 Mins</div>
-                    <div style={{ fontSize: '11px', color: '#627680', fontWeight: 500 }}>Avg. Response in Moulvibazar</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Reassurance Bar */}
-              <div
-                style={{
-                  marginTop: '18px',
-                  paddingTop: '16px',
-                  borderTop: '1px solid var(--glass-border)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  fontSize: '11.5px',
-                  color: '#627680',
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ShieldCheck size={16} color="#15803D" />
-                  <span style={{ fontWeight: 700, color: '#090D14' }}>BMDC Registered & DGHS Verified</span>
-                </span>
-                <button
-                  onClick={onOpenHelpline}
-                  className="glass-pill"
-                  style={{
-                    color: '#0060FA',
-                    fontWeight: 700,
-                    fontSize: '11.5px',
-                    padding: '5px 12px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Tele-Desk Support →
-                </button>
-              </div>
-            </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

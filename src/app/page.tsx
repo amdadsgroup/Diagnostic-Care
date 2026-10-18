@@ -22,16 +22,14 @@ import LiveQueueTracker from '@/components/queue/LiveQueueTracker';
 import PrescriptionSlipModal from '@/components/prescription/PrescriptionSlipModal';
 import PaymentModal from '@/components/payment/PaymentModal';
 import LedgerViewer from '@/components/finance/LedgerViewer';
-import AdvancedSearchFilter from '@/components/search/AdvancedSearchFilter';
 import VerifiedReviewsModal from '@/components/reviews/VerifiedReviewsModal';
 import ProviderAnalyticsDashboard from '@/components/analytics/ProviderAnalyticsDashboard';
 import HelplineBookingConsole from '@/components/support/HelplineBookingConsole';
-import CategoryNavigator, { HealthcareCategoryKey } from '@/components/marketplace/CategoryNavigator';
+import type { HealthcareCategoryKey } from '@/components/marketplace/CategoryNavigator';
 import SupportTicketModal from '@/components/support/SupportTicketModal';
 import ComprehensiveAdminConsole from '@/components/admin/ComprehensiveAdminConsole';
 import HeroSection from '@/components/marketplace/HeroSection';
-import TrustSection from '@/components/marketplace/TrustSection';
-import MapDiscovery from '@/components/marketplace/MapDiscovery';
+import EightDivisionsSection from '@/components/marketplace/EightDivisionsSection';
 import MobileNavigation, { ActiveNavTab } from '@/components/navigation/MobileNavigation';
 import MobileAppointmentsView from '@/components/patient/MobileAppointmentsView';
 import MobileHealthVaultView from '@/components/patient/MobileHealthVaultView';
@@ -80,9 +78,14 @@ function UrlSyncHandler({
   onCategoryChange: (cat: HealthcareCategoryKey) => void;
 }) {
   const searchParams = useSearchParams();
+  const lastHandledRef = React.useRef<string>('');
 
   useEffect(() => {
     if (!searchParams) return;
+    const currentParams = searchParams.toString();
+    if (lastHandledRef.current === currentParams) return;
+    lastHandledRef.current = currentParams;
+
     const action = searchParams.get('action');
     const tab = searchParams.get('tab');
     const category = searchParams.get('category');
@@ -131,9 +134,9 @@ export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
   const [appState, setAppState] = useState(INITIAL_APP_STATE);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('Moulvibazar');
+  const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [selectedSpecialty, setSelectedSpecialty] = useState('ALL');
-  const [selectedLocation, setSelectedLocation] = useState('Moulvibazar Sadar');
+  const [selectedLocation, setSelectedLocation] = useState('Dhaka');
 
   // Modal State
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
@@ -484,9 +487,7 @@ export default function HomePage() {
         }}
         onOpenOnboard={() => {
           if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('open-hospital-portal', { detail: { mode: 'register' } }));
-            const el = document.getElementById('provider-hub');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
+            window.location.href = '/provider/login?role=hospital&mode=register';
           }
         }}
         selectedLocation={selectedLocation}
@@ -918,7 +919,7 @@ export default function HomePage() {
                   <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '14px' }}>
                     {BRAND_CONSTANTS.BRAND_NAME}
                   </div>
-                  <div>{BRAND_CONSTANTS.INITIAL_LAUNCH_LOCATION} Hub • Bangladesh</div>
+                  <div>Digital Healthcare Network • Bangladesh</div>
                   <div>Helpline: {BRAND_CONSTANTS.CUSTOMER_CARE_PHONE}</div>
                 </div>
               </div>
@@ -939,7 +940,7 @@ export default function HomePage() {
               >
                 <div>Patient: <strong>{currentUser?.fullName || (language === 'en' ? 'Verified Patient' : 'সম্মানিত রোগী')}</strong> {currentUser?.phone ? `(${currentUser.phone})` : ''}</div>
                 <div>Date: <strong>Today</strong></div>
-                <div>Rx ID: <strong>RX-MB-2026-891</strong></div>
+                <div>Rx ID: <strong>RX-BD-2026-891</strong></div>
               </div>
 
               {/* Clinical Notes & Medications */}
@@ -1026,14 +1027,13 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* PRIMARY MARKETPLACE TAB (Fully Synchronized Across Mobile & Desktop) */}
+        {/* PRIMARY MARKETPLACE TAB (Clean, Mobile First, Database-Driven) */}
         {activeTab === 'marketplace' && (
           <div>
-            {/* HERO SECTION WITH AI SEARCH COMMAND & REAL-TIME MEDICAL TELEMETRY */}
-              <HeroSection
-                language={language}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
+            <HeroSection
+              language={language}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
               selectedDistrict={selectedDistrict}
               setSelectedDistrict={setSelectedDistrict}
               onSearchSubmit={() => {
@@ -1046,301 +1046,451 @@ export default function HomePage() {
               onSelectCategory={(cat) => handleCategorySelection(cat)}
             />
 
-            {/* TRUST & VERIFICATION METRICS STRIP */}
-            <TrustSection language={language} />
+            {/* NATIONWIDE 8 ADMINISTRATIVE DIVISIONS DISCOVERY SECTION */}
+            <EightDivisionsSection
+              language={language}
+              activeDivision={selectedDistrict !== 'ALL' ? selectedDistrict : undefined}
+              onSelectDivision={(slug) => {
+                setSelectedDistrict(slug.charAt(0).toUpperCase() + slug.slice(1));
+                const resultsSection = document.getElementById('doctor-discovery-section');
+                if (resultsSection) {
+                  resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            />
 
-            {/* DOCTOR SPECIALTIES NAVIGATOR */}
-            <section className="container" style={{ padding: '36px 24px 0 24px' }}>
-              <CategoryNavigator
-                language={language}
-                activeCategory={activeCategory}
-                onSelectCategory={(cat) => handleCategorySelection(cat)}
-                onOpenSupportModal={() => setIsSupportModalOpen(true)}
-              />
-            </section>
-
-            {/* ADVANCED MULTI-CRITERIA SEARCH ENGINE */}
-            <section className="container" style={{ padding: '16px 24px 0 24px' }}>
-              <AdvancedSearchFilter onSelectResult={handleSearchSelectResult} />
-            </section>
-
-            {/* SPECIALIST DOCTORS SECTION */}
-            <section id="doctor-discovery-section" className="container" style={{ padding: '52px 24px' }}>
+            {/* REAL DATABASE-DRIVEN DOCTOR DISCOVERY SECTION */}
+            <section id="doctor-discovery-section" className="container" style={{ padding: '40px 16px' }}>
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'flex-end',
-                  marginBottom: '28px',
+                  alignItems: 'center',
+                  marginBottom: '24px',
                   flexWrap: 'wrap',
-                  gap: '16px',
+                  gap: '12px',
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#0891B2', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
-                    VERIFIED MEDICAL CHAMBERS
-                  </div>
-                  <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--navy-900)', letterSpacing: '-0.02em' }}>
-                    {t.sectionDoctorsTitle}
+                  <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                    {language === 'en' ? 'Available Specialist Doctors' : 'উপলব্ধ বিশেষজ্ঞ চিকিৎসকবৃন্দ'}
                   </h2>
-                  <p style={{ color: 'var(--slate-500)', fontSize: '14px', marginTop: '3px' }}>
-                    {t.sectionDoctorsSubtitle}
+                  <p style={{ color: '#64748B', fontSize: '13.5px', marginTop: '2px' }}>
+                    {language === 'en'
+                      ? 'Verified BMDC registered practitioners with confirmed chamber schedules.'
+                      : 'বিএমডিসি নিবন্ধিত বিশেষজ্ঞ ডাক্তারদের চেম্বার শিডিউল ও সরাসরি সিরিয়াল বুকিং।'}
                   </p>
                 </div>
 
-                {/* Actions & Filter tags */}
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  {['ALL', 'Cardiologist', 'Gynecologist', 'Medicine'].map((spec) => (
-                    <button
-                      key={spec}
-                      onClick={() => setSelectedSpecialty(spec)}
-                      style={{
-                        padding: '7px 16px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        backgroundColor: selectedSpecialty === spec ? 'var(--navy-900)' : 'var(--slate-100)',
-                        color: selectedSpecialty === spec ? '#FFFFFF' : 'var(--slate-700)',
-                        border: selectedSpecialty === spec ? '1px solid var(--navy-900)' : '1px solid var(--slate-200)',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      {spec === 'ALL' ? t.filterAllSpecialties : spec}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setIsDiagnosticCartOpen(true)}
-                    style={{
-                      padding: '7px 16px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      backgroundColor: 'var(--brand-teal-600)',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <span>🧪 {language === 'en' ? 'Book Lab Tests' : 'ল্যাব টেস্ট বুক করুন'}</span>
-                  </button>
-                  <button
-                    onClick={() => setIsFeedbackModalOpen(true)}
-                    style={{
-                      padding: '7px 14px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      backgroundColor: 'var(--slate-100)',
-                      color: 'var(--slate-700)',
-                      border: '1px solid var(--slate-300)',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <span>🐞 {language === 'en' ? 'Feedback / QA' : 'মতামত / ত্রুটি'}</span>
-                  </button>
                   <Link
                     href="/doctors"
                     style={{
-                      padding: '7px 16px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      backgroundColor: 'var(--brand-primary)',
-                      color: '#FFFFFF',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      backgroundColor: '#FFFFFF',
+                      color: '#0060FA',
+                      border: '1px solid #BFDBFE',
                       textDecoration: 'none',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '4px',
                     }}
                   >
-                    <span>{language === 'en' ? 'All Doctors' : 'সব ডাক্তার'}</span>
+                    <span>{language === 'en' ? 'View All Doctors' : 'সকল ডাক্তার দেখুন'}</span>
                     <ArrowRight size={13} />
                   </Link>
                 </div>
               </div>
 
-              {/* Doctors Grid */}
-              <div className="grid-cards">
-                {filteredAssociations.map((assoc) => {
-                  const doctor = assoc.doctor || appState.doctors.find((d) => d.id === assoc.doctorId) || appState.doctors[0];
-                  if (!doctor) return null;
-                  const dateKey = `${assoc.id}_${new Date().toISOString().split('T')[0]}`;
-                  const slots = appState.slots[dateKey] || [];
+              {/* Genuine Database Roster OR Clean Empty State */}
+              {filteredAssociations.length > 0 ? (
+                <div className="grid-cards">
+                  {filteredAssociations.map((assoc) => {
+                    const doctor = assoc.doctor || appState.doctors.find((d) => d.id === assoc.doctorId);
+                    if (!doctor) return null;
+                    const dateKey = `${assoc.id}_${new Date().toISOString().split('T')[0]}`;
+                    const slots = appState.slots[dateKey] || [];
 
-                  return (
-                    <div
-                      key={assoc.id}
-                      className="futuristic-card"
-                      style={{
-                        padding: '24px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div>
-                        {/* Doctor Info */}
-                        <div style={{ display: 'flex', gap: '16px', marginBottom: '18px' }}>
+                    return (
+                      <div
+                        key={assoc.id}
+                        className="glass-card"
+                        style={{
+                          padding: '20px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '12px',
+                          backgroundColor: '#FFFFFF',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', gap: '14px', marginBottom: '14px' }}>
+                            <div
+                              style={{
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '10px',
+                                backgroundColor: '#EFF6FF',
+                                color: '#0060FA',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                border: '1px solid #BFDBFE',
+                              }}
+                            >
+                              <Stethoscope size={24} />
+                            </div>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>
+                                  {doctor.fullName}
+                                </h3>
+                                <CheckCircle2 size={15} color="#10B981" />
+                              </div>
+                              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0060FA', marginTop: '1px' }}>
+                                {doctor.specialization}
+                              </div>
+                              <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
+                                {doctor.qualifications} {doctor.bmdcNumber ? `• BMDC: ${doctor.bmdcNumber}` : ''}
+                              </div>
+                            </div>
+                          </div>
+
                           <div
                             style={{
-                              width: '60px',
-                              height: '60px',
-                              borderRadius: '14px',
-                              backgroundColor: 'var(--cyan-50)',
-                              color: '#0891B2',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontWeight: 800,
-                              fontSize: '22px',
-                              flexShrink: 0,
-                              border: '1px solid rgba(6, 182, 212, 0.3)',
+                              backgroundColor: '#F8FAFC',
+                              borderRadius: '8px',
+                              padding: '10px 12px',
+                              fontSize: '12px',
+                              color: '#334155',
+                              marginBottom: '14px',
+                              border: '1px solid #E2E8F0',
                             }}
                           >
-                            <Stethoscope size={30} />
-                          </div>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                                {doctor.fullName}
-                              </h3>
-                              <CheckCircle2 size={17} color="#10B981" />
+                            <div style={{ fontWeight: 600, color: '#0F172A' }}>
+                              {assoc.organizationName}
                             </div>
-                            <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0891B2', marginTop: '2px' }}>
-                              {doctor.specialization}
+                            <div style={{ color: '#64748B', marginTop: '1px' }}>
+                              {assoc.branchName} {assoc.chamberRoomNumber ? `• ${assoc.chamberRoomNumber}` : ''}
                             </div>
-                            <div style={{ fontSize: '11.5px', color: 'var(--slate-500)', marginTop: '2px' }}>
-                              {doctor.qualifications} • BMDC: <strong>{doctor.bmdcNumber}</strong>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', paddingTop: '6px', borderTop: '1px solid #E2E8F0' }}>
+                              <span style={{ color: '#64748B' }}>{t.slotConsultationFee || 'Consultation Fee'}:</span>
+                              <strong style={{ color: '#10B981', fontSize: '14px' }}>
+                                {BRAND_CONSTANTS.CURRENCY_SYMBOL}{assoc.consultationFee}
+                              </strong>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
-                              <button
-                                onClick={() => setIsReviewsModalOpen(true)}
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                  fontSize: '11px',
-                                  fontWeight: 700,
-                                  color: '#B45309',
-                                  backgroundColor: '#FEF3C7',
-                                  padding: '3px 8px',
-                                  borderRadius: '12px',
-                                  border: '1px solid #FCD34D',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                ⭐ 4.9 (128 {language === 'en' ? 'Verified Reviews' : 'ভেরিফায়েড রিভিউ'})
-                              </button>
-                              <span
-                                style={{
-                                  fontSize: '10.5px',
-                                  fontWeight: 700,
-                                  color: '#047857',
-                                  background: 'var(--emerald-50)',
-                                  padding: '2px 7px',
-                                  borderRadius: '6px',
-                                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                                }}
-                              >
-                                {t.availableTodayBadge}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Chamber Location & Fee */}
-                        <div
-                          style={{
-                            backgroundColor: 'var(--slate-50)',
-                            borderRadius: '12px',
-                            padding: '12px 14px',
-                            fontSize: '12.5px',
-                            color: 'var(--slate-700)',
-                            marginBottom: '18px',
-                            border: '1px solid var(--slate-200)',
-                          }}
-                        >
-                          <div style={{ fontWeight: 700, color: 'var(--navy-900)' }}>
-                            {assoc.organizationName}
-                          </div>
-                          <div style={{ color: 'var(--slate-500)', marginTop: '2px', fontSize: '12px' }}>
-                            {assoc.branchName}, {assoc.chamberRoomNumber}
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--slate-200)' }}>
-                            <span style={{ fontSize: '12px', color: 'var(--slate-600)' }}>{t.slotConsultationFee}:</span>
-                            <strong style={{ color: '#047857', fontSize: '15px' }}>
-                              {BRAND_CONSTANTS.CURRENCY_SYMBOL}{assoc.consultationFee}
-                            </strong>
-                          </div>
-                        </div>
-
-                        {/* Real-Time Interactive Slots with 5-Min Hold */}
-                        <div>
-                          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Clock size={14} color="#0891B2" />
-                            <span>{t.slotSelectPrompt}</span>
                           </div>
 
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            {slots.slice(0, 8).map((slot) => {
-                              const isBooked = slot.status === 'CONFIRMED';
-                              const isHeld = slot.status === 'HELD';
-                              return (
-                                <button
-                                  key={slot.id}
-                                  disabled={isBooked}
-                                  onClick={() => handleSelectSlot(slot, assoc)}
-                                  style={{
-                                    padding: '7px 12px',
-                                    borderRadius: '8px',
-                                    fontSize: '12px',
-                                    fontWeight: 700,
-                                    border: isHeld
-                                      ? '1px solid #F59E0B'
-                                      : isBooked
-                                      ? '1px solid var(--slate-200)'
-                                      : '1px solid #0891B2',
-                                    backgroundColor: isHeld
-                                      ? 'var(--amber-50)'
-                                      : isBooked
-                                      ? 'var(--slate-100)'
-                                      : '#FFFFFF',
-                                    color: isHeld
-                                      ? '#B45309'
-                                      : isBooked
-                                      ? 'var(--slate-400)'
-                                      : 'var(--navy-900)',
-                                    textDecoration: isBooked ? 'line-through' : 'none',
-                                    cursor: isBooked ? 'not-allowed' : 'pointer',
-                                    transition: 'all 0.15s ease',
-                                  }}
-                                >
-                                  {slot.startTime} {isHeld ? `(${t.slotHeld})` : ''}
-                                </button>
-                              );
-                            })}
-                          </div>
+                          {slots.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#475569', marginBottom: '8px' }}>
+                                {language === 'en' ? 'Select Consultation Time:' : 'সময় নির্বাচন করুন:'}
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {slots.slice(0, 6).map((slot) => {
+                                  const isBooked = slot.status === 'CONFIRMED';
+                                  const isHeld = slot.status === 'HELD';
+                                  return (
+                                    <button
+                                      key={slot.id}
+                                      disabled={isBooked}
+                                      onClick={() => handleSelectSlot(slot, assoc)}
+                                      style={{
+                                        padding: '6px 10px',
+                                        borderRadius: '6px',
+                                        fontSize: '11.5px',
+                                        fontWeight: 600,
+                                        border: isHeld
+                                          ? '1px solid #F59E0B'
+                                          : isBooked
+                                          ? '1px solid #E2E8F0'
+                                          : '1px solid #CBD5E1',
+                                        backgroundColor: isHeld
+                                          ? '#FFFBEB'
+                                          : isBooked
+                                          ? '#F1F5F9'
+                                          : '#FFFFFF',
+                                        color: isHeld
+                                          ? '#B45309'
+                                          : isBooked
+                                          ? '#94A3B8'
+                                          : '#0F172A',
+                                        textDecoration: isBooked ? 'line-through' : 'none',
+                                        cursor: isBooked ? 'not-allowed' : 'pointer',
+                                      }}
+                                    >
+                                      {slot.startTime} {isHeld ? '(Hold)' : ''}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Clean, Useful Empty State */
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '12px',
+                    border: '1px solid #E2E8F0',
+                    padding: '48px 24px',
+                    textAlign: 'center',
+                    maxWidth: '580px',
+                    margin: '0 auto',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '10px',
+                      backgroundColor: '#EFF6FF',
+                      color: '#0060FA',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px auto',
+                    }}
+                  >
+                    <Stethoscope size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', marginBottom: '6px' }}>
+                    {language === 'en' ? 'No doctors listed for this filter yet' : 'এই অনুসন্ধানে কোনো ডাক্তার এখনো যুক্ত নেই'}
+                  </h3>
+                  <p style={{ color: '#64748B', fontSize: '13.5px', lineHeight: 1.5, marginBottom: '20px' }}>
+                    {language === 'en'
+                      ? 'Doctor appointments and chamber schedules are populated directly from verified provider registrations. Explore other healthcare categories or register as a provider.'
+                      : 'ডাক্তারদের অ্যাপয়েন্টমেন্ট ও চেম্বার সময়সূচী সরাসরি নিবন্ধিত স্বাস্থ্য প্রতিষ্ঠান থেকে যুক্ত হয়। অন্যান্য সেবা দেখুন বা প্রোভাইডার হিসেবে যোগ দিন।'}
+                  </p>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <Link
+                      href="/doctors"
+                      className="btn-primary"
+                      style={{ padding: '8px 18px', fontSize: '13px' }}
+                    >
+                      {language === 'en' ? 'Browse Full Directory' : 'পুরো তালিকা দেখুন'}
+                    </Link>
+                    <Link
+                      href="/provider/register"
+                      className="btn-outline"
+                      style={{ padding: '8px 18px', fontSize: '13px' }}
+                    >
+                      {language === 'en' ? 'Register as Doctor / Provider' : 'প্রোভাইডার হিসেবে নিবন্ধন'}
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* HOW IT WORKS SECTION */}
+            <section
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderTop: '1px solid #E2E8F0',
+                borderBottom: '1px solid #E2E8F0',
+                padding: '48px 16px',
+              }}
+            >
+              <div className="container" style={{ maxWidth: '980px', margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+                  <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                    {language === 'en' ? 'How Diagnostic Care Works' : 'ডায়াগনস্টিক কেয়ার যেভাবে কাজ করে'}
+                  </h2>
+                  <p style={{ color: '#64748B', fontSize: '13.5px', marginTop: '4px' }}>
+                    {language === 'en'
+                      ? 'Simple, transparent, and verified healthcare booking for patients and providers.'
+                      : 'রোগী ও স্বাস্থ্যসেবা প্রতিষ্ঠানের জন্য সহজ, নির্ভরযোগ্য ও স্বচ্ছ প্রক্রিয়া।'}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                    gap: '20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                      padding: '24px 20px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        backgroundColor: '#EFF6FF',
+                        color: '#0060FA',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '15px',
+                        marginBottom: '14px',
+                      }}
+                    >
+                      1
                     </div>
-                  );
-                })}
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', marginBottom: '6px' }}>
+                      {language === 'en' ? 'Search Verified Services' : 'যাচাইকৃত সেবা খুঁজুন'}
+                    </h3>
+                    <p style={{ color: '#64748B', fontSize: '13px', lineHeight: 1.5 }}>
+                      {language === 'en'
+                        ? 'Filter by location, medical specialty, diagnostic center, or specific pathology test with real transparent pricing.'
+                        : 'আপনার এলাকা, বিশেষজ্ঞ বিভাগ বা নির্দিষ্ট ডায়াগনস্টিক টেস্টের সঠিক মূল্য অনুযায়ী সহজে খুঁজুন।'}
+                    </p>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                      padding: '24px 20px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        backgroundColor: '#EFF6FF',
+                        color: '#0060FA',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '15px',
+                        marginBottom: '14px',
+                      }}
+                    >
+                      2
+                    </div>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', marginBottom: '6px' }}>
+                      {language === 'en' ? 'Lock Your Schedule' : 'সময় নির্ধারণ ও লক করুন'}
+                    </h3>
+                    <p style={{ color: '#64748B', fontSize: '13px', lineHeight: 1.5 }}>
+                      {language === 'en'
+                        ? 'Choose an available consultation slot with a guaranteed 5-minute atomic lock, preventing duplicate booking conflicts.'
+                        : 'সরাসরি উপলব্ধ সময় নির্বাচন করুন। ৫ মিনিটের সুরক্ষিত লকের মাধ্যমে ডাবল-বুকিং থেকে সুরক্ষিত থাকুন।'}
+                    </p>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                      padding: '24px 20px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        backgroundColor: '#EFF6FF',
+                        color: '#0060FA',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '15px',
+                        marginBottom: '14px',
+                      }}
+                    >
+                      3
+                    </div>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', marginBottom: '6px' }}>
+                      {language === 'en' ? 'Instant Confirmation' : 'তাৎক্ষণিক কনফার্মেশন'}
+                    </h3>
+                    <p style={{ color: '#64748B', fontSize: '13px', lineHeight: 1.5 }}>
+                      {language === 'en'
+                        ? 'Receive your digital appointment voucher, track queue serial status, and access verified consultation reports securely.'
+                        : 'আপনার ডিজিটাল অ্যাপয়েন্টমেন্ট ভাউচার পান, লাইভ সিরিয়াল ট্র্যাক করুন এবং রিপোর্ট নিরাপদে সংগ্রহ করুন।'}
+                    </p>
+                  </div>
+                </div>
               </div>
             </section>
 
-            {/* INTERACTIVE GEOGRAPHIC COVERAGE & FACILITY MAP */}
-            <div className="container">
-              <MapDiscovery
-                language={language}
-                onSelectFacility={() => setIsHelplineOpen(true)}
-              />
-            </div>
+            {/* HEALTHCARE PROVIDER ONBOARDING BANNER */}
+            <section className="container" style={{ padding: '48px 16px' }}>
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  border: '1px solid #E2E8F0',
+                  padding: '36px 28px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '24px',
+                }}
+              >
+                <div style={{ maxWidth: '640px' }}>
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      color: '#0060FA',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      marginBottom: '8px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    <Building2 size={15} />
+                    <span>{language === 'en' ? 'Healthcare Provider Network' : 'স্বাস্থ্যসেবা প্রোভাইডার নেটওয়ার্ক'}</span>
+                  </div>
+                  <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+                    {language === 'en'
+                      ? 'Partner with Diagnostic Care'
+                      : 'ডায়াগনস্টিক কেয়ারের সাথে যুক্ত হোন'}
+                  </h3>
+                  <p style={{ color: '#475569', fontSize: '13.5px', lineHeight: 1.55 }}>
+                    {language === 'en'
+                      ? 'Are you a licensed hospital, diagnostic laboratory, or specialist practitioner in Bangladesh? Subscribe to expand your patient reach, automate doctor chamber schedules, and manage appointments.'
+                      : 'আপনি কি কোনো হাসপাতাল, ডায়াগনস্টিক সেন্টার বা চিকিৎসক? আমাদের প্ল্যাটফর্মে সাবস্ক্রাইব করে সহজে চেম্বার শিডিউল ও রোগী ব্যবস্থাপনা পরিচালনা করুন।'}
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <Link
+                    href="/provider/register"
+                    className="btn-primary"
+                    style={{ padding: '10px 20px', fontSize: '13.5px' }}
+                  >
+                    {language === 'en' ? 'Register Your Facility' : 'প্রতিষ্ঠান নিবন্ধন করুন'}
+                  </Link>
+                  <Link
+                    href="/provider/login"
+                    className="btn-outline"
+                    style={{ padding: '10px 20px', fontSize: '13.5px' }}
+                  >
+                    {language === 'en' ? 'Provider Sign In' : 'প্রোভাইডার লগইন'}
+                  </Link>
+                </div>
+              </div>
+            </section>
           </div>
         )}
       </main>

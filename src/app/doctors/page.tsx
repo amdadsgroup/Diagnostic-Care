@@ -16,6 +16,8 @@ import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { INITIAL_APP_STATE } from '@/lib/store';
 import { Doctor, ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
 import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
+import { getCachedData } from '@/lib/cache';
+import { CardSkeleton } from '@/components/ui/CardSkeleton';
 import {
   Search,
   MapPin,
@@ -34,6 +36,7 @@ import {
   User,
   Star,
   X,
+  RefreshCw,
 } from 'lucide-react';
 
 export default function DoctorsPage() {
@@ -42,13 +45,18 @@ export default function DoctorsPage() {
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState('Moulvibazar');
+  const [selectedLocation, setSelectedLocation] = useState('Dhaka');
+
+  // Synchronous cache hydration for instant 0ms first render
+  const cachedDocs = typeof window !== 'undefined' ? getCachedData<Doctor[]>('doctors_list_active_all', true) : null;
+  const cachedAssocs = typeof window !== 'undefined' ? getCachedData<DoctorAssociation[]>('doctor_associations_active_all', true) : null;
 
   // Doctors & Schedule State
-  const [doctors, setDoctors] = useState<Doctor[]>(INITIAL_APP_STATE.doctors);
-  const [doctorAssociations, setDoctorAssociations] = useState<DoctorAssociation[]>(INITIAL_APP_STATE.doctorAssociations);
+  const [doctors, setDoctors] = useState<Doctor[]>(cachedDocs || INITIAL_APP_STATE.doctors);
+  const [doctorAssociations, setDoctorAssociations] = useState<DoctorAssociation[]>(cachedAssocs || INITIAL_APP_STATE.doctorAssociations);
   const [slotsState, setSlotsState] = useState<Record<string, ScheduleSlot[]>>(INITIAL_APP_STATE.slots);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!cachedDocs || cachedDocs.length === 0);
+  const [isError, setIsError] = useState(false);
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,6 +70,29 @@ export default function DoctorsPage() {
   const [selectedAssociation, setSelectedAssociation] = useState<DoctorAssociation | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<Appointment | null>(null);
 
+  const fetchDoctorData = () => {
+    setIsError(false);
+    if (!cachedDocs || cachedDocs.length === 0) {
+      setIsLoading(true);
+    }
+
+    Promise.all([
+      DoctorService.getDoctors(),
+      DoctorService.getDoctorAssociations(),
+    ])
+      .then(([dbDocs, dbAssocs]) => {
+        if (dbDocs) setDoctors(dbDocs);
+        if (dbAssocs) setDoctorAssociations(dbAssocs);
+      })
+      .catch((err) => {
+        console.warn('Doctors load notice:', err);
+        setIsError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     // Check current user
     AuthService.getCurrentUser().then((u) => {
@@ -71,25 +102,7 @@ export default function DoctorsPage() {
     const savedLoc = localStorage.getItem('dc_user_location');
     if (savedLoc) setSelectedLocation(savedLoc);
 
-    // Fetch doctors and associations from Supabase with graceful fallback
-    Promise.all([
-      DoctorService.getDoctors(),
-      DoctorService.getDoctorAssociations(),
-    ])
-      .then(([dbDocs, dbAssocs]) => {
-        if (dbDocs && dbDocs.length > 0) {
-          setDoctors(dbDocs);
-        }
-        if (dbAssocs && dbAssocs.length > 0) {
-          setDoctorAssociations(dbAssocs);
-        }
-      })
-      .catch((err) => {
-        console.warn('Doctors load notice:', err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    fetchDoctorData();
   }, []);
 
   const specialties = [
@@ -352,10 +365,18 @@ export default function DoctorsPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#090D14' }}>
-                    {filteredDoctors.length} {language === 'en' ? 'Doctors' : 'জন ডাক্তার'}
+                    {isLoading && doctors.length === 0 ? (
+                      <span style={{ color: '#0060FA' }}>
+                        {language === 'en' ? 'Checking directory...' : 'খোঁজা হচ্ছে...'}
+                      </span>
+                    ) : (
+                      `${filteredDoctors.length} ${language === 'en' ? 'Doctors' : 'জন ডাক্তার'}`
+                    )}
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#627680' }}>
-                    {language === 'en' ? 'Available for Consultation' : 'সিরিয়ালের জন্য প্রস্তুত'}
+                    {isLoading && doctors.length === 0
+                      ? (language === 'en' ? 'Connecting to active specialists...' : 'বিশেষজ্ঞদের তালিকা যাচাই হচ্ছে...')
+                      : (language === 'en' ? 'Available for Consultation' : 'সিরিয়ালের জন্য প্রস্তুত')}
                   </div>
                 </div>
               </div>
@@ -467,10 +488,16 @@ export default function DoctorsPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  <option value="ALL">{language === 'en' ? 'All Locations' : 'সকল স্থান'}</option>
-                  <option value="Moulvibazar">Moulvibazar (মৌলভীবাজার)</option>
+                  <option value="ALL">{language === 'en' ? 'All Bangladesh' : 'সমগ্র বাংলাদেশ'}</option>
+                  <option value="Dhaka">Dhaka (ঢাকা - গেটওয়ে)</option>
+                  <option value="Chattogram">Chattogram (চট্টগ্রাম)</option>
+                  <option value="Rajshahi">Rajshahi (রাজশাহী)</option>
+                  <option value="Khulna">Khulna (খুলনা)</option>
+                  <option value="Barishal">Barishal (বরিশাল)</option>
                   <option value="Sylhet">Sylhet (সিলেট)</option>
-                  <option value="Dhaka">Dhaka (ঢাকা)</option>
+                  <option value="Rangpur">Rangpur (রংপুর)</option>
+                  <option value="Mymensingh">Mymensingh (ময়মনসিংহ)</option>
+                  <option value="Moulvibazar">Moulvibazar (মৌলভীবাজার)</option>
                 </select>
               </div>
 
@@ -606,11 +633,51 @@ export default function DoctorsPage() {
 
         {/* Doctor Cards Listing Grid */}
         <section className="container" style={{ marginTop: '32px' }}>
-          {isLoading ? (
-            <div style={{ padding: '60px 0', textAlign: 'center', color: '#64748B' }}>
-              <div style={{ fontSize: '16px', fontWeight: 600 }}>
-                {language === 'en' ? 'Loading verified doctors...' : 'ডাক্তারদের তথ্য লোড হচ্ছে...'}
+          {isLoading && doctors.length === 0 ? (
+            <div style={{ padding: '16px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: '#0060FA', fontSize: '13px', fontWeight: 600 }}>
+                <RefreshCw size={16} className="animate-spin" />
+                <span>{language === 'en' ? 'Retrieving verified doctor directory...' : 'যাচাইকৃত ডাক্তারদের তালিকা প্রস্তুত করা হচ্ছে...'}</span>
               </div>
+              <CardSkeleton count={6} type="doctor" />
+            </div>
+          ) : isError && doctors.length === 0 ? (
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '16px',
+                border: '1px solid #FED7D7',
+                padding: '48px 24px',
+                textAlign: 'center',
+                maxWidth: '540px',
+                margin: '0 auto',
+              }}
+            >
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#C53030', marginBottom: '8px' }}>
+                {language === 'en' ? 'Unable to load doctor directory' : 'ডাক্তারদের তথ্য লোড করা যায়নি'}
+              </div>
+              <p style={{ fontSize: '13px', color: '#718096', marginBottom: '20px' }}>
+                {language === 'en' ? 'Please check your connection or retry fetching verified profiles.' : 'ইন্টারনেট সংযোগ চেক করুন অথবা পুনরায় চেষ্টা করুন।'}
+              </p>
+              <button
+                onClick={fetchDoctorData}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#0060FA',
+                  color: '#FFFFFF',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
+              >
+                <RefreshCw size={16} />
+                <span>{language === 'en' ? 'Retry Connection' : 'পুনরায় লোড করুন'}</span>
+              </button>
             </div>
           ) : filteredDoctors.length === 0 ? (
             <div

@@ -20,7 +20,8 @@ import {
   CustomerPrivacySettings,
 } from '@/services/patient.service';
 import { NotificationService, AppNotification } from '@/services/notification.service';
-import { Appointment, Doctor, Organization } from '@/types';
+import { Appointment, Doctor, Organization, DoctorWishlistItem } from '@/types';
+import { WishlistService } from '@/services/wishlist.service';
 import { BRAND_COLORS, BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import {
   User,
@@ -114,6 +115,9 @@ export default function CustomerDashboardView() {
 
   // Saved Providers State
   const [savedProviders, setSavedProviders] = useState<SavedProviderItem[]>([]);
+  const [doctorWishlist, setDoctorWishlist] = useState<DoctorWishlistItem[]>([]);
+  const [wishlistSearchQuery, setWishlistSearchQuery] = useState('');
+  const [savedSubTab, setSavedSubTab] = useState<'doctors' | 'facilities'>('doctors');
 
   // Notifications State
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -156,12 +160,21 @@ export default function CustomerDashboardView() {
       }
 
       // Role gate: redirect healthcare providers, doctors and admins to their portal
+      if (['DOCTOR', 'DOCTOR_ASSISTANT'].includes(user.primaryRole)) {
+        window.location.href = '/doctor/portal';
+        return;
+      }
+      if (user.primaryRole === 'SUPER_ADMIN') {
+        window.location.href = '/admin';
+        return;
+      }
+
       const isProviderRole = ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'DIAGNOSTIC_STAFF', 'HOSPITAL_STAFF'].includes(user.primaryRole);
       let hasProviderSession = false;
       let isFacilityName = false;
       if (typeof window !== 'undefined') {
         hasProviderSession = !!localStorage.getItem('dc_hospital_session');
-        const facilityKeywords = ['popular', 'hospital', 'diagnostic', 'clinic', 'medical', 'centre', 'center', 'lab', 'care'];
+        const facilityKeywords = ['popular', 'hospital', 'diagnostic', 'clinic', 'medical', 'centre', 'center', 'lab'];
         const nameLower = (user.fullName || '').toLowerCase();
         isFacilityName = facilityKeywords.some((kw) => nameLower.includes(kw));
       }
@@ -187,14 +200,6 @@ export default function CustomerDashboardView() {
           }
         }
         window.location.href = '/hospital/portal';
-        return;
-      }
-      if (['DOCTOR', 'DOCTOR_ASSISTANT'].includes(user.primaryRole)) {
-        window.location.href = '/doctor/portal';
-        return;
-      }
-      if (user.primaryRole === 'SUPER_ADMIN') {
-        window.location.href = '/admin';
         return;
       }
 
@@ -230,9 +235,12 @@ export default function CustomerDashboardView() {
         const recs = await PatientService.getMedicalRecords(prof.patientId || userId);
         setMedicalRecords(recs);
 
-        // 5. Load Saved Providers
+        // 5. Load Saved Providers & Doctor Wishlist
         const saved = await PatientService.getSavedProviders(userId);
         setSavedProviders(saved);
+
+        const wishlist = await WishlistService.getWishlist(userId);
+        setDoctorWishlist(wishlist);
 
         // 6. Load Notifications
         const notifs = await NotificationService.getUserNotifications(userId);
@@ -471,6 +479,20 @@ export default function CustomerDashboardView() {
       showToast(
         language === 'bn' ? 'সংরক্ষিত তালিকা থেকে সরানো হয়েছে।' : 'Removed from saved providers.'
       );
+    }
+  };
+
+  // Remove Doctor from Wishlist
+  const handleRemoveWishlistDoctor = async (doctorId: string) => {
+    if (!currentUser) return;
+    try {
+      await WishlistService.removeFromWishlist(currentUser.id, doctorId);
+      setDoctorWishlist((prev) => prev.filter((item) => item.doctorId !== doctorId));
+      showToast(
+        language === 'bn' ? 'ডাক্তার পছন্দ তালিকা থেকে সরানো হয়েছে।' : 'Doctor removed from your wishlist.'
+      );
+    } catch {
+      showToast('Could not remove doctor', 'error');
     }
   };
 
@@ -2054,7 +2076,7 @@ export default function CustomerDashboardView() {
               </div>
             )}
 
-            {/* TAB 6: SAVED PROVIDERS */}
+            {/* TAB 6: SAVED DOCTORS & PROVIDERS */}
             {activeTab === 'saved' && (
               <div
                 style={{
@@ -2064,101 +2086,366 @@ export default function CustomerDashboardView() {
                   padding: '28px',
                 }}
               >
-                <div style={{ marginBottom: '24px' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#090D14', margin: '0 0 4px 0' }}>
-                    {language === 'bn' ? 'সংরক্ষিত ডাক্তার ও স্বাস্থ্য প্রতিষ্ঠান' : 'Saved Doctors & Healthcare Providers'}
-                  </h2>
-                  <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-                    {language === 'bn'
-                      ? 'ভবিষ্যতে সহজে খুঁজে পাওয়ার জন্য আপনার পছন্দের ডাক্তার ও হাসপাতালসমূহ।'
-                      : 'Bookmarks for preferred specialist doctors, laboratories, and hospitals.'}
-                  </p>
-                </div>
-
-                {savedProviders.length > 0 ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-                    {savedProviders.map((item) => (
-                      <div
-                        key={item.id}
-                        style={{
-                          backgroundColor: '#F8FAFC',
-                          borderRadius: '16px',
-                          border: '1px solid #E2E8F0',
-                          padding: '20px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '11px', fontWeight: 800, color: BRAND_COLORS.primary, backgroundColor: '#EFF6FF', padding: '2px 8px', borderRadius: '10px' }}>
-                              {item.entityType.toUpperCase()}
-                            </span>
-                            <button
-                              onClick={() => handleRemoveSavedProvider(item)}
-                              style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: 0 }}
-                              title="Unsave"
-                            >
-                              <Star size={18} fill="#EF4444" color="#EF4444" />
-                            </button>
-                          </div>
-
-                          <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#090D14', margin: '0 0 4px 0' }}>
-                            {item.doctor?.fullName || item.organization?.name || 'Healthcare Provider'}
-                          </h4>
-                          <p style={{ fontSize: '13px', color: '#059669', fontWeight: 600, margin: '0 0 6px 0' }}>
-                            {item.doctor?.specialization || item.organization?.orgType || 'Medical Services'}
-                          </p>
-                          <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>
-                            {item.doctor ? `BMDC: ${item.doctor.bmdcNumber}` : item.organization?.contactPhone}
-                          </p>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '8px', marginTop: '16px', borderTop: '1px solid #E2E8F0', paddingTop: '12px' }}>
-                          <Link
-                            href={item.entityType === 'doctor' ? `/doctors/${item.entityId}` : `/hospitals/${item.entityId}`}
-                            style={{
-                              flex: 1,
-                              padding: '8px',
-                              backgroundColor: '#0F172A',
-                              color: '#FFFFFF',
-                              borderRadius: '10px',
-                              fontSize: '12.5px',
-                              fontWeight: 700,
-                              textDecoration: 'none',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {language === 'bn' ? 'প্রোফাইল দেখুন' : 'View Profile'}
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{ textAlign: 'center', padding: '48px 16px' }}>
-                    <Star size={44} color="#CBD5E1" style={{ margin: '0 auto 12px' }} />
-                    <p style={{ color: '#64748B', fontSize: '14px', margin: '0 0 16px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#090D14', margin: '0 0 4px 0' }}>
+                      {language === 'bn' ? 'পছন্দের ডাক্তার ও স্বাস্থ্যসেবা প্রতিষ্ঠান' : 'Saved Doctors & Healthcare Wishlist'}
+                    </h2>
+                    <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
                       {language === 'bn'
-                        ? 'আপনার সংরক্ষিত কোনো ডাক্তার নেই।'
-                        : 'You haven’t saved any doctors or healthcare facilities yet.'}
+                        ? 'আপনার সংরক্ষিত বিশেষজ্ঞ ডাক্তার এবং ডায়াগনস্টিক সেন্টারের দ্রুত বুকিং তালিকা।'
+                        : 'Quickly access and book appointments with your saved medical specialists and clinics.'}
                     </p>
-                    <Link
-                      href="/doctors"
+                  </div>
+
+                  {/* Sub-tab Switcher */}
+                  <div style={{ display: 'flex', gap: '8px', background: '#F1F5F9', padding: '4px', borderRadius: '12px' }}>
+                    <button
+                      onClick={() => setSavedSubTab('doctors')}
                       style={{
-                        padding: '10px 24px',
-                        backgroundColor: BRAND_COLORS.primary,
-                        color: '#FFFFFF',
-                        borderRadius: '12px',
-                        fontSize: '13px',
-                        fontWeight: 800,
-                        textDecoration: 'none',
-                        display: 'inline-block',
+                        padding: '8px 16px',
+                        borderRadius: '10px',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer',
+                        background: savedSubTab === 'doctors' ? '#FFFFFF' : 'transparent',
+                        color: savedSubTab === 'doctors' ? BRAND_COLORS.primary : '#64748B',
+                        boxShadow: savedSubTab === 'doctors' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
                       }}
                     >
-                      {language === 'bn' ? 'ডাক্তার তালিকায় যান' : 'Browse Doctor Directory'}
-                    </Link>
+                      <Heart size={14} fill={savedSubTab === 'doctors' ? BRAND_COLORS.primary : 'none'} />
+                      <span>{language === 'bn' ? 'ডাক্তারবৃন্দ' : 'Doctors'} ({doctorWishlist.length})</span>
+                    </button>
+                    <button
+                      onClick={() => setSavedSubTab('facilities')}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '10px',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer',
+                        background: savedSubTab === 'facilities' ? '#FFFFFF' : 'transparent',
+                        color: savedSubTab === 'facilities' ? BRAND_COLORS.primary : '#64748B',
+                        boxShadow: savedSubTab === 'facilities' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <Building2 size={14} />
+                      <span>{language === 'bn' ? 'প্রতিষ্ঠানসমূহ' : 'Facilities'} ({savedProviders.length})</span>
+                    </button>
+                  </div>
+                </div>
+
+                {savedSubTab === 'doctors' && (
+                  <div>
+                    {doctorWishlist.length > 0 && (
+                      <div style={{ marginBottom: '20px', position: 'relative', maxWidth: '360px' }}>
+                        <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                        <input
+                          type="text"
+                          placeholder={language === 'bn' ? 'নাম বা বিভাগ দিয়ে খুঁজুন...' : 'Search saved doctors...'}
+                          value={wishlistSearchQuery}
+                          onChange={(e) => setWishlistSearchQuery(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '9px 12px 9px 36px',
+                            borderRadius: '12px',
+                            border: '1px solid #CBD5E1',
+                            fontSize: '13px',
+                            outline: 'none',
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {(() => {
+                      const filtered = doctorWishlist.filter((item) => {
+                        if (!wishlistSearchQuery.trim()) return true;
+                        const q = wishlistSearchQuery.toLowerCase();
+                        const name = (item.doctor?.fullName || '').toLowerCase();
+                        const spec = (item.doctor?.specialization || '').toLowerCase();
+                        return name.includes(q) || spec.includes(q);
+                      });
+
+                      if (filtered.length > 0) {
+                        return (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '18px' }}>
+                            {filtered.map((item) => {
+                              const doc = item.doctor;
+                              return (
+                                <div
+                                  key={item.id}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '18px',
+                                    border: '1px solid #E2E8F0',
+                                    padding: '20px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                                    transition: 'all 0.2s ease',
+                                  }}
+                                >
+                                  <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                        <div
+                                          style={{
+                                            width: '52px',
+                                            height: '52px',
+                                            borderRadius: '14px',
+                                            background: 'linear-gradient(135deg, rgba(0,96,250,0.1) 0%, rgba(235,243,255,0.8) 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#0060FA',
+                                            flexShrink: 0,
+                                          }}
+                                        >
+                                          <Stethoscope size={26} />
+                                        </div>
+                                        <div>
+                                          <span
+                                            style={{
+                                              fontSize: '10.5px',
+                                              fontWeight: 800,
+                                              color: '#0060FA',
+                                              background: '#EFF6FF',
+                                              padding: '2px 8px',
+                                              borderRadius: '6px',
+                                              textTransform: 'uppercase',
+                                            }}
+                                          >
+                                            {doc?.specialization || 'Specialist'}
+                                          </span>
+                                          <h4 style={{ fontSize: '15.5px', fontWeight: 800, color: '#090D14', margin: '4px 0 2px 0' }}>
+                                            {doc?.fullName || 'Specialist Doctor'}
+                                          </h4>
+                                          <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>
+                                            {doc?.qualifications || 'MBBS'}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <button
+                                        onClick={() => handleRemoveWishlistDoctor(item.doctorId)}
+                                        style={{
+                                          background: 'rgba(254, 242, 242, 0.8)',
+                                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                                          borderRadius: '8px',
+                                          width: '32px',
+                                          height: '32px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          color: '#EF4444',
+                                          cursor: 'pointer',
+                                          transition: 'all 0.2s',
+                                        }}
+                                        title={language === 'bn' ? 'পছন্দ থেকে মুছুন' : 'Remove from Wishlist'}
+                                      >
+                                        <Heart size={16} fill="#EF4444" />
+                                      </button>
+                                    </div>
+
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        gap: '12px',
+                                        fontSize: '12px',
+                                        color: '#475569',
+                                        margin: '12px 0',
+                                        padding: '8px 12px',
+                                        background: '#F8FAFC',
+                                        borderRadius: '10px',
+                                      }}
+                                    >
+                                      {doc?.bmdcNumber && (
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                          <ShieldCheck size={14} color="#15803D" />
+                                          BMDC: {doc.bmdcNumber}
+                                        </span>
+                                      )}
+                                      {doc?.experienceYears && (
+                                        <span>• {doc.experienceYears} {language === 'bn' ? 'বছরের অভিজ্ঞতা' : 'yrs exp'}</span>
+                                      )}
+                                      {doc?.rating ? (
+                                        <span style={{ color: '#D97706', fontWeight: 700 }}>• ★ {doc.rating}</span>
+                                      ) : null}
+                                    </div>
+                                  </div>
+
+                                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
+                                    <Link
+                                      href={`/doctors/${item.doctorId}`}
+                                      style={{
+                                        flex: 1,
+                                        padding: '9px 12px',
+                                        backgroundColor: '#0060FA',
+                                        color: '#FFFFFF',
+                                        borderRadius: '10px',
+                                        fontSize: '12.5px',
+                                        fontWeight: 700,
+                                        textDecoration: 'none',
+                                        textAlign: 'center',
+                                        boxShadow: '0 2px 6px rgba(0,96,250,0.2)',
+                                      }}
+                                    >
+                                      {language === 'bn' ? 'অ্যাপয়েন্টমেন্ট বুক করুন' : 'Book Appointment'}
+                                    </Link>
+                                    <Link
+                                      href={`/doctors/${item.doctorId}`}
+                                      style={{
+                                        padding: '9px 14px',
+                                        backgroundColor: '#F1F5F9',
+                                        color: '#334155',
+                                        borderRadius: '10px',
+                                        fontSize: '12.5px',
+                                        fontWeight: 700,
+                                        textDecoration: 'none',
+                                        textAlign: 'center',
+                                      }}
+                                    >
+                                      {language === 'bn' ? 'প্রোফাইল' : 'Profile'}
+                                    </Link>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div style={{ textAlign: 'center', padding: '48px 16px' }}>
+                          <Heart size={44} color="#CBD5E1" style={{ margin: '0 auto 12px' }} />
+                          <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                            {language === 'bn' ? 'পছন্দের কোনো ডাক্তার যোগ করা হয়নি' : 'No Doctors in Your Wishlist Yet'}
+                          </h4>
+                          <p style={{ color: '#64748B', fontSize: '13px', margin: '0 0 16px 0', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+                            {language === 'bn'
+                              ? 'যেকোনো ডাক্তারের প্রোফাইলে গিয়ে “পছন্দ তালিকায় রাখুন” বাটনে ক্লিক করে সহজে সংরক্ষিত করুন।'
+                              : 'Tap "Save to Wishlist" on any verified doctor’s profile or scanned QR code card to save them here.'}
+                          </p>
+                          <Link
+                            href="/doctors"
+                            style={{
+                              padding: '10px 24px',
+                              backgroundColor: BRAND_COLORS.primary,
+                              color: '#FFFFFF',
+                              borderRadius: '12px',
+                              fontSize: '13px',
+                              fontWeight: 800,
+                              textDecoration: 'none',
+                              display: 'inline-block',
+                            }}
+                          >
+                            {language === 'bn' ? 'ডাক্তার তালিকায় যান' : 'Browse Doctor Directory'}
+                          </Link>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+
+                {savedSubTab === 'facilities' && (
+                  <div>
+                    {savedProviders.length > 0 ? (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                        {savedProviders.map((item) => (
+                          <div
+                            key={item.id}
+                            style={{
+                              backgroundColor: '#F8FAFC',
+                              borderRadius: '16px',
+                              border: '1px solid #E2E8F0',
+                              padding: '20px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 800, color: BRAND_COLORS.primary, backgroundColor: '#EFF6FF', padding: '2px 8px', borderRadius: '10px' }}>
+                                  {item.entityType.toUpperCase()}
+                                </span>
+                                <button
+                                  onClick={() => handleRemoveSavedProvider(item)}
+                                  style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: 0 }}
+                                  title="Unsave"
+                                >
+                                  <Star size={18} fill="#EF4444" color="#EF4444" />
+                                </button>
+                              </div>
+
+                              <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#090D14', margin: '0 0 4px 0' }}>
+                                {item.doctor?.fullName || item.organization?.name || 'Healthcare Provider'}
+                              </h4>
+                              <p style={{ fontSize: '13px', color: '#059669', fontWeight: 600, margin: '0 0 6px 0' }}>
+                                {item.doctor?.specialization || item.organization?.orgType || 'Medical Services'}
+                              </p>
+                              <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>
+                                {item.doctor ? `BMDC: ${item.doctor.bmdcNumber}` : item.organization?.contactPhone}
+                              </p>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px', borderTop: '1px solid #E2E8F0', paddingTop: '12px' }}>
+                              <Link
+                                href={item.entityType === 'doctor' ? `/doctors/${item.entityId}` : `/hospitals/${item.entityId}`}
+                                style={{
+                                  flex: 1,
+                                  padding: '8px',
+                                  backgroundColor: '#0F172A',
+                                  color: '#FFFFFF',
+                                  borderRadius: '10px',
+                                  fontSize: '12.5px',
+                                  fontWeight: 700,
+                                  textDecoration: 'none',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {language === 'bn' ? 'প্রোফাইল দেখুন' : 'View Profile'}
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '48px 16px' }}>
+                        <Building2 size={44} color="#CBD5E1" style={{ margin: '0 auto 12px' }} />
+                        <p style={{ color: '#64748B', fontSize: '14px', margin: '0 0 16px 0' }}>
+                          {language === 'bn'
+                            ? 'আপনার সংরক্ষিত কোনো হাসপাতাল বা ডায়াগনস্টিক সেন্টার নেই।'
+                            : 'You haven’t bookmarked any hospitals or diagnostic centers yet.'}
+                        </p>
+                        <Link
+                          href="/hospitals"
+                          style={{
+                            padding: '10px 24px',
+                            backgroundColor: BRAND_COLORS.primary,
+                            color: '#FFFFFF',
+                            borderRadius: '12px',
+                            fontSize: '13px',
+                            fontWeight: 800,
+                            textDecoration: 'none',
+                            display: 'inline-block',
+                          }}
+                        >
+                          {language === 'bn' ? 'হাসপাতাল খুঁজুন' : 'Browse Hospitals'}
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

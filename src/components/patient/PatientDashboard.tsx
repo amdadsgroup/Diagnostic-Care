@@ -169,7 +169,7 @@ export default function PatientDashboard({
           }}
         >
           <CalendarCheck size={18} color={activeTab === 'appointments' ? BRAND_COLORS.primary : 'var(--slate-500)'} />
-          <span>{isBn ? `আমার অ্যাপয়েন্টমেন্টস (${formatNumber(appointments.length)})` : `My Appointments (${appointments.length})`}</span>
+          <span>{isBn ? `আমার অ্যাপয়েন্টমেন্টস ${isLoading ? '(লোড হচ্ছে...)' : `(${formatNumber(appointments.length)})`}` : `My Appointments ${isLoading ? '(Loading...)' : `(${appointments.length})`}`}</span>
         </button>
 
         <button
@@ -270,7 +270,13 @@ export default function PatientDashboard({
               </div>
             </div>
           ))}
-          {appointments.length === 0 && (
+          {isLoading && appointments.length === 0 ? (
+            <div className="portal-card" style={{ padding: '24px' }}>
+              <div className="skeleton-box" style={{ width: '120px', height: '24px', marginBottom: '12px' }} />
+              <div className="skeleton-box" style={{ width: '220px', height: '20px', marginBottom: '8px' }} />
+              <div className="skeleton-box" style={{ width: '160px', height: '16px' }} />
+            </div>
+          ) : appointments.length === 0 ? (
             <div
               className="portal-card"
               style={{
@@ -294,7 +300,7 @@ export default function PatientDashboard({
                   : 'Easily book verified specialist doctors or trusted diagnostic test laboratories across Moulvibazar & Sylhet.'}
               </p>
             </div>
-          )}
+          ) : null}
         </div>
       )}
 

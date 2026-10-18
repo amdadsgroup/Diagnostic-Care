@@ -26,6 +26,7 @@ import {
 import {
   Building2,
   Users,
+  User,
   Stethoscope,
   Calendar,
   Layers,
@@ -41,6 +42,7 @@ import {
   Search,
   Filter,
   Eye,
+  EyeOff,
   Edit,
   Phone,
   Mail,
@@ -73,7 +75,10 @@ import {
   Copy,
   PhoneCall,
   ArrowLeft,
+  QrCode,
 } from 'lucide-react';
+import QRCodeStudio from '@/components/qr/QRCodeStudio';
+import { QRService } from '@/services/qr.service';
 
 export default function HospitalPortalPage() {
   const { language } = useLanguage();
@@ -86,8 +91,17 @@ export default function HospitalPortalPage() {
 
   // Active Navigation Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'profile' | 'branches' | 'doctors' | 'appointments' | 'diagnostic_bookings' | 'services' | 'staff' | 'subscription' | 'analytics'
+    'overview' | 'profile' | 'branches' | 'doctors' | 'appointments' | 'diagnostic_bookings' | 'services' | 'staff' | 'subscription' | 'analytics' | 'qr_code'
   >('overview');
+
+  // QR Management State
+  const [qrSubTab, setQrSubTab] = useState<'organization' | 'doctors'>('organization');
+  const [selectedDoctorForQr, setSelectedDoctorForQr] = useState<HospitalDoctorAssociation | null>(null);
+  const [isDoctorQrStudioOpen, setIsDoctorQrStudioOpen] = useState(false);
+  const [isBatchPrintOpen, setIsBatchPrintOpen] = useState(false);
+  const [doctorQrSearch, setDoctorQrSearch] = useState('');
+  const [doctorQrDeptFilter, setDoctorQrDeptFilter] = useState('all');
+  const [orgQrAnalytics, setOrgQrAnalytics] = useState<any>(null);
 
   // Data states
   const [stats, setStats] = useState<HospitalDashboardStats | null>(null);
@@ -116,6 +130,54 @@ export default function HospitalPortalPage() {
   const [newBranchPhone, setNewBranchPhone] = useState('');
   const [branchLimitNotice, setBranchLimitNotice] = useState<string | null>(null);
 
+  // Unified Add Doctor to Institution Modal State
+  const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
+  const [doctorModalMode, setDoctorModalMode] = useState<'create' | 'invite'>('create');
+  const [doctorModalSuccess, setDoctorModalSuccess] = useState<string | null>(null);
+
+  // Action A: Create New Doctor Account State
+  const [isCreateDoctorOpen, setIsCreateDoctorOpen] = useState(false);
+  const [createDocName, setCreateDocName] = useState('');
+  const [createDocEmail, setCreateDocEmail] = useState('');
+  const [createDocPassword, setCreateDocPassword] = useState('');
+  const [createDocConfirmPassword, setCreateDocConfirmPassword] = useState('');
+  const [showCreateDocPassword, setShowCreateDocPassword] = useState(false);
+  const [showCreateDocConfirmPassword, setShowCreateDocConfirmPassword] = useState(false);
+  const [createDocPhone, setCreateDocPhone] = useState('');
+  const [createDocSpecialty, setCreateDocSpecialty] = useState('General Medicine');
+  const [createDocQualifications, setCreateDocQualifications] = useState('MBBS, FCPS');
+  const [createDocExperience, setCreateDocExperience] = useState<number | ''>(8);
+  const [createDocBmdc, setCreateDocBmdc] = useState('');
+  const [createDocDept, setCreateDocDept] = useState('');
+  const [createDocBranch, setCreateDocBranch] = useState('');
+  const [createDocFee, setCreateDocFee] = useState(1000);
+  const [createDocRoom, setCreateDocRoom] = useState('Room 101');
+  const [createDocDuration, setCreateDocDuration] = useState(15);
+  const [createDocDays, setCreateDocDays] = useState<string[]>(['Sat', 'Sun', 'Mon', 'Tue', 'Wed']);
+  const [createDocStartTime, setCreateDocStartTime] = useState('05:00 PM');
+  const [createDocEndTime, setCreateDocEndTime] = useState('09:00 PM');
+  const [createDocDailyLimit, setCreateDocDailyLimit] = useState(30);
+  const [createDocLoading, setCreateDocLoading] = useState(false);
+  const [createDocError, setCreateDocError] = useState<string | null>(null);
+
+  // Action B: Invite Existing Doctor by Email State
+  const [isInviteDoctorOpen, setIsInviteDoctorOpen] = useState(false);
+  const [inviteDocEmail, setInviteDocEmail] = useState('');
+  const [inviteDocDept, setInviteDocDept] = useState('');
+  const [inviteDocBranch, setInviteDocBranch] = useState('');
+  const [inviteDocRole, setInviteDocRole] = useState('Visiting Specialist Consultant');
+  const [inviteDocFee, setInviteDocFee] = useState(1000);
+  const [inviteDocRoom, setInviteDocRoom] = useState('Room 201');
+  const [inviteDocHours, setInviteDocHours] = useState('05:00 PM - 09:00 PM');
+  const [inviteDocMessage, setInviteDocMessage] = useState('');
+  const [inviteDocLoading, setInviteDocLoading] = useState(false);
+  const [inviteDocError, setInviteDocError] = useState<string | null>(null);
+
+  // Doctor Management Sub-tabs and Invitations Roster
+  const [doctorManagementTab, setDoctorManagementTab] = useState<'roster' | 'invitations'>('roster');
+  const [sentInvitations, setSentInvitations] = useState<any[]>([]);
+
+  // Legacy compatibility
   const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
   const [inviteDocName, setInviteDocName] = useState('');
   const [inviteBmdc, setInviteBmdc] = useState('');
@@ -345,6 +407,12 @@ export default function HospitalPortalPage() {
       setAuthLoading(true);
       try {
         const user = await AuthService.getCurrentUser();
+        if (user && (user.primaryRole === 'DOCTOR' || user.primaryRole === 'DOCTOR_ASSISTANT')) {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/doctor/portal';
+          }
+          return;
+        }
         setCurrentUser(user);
         if (user) {
           let hosp = await HospitalService.getHospitalByOwner(user.id);
@@ -859,7 +927,147 @@ export default function HospitalPortalPage() {
     }
   };
 
-  // Handle invite / link doctor
+  // Action A: Handle Create New Doctor Account
+  const handleCreateDoctorAccountSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+    setCreateDocError(null);
+    setDoctorModalSuccess(null);
+
+    // Validate passwords
+    if (createDocPassword.length < 8) {
+      setCreateDocError(language === 'bn' ? 'পাসওয়ার্ড ন্যূনতম ৮ অক্ষরের হতে হবে।' : 'Initial password must be at least 8 characters long.');
+      return;
+    }
+
+    if (createDocPassword !== createDocConfirmPassword) {
+      setCreateDocError(language === 'bn' ? 'পাসওয়ার্ড এবং কনফার্ম পাসওয়ার্ড মেলেনি।' : 'Initial password and confirm password do not match.');
+      return;
+    }
+
+    if (!createDocName.trim() || !createDocEmail.trim() || !createDocBmdc.trim()) {
+      setCreateDocError(language === 'bn' ? 'অনুগ্রহ করে সকল আবশ্যকীয় তথ্য পূরণ করুন।' : 'Please fill in all required fields marked with *.');
+      return;
+    }
+
+    setCreateDocLoading(true);
+
+    const res = await HospitalService.createDoctorAccount({
+      hospitalId: profile.id,
+      hospitalName: profile.name,
+      fullName: createDocName.trim(),
+      email: createDocEmail.trim(),
+      password: createDocPassword,
+      phone: createDocPhone.trim(),
+      specialty: createDocSpecialty,
+      qualifications: createDocQualifications.trim(),
+      bmdcNumber: createDocBmdc.trim(),
+      departmentId: departments.find((d) => d.name === createDocDept)?.id,
+      departmentName: createDocDept || 'General Medicine',
+      branchId: branches.find((b) => b.branchName === createDocBranch)?.id,
+      branchName: createDocBranch || 'Main Campus',
+      consultationFee: createDocFee,
+      chamberRoom: createDocRoom,
+      daysOfWeek: createDocDays,
+      visitingStartTime: createDocStartTime,
+      visitingEndTime: createDocEndTime,
+      dailySerialLimit: createDocDailyLimit,
+    });
+
+    setCreateDocLoading(false);
+
+    if (!res.success) {
+      setCreateDocError(res.message);
+      return;
+    }
+
+    // Success confirmation
+    setDoctorModalSuccess(
+      language === 'bn'
+        ? 'ডাক্তার একাউন্ট সফলভাবে তৈরি হয়েছে এবং আপনার প্রতিষ্ঠানের সাথে সংযুক্ত হয়েছে।'
+        : 'Doctor account created successfully and affiliated with your institution! The doctor will be prompted to set a personal password upon first login.'
+    );
+
+    await loadHospitalData(profile.id);
+
+    // Auto-dismiss modal after celebration notice
+    setTimeout(() => {
+      setIsDoctorModalOpen(false);
+      setIsCreateDoctorOpen(false);
+      setIsAddDoctorOpen(false);
+      setDoctorModalSuccess(null);
+      setCreateDocName('');
+      setCreateDocEmail('');
+      setCreateDocPassword('');
+      setCreateDocConfirmPassword('');
+      setCreateDocPhone('');
+      setCreateDocBmdc('');
+    }, 2400);
+  };
+
+  // Action B: Handle Invite Existing Doctor by Email
+  const handleInviteDoctorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+    setInviteDocError(null);
+    setDoctorModalSuccess(null);
+
+    if (!inviteDocEmail.trim()) {
+      setInviteDocError(language === 'bn' ? 'ডাক্তারের নিবন্ধিত ইমেইল আবশ্যক।' : 'Doctor registered email address is required.');
+      return;
+    }
+
+    setInviteDocLoading(true);
+
+    const res = await HospitalService.inviteDoctorByEmail({
+      hospitalId: profile.id,
+      hospitalName: profile.name,
+      email: inviteDocEmail.trim(),
+      departmentId: departments.find((d) => d.name === inviteDocDept)?.id,
+      departmentName: inviteDocDept || 'General Medicine',
+      branchId: branches.find((b) => b.branchName === inviteDocBranch)?.id,
+      branchName: inviteDocBranch || 'Main Campus',
+      proposedRole: inviteDocRole,
+      consultationFee: inviteDocFee,
+      chamberRoom: inviteDocRoom,
+      visitingHours: inviteDocHours,
+    });
+
+    setInviteDocLoading(false);
+
+    if (!res.success) {
+      setInviteDocError(res.message);
+      return;
+    }
+
+    setDoctorModalSuccess(
+      language === 'bn'
+        ? 'এফিলিয়েশন আমন্ত্রণ সফলভাবে পাঠানো হয়েছে।'
+        : 'Affiliation invitation dispatched successfully! The doctor can review and accept this affiliation inside their Doctor Portal.'
+    );
+
+    const invs = await HospitalService.getHospitalDoctorInvitations(profile.id);
+    setSentInvitations(invs);
+    setDoctorManagementTab('invitations');
+
+    setTimeout(() => {
+      setIsDoctorModalOpen(false);
+      setIsInviteDoctorOpen(false);
+      setDoctorModalSuccess(null);
+      setInviteDocEmail('');
+      setInviteDocMessage('');
+    }, 2400);
+  };
+
+  // Cancel pending invitation
+  const handleCancelInvitation = async (invitationId: string) => {
+    if (!profile) return;
+    await HospitalService.cancelDoctorInvitation(invitationId);
+    const invs = await HospitalService.getHospitalDoctorInvitations(profile.id);
+    setSentInvitations(invs);
+  };
+
+  // Legacy compatibility handler
   const handleInviteDoctor = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile || !inviteDocName.trim()) return;
@@ -1210,7 +1418,7 @@ export default function HospitalPortalPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <LanguageSwitcher variant="pills" showIcon />
             <Link
-              href="/login?redirect=/hospital/portal"
+              href="/provider/login?role=hospital&redirect=/hospital/portal"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1488,6 +1696,13 @@ export default function HospitalPortalPage() {
                         return;
                       }
                       if (res.user) {
+                        if (res.profile?.primaryRole === 'DOCTOR' || res.profile?.primaryRole === 'DOCTOR_ASSISTANT') {
+                          setGatewaySuccess(language === 'bn' ? 'ডাক্তার একাউন্ট শনাক্ত হয়েছে! ডাক্তার পোর্টালে নিয়ে যাওয়া হচ্ছে...' : 'Doctor account detected! Redirecting to Doctor Portal...');
+                          setTimeout(() => {
+                            window.location.href = '/doctor/portal';
+                          }, 500);
+                          return;
+                        }
                         setGatewaySuccess(language === 'bn' ? 'লগইন সফল হয়েছে! ড্যাশবোর্ডে প্রবেশ করা হচ্ছে...' : 'Login successful! Entering provider operations console...');
                         setTimeout(() => {
                           window.location.reload();
@@ -1800,6 +2015,38 @@ export default function HospitalPortalPage() {
                   </button>
                 </form>
               )}
+            </div>
+
+            {/* Patient Portal Switcher */}
+            <div
+              style={{
+                marginTop: '20px',
+                padding: '12px 18px',
+                borderRadius: '12px',
+                backgroundColor: tokens.cardBgSubtle,
+                border: `1px solid ${tokens.cardBorder}`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+              }}
+            >
+              <User size={16} color="#059669" />
+              <span style={{ fontSize: '13px', color: tokens.textSecondary }}>
+                {language === 'bn' ? 'রোগী হিসেবে সেবা নিতে বা সিরিয়াল দিতে চান?' : 'Looking to book a doctor appointment as a Patient?'}
+              </span>
+              <Link
+                href="/login"
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  color: '#059669',
+                  textDecoration: 'none',
+                }}
+              >
+                {language === 'bn' ? 'রোগী লগইন →' : 'Patient Sign In →'}
+              </Link>
             </div>
 
             {/* Helpline Notice */}
@@ -2214,6 +2461,7 @@ export default function HospitalPortalPage() {
             { id: 'staff', label: `Staff & Access (${staff.length})`, labelBn: `স্টাফ ও পারমিশন (${staff.length})`, icon: Users },
             { id: 'subscription', label: 'Subscription & Billing', labelBn: 'সাবস্ক্রিপশন ও বিলিং', icon: CreditCard },
             { id: 'analytics', label: 'Reports & Exports', labelBn: 'রিপোর্ট ও এক্সপোর্ট', icon: BarChart3 },
+            { id: 'qr_code', label: 'QR Management & Prints', labelBn: 'কিউআর ম্যানেজমেন্ট ও প্রিন্ট', icon: QrCode },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -3804,30 +4052,294 @@ export default function HospitalPortalPage() {
 
                   <button
                     type="button"
-                    onClick={() => setIsAddDoctorOpen(true)}
+                    onClick={() => {
+                      setDoctorModalMode('create');
+                      setCreateDocError(null);
+                      setInviteDocError(null);
+                      setDoctorModalSuccess(null);
+                      setIsDoctorModalOpen(true);
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 18px',
+                      borderRadius: '10px',
+                      backgroundColor: BRAND_COLORS.primary,
+                      border: 'none',
+                      color: '#FFFFFF',
+                      fontSize: '12.5px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0, 96, 250, 0.25)',
+                    }}
+                  >
+                    <Plus size={15} />
+                    <span>{language === 'bn' ? 'প্রতিষ্ঠানে ডাক্তার যুক্ত করুন' : 'Add Doctor to Institution'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDoctorModalMode('invite');
+                      setCreateDocError(null);
+                      setInviteDocError(null);
+                      setDoctorModalSuccess(null);
+                      setIsDoctorModalOpen(true);
+                    }}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '6px',
                       padding: '9px 16px',
                       borderRadius: '10px',
-                      backgroundColor: BRAND_COLORS.primary,
-                      border: 'none',
-                      color: '#FFFFFF',
+                      backgroundColor: tokens.cardBg,
+                      border: `1px solid ${tokens.cardBorder}`,
+                      color: tokens.textPrimary,
                       fontSize: '12.5px',
                       fontWeight: 700,
                       cursor: 'pointer',
                     }}
                   >
-                    <Plus size={15} />
-                    <span>{language === 'bn' ? 'নতুন ডাক্তার সংযুক্ত করুন' : 'Invite / Link Doctor'}</span>
+                    <Mail size={15} color={BRAND_COLORS.primary} />
+                    <span>{language === 'bn' ? 'বিদ্যমান ডাক্তার আমন্ত্রণ' : 'Invite Existing Doctor'}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Top 7 Summary Cards as per Section 3 */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px' }}>
-                {[
+              {/* Sub-Navigation: Affiliated Doctors vs Sent Invitations */}
+              <div style={{ display: 'flex', gap: '8px', borderBottom: `1px solid ${tokens.tableBorder}`, paddingBottom: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setDoctorManagementTab('roster')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: doctorManagementTab === 'roster' ? BRAND_COLORS.primary : 'transparent',
+                    color: doctorManagementTab === 'roster' ? '#FFFFFF' : tokens.textMuted,
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {language === 'bn' ? `অ্যাফিলিয়েটেড চিকিৎসক ও সিরিয়াল (${doctors.length})` : `Affiliated Doctors & Serials (${doctors.length})`}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDoctorManagementTab('invitations')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: doctorManagementTab === 'invitations' ? BRAND_COLORS.primary : 'transparent',
+                    color: doctorManagementTab === 'invitations' ? '#FFFFFF' : tokens.textMuted,
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <Mail size={14} />
+                  <span>{language === 'bn' ? 'প্রেরিত আমন্ত্রণ তালিকা' : 'Affiliation Invitations'}</span>
+                  {sentInvitations.filter((i) => i.status === 'pending').length > 0 && (
+                    <span style={{ backgroundColor: '#F59E0B', color: '#FFFFFF', padding: '1px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: 800 }}>
+                      {sentInvitations.filter((i) => i.status === 'pending').length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {doctorManagementTab === 'invitations' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div
+                    style={{
+                      padding: '16px 20px',
+                      backgroundColor: tokens.cardBg,
+                      borderRadius: '16px',
+                      border: `1px solid ${tokens.cardBorder}`,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '12px',
+                    }}
+                  >
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px 0', color: tokens.textPrimary }}>
+                        {language === 'bn' ? 'চিকিৎসক অ্যাফিলিয়েশন আমন্ত্রণ তালিকা' : 'Doctor Affiliation Invitations'}
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '12px', color: tokens.textMuted }}>
+                        Track invitation consent from practitioners invited to affiliate with your healthcare center.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInviteDocError(null);
+                        setIsInviteDoctorOpen(true);
+                      }}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        backgroundColor: BRAND_COLORS.primary,
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <Plus size={14} />
+                      <span>{language === 'bn' ? 'নতুন আমন্ত্রণ পাঠান' : 'Invite Another Doctor'}</span>
+                    </button>
+                  </div>
+
+                  {sentInvitations.length === 0 ? (
+                    <div
+                      style={{
+                        textAlign: 'center',
+                        padding: '48px 24px',
+                        backgroundColor: tokens.cardBg,
+                        borderRadius: '16px',
+                        border: `1px dashed ${tokens.cardBorder}`,
+                      }}
+                    >
+                      <Mail size={36} color={tokens.textMuted} style={{ marginBottom: '10px', opacity: 0.6 }} />
+                      <h4 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px 0', color: tokens.textPrimary }}>
+                        {language === 'bn' ? 'কোনো আমন্ত্রণ মুলতবি নেই' : 'No Sent Invitations Found'}
+                      </h4>
+                      <p style={{ fontSize: '12.5px', color: tokens.textMuted, margin: '0 0 16px 0' }}>
+                        Invite existing registered doctors to link their practice to your chambers without creating duplicates.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInviteDocError(null);
+                          setIsInviteDoctorOpen(true);
+                        }}
+                        style={{
+                          padding: '8px 16px',
+                          borderRadius: '8px',
+                          backgroundColor: BRAND_COLORS.primary,
+                          color: '#FFFFFF',
+                          border: 'none',
+                          fontSize: '12.5px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Invite Doctor by Email
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: tokens.cardBg,
+                        borderRadius: '16px',
+                        border: `1px solid ${tokens.cardBorder}`,
+                        overflowX: 'auto',
+                      }}
+                    >
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: tokens.tableHeaderBg, borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                            <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DOCTOR EMAIL / IDENTITY</th>
+                            <th style={{ padding: '12px 16px', color: tokens.textMuted }}>DEPARTMENT & BRANCH</th>
+                            <th style={{ padding: '12px 16px', color: tokens.textMuted }}>PROPOSED ROLE & FEE</th>
+                            <th style={{ padding: '12px 16px', color: tokens.textMuted }}>INVITATION DATE</th>
+                            <th style={{ padding: '12px 16px', color: tokens.textMuted }}>STATUS</th>
+                            <th style={{ padding: '12px 16px', color: tokens.textMuted, textAlign: 'right' }}>ACTIONS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sentInvitations.map((inv) => (
+                            <tr key={inv.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                              <td style={{ padding: '14px 16px' }}>
+                                <div style={{ fontWeight: 800, color: tokens.textPrimary }}>{inv.doctorEmail}</div>
+                                {inv.doctorName && (
+                                  <div style={{ fontSize: '11px', color: BRAND_COLORS.primary, fontWeight: 700 }}>
+                                    {inv.doctorName}
+                                  </div>
+                                )}
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <div style={{ color: tokens.textPrimary, fontWeight: 600 }}>{inv.departmentName || 'General Medicine'}</div>
+                                <div style={{ fontSize: '11px', color: tokens.textMuted }}>{inv.branchName || 'Main Campus'}</div>
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <div style={{ color: tokens.textPrimary, fontWeight: 600 }}>{inv.proposedRole || 'Visiting Specialist'}</div>
+                                <div style={{ fontSize: '11px', color: tokens.textMuted }}>৳{inv.consultationFee || 800} • {inv.chamberRoom || 'Room 101'}</div>
+                              </td>
+                              <td style={{ padding: '14px 16px', color: tokens.textMuted }}>
+                                {new Date(inv.createdAt).toLocaleDateString()}
+                              </td>
+                              <td style={{ padding: '14px 16px' }}>
+                                <span
+                                  style={{
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '11px',
+                                    fontWeight: 800,
+                                    textTransform: 'uppercase',
+                                    backgroundColor:
+                                      inv.status === 'accepted'
+                                        ? 'rgba(16, 185, 129, 0.15)'
+                                        : inv.status === 'declined'
+                                        ? 'rgba(239, 68, 68, 0.15)'
+                                        : inv.status === 'cancelled'
+                                        ? tokens.cardBgSubtle
+                                        : 'rgba(245, 158, 11, 0.15)',
+                                    color:
+                                      inv.status === 'accepted'
+                                        ? '#10B981'
+                                        : inv.status === 'declined'
+                                        ? '#EF4444'
+                                        : inv.status === 'cancelled'
+                                        ? tokens.textMuted
+                                        : '#F59E0B',
+                                  }}
+                                >
+                                  {inv.status}
+                                </span>
+                              </td>
+                              <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                                {inv.status === 'pending' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCancelInvitation(inv.id)}
+                                    style={{
+                                      padding: '5px 10px',
+                                      borderRadius: '6px',
+                                      border: '1px solid #EF4444',
+                                      backgroundColor: 'transparent',
+                                      color: '#EF4444',
+                                      fontSize: '11.5px',
+                                      fontWeight: 700,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Top 7 Summary Cards as per Section 3 */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px' }}>
+                    {[
                   { label: 'Total Doctors', val: doctors.length, color: BRAND_COLORS.primary, icon: Stethoscope },
                   { label: "Today's Total Serials", val: todayAppointments.length, color: '#0060FA', icon: Calendar },
                   { label: "Today's Confirmed", val: todayConfirmedSerials, color: '#10B981', icon: CheckCircle2 },
@@ -4104,8 +4616,10 @@ export default function HospitalPortalPage() {
                   </table>
                 </div>
               )}
-            </div>
-          );
+            </>
+          )}
+        </div>
+      );
         })()}
 
         {/* TAB 5: APPOINTMENTS DESK */}
@@ -5211,6 +5725,291 @@ export default function HospitalPortalPage() {
             </div>
           </div>
         )}
+
+        {/* TAB 11: UNIVERSAL QR MANAGEMENT & PRINTS */}
+        {activeTab === 'qr_code' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+            {/* Header & Sub-tab switcher */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '14px',
+              }}
+            >
+              <div>
+                <h2 style={{ fontSize: '18px', fontWeight: 800, color: tokens.textPrimary, margin: '0 0 4px 0' }}>
+                  {language === 'bn' ? 'প্রতিষ্ঠান ও চিকিৎসক কিউআর কোড ম্যানেজমেন্ট' : 'Institution & Doctor QR Code Management'}
+                </h2>
+                <div style={{ fontSize: '12.5px', color: tokens.textMuted }}>
+                  {language === 'bn'
+                    ? 'হাসপাতাল প্রোফাইল ও অনুমোদিত চিকিৎসকদের জন্য ভেরিফাইড কিউআর কোড তৈরি, ডাউনলোড ও ব্যাচ প্রিন্ট করুন।'
+                    : 'Generate, download, and batch-print verified QR codes for reception desks, chamber doors, and prescription pads.'}
+                </div>
+              </div>
+
+              {/* Subtab Toggle: Organization vs Affiliated Doctors */}
+              <div style={{ display: 'flex', gap: '6px', backgroundColor: tokens.cardBgSubtle, padding: '4px', borderRadius: '10px', border: `1px solid ${tokens.cardBorder}` }}>
+                <button
+                  type="button"
+                  onClick={() => setQrSubTab('organization')}
+                  style={{
+                    padding: '7px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: qrSubTab === 'organization' ? BRAND_COLORS.primary : 'transparent',
+                    color: qrSubTab === 'organization' ? '#FFFFFF' : tokens.textSecondary,
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {language === 'bn' ? 'হাসপাতাল কিউআর কোড' : 'Hospital QR Code'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQrSubTab('doctors')}
+                  style={{
+                    padding: '7px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: qrSubTab === 'doctors' ? BRAND_COLORS.primary : 'transparent',
+                    color: qrSubTab === 'doctors' ? '#FFFFFF' : tokens.textSecondary,
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {language === 'bn' ? `অনুমোদিত চিকিৎসক কিউআর (${doctors.length})` : `Affiliated Doctors (${doctors.length})`}
+                </button>
+              </div>
+            </div>
+
+            {/* Subtab 1: Organization QR Code */}
+            {qrSubTab === 'organization' && (
+              <div
+                style={{
+                  backgroundColor: tokens.cardBg,
+                  borderRadius: '16px',
+                  border: `1px solid ${tokens.cardBorder}`,
+                  padding: '24px',
+                  boxShadow: tokens.cardShadow,
+                }}
+              >
+                <QRCodeStudio
+                  details={{
+                    ownerType: (profile.institutionType as string) === 'diagnostic_center' ? 'diagnostic_center' : 'hospital',
+                    ownerId: profile.id,
+                    name: language === 'bn' ? (profile.nameBn || profile.name) : profile.name,
+                    designation: profile.dghsRegistrationNumber ? `DGHS Reg: ${profile.dghsRegistrationNumber}` : 'Accredited Healthcare Provider',
+                    specialty: `Campuses: ${branches.length} • Total Beds: ${profile.totalBeds || 0} • 24/7 Emergency & ICU`,
+                    organizationName: 'Diagnostic Care Verified Partner',
+                    publicUrl: QRService.getPublicProfileUrl((profile.institutionType as string) === 'diagnostic_center' ? 'diagnostic_center' : 'hospital', profile.id),
+                    isVerified: profile.verificationStatus === 'verified',
+                  }}
+                  showAnalyticsSummary={true}
+                  totalScans={orgQrAnalytics?.totalScans || 0}
+                />
+              </div>
+            )}
+
+            {/* Subtab 2: Affiliated Doctors QR Management */}
+            {qrSubTab === 'doctors' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Search & Actions Bar */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '12px',
+                    padding: '16px 20px',
+                    backgroundColor: tokens.cardBg,
+                    borderRadius: '14px',
+                    border: `1px solid ${tokens.cardBorder}`,
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '10px', flex: 1, minWidth: '280px', flexWrap: 'wrap' }}>
+                    <div style={{ position: 'relative', flex: '1 1 200px' }}>
+                      <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: tokens.textMuted }} />
+                      <input
+                        type="text"
+                        value={doctorQrSearch}
+                        onChange={(e) => setDoctorQrSearch(e.target.value)}
+                        placeholder={language === 'bn' ? 'চিকিৎসক বা বিএমডিসি খুঁজুন...' : 'Search doctor or BMDC...'}
+                        style={{
+                          width: '100%',
+                          padding: '9px 12px 9px 34px',
+                          borderRadius: '10px',
+                          border: `1px solid ${tokens.inputBorder}`,
+                          backgroundColor: tokens.inputBg,
+                          color: tokens.textPrimary,
+                          fontSize: '13px',
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <select
+                      value={doctorQrDeptFilter}
+                      onChange={(e) => setDoctorQrDeptFilter(e.target.value)}
+                      style={{
+                        padding: '9px 12px',
+                        borderRadius: '10px',
+                        border: `1px solid ${tokens.inputBorder}`,
+                        backgroundColor: tokens.inputBg,
+                        color: tokens.textPrimary,
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="all">{language === 'bn' ? 'সকল বিভাগ' : 'All Departments'}</option>
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={dept.name}>
+                          {language === 'bn' ? (dept.nameBn || dept.name) : dept.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Batch Print Action */}
+                  <button
+                    type="button"
+                    onClick={() => setIsBatchPrintOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '9px 18px',
+                      borderRadius: '10px',
+                      backgroundColor: '#0F172A',
+                      color: '#FFFFFF',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Printer size={15} />
+                    <span>{language === 'bn' ? 'সকল চিকিৎসকের ব্যাচ প্রিন্ট শিট' : 'Batch Print Sheet (A4)'}</span>
+                  </button>
+                </div>
+
+                {/* Doctors QR Table */}
+                <div
+                  style={{
+                    backgroundColor: tokens.cardBg,
+                    borderRadius: '16px',
+                    border: `1px solid ${tokens.cardBorder}`,
+                    overflow: 'hidden',
+                    boxShadow: tokens.cardShadow,
+                  }}
+                >
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: tokens.tableHeaderBg, borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                        <th style={{ padding: '12px 18px', color: tokens.textMuted }}>DOCTOR</th>
+                        <th style={{ padding: '12px 18px', color: tokens.textMuted }}>DEPARTMENT & BRANCH</th>
+                        <th style={{ padding: '12px 18px', color: tokens.textMuted }}>CHAMBER ROOM</th>
+                        <th style={{ padding: '12px 18px', color: tokens.textMuted }}>FEE</th>
+                        <th style={{ padding: '12px 18px', color: tokens.textMuted, textAlign: 'right' }}>QR ACTIONS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {doctors
+                        .filter((d) => {
+                          const matchesQuery =
+                            !doctorQrSearch.trim() ||
+                            d.doctorName.toLowerCase().includes(doctorQrSearch.trim().toLowerCase()) ||
+                            (d.bmdcRegistrationNumber || '').toLowerCase().includes(doctorQrSearch.trim().toLowerCase());
+                          const matchesDept = doctorQrDeptFilter === 'all' || d.departmentName === doctorQrDeptFilter;
+                          return matchesQuery && matchesDept;
+                        })
+                        .map((d) => (
+                          <tr key={d.id} style={{ borderBottom: `1px solid ${tokens.tableBorder}` }}>
+                            <td style={{ padding: '14px 18px' }}>
+                              <div style={{ fontWeight: 800, color: tokens.textPrimary }}>{d.doctorName}</div>
+                              <div style={{ fontSize: '11.5px', color: tokens.textMuted, marginTop: '2px' }}>
+                                BMDC: {d.bmdcRegistrationNumber || 'A-89412'} • {d.doctorSpecialization}
+                              </div>
+                            </td>
+                            <td style={{ padding: '14px 18px' }}>
+                              <div style={{ fontWeight: 600, color: tokens.textPrimary }}>{d.departmentName}</div>
+                              <div style={{ fontSize: '11.5px', color: tokens.textMuted }}>{d.branchName}</div>
+                            </td>
+                            <td style={{ padding: '14px 18px', color: tokens.textPrimary, fontWeight: 700 }}>
+                              {d.chamberRoom || 'General Chamber'}
+                            </td>
+                            <td style={{ padding: '14px 18px', fontWeight: 800, color: BRAND_COLORS.primary }}>
+                              ৳{d.consultationFee}
+                            </td>
+                            <td style={{ padding: '14px 18px', textAlign: 'right' }}>
+                              <div style={{ display: 'inline-flex', gap: '8px' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedDoctorForQr(d);
+                                    setIsDoctorQrStudioOpen(true);
+                                  }}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '7px 12px',
+                                    borderRadius: '8px',
+                                    backgroundColor: '#EFF6FF',
+                                    border: '1px solid #BFDBFE',
+                                    color: BRAND_COLORS.primary,
+                                    fontSize: '12px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <QrCode size={14} />
+                                  <span>Print Studio</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const url = QRService.getPublicProfileUrl('doctor', d.doctorId);
+                                    const dataUrl = await QRService.generatePNGDataUrl(url, { width: 1024 });
+                                    const link = document.createElement('a');
+                                    link.href = dataUrl;
+                                    link.download = `qr-${d.doctorName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+                                    link.click();
+                                  }}
+                                  title="Quick Download PNG"
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '7px 10px',
+                                    borderRadius: '8px',
+                                    backgroundColor: tokens.cardBgSubtle,
+                                    border: `1px solid ${tokens.cardBorder}`,
+                                    color: tokens.textPrimary,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <Download size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ========================================================================= */}
@@ -5322,119 +6121,763 @@ export default function HospitalPortalPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL 2: INVITE / LINK DOCTOR MODAL */}
+      {/* UNIFIED MODAL: ADD DOCTOR TO INSTITUTION (CREATE NEW & INVITE EXISTING) */}
       {/* ========================================================================= */}
-      {isAddDoctorOpen && (
+      {(isDoctorModalOpen || isCreateDoctorOpen || isInviteDoctorOpen || isAddDoctorOpen) && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 100,
+            zIndex: 110,
             padding: '16px',
+            overflowY: 'auto',
           }}
         >
           <div
             style={{
               backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-              borderRadius: '20px',
-              padding: '28px',
-              maxWidth: '480px',
+              borderRadius: '24px',
+              padding: '28px 32px',
+              maxWidth: '740px',
               width: '100%',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 24px 50px rgba(0, 0, 0, 0.35)',
+              border: `1px solid ${tokens.cardBorder}`,
+              maxHeight: '92vh',
+              overflowY: 'auto',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: tokens.textPrimary }}>
-                {language === 'bn' ? 'চিকিৎসক সংযুক্ত / আমন্ত্রণ জানান' : 'Invite / Link Specialist Doctor'}
-              </h3>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 4px 0', color: tokens.textPrimary, letterSpacing: '-0.02em' }}>
+                  {language === 'bn' ? 'প্রতিষ্ঠানে ডাক্তার যুক্ত করুন' : 'Add Doctor to Institution'}
+                </h3>
+                <p style={{ margin: 0, fontSize: '13px', color: tokens.textMuted, lineHeight: 1.5 }}>
+                  {language === 'bn'
+                    ? 'নতুন ডাক্তার একাউন্ট তৈরি করুন অথবা ডায়াগনস্টিক কেয়ারের বিদ্যমান ডাক্তারকে আপনার প্রতিষ্ঠানে আমন্ত্রণ জানান।'
+                    : 'Create a new doctor account or invite an existing Diagnostic Care doctor to your institution.'}
+                </p>
+              </div>
               <button
                 type="button"
-                onClick={() => setIsAddDoctorOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: tokens.textMuted }}
+                onClick={() => {
+                  setIsDoctorModalOpen(false);
+                  setIsCreateDoctorOpen(false);
+                  setIsInviteDoctorOpen(false);
+                  setIsAddDoctorOpen(false);
+                  setCreateDocError(null);
+                  setInviteDocError(null);
+                  setDoctorModalSuccess(null);
+                }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: tokens.textMuted, padding: '4px' }}
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleInviteDoctor} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
-                  Doctor Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={inviteDocName}
-                  onChange={(e) => setInviteDocName(e.target.value)}
-                  placeholder="e.g. Prof. Dr. M. A. Rahman"
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
-                />
-              </div>
+            {/* Segmented Control Mode Switcher */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '8px',
+                padding: '4px',
+                backgroundColor: tokens.cardBgSubtle,
+                borderRadius: '14px',
+                border: `1px solid ${tokens.cardBorder}`,
+                marginBottom: '20px',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setDoctorModalMode('create');
+                  setCreateDocError(null);
+                  setDoctorModalSuccess(null);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  backgroundColor: doctorModalMode === 'create' ? BRAND_COLORS.primary : 'transparent',
+                  color: doctorModalMode === 'create' ? '#FFFFFF' : tokens.textSecondary,
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: doctorModalMode === 'create' ? '0 2px 8px rgba(0, 96, 250, 0.3)' : 'none',
+                }}
+              >
+                <UserCheck size={16} />
+                <span>1. {language === 'bn' ? 'নতুন ডাক্তার একাউন্ট তৈরি' : 'Create New Doctor Account'}</span>
+              </button>
 
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
-                  BMDC Registration Number *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={inviteBmdc}
-                  onChange={(e) => setInviteBmdc(e.target.value)}
-                  placeholder="e.g. A-28941"
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setDoctorModalMode('invite');
+                  setInviteDocError(null);
+                  setDoctorModalSuccess(null);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  backgroundColor: doctorModalMode === 'invite' ? BRAND_COLORS.primary : 'transparent',
+                  color: doctorModalMode === 'invite' ? '#FFFFFF' : tokens.textSecondary,
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: doctorModalMode === 'invite' ? '0 2px 8px rgba(0, 96, 250, 0.3)' : 'none',
+                }}
+              >
+                <Mail size={16} />
+                <span>2. {language === 'bn' ? 'বিদ্যমান ডাক্তার আমন্ত্রণ' : 'Invite Existing Doctor'}</span>
+              </button>
+            </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
-                    Department
-                  </label>
-                  <select
-                    value={inviteDept}
-                    onChange={(e) => setInviteDept(e.target.value)}
-                    style={{ width: '100%', padding: '9px 10px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '12.5px', boxSizing: 'border-box' }}
+            {/* Success Banner */}
+            {doctorModalSuccess && (
+              <div
+                style={{
+                  padding: '14px 18px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: '12px',
+                  color: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '18px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                }}
+              >
+                <CheckCircle2 size={20} />
+                <span>{doctorModalSuccess}</span>
+              </div>
+            )}
+
+            {/* Error Banner */}
+            {(doctorModalMode === 'create' ? createDocError : inviteDocError) && (
+              <div
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: '12px',
+                  color: '#EF4444',
+                  marginBottom: '18px',
+                  fontSize: '12.5px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}>
+                  <AlertTriangle size={16} />
+                  <span>{doctorModalMode === 'create' ? createDocError : inviteDocError}</span>
+                </div>
+                {doctorModalMode === 'create' && createDocError && (createDocError.includes('already') || createDocError.includes('exists')) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDoctorModalMode('invite');
+                      setInviteDocEmail(createDocEmail);
+                      setCreateDocError(null);
+                    }}
+                    style={{
+                      alignSelf: 'flex-start',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      backgroundColor: BRAND_COLORS.primary,
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontSize: '11.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
                   >
-                    <option value="">Select Department</option>
-                    {departments.map((d) => (
-                      <option key={d.id} value={d.name}>{d.name}</option>
-                    ))}
-                  </select>
+                    Switch to "Invite Existing Doctor" with this email
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* ================================================================= */}
+            {/* OPTION 1: CREATE NEW DOCTOR ACCOUNT FORM */}
+            {/* ================================================================= */}
+            {doctorModalMode === 'create' && (
+              <form onSubmit={handleCreateDoctorAccountSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  {/* Doctor Full Name */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'ডাক্তারের পূর্ণ নাম' : "Doctor's Full Name"} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={createDocName}
+                      onChange={(e) => setCreateDocName(e.target.value)}
+                      placeholder="e.g. Prof. Dr. M. A. Rahman"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Doctor Email Address */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'ডাক্তারের ইমেইল এড্রেস (লগইন আইডি)' : 'Doctor Email Address (Login Identity)'} *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={createDocEmail}
+                      onChange={(e) => setCreateDocEmail(e.target.value)}
+                      placeholder="doctor@hospital.com"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
                 </div>
 
+                {/* Password Fields with Eye/EyeOff toggles */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'প্রাথমিক পাসওয়ার্ড (ন্যূনতম ৮ অক্ষর)' : 'Initial Password (Min 8 Chars)'} *
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showCreateDocPassword ? 'text' : 'password'}
+                        required
+                        minLength={8}
+                        value={createDocPassword}
+                        onChange={(e) => setCreateDocPassword(e.target.value)}
+                        placeholder="••••••••"
+                        style={{ width: '100%', padding: '9px 40px 9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateDocPassword(!showCreateDocPassword)}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: tokens.textMuted, cursor: 'pointer', padding: 0 }}
+                      >
+                        {showCreateDocPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'} *
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showCreateDocConfirmPassword ? 'text' : 'password'}
+                        required
+                        minLength={8}
+                        value={createDocConfirmPassword}
+                        onChange={(e) => setCreateDocConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        style={{ width: '100%', padding: '9px 40px 9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateDocConfirmPassword(!showCreateDocConfirmPassword)}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: tokens.textMuted, cursor: 'pointer', padding: 0 }}
+                      >
+                        {showCreateDocConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  {/* BMDC Registration */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'বিএমডিসি রেজিস্ট্রেশন নম্বর' : 'BMDC Registration Number'} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={createDocBmdc}
+                      onChange={(e) => setCreateDocBmdc(e.target.value)}
+                      placeholder="e.g. A-39214"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Medical Specialty */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'মেডিকেল স্পেশালিটি' : 'Medical Specialty'} *
+                    </label>
+                    <select
+                      value={createDocSpecialty}
+                      onChange={(e) => setCreateDocSpecialty(e.target.value)}
+                      style={{ width: '100%', padding: '9px 10px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    >
+                      <option value="General Medicine">General Medicine</option>
+                      <option value="Cardiology">Cardiology</option>
+                      <option value="Neurology">Neurology</option>
+                      <option value="Orthopedics">Orthopedics</option>
+                      <option value="Pediatrics">Pediatrics</option>
+                      <option value="Gynecology & Obstetrics">Gynecology & Obstetrics</option>
+                      <option value="Dermatology">Dermatology</option>
+                      <option value="Gastroenterology">Gastroenterology</option>
+                      <option value="Nephrology">Nephrology</option>
+                      <option value="ENT / Otolaryngology">ENT / Otolaryngology</option>
+                      <option value="General Surgery">General Surgery</option>
+                      <option value="Oncology">Oncology</option>
+                      <option value="Urology">Urology</option>
+                      <option value="Pulmonology">Pulmonology</option>
+                      <option value="Psychiatry">Psychiatry</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                  {/* Consultation Fee */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'কনসালটেশন ফি (BDT)' : 'Consultation Fee (BDT)'} *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      value={createDocFee}
+                      onChange={(e) => setCreateDocFee(Number(e.target.value))}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Doctor Phone Number (Optional) */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'ফোন নম্বর (ঐচ্ছিক)' : 'Doctor Phone Number (Optional)'}
+                    </label>
+                    <input
+                      type="tel"
+                      value={createDocPhone}
+                      onChange={(e) => setCreateDocPhone(e.target.value)}
+                      placeholder="01XXXXXXXXX"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Years of Experience (Optional) */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'অভিজ্ঞতার বছর (ঐচ্ছিক)' : 'Years of Experience (Optional)'}
+                    </label>
+                    <input
+                      type="number"
+                      value={createDocExperience}
+                      onChange={(e) => setCreateDocExperience(e.target.value ? Number(e.target.value) : '')}
+                      placeholder="e.g. 10"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  {/* Qualifications */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'শিক্ষাগত যোগ্যতা (ঐচ্ছিক)' : 'Qualifications (Optional)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={createDocQualifications}
+                      onChange={(e) => setCreateDocQualifications(e.target.value)}
+                      placeholder="e.g. MBBS, FCPS, MD (Cardiology)"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Institution Branch */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'হাসপাতাল শাখা' : 'Institution Branch'}
+                    </label>
+                    <select
+                      value={createDocBranch}
+                      onChange={(e) => setCreateDocBranch(e.target.value)}
+                      style={{ width: '100%', padding: '9px 10px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    >
+                      <option value="">Select Branch (Default: Main Campus)</option>
+                      {branches.map((b) => (
+                        <option key={b.id} value={b.branchName}>{b.branchName}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                  {/* Department */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'বিভাগ' : 'Department'}
+                    </label>
+                    <select
+                      value={createDocDept}
+                      onChange={(e) => setCreateDocDept(e.target.value)}
+                      style={{ width: '100%', padding: '9px 10px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Chamber or Room */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'চেম্বার রুম নম্বর' : 'Chamber or Room Number'}
+                    </label>
+                    <input
+                      type="text"
+                      value={createDocRoom}
+                      onChange={(e) => setCreateDocRoom(e.target.value)}
+                      placeholder="e.g. Room 204"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Consultation Duration */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'প্রতি রোগীর সময় (মিনিট)' : 'Consultation Duration (Mins)'}
+                    </label>
+                    <input
+                      type="number"
+                      value={createDocDuration}
+                      onChange={(e) => setCreateDocDuration(Number(e.target.value))}
+                      placeholder="15"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Consultation Days and Visiting Hours */}
+                <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: tokens.cardBgSubtle, border: `1px solid ${tokens.cardBorder}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary }}>
+                      {language === 'bn' ? 'কনসালটেশন দিনসমূহ' : 'Consultation Days'}
+                    </label>
+                    <span style={{ fontSize: '11px', color: tokens.textMuted }}>Click to toggle</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                    {['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day) => {
+                      const isSelected = createDocDays.includes(day);
+                      return (
+                        <button
+                          type="button"
+                          key={day}
+                          onClick={() => {
+                            if (isSelected) {
+                              setCreateDocDays(createDocDays.filter((d) => d !== day));
+                            } else {
+                              setCreateDocDays([...createDocDays, day]);
+                            }
+                          }}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '8px',
+                            border: `1px solid ${isSelected ? BRAND_COLORS.primary : tokens.cardBorder}`,
+                            backgroundColor: isSelected ? 'rgba(0, 96, 250, 0.12)' : 'transparent',
+                            color: isSelected ? BRAND_COLORS.primary : tokens.textSecondary,
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '11.5px', fontWeight: 700, color: tokens.textMuted, display: 'block', marginBottom: '3px' }}>
+                        Start Time
+                      </label>
+                      <input
+                        type="text"
+                        value={createDocStartTime}
+                        onChange={(e) => setCreateDocStartTime(e.target.value)}
+                        placeholder="05:00 PM"
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '12.5px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '11.5px', fontWeight: 700, color: tokens.textMuted, display: 'block', marginBottom: '3px' }}>
+                        End Time
+                      </label>
+                      <input
+                        type="text"
+                        value={createDocEndTime}
+                        onChange={(e) => setCreateDocEndTime(e.target.value)}
+                        placeholder="09:00 PM"
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '12.5px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '11.5px', fontWeight: 700, color: tokens.textMuted, display: 'block', marginBottom: '3px' }}>
+                        Daily Serial Limit
+                      </label>
+                      <input
+                        type="number"
+                        value={createDocDailyLimit}
+                        onChange={(e) => setCreateDocDailyLimit(Number(e.target.value))}
+                        placeholder="30"
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '12.5px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Buttons */}
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDoctorModalOpen(false);
+                      setIsCreateDoctorOpen(false);
+                      setIsAddDoctorOpen(false);
+                    }}
+                    style={{ padding: '10px 18px', borderRadius: '10px', backgroundColor: tokens.cardBgSubtle, border: `1px solid ${tokens.cardBorder}`, color: tokens.textSecondary, fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {language === 'bn' ? 'বাতিল' : 'Cancel'}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={createDocLoading}
+                    style={{
+                      padding: '10px 24px',
+                      borderRadius: '10px',
+                      backgroundColor: BRAND_COLORS.primary,
+                      border: 'none',
+                      color: '#FFFFFF',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      cursor: createDocLoading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 14px rgba(0, 96, 250, 0.3)',
+                    }}
+                  >
+                    {createDocLoading ? (
+                      <span>{language === 'bn' ? 'একাউন্ট তৈরি হচ্ছে...' : 'Creating Account...'}</span>
+                    ) : (
+                      <>
+                        <UserCheck size={16} />
+                        <span>{language === 'bn' ? 'ডাক্তার একাউন্ট তৈরি করুন' : 'Create Doctor Account'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* ================================================================= */}
+            {/* OPTION 2: INVITE EXISTING DOCTOR FORM */}
+            {/* ================================================================= */}
+            {doctorModalMode === 'invite' && (
+              <form onSubmit={handleInviteDoctorSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(0, 96, 250, 0.05)',
+                    border: '1px solid rgba(0, 96, 250, 0.15)',
+                    fontSize: '12px',
+                    color: tokens.textMuted,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <strong style={{ color: BRAND_COLORS.primary, display: 'block', marginBottom: '2px' }}>
+                    {language === 'bn' ? 'সেন্ট্রাল ডাক্তার একাউন্ট লিংকিং' : 'Central Doctor Identity Linking'}
+                  </strong>
+                  {language === 'bn'
+                    ? 'ডাক্তারের ইতিমধ্যে ডায়াগনস্টিক কেয়ারে একটি স্থায়ী একাউন্ট রয়েছে। আপনাকে তার নাম, বিএমডিসি বা ডিগ্রি পুনরায় প্রবেশ করাতে হবে না। আপনার চেম্বার প্রস্তাবটি তার ড্যাশবোর্ডে পাঠানো হবে।'
+                    : 'The doctor already holds a verified Diagnostic Care identity. You do not need to re-enter their BMDC credentials or bio. An affiliation invitation will be dispatched to their account for approval.'}
+                </div>
+
+                {/* Doctor Registered Email */}
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
-                    Consultation Fee (BDT)
+                    {language === 'bn' ? 'ডাক্তারের নিবন্ধিত ইমেইল এড্রেস' : "Doctor's Registered Email Address"} *
                   </label>
                   <input
-                    type="number"
-                    value={inviteFee}
-                    onChange={(e) => setInviteFee(Number(e.target.value))}
+                    type="email"
+                    required
+                    value={inviteDocEmail}
+                    onChange={(e) => setInviteDocEmail(e.target.value)}
+                    placeholder="doctor@hospital.com"
                     style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
                   />
                 </div>
-              </div>
 
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsAddDoctorOpen(false)}
-                  style={{ padding: '9px 16px', borderRadius: '10px', backgroundColor: tokens.cardBgSubtle, border: `1px solid ${tokens.cardBorder}`, color: tokens.textSecondary, fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '9px 20px', borderRadius: '10px', backgroundColor: BRAND_COLORS.primary, border: 'none', color: '#FFFFFF', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer' }}
-                >
-                  Save Association
-                </button>
-              </div>
-            </form>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  {/* Institution Branch */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'প্রতিষ্ঠান শাখা' : 'Institution Branch'} *
+                    </label>
+                    <select
+                      required
+                      value={inviteDocBranch}
+                      onChange={(e) => setInviteDocBranch(e.target.value)}
+                      style={{ width: '100%', padding: '9px 10px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    >
+                      <option value="">Select Branch</option>
+                      {branches.map((b) => (
+                        <option key={b.id} value={b.branchName}>{b.branchName}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Department */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'বিভাগ' : 'Department'} *
+                    </label>
+                    <select
+                      required
+                      value={inviteDocDept}
+                      onChange={(e) => setInviteDocDept(e.target.value)}
+                      style={{ width: '100%', padding: '9px 10px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  {/* Consultation Fee */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'প্রস্তাবিত কনসালটেশন ফি (BDT)' : 'Consultation Fee in BDT'} *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      value={inviteDocFee}
+                      onChange={(e) => setInviteDocFee(Number(e.target.value))}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Chamber or Room */}
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                      {language === 'bn' ? 'চেম্বার রুম নম্বর (ঐচ্ছিক)' : 'Chamber or Room Number (Optional)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={inviteDocRoom}
+                      onChange={(e) => setInviteDocRoom(e.target.value)}
+                      placeholder="e.g. Chamber 301"
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Proposed Consultation Schedule */}
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    {language === 'bn' ? 'প্রস্তাবিত কনসালটেশন সময়সূচি (ঐচ্ছিক)' : 'Proposed Consultation Schedule (Optional)'}
+                  </label>
+                  <input
+                    type="text"
+                    value={inviteDocHours}
+                    onChange={(e) => setInviteDocHours(e.target.value)}
+                    placeholder="e.g. 05:00 PM - 09:00 PM, Saturday to Thursday"
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                {/* Invitation Message */}
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: tokens.textSecondary, display: 'block', marginBottom: '4px' }}>
+                    {language === 'bn' ? 'আমন্ত্রণ বার্তা (ঐচ্ছিক)' : 'Invitation Message (Optional)'}
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={inviteDocMessage}
+                    onChange={(e) => setInviteDocMessage(e.target.value)}
+                    placeholder="e.g. We would be honored to welcome you to our specialist consultation roster."
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${tokens.inputBorder}`, backgroundColor: tokens.inputBg, color: tokens.textPrimary, fontSize: '13px', boxSizing: 'border-box', outline: 'none' }}
+                  />
+                </div>
+
+                {/* Footer Buttons */}
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDoctorModalOpen(false);
+                      setIsInviteDoctorOpen(false);
+                      setInviteDocError(null);
+                    }}
+                    style={{ padding: '10px 18px', borderRadius: '10px', backgroundColor: tokens.cardBgSubtle, border: `1px solid ${tokens.cardBorder}`, color: tokens.textSecondary, fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {language === 'bn' ? 'বাতিল' : 'Cancel'}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={inviteDocLoading}
+                    style={{
+                      padding: '10px 24px',
+                      borderRadius: '10px',
+                      backgroundColor: BRAND_COLORS.primary,
+                      border: 'none',
+                      color: '#FFFFFF',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      cursor: inviteDocLoading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 14px rgba(0, 96, 250, 0.3)',
+                    }}
+                  >
+                    {inviteDocLoading ? (
+                      <span>{language === 'bn' ? 'আমন্ত্রণ পাঠানো হচ্ছে...' : 'Sending Invitation...'}</span>
+                    ) : (
+                      <>
+                        <Mail size={16} />
+                        <span>{language === 'bn' ? 'ডাক্তারকে আমন্ত্রণ পাঠান' : 'Send Doctor Invitation'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
@@ -6778,6 +8221,195 @@ export default function HospitalPortalPage() {
               >
                 Close Helpline
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 15: DOCTOR QR CODE PRINT STUDIO MODAL */}
+      {isDoctorQrStudioOpen && selectedDoctorForQr && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+              borderRadius: '24px',
+              padding: '28px',
+              maxWidth: '920px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: `1px solid ${tokens.cardBorder}`,
+              position: 'relative',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setIsDoctorQrStudioOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: tokens.textMuted,
+                padding: '4px',
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <QRCodeStudio
+              details={{
+                ownerType: 'doctor',
+                ownerId: selectedDoctorForQr.doctorId,
+                name: selectedDoctorForQr.doctorName,
+                designation: `BMDC Reg: ${selectedDoctorForQr.bmdcRegistrationNumber || 'Verified'}`,
+                specialty: `${selectedDoctorForQr.doctorSpecialization} • ${selectedDoctorForQr.departmentName}`,
+                organizationName: `${profile.name} (${selectedDoctorForQr.chamberRoom || 'Chamber'})`,
+                publicUrl: QRService.getPublicProfileUrl('doctor', selectedDoctorForQr.doctorId),
+                isVerified: true,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 16: BATCH PRINT SHEET (A4) FOR ALL DOCTORS */}
+      {isBatchPrintOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              padding: '28px',
+              maxWidth: '960px',
+              width: '100%',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              position: 'relative',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '14px', borderBottom: '1px solid #E2E8F0' }}>
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  {language === 'bn' ? 'চিকিৎসক ব্যাচ প্রিন্ট শিট (A4)' : 'Affiliated Doctors Batch Print Sheet (A4)'}
+                </h3>
+                <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+                  {profile.name} • {doctors.length} Verified Doctors
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="btn-primary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Printer size={15} />
+                  <span>{language === 'bn' ? 'শিট প্রিন্ট করুন' : 'Print All (A4)'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsBatchPrintOpen(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                    padding: '6px',
+                  }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Print Grid */}
+            <div
+              id="batch-print-grid"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: '16px',
+              }}
+            >
+              {doctors.map((d) => {
+                const docUrl = QRService.getPublicProfileUrl('doctor', d.doctorId);
+                return (
+                  <div
+                    key={d.id}
+                    style={{
+                      border: '1.5px solid #CBD5E1',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      textAlign: 'center',
+                      backgroundColor: '#FFFFFF',
+                    }}
+                  >
+                    <div style={{ fontSize: '10px', fontWeight: 800, color: '#0060FA', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      Diagnostic Care • Verified
+                    </div>
+                    <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#0F172A', lineHeight: 1.3 }}>
+                      {d.doctorName}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#475569', marginTop: '2px' }}>
+                      {d.doctorSpecialization}
+                    </div>
+                    <div style={{ fontSize: '10.5px', color: '#64748B', marginTop: '1px' }}>
+                      BMDC: {d.bmdcRegistrationNumber || 'Verified'} • {d.chamberRoom || 'Chamber'}
+                    </div>
+
+                    <div style={{ margin: '12px auto', width: '130px', height: '130px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(docUrl)}`}
+                        alt={`QR for ${d.doctorName}`}
+                        style={{ width: '130px', height: '130px', borderRadius: '8px' }}
+                      />
+                    </div>
+
+                    <div style={{ fontSize: '10px', color: '#15803D', fontWeight: 700, backgroundColor: '#F0FDF4', padding: '3px 8px', borderRadius: '4px' }}>
+                      Scan to Book Appointment
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
