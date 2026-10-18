@@ -18,6 +18,10 @@ import {
   Keyboard,
   ArrowRight,
   ExternalLink,
+  Lock,
+  Sliders,
+  FileImage,
+  Info,
 } from 'lucide-react';
 
 interface QRScannerModalProps {
@@ -41,6 +45,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   const [cameraRequested, setCameraRequested] = useState<boolean>(false);
   const [isRequestingPermission, setIsRequestingPermission] = useState<boolean>(false);
   const [permissionDenied, setPermissionDenied] = useState<boolean>(false);
+  const [noCameraHardware, setNoCameraHardware] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [scannedResult, setScannedResult] = useState<{ path: string; rawText: string } | null>(null);
@@ -50,7 +55,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasProcessedRef = useRef<boolean>(false);
 
-  // Initialize or teardown camera on open/close
+  // Initialize or teardown camera on open/close and listen for permission changes
   useEffect(() => {
     if (!isOpen) {
       stopCamera();
@@ -60,6 +65,8 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
       setIsProcessing(false);
       setCameraRequested(false);
       setIsRequestingPermission(false);
+      setPermissionDenied(false);
+      setNoCameraHardware(false);
       return;
     }
 
@@ -67,20 +74,45 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     setScannedResult(null);
     setErrorMessage(null);
 
-    // If permission was already granted previously, auto-start smoothly
-    if (activeMode === 'camera' && typeof navigator !== 'undefined' && navigator.permissions?.query) {
+    // Live permission monitoring
+    let permObj: PermissionStatus | null = null;
+    if (typeof navigator !== 'undefined' && navigator.permissions?.query) {
       navigator.permissions.query({ name: 'camera' as any })
         .then((res) => {
+          permObj = res;
           if (res.state === 'granted') {
-            setCameraRequested(true);
-            startCamera(cameraFacing);
+            setPermissionDenied(false);
+            setErrorMessage(null);
+            if (activeMode === 'camera') {
+              setCameraRequested(true);
+              startCamera(cameraFacing);
+            }
+          } else if (res.state === 'denied') {
+            setPermissionDenied(true);
           }
+
+          // Automatically start when user unblocks in browser address bar!
+          res.onchange = () => {
+            if (res.state === 'granted') {
+              setPermissionDenied(false);
+              setErrorMessage(null);
+              setCameraRequested(true);
+              startCamera(cameraFacing);
+            } else if (res.state === 'denied') {
+              setPermissionDenied(true);
+            } else {
+              setPermissionDenied(false);
+            }
+          };
         })
         .catch(() => {});
     }
 
     return () => {
       stopCamera();
+      if (permObj) {
+        permObj.onchange = null;
+      }
     };
   }, [isOpen, activeMode]);
 
@@ -96,10 +128,31 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     setIsRequestingPermission(true);
     setErrorMessage(null);
     setPermissionDenied(false);
+    setNoCameraHardware(false);
 
     try {
       if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
         throw new Error('Camera device not supported by this browser');
+      }
+
+      // Check if any camera hardware is actually detected on the system
+      if (navigator.mediaDevices.enumerateDevices) {
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const videoDevices = devices.filter((d) => d.kind === 'videoinput');
+          if (devices.length > 0 && videoDevices.length === 0) {
+            setNoCameraHardware(true);
+            setIsRequestingPermission(false);
+            setErrorMessage(
+              language === 'en'
+                ? 'No webcam or camera device was detected on your computer. Please connect a camera or use "Upload Image" instead.'
+                : 'আপনার ডিভাইসে কোনো ক্যামেরা পাওয়া যায়নি। অনুগ্রহ করে ওয়েবক্যাম সংযোগ করুন অথবা "ছবি আপলোড" অপশন ব্যবহার করুন।'
+            );
+            return;
+          }
+        } catch {
+          // Continue if enumerateDevices fails
+        }
       }
 
       // Explicit user-gesture camera permission prompt
@@ -126,18 +179,27 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
       setIsRequestingPermission(false);
       console.warn('Camera permission note:', err);
       const isDenied = err?.name === 'NotAllowedError' || (err?.message || '').toLowerCase().includes('permission') || (err?.message || '').toLowerCase().includes('denied');
-      if (isDenied) {
+      const isNotFound = err?.name === 'NotFoundError' || err?.name === 'DevicesNotFoundError';
+
+      if (isNotFound) {
+        setNoCameraHardware(true);
+        setErrorMessage(
+          language === 'en'
+            ? 'No webcam was found on your computer. You can upload an image of the QR code or enter the code manually.'
+            : 'আপনার ডিভাইসে কোনো ক্যামেরা নেই। প্রেসক্রিপশন বা কার্ডের ছবি আপলোড করুন অথবা কোডটি লিখুন।'
+        );
+      } else if (isDenied) {
         setPermissionDenied(true);
         setErrorMessage(
           language === 'en'
-            ? 'Camera access was blocked in your browser settings. To allow access, click the lock or settings icon in your browser URL bar, set Camera to "Allow", and click Try Again.'
-            : 'ক্যামেরা ব্যবহারের অনুমতি ব্রাউজারে ব্লক করা আছে। ব্রাউজার অ্যাড্রেস বারের লক আইকনে ক্লিক করে ক্যামেরার অনুমতি দিন এবং পুনরায় চেষ্টা করুন।'
+            ? 'Camera access was blocked in your browser settings. Browsers suppress permission popups once blocked.'
+            : 'ক্যামেরা ব্যবহারের অনুমতি ব্রাউজারে ব্লক করা আছে। একবার ব্লক করা থাকলে ব্রাউজার নতুন কোনো পপআপ দেখায় না।'
         );
       } else {
         setErrorMessage(
           language === 'en'
-            ? 'No camera was found or your camera is in use by another program. You can upload an image or enter the code manually.'
-            : 'ক্যামেরা পাওয়া যায়নি বা অন্য অ্যাপ্লিকেশনে ব্যবহৃত হচ্ছে। অনুগ্রহ করে ছবি আপলোড করুন অথবা কোডটি লিখে প্রবেশ করুন।'
+            ? 'Camera is currently unavailable or in use by another application. Please close other camera apps or upload an image.'
+            : 'ক্যামেরা চালু করা যাচ্ছে না বা অন্য অ্যাপে ব্যবহৃত হচ্ছে। অনুগ্রহ করে অন্য অ্যাপ বন্ধ করুন বা ছবি আপলোড করুন।'
         );
       }
     }
@@ -487,11 +549,11 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                 <div
                   style={{
                     width: '100%',
-                    maxWidth: '380px',
-                    padding: '28px 20px',
+                    maxWidth: '420px',
+                    padding: '24px 20px',
                     borderRadius: '20px',
-                    backgroundColor: errorMessage ? '#FFF7ED' : '#F8FAFC',
-                    border: errorMessage ? '1px solid #FFEDD5' : '1px solid #E2E8F0',
+                    backgroundColor: permissionDenied ? '#FFF7ED' : (errorMessage ? '#FEF2F2' : '#F8FAFC'),
+                    border: permissionDenied ? '1px solid #FED7AA' : (errorMessage ? '1px solid #FECACA' : '1px solid #E2E8F0'),
                     textAlign: 'center',
                     display: 'flex',
                     flexDirection: 'column',
@@ -501,72 +563,185 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                 >
                   <div
                     style={{
-                      width: '64px',
-                      height: '64px',
+                      width: '60px',
+                      height: '60px',
                       borderRadius: '18px',
-                      backgroundColor: errorMessage ? '#FEF2F2' : '#EFF6FF',
-                      color: errorMessage ? '#DC2626' : BRAND_COLORS.primary,
+                      backgroundColor: permissionDenied ? '#FFEDD5' : (errorMessage ? '#FEE2E2' : '#EFF6FF'),
+                      color: permissionDenied ? '#EA580C' : (errorMessage ? '#DC2626' : BRAND_COLORS.primary),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      marginBottom: '16px',
-                      boxShadow: errorMessage ? '0 4px 12px rgba(220,38,38,0.1)' : '0 4px 12px rgba(0,96,250,0.12)',
+                      marginBottom: '14px',
+                      boxShadow: permissionDenied
+                        ? '0 4px 12px rgba(234,88,12,0.12)'
+                        : (errorMessage ? '0 4px 12px rgba(220,38,38,0.1)' : '0 4px 12px rgba(0,96,250,0.12)'),
                     }}
                   >
-                    {errorMessage ? <AlertTriangle size={32} /> : <Camera size={32} />}
+                    {permissionDenied ? <Lock size={28} /> : (errorMessage ? <AlertTriangle size={28} /> : <Camera size={28} />)}
                   </div>
 
-                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', margin: '0 0 8px 0' }}>
-                    {errorMessage
-                      ? (permissionDenied
-                          ? (language === 'en' ? 'Camera Permission Blocked' : 'ক্যামেরা ব্যবহারের অনুমতি বন্ধ')
-                          : (language === 'en' ? 'Camera Currently Unavailable' : 'ক্যামেরা চালু করা যাচ্ছে না'))
-                      : (language === 'en' ? 'Camera Permission Required' : 'ক্যামেরা ব্যবহারের অনুমতি প্রয়োজন')}
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
+                    {permissionDenied
+                      ? (language === 'en' ? 'Camera Blocked in Browser' : 'ব্রাউজারে ক্যামেরা ব্লক করা আছে')
+                      : (noCameraHardware
+                          ? (language === 'en' ? 'No Camera Detected' : 'কোনো ক্যামেরা পাওয়া যায়নি')
+                          : (errorMessage
+                              ? (language === 'en' ? 'Camera Currently Unavailable' : 'ক্যামেরা চালু করা যাচ্ছে না')
+                              : (language === 'en' ? 'Camera Permission Required' : 'ক্যামেরা ব্যবহারের অনুমতি প্রয়োজন')))}
                   </h3>
 
-                  <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.55, margin: '0 0 20px 0' }}>
-                    {errorMessage
-                      ? errorMessage
-                      : (language === 'en'
-                          ? 'To scan a medical prescription, chamber card, or healthcare poster, please allow camera access. Scanning is processed live in your browser and never saved.'
-                          : 'প্রেসক্রিপশন বা ডাক্তারের কিউআর কোড স্ক্যান করতে ক্যামেরা অ্যাক্সেস প্রয়োজন। আপনার ক্যামেরা কোনো ভিডিও ধারণ বা সংরক্ষণ করে না।')}
-                  </p>
+                  {permissionDenied ? (
+                    <div style={{ width: '100%', textAlign: 'left', margin: '10px 0 16px 0' }}>
+                      <div
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '12px',
+                          padding: '12px 14px',
+                          border: '1px solid #FDBA74',
+                          fontSize: '12.5px',
+                          color: '#475569',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <p style={{ fontWeight: 700, color: '#9A3412', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Info size={15} />
+                          {language === 'en' ? 'Why is there no permission popup?' : 'অনুমতির পপআপ কেন আসছে না?'}
+                        </p>
+                        <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#64748B' }}>
+                          {language === 'en'
+                            ? 'Google Chrome blocks websites from showing popups once camera access has been blocked. You can unblock it in 3 seconds:'
+                            : 'ব্রাউজার সেটিংসে ক্যামেরা একবার ব্লক করা থাকলে নতুন করে পপআপ দেখানো বন্ধ থাকে। আনব্লক করার সহজ ৩টি ধাপ:'}
+                        </p>
+                        <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#1E293B', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                          <li>
+                            {language === 'en' ? (
+                              <span>Click the <strong>Tune / Settings icon (🎛️ or 🔒)</strong> on the far left of your address bar (next to <i>diagnosticcare.vercel.app</i>).</span>
+                            ) : (
+                              <span>ব্রাউজার অ্যাড্রেস বারের শুরুতে <strong>সেটিংস বা লক আইকনে (🎛️ বা 🔒)</strong> ক্লিক করুন।</span>
+                            )}
+                          </li>
+                          <li>
+                            {language === 'en' ? (
+                              <span>Find <strong>Camera</strong> and toggle it to <strong>Allow</strong> (or click <i>Reset permission</i>).</span>
+                            ) : (
+                              <span><strong>Camera</strong> অপশনটি <strong>Allow</strong> বা চালু করুন।</span>
+                            )}
+                          </li>
+                          <li>
+                            {language === 'en' ? (
+                              <span>This screen will <strong>automatically detect</strong> it and open your camera!</span>
+                            ) : (
+                              <span>পরিবর্তন করলেই ক্যামেরা <strong>স্বয়ংক্রিয়ভাবে চালু</strong> হয়ে যাবে!</span>
+                            )}
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.55, margin: '0 0 18px 0' }}>
+                      {errorMessage
+                        ? errorMessage
+                        : (language === 'en'
+                            ? 'To scan a medical prescription, chamber card, or healthcare poster, click the button below to allow camera access.'
+                            : 'প্রেসক্রিপশন বা ডাক্তারের কিউআর কোড স্ক্যান করতে নিচের বাটনে ক্লিক করে ক্যামেরা চালু করুন।')}
+                    </p>
+                  )}
 
-                  <button
-                    onClick={handleRequestCameraPermission}
-                    disabled={isRequestingPermission}
-                    className="btn-primary"
-                    id="btn-request-camera-permission"
-                    style={{
-                      width: '100%',
-                      padding: '12px 20px',
-                      borderRadius: '12px',
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      cursor: isRequestingPermission ? 'not-allowed' : 'pointer',
-                      boxShadow: '0 4px 14px rgba(0,96,250,0.25)',
-                    }}
-                  >
-                    {isRequestingPermission ? (
-                      <>
-                        <RefreshCw size={17} className="spin-animation" />
-                        <span>{language === 'en' ? 'Requesting Browser Permission...' : 'ব্রাউজারে অনুমতি চাওয়া হচ্ছে...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Camera size={18} />
-                        <span>
-                          {errorMessage
-                            ? (language === 'en' ? 'Try Again & Allow Camera' : 'পুনরায় অনুমতি দিন')
-                            : (language === 'en' ? 'Enable Camera & Scan' : 'ক্যামেরা চালু করুন ও স্ক্যান করুন')}
-                        </span>
-                      </>
-                    )}
-                  </button>
+                  {/* Actions Area */}
+                  {permissionDenied ? (
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <button
+                        onClick={() => {
+                          setErrorMessage(null);
+                          setActiveMode('upload');
+                        }}
+                        className="btn-primary"
+                        style={{
+                          width: '100%',
+                          padding: '12px 18px',
+                          borderRadius: '12px',
+                          fontSize: '14px',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          boxShadow: '0 4px 14px rgba(0,96,250,0.25)',
+                        }}
+                      >
+                        <FileImage size={18} />
+                        <span>{language === 'en' ? 'Upload QR Photo Instead (Fastest)' : 'ছবি আপলোড করে স্ক্যান করুন (দ্রুততম)'}</span>
+                      </button>
+
+                      <button
+                        onClick={handleRequestCameraPermission}
+                        disabled={isRequestingPermission}
+                        style={{
+                          width: '100%',
+                          padding: '10px 16px',
+                          borderRadius: '12px',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          border: '1px solid #CBD5E1',
+                          backgroundColor: '#FFFFFF',
+                          color: '#334155',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        {isRequestingPermission ? (
+                          <>
+                            <RefreshCw size={15} className="spin-animation" />
+                            <span>{language === 'en' ? 'Checking browser permission...' : 'অনুমতি যাচাই হচ্ছে...'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw size={15} />
+                            <span>{language === 'en' ? 'I Unblocked It — Check Again' : 'আনব্লক করেছি — পুনরায় পরীক্ষা করুন'}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleRequestCameraPermission}
+                      disabled={isRequestingPermission}
+                      className="btn-primary"
+                      id="btn-request-camera-permission"
+                      style={{
+                        width: '100%',
+                        padding: '12px 20px',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        cursor: isRequestingPermission ? 'not-allowed' : 'pointer',
+                        boxShadow: '0 4px 14px rgba(0,96,250,0.25)',
+                      }}
+                    >
+                      {isRequestingPermission ? (
+                        <>
+                          <RefreshCw size={17} className="spin-animation" />
+                          <span>{language === 'en' ? 'Requesting Browser Permission...' : 'ব্রাউজারে অনুমতি চাওয়া হচ্ছে...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Camera size={18} />
+                          <span>
+                            {errorMessage
+                              ? (language === 'en' ? 'Try Again' : 'পুনরায় চেষ্টা করুন')
+                              : (language === 'en' ? 'Enable Camera & Scan' : 'ক্যামেরা চালু করুন ও স্ক্যান করুন')}
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  )}
 
                   <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', fontSize: '12px' }}>
                     <button
