@@ -10,3 +10,4 @@ backups/
 
 .vercel
 .env*
+scratch/
