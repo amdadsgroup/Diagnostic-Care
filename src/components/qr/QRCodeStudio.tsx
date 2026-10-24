@@ -19,7 +19,9 @@ import {
   FileText,
   CreditCard,
   LayoutGrid,
+  ShieldAlert,
 } from 'lucide-react';
+import { AuthService, AuthUserProfile } from '@/services/auth.service';
 
 export type PrintPreset = 'poster' | 'prescription' | 'visiting_card' | 'a4_sheet' | 'custom';
 
@@ -27,6 +29,7 @@ interface QRCodeStudioProps {
   details: QRCardDetails;
   showAnalyticsSummary?: boolean;
   totalScans?: number;
+  canManage?: boolean;
   onClose?: () => void;
 }
 
@@ -34,6 +37,7 @@ export const QRCodeStudio: React.FC<QRCodeStudioProps> = ({
   details,
   showAnalyticsSummary = false,
   totalScans = 0,
+  canManage,
   onClose,
 }) => {
   const { language } = useLanguage();
@@ -44,11 +48,36 @@ export const QRCodeStudio: React.FC<QRCodeStudioProps> = ({
   const [qrSize, setQrSize] = useState<number>(220);
   const [copied, setCopied] = useState<boolean>(false);
   const [shared, setShared] = useState<boolean>(false);
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(canManage !== undefined ? canManage : null);
   const printAreaRef = useRef<HTMLDivElement>(null);
 
-  // Generate SVG & PNG on change
+  // Check authorization on mount if not pre-provided
   useEffect(() => {
     let isMounted = true;
+    if (canManage !== undefined) {
+      setIsAuthorized(canManage);
+      return;
+    }
+
+    AuthService.getCurrentUser().then((user) => {
+      if (!isMounted) return;
+      const allowed = QRService.canUserManageQR(user, details.ownerType, details.ownerId);
+      setIsAuthorized(allowed);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [canManage, details.ownerType, details.ownerId]);
+
+  // Generate SVG & PNG on change ONLY if authorized
+  useEffect(() => {
+    let isMounted = true;
+    if (isAuthorized === false) {
+      setIsGenerating(false);
+      return;
+    }
+
     setIsGenerating(true);
 
     const renderCodes = async () => {
@@ -80,7 +109,7 @@ export const QRCodeStudio: React.FC<QRCodeStudioProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [details.publicUrl, activePreset]);
+  }, [details.publicUrl, activePreset, isAuthorized]);
 
   // Handle Preset Selection
   const handleSelectPreset = (preset: PrintPreset) => {
@@ -94,6 +123,7 @@ export const QRCodeStudio: React.FC<QRCodeStudioProps> = ({
 
   // Download PNG file
   const handleDownloadPNG = () => {
+    if (isAuthorized !== true) return;
     if (!pngDataUrl) return;
     const cleanName = (details.name || 'qr-code').toLowerCase().replace(/[^a-z0-9]/g, '-');
     const link = document.createElement('a');
@@ -106,6 +136,7 @@ export const QRCodeStudio: React.FC<QRCodeStudioProps> = ({
 
   // Download SVG file
   const handleDownloadSVG = () => {
+    if (isAuthorized !== true) return;
     if (!svgString) return;
     const cleanName = (details.name || 'qr-code').toLowerCase().replace(/[^a-z0-9]/g, '-');
     const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
@@ -151,10 +182,69 @@ export const QRCodeStudio: React.FC<QRCodeStudioProps> = ({
 
   // Browser Print
   const handlePrint = () => {
+    if (isAuthorized !== true) return;
     if (typeof window !== 'undefined') {
       window.print();
     }
   };
+
+  if (isAuthorized === false) {
+    return (
+      <div
+        className="glass-card"
+        style={{
+          width: '100%',
+          maxWidth: '540px',
+          margin: '24px auto',
+          padding: '36px 28px',
+          textAlign: 'center',
+          borderRadius: '20px',
+          border: '1.5px solid rgba(239, 68, 68, 0.25)',
+          background: 'rgba(254, 242, 242, 0.95)',
+          boxShadow: '0 20px 40px rgba(239, 68, 68, 0.08)',
+        }}
+      >
+        <div
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '18px',
+            backgroundColor: '#FEE2E2',
+            color: '#DC2626',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px',
+          }}
+        >
+          <ShieldAlert size={32} />
+        </div>
+        <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#991B1B', margin: '0 0 8px 0' }}>
+          {language === 'bn' ? 'অননুমোদিত প্রবেশাধিকার' : 'Access Restricted: Management Privileges Required'}
+        </h3>
+        <p style={{ fontSize: '13px', color: '#7F1D1D', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+          {language === 'bn'
+            ? 'কিউআর কোড ডাউনলোড, প্রিন্ট এবং ম্যানেজমেন্ট টুলস কেবল অনুমোদিত চিকিৎসক এবং প্রতিষ্ঠানের জন্য সীমাবদ্ধ। সাধারণ দর্শনার্থী বা রোগীরা এই ফিচার ব্যবহার করতে পারবেন না।'
+            : 'Official QR code management, high-resolution downloads, and print studio tools are strictly restricted to verified healthcare professionals and authorized institution administrators.'}
+        </p>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="btn-secondary"
+            style={{
+              padding: '10px 24px',
+              borderRadius: '12px',
+              fontWeight: 700,
+              fontSize: '13px',
+              cursor: 'pointer',
+            }}
+          >
+            {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="qr-studio-container" style={{ width: '100%', maxWidth: '920px', margin: '0 auto' }}>

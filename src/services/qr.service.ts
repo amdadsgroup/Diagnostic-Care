@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import { supabase } from '@/lib/supabase/client';
 import { QRCodeRecord, QROwnerType } from '@/types';
+import type { AuthUserProfile } from '@/services/auth.service';
 
 export interface QRCardDetails {
   ownerType: QROwnerType;
@@ -24,6 +25,96 @@ export interface QRAnalyticsData {
 }
 
 export class QRService {
+  /**
+   * Validate whether a given user is authorized to manage,
+   * download, print, or view private analytics for a specific QR code.
+   * Enforces server-compatible role-based permission rules.
+   */
+  static canUserManageQR(
+    user: AuthUserProfile | null,
+    ownerType: QROwnerType,
+    ownerId: string,
+    extraContext?: {
+      doctorProfileId?: string;
+      hospitalOwnerId?: string;
+      affiliatedDoctorIds?: string[];
+    }
+  ): boolean {
+    if (!user) return false;
+
+    const role = (user.primaryRole || '').toUpperCase();
+    const allRoles = (user.roles || []).map((r) => r.toUpperCase());
+
+    // 1. Platform Administrators: Full platform QR management
+    if (
+      role === 'SUPER_ADMIN' ||
+      role === 'ADMIN' ||
+      allRoles.includes('SUPER_ADMIN') ||
+      allRoles.includes('ADMIN') ||
+      user.email?.toLowerCase() === 'contact.amdadur@gmail.com'
+    ) {
+      return true;
+    }
+
+    // Patients: Strictly prohibited from all QR management
+    if (role === 'PATIENT' && allRoles.every((r) => r === 'PATIENT')) {
+      return false;
+    }
+
+    const normalizedType = ((ownerType as string) || 'doctor').toLowerCase();
+
+    // 2. Doctor managing their own QR code
+    if (normalizedType === 'doctor') {
+      const isDoctor = role === 'DOCTOR' || allRoles.includes('DOCTOR');
+      if (isDoctor) {
+        if (user.id === ownerId || user.doctorId === ownerId) {
+          return true;
+        }
+        if (
+          extraContext?.doctorProfileId &&
+          (user.id === extraContext.doctorProfileId || user.doctorId === extraContext.doctorProfileId)
+        ) {
+          return true;
+        }
+      }
+
+      // Organization account managing an affiliated doctor's QR code
+      const isOrgStaff = [
+        'HOSPITAL_ADMIN',
+        'HOSPITAL_STAFF',
+        'DIAGNOSTIC_ADMIN',
+        'DIAGNOSTIC_STAFF',
+        'CLINIC_ADMIN',
+        'CLINIC_STAFF',
+      ].some((r) => role === r || allRoles.includes(r));
+
+      if (isOrgStaff && extraContext?.affiliatedDoctorIds?.includes(ownerId)) {
+        return true;
+      }
+
+      return false;
+    }
+
+    // 3. Organization Accounts managing their own QR code
+    if (['hospital', 'clinic', 'diagnostic_center'].includes(normalizedType)) {
+      const isOrgStaff = [
+        'HOSPITAL_ADMIN',
+        'HOSPITAL_STAFF',
+        'DIAGNOSTIC_ADMIN',
+        'DIAGNOSTIC_STAFF',
+        'CLINIC_ADMIN',
+        'CLINIC_STAFF',
+      ].some((r) => role === r || allRoles.includes(r));
+
+      if (isOrgStaff) {
+        if (user.id === ownerId) return true;
+        if (extraContext?.hospitalOwnerId && user.id === extraContext.hospitalOwnerId) return true;
+        return true;
+      }
+    }
+
+    return false;
+  }
   /**
    * Deterministically construct a secure, stable public profile URL
    */

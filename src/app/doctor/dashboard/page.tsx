@@ -716,7 +716,13 @@ function DoctorDashboardContent() {
     .filter((a: any) => (a.status || '').toLowerCase() === 'completed')
     .reduce((sum, a) => sum + (Number(a.consultation_fee || a.consultationFee) || currentFee), 0);
 
-  const isDoctorRole = currentUser && (currentUser.primaryRole === 'DOCTOR' || currentUser.roles.includes('DOCTOR'));
+  const isDoctorRole = Boolean(
+    currentUser &&
+      (currentUser.primaryRole === 'DOCTOR' ||
+        (currentUser.roles || []).includes('DOCTOR') ||
+        currentUser.primaryRole === 'SUPER_ADMIN' ||
+        (currentUser.roles || []).includes('SUPER_ADMIN'))
+  );
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
@@ -2976,6 +2982,7 @@ function DoctorDashboardContent() {
                           publicUrl: QRService.getPublicProfileUrl('doctor', currentUser?.id || '20000001-0000-0000-0000-000000000001'),
                           isVerified: true,
                         }}
+                        canManage={isDoctorRole}
                         showAnalyticsSummary={true}
                         totalScans={qrAnalytics?.totalScans || 0}
                       />

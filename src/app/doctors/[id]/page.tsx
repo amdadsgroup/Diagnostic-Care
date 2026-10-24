@@ -67,6 +67,14 @@ export default function DoctorDetailPage() {
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [isLoading, setIsLoading] = useState(!initialDoctor);
 
+  // Strict role-based permission check: verify if the authenticated user is authorized to manage this doctor's QR code
+  const canManageDoctorQr = React.useMemo(() => {
+    if (!currentUser || !doctor) return false;
+    return QRService.canUserManageQR(currentUser, 'doctor', doctor.id, {
+      doctorProfileId: (doctor as any).userId || (doctor as any).profileId,
+    });
+  }, [currentUser, doctor]);
+
   // Booking Modal State
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<Appointment | null>(null);
@@ -673,29 +681,32 @@ export default function DoctorDetailPage() {
                       : (language === 'en' ? 'Save to Wishlist' : 'পছন্দ তালিকায় রাখুন')}
                   </button>
 
-                  <button
-                    onClick={() => setIsQrStudioOpen(true)}
-                    id="btn-open-doctor-qr-studio"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 16px',
-                      borderRadius: '12px',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      border: '1px solid rgba(0, 96, 250, 0.3)',
-                      background: 'rgba(235, 243, 255, 0.8)',
-                      color: '#0060FA',
-                      boxShadow: '0 2px 8px rgba(0, 96, 250, 0.08)',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <QrCode size={16} color="#0060FA" />
-                    {language === 'en' ? 'Doctor QR & Print' : 'ডাক্তার কিউআর ও প্রিন্ট'}
-                  </button>
+                  {/* QR Management Button: Strictly rendered ONLY for verified doctor owner or platform admin */}
+                  {canManageDoctorQr && (
+                    <button
+                      onClick={() => setIsQrStudioOpen(true)}
+                      id="btn-open-doctor-qr-studio"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        border: '1px solid rgba(0, 96, 250, 0.3)',
+                        background: 'rgba(235, 243, 255, 0.8)',
+                        color: '#0060FA',
+                        boxShadow: '0 2px 8px rgba(0, 96, 250, 0.08)',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <QrCode size={16} color="#0060FA" />
+                      {language === 'en' ? 'Manage Doctor QR & Print' : 'ডাক্তার কিউআর ম্যানেজ ও প্রিন্ট'}
+                    </button>
+                  )}
 
                   <button
                     onClick={() => {
@@ -1088,8 +1099,8 @@ export default function DoctorDetailPage() {
         </div>
       )}
 
-      {/* QR Code Studio Modal */}
-      {isQrStudioOpen && doctor && (
+      {/* QR Code Studio Modal - Strictly rendered ONLY when verified authorized */}
+      {isQrStudioOpen && doctor && canManageDoctorQr && (
         <div
           style={{
             position: 'fixed',
@@ -1159,6 +1170,7 @@ export default function DoctorDetailPage() {
                 publicUrl: typeof window !== 'undefined' ? `${window.location.origin}/doctors/${doctor.id}?ref=qr` : `https://diagnosticcare.vercel.app/doctors/${doctor.id}?ref=qr`,
                 isVerified: doctor.verificationStatus === 'VERIFIED',
               }}
+              canManage={canManageDoctorQr}
               onClose={() => setIsQrStudioOpen(false)}
             />
           </div>

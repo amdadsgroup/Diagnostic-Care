@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import QRCodeStudio from '@/components/qr/QRCodeStudio';
 import { QRService } from '@/services/qr.service';
+import { AuthService, AuthUserProfile } from '@/services/auth.service';
 
 interface DiagnosticCenter {
   id: string;
@@ -77,8 +78,21 @@ export default function DiagnosticCenterDetailPage() {
   const [affiliatedDoctors, setAffiliatedDoctors] = useState<AffiliatedDoctor[]>([]);
   const [isLoading, setIsLoading] = useState(!initialCenter);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
+
+  // Strict role-based permission check: verify if the authenticated user is authorized to manage this center's QR code
+  const canManageCenterQr = React.useMemo(() => {
+    if (!currentUser || !center) return false;
+    return QRService.canUserManageQR(currentUser, 'diagnostic_center', center.id, {
+      hospitalOwnerId: (center as any).owner_profile_id,
+    });
+  }, [currentUser, center]);
 
   useEffect(() => {
+    AuthService.getCurrentUser().then((u) => {
+      if (u) setCurrentUser(u);
+    });
+
     async function loadCenterData() {
       try {
         const cleanId = (id || '').trim();
@@ -352,23 +366,26 @@ export default function DiagnosticCenterDetailPage() {
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => setIsQrModalOpen(true)}
-                className="btn-secondary"
-                style={{
-                  padding: '9px 14px',
-                  fontSize: '13px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                }}
-              >
-                <QrCode size={15} />
-                <span>{language === 'bn' ? 'সেন্টার কিউআর কোড' : 'Center QR Code'}</span>
-              </button>
+              {/* QR Management Button: Strictly rendered ONLY for verified center owner/staff or platform admin */}
+              {canManageCenterQr && (
+                <button
+                  type="button"
+                  onClick={() => setIsQrModalOpen(true)}
+                  className="btn-secondary"
+                  style={{
+                    padding: '9px 14px',
+                    fontSize: '13px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <QrCode size={15} />
+                  <span>{language === 'bn' ? 'সেন্টার কিউআর কোড' : 'Center QR Code'}</span>
+                </button>
+              )}
 
               {center.phone && (
                 <a
@@ -512,8 +529,8 @@ export default function DiagnosticCenterDetailPage() {
             </div>
           </div>
         )}
-      {/* Center QR Code Studio Modal */}
-      {isQrModalOpen && center && (
+      {/* Center QR Code Studio Modal - Strictly rendered ONLY when verified authorized */}
+      {isQrModalOpen && center && canManageCenterQr && (
         <div
           style={{
             position: 'fixed',
@@ -570,7 +587,9 @@ export default function DiagnosticCenterDetailPage() {
                 publicUrl: QRService.getPublicProfileUrl('diagnostic_center', center.id),
                 isVerified: Boolean(center.dghs_registration_number),
               }}
+              canManage={canManageCenterQr}
               showAnalyticsSummary={true}
+              onClose={() => setIsQrModalOpen(false)}
             />
           </div>
         </div>

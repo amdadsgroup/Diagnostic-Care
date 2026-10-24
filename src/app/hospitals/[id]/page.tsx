@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import QRCodeStudio from '@/components/qr/QRCodeStudio';
 import { QRService } from '@/services/qr.service';
+import { AuthService, AuthUserProfile } from '@/services/auth.service';
 
 export default function HospitalDetailPage() {
   const params = useParams();
@@ -38,8 +39,21 @@ export default function HospitalDetailPage() {
   const [affiliatedDoctors, setAffiliatedDoctors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(!initialHosp);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
+
+  // Strict role-based permission check: verify if the authenticated user is authorized to manage this hospital's QR code
+  const canManageHospitalQr = React.useMemo(() => {
+    if (!currentUser || !hospital) return false;
+    return QRService.canUserManageQR(currentUser, 'hospital', hospital.id, {
+      hospitalOwnerId: hospital.owner_profile_id,
+    });
+  }, [currentUser, hospital]);
 
   useEffect(() => {
+    AuthService.getCurrentUser().then((u) => {
+      if (u) setCurrentUser(u);
+    });
+
     async function loadHospital() {
       try {
         const cleanId = (id || '').trim();
@@ -274,23 +288,26 @@ export default function HospitalDetailPage() {
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => setIsQrModalOpen(true)}
-                className="btn-secondary"
-                style={{
-                  padding: '9px 14px',
-                  fontSize: '13px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                }}
-              >
-                <QrCode size={15} />
-                <span>{language === 'bn' ? 'হাসপাতাল কিউআর কোড' : 'Hospital QR Code'}</span>
-              </button>
+              {/* QR Management Button: Strictly rendered ONLY for verified hospital owner/staff or platform admin */}
+              {canManageHospitalQr && (
+                <button
+                  type="button"
+                  onClick={() => setIsQrModalOpen(true)}
+                  className="btn-secondary"
+                  style={{
+                    padding: '9px 14px',
+                    fontSize: '13px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <QrCode size={15} />
+                  <span>{language === 'bn' ? 'হাসপাতাল কিউআর কোড' : 'Hospital QR Code'}</span>
+                </button>
+              )}
 
               {hospital.phone && (
                 <a
@@ -388,8 +405,8 @@ export default function HospitalDetailPage() {
           )}
         </div>
 
-        {/* Hospital QR Code Studio Modal */}
-        {isQrModalOpen && hospital && (
+        {/* Hospital QR Code Studio Modal - Strictly rendered ONLY when verified authorized */}
+        {isQrModalOpen && hospital && canManageHospitalQr && (
           <div
             style={{
               position: 'fixed',
@@ -446,7 +463,9 @@ export default function HospitalDetailPage() {
                   publicUrl: QRService.getPublicProfileUrl('hospital', hospital.id),
                   isVerified: Boolean(hospital.dghs_registration_number),
                 }}
+                canManage={canManageHospitalQr}
                 showAnalyticsSummary={true}
+                onClose={() => setIsQrModalOpen(false)}
               />
             </div>
           </div>

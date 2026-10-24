@@ -230,19 +230,18 @@ export default function HomePage() {
     }
   }, []);
 
-  // Auto-redirect provider accounts when attempting to view patient profile or portal tab
+  // Auto-redirect verified provider accounts when attempting to view provider portal tab
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasHospSession = !!localStorage.getItem('dc_hospital_session');
-      const isProvRole =
+      const isProvRole = Boolean(
         ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentRole) ||
-        (currentUser && ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser.primaryRole));
-      const isFacilityName = ['popular', 'hospital', 'diagnostic', 'clinic', 'medical'].some((k) =>
-        (currentUser?.fullName || '').toLowerCase().includes(k)
+          (currentUser &&
+            ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(
+              currentUser.primaryRole
+            ))
       );
-      const isHospPhone = currentUser?.phone === '01733983752';
 
-      if ((hasHospSession || isProvRole || isFacilityName || isHospPhone) && (activeTab === 'profile' || activeTab === 'portal')) {
+      if (isProvRole && (activeTab === 'portal')) {
         window.location.href = '/hospital/portal';
       }
     }

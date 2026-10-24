@@ -53,14 +53,15 @@ export default function MobileNavigation({
   unreadCount = 0,
   currentUser,
 }: MobileNavigationProps) {
-  const isProvider =
-    ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentRole) ||
-    ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF'].includes(currentUser?.primaryRole) ||
-    (typeof window !== 'undefined' && !!localStorage.getItem('dc_hospital_session')) ||
-    (currentUser && ['popular', 'hospital', 'diagnostic', 'clinic', 'medical'].some((k: string) => (currentUser.fullName || '').toLowerCase().includes(k))) ||
-    currentUser?.phone === '01733983752';
+  const isProvider = Boolean(
+    ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF', 'DOCTOR', 'SUPER_ADMIN'].includes(currentRole) ||
+      (currentUser &&
+        ['HOSPITAL_ADMIN', 'DIAGNOSTIC_ADMIN', 'CLINIC_ADMIN', 'HOSPITAL_STAFF', 'DIAGNOSTIC_STAFF', 'DOCTOR', 'SUPER_ADMIN'].includes(
+          currentUser.primaryRole
+        ))
+  );
 
-  const isPatient = !isProvider && currentRole === 'PATIENT' && (!currentUser || currentUser.primaryRole === 'PATIENT');
+  const isPatient = !isProvider;
 
   // Active state matching
   const isHomeActive = activeTab === 'marketplace';

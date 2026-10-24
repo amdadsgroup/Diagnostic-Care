@@ -413,6 +413,28 @@ export default function HospitalPortalPage() {
           }
           return;
         }
+
+        const isAuthorizedHospitalUser = Boolean(
+          user &&
+            [
+              'HOSPITAL_ADMIN',
+              'HOSPITAL_STAFF',
+              'DIAGNOSTIC_ADMIN',
+              'DIAGNOSTIC_STAFF',
+              'CLINIC_ADMIN',
+              'CLINIC_STAFF',
+              'SUPER_ADMIN',
+              'ADMIN',
+            ].some((r) => r === user.primaryRole || user.roles?.includes(r as any))
+        );
+
+        if (!user || !isAuthorizedHospitalUser) {
+          setCurrentUser(user);
+          setProfile(null);
+          setAuthLoading(false);
+          return;
+        }
+
         setCurrentUser(user);
         if (user) {
           let hosp = await HospitalService.getHospitalByOwner(user.id);
@@ -1385,9 +1407,23 @@ export default function HospitalPortalPage() {
   }
 
   // --------------------------------------------------------------------------
-  // STATE 2: UNAUTHENTICATED GATEWAY (NO DEMO DATA)
+  // STATE 2: UNAUTHENTICATED OR UNAUTHORIZED GATEWAY (PATIENT / PUBLIC BARRIER)
   // --------------------------------------------------------------------------
-  if (!currentUser) {
+  const isAuthorizedHospitalUser = Boolean(
+    currentUser &&
+      [
+        'HOSPITAL_ADMIN',
+        'HOSPITAL_STAFF',
+        'DIAGNOSTIC_ADMIN',
+        'DIAGNOSTIC_STAFF',
+        'CLINIC_ADMIN',
+        'CLINIC_STAFF',
+        'SUPER_ADMIN',
+        'ADMIN',
+      ].some((r) => r === currentUser.primaryRole || currentUser.roles?.includes(r as any))
+  );
+
+  if (!currentUser || !isAuthorizedHospitalUser || !profile) {
     return (
       <div
         style={{
@@ -1417,24 +1453,37 @@ export default function HospitalPortalPage() {
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <LanguageSwitcher variant="pills" showIcon />
-            <Link
-              href="/provider/login?role=hospital&redirect=/hospital/portal"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 16px',
-                backgroundColor: BRAND_COLORS.primary,
-                color: '#FFFFFF',
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: 700,
-                textDecoration: 'none',
-              }}
-            >
-              <LogIn size={15} />
-              <span>{language === 'bn' ? 'লগইন করুন' : 'Sign In'}</span>
-            </Link>
+            {currentUser ? (
+              <button
+                onClick={async () => {
+                  await AuthService.signOut();
+                  window.location.reload();
+                }}
+                className="btn-outline"
+                style={{ padding: '7px 14px', fontSize: '12.5px', borderRadius: '8px', cursor: 'pointer' }}
+              >
+                {language === 'bn' ? 'লগআউট' : 'Sign Out'}
+              </button>
+            ) : (
+              <Link
+                href="/provider/login?role=hospital&redirect=/hospital/portal"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: '#FFFFFF',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                }}
+              >
+                <LogIn size={15} />
+                <span>{language === 'bn' ? 'লগইন করুন' : 'Sign In'}</span>
+              </Link>
+            )}
           </div>
         </header>
 
@@ -1448,6 +1497,39 @@ export default function HospitalPortalPage() {
             boxSizing: 'border-box',
           }}
         >
+          {/* Patient Barrier Banner */}
+          {currentUser && currentUser.primaryRole === 'PATIENT' && (
+            <div
+              style={{
+                backgroundColor: '#FEF2F2',
+                border: '1.5px solid #EF4444',
+                borderRadius: '16px',
+                padding: '20px 24px',
+                marginBottom: '28px',
+                textAlign: 'center',
+                color: '#991B1B',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 800, fontSize: '16px', marginBottom: '6px' }}>
+                <ShieldCheck size={20} color="#DC2626" />
+                <span>{language === 'bn' ? 'রোগী অ্যাকাউন্ট শনাক্ত হয়েছে' : 'Patient Account Detected'}</span>
+              </div>
+              <p style={{ fontSize: '13.5px', lineHeight: 1.6, margin: '0 0 16px 0', color: '#7F1D1D' }}>
+                {language === 'bn'
+                  ? 'আপনি বর্তমানে একজন রোগী (Patient) হিসেবে লগইন আছেন। প্রাতিষ্ঠানিক ব্যবস্থাপনা ও কিউআর কোড ম্যানেজমেন্ট পোর্টাল কেবল অনুমোদিত হাসপাতাল ও ডায়াগনস্টিক সেন্টারের কর্মকর্তাদের জন্য উন্মুক্ত।'
+                  : 'You are currently logged in with a Patient account. Institutional hospital consoles and QR Code Management tools are strictly restricted to verified facility staff and healthcare administrators.'}
+              </p>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link href="/appointments" className="btn-primary" style={{ padding: '8px 18px', fontSize: '13px', borderRadius: '10px', textDecoration: 'none' }}>
+                  {language === 'bn' ? 'আমার অ্যাপয়েন্টমেন্ট' : 'My Appointments'}
+                </Link>
+                <Link href="/" className="btn-secondary" style={{ padding: '8px 18px', fontSize: '13px', borderRadius: '10px', textDecoration: 'none' }}>
+                  {language === 'bn' ? 'মূল পাতা' : 'Back to Home'}
+                </Link>
+              </div>
+            </div>
+          )}
+
           <div
             style={{
               backgroundColor: tokens.cardBg,
