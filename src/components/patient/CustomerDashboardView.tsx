@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import AuthModal from '@/components/auth/AuthModal';
@@ -58,7 +58,7 @@ import {
   Search,
 } from 'lucide-react';
 
-type DashboardTab =
+export type DashboardTab =
   | 'overview'
   | 'profile'
   | 'appointments'
@@ -69,14 +69,41 @@ type DashboardTab =
   | 'security'
   | 'preferences';
 
-export default function CustomerDashboardView() {
+interface CustomerDashboardViewProps {
+  initialTab?: DashboardTab;
+}
+
+function CustomerDashboardContent({ initialTab }: CustomerDashboardViewProps = {}) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { language, setLanguage, formatCurrency } = useLanguage();
   const [currentUser, setCurrentUser] = useState<AuthUserProfile | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
+  const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
+    if (initialTab) return initialTab;
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname.startsWith('/appointments')) return 'appointments';
+      const t = new URLSearchParams(window.location.search).get('tab');
+      if (t && ['overview', 'profile', 'appointments', 'health', 'family', 'saved', 'notifications', 'security', 'preferences'].includes(t)) {
+        return t as DashboardTab;
+      }
+    }
+    return 'overview';
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (pathname?.startsWith('/appointments')) {
+      setActiveTab('appointments');
+    } else {
+      const tabParam = searchParams?.get('tab');
+      if (tabParam && ['overview', 'profile', 'appointments', 'health', 'family', 'saved', 'notifications', 'security', 'preferences'].includes(tabParam)) {
+        setActiveTab(tabParam as DashboardTab);
+      }
+    }
+  }, [pathname, searchParams]);
 
   // Profile State
   const [profile, setProfile] = useState<CustomerFullProfile | null>(null);
@@ -869,10 +896,55 @@ export default function CustomerDashboardView() {
           </div>
         </section>
 
+        {/* Mobile Horizontal Tabs Pill Bar (Visible on mobile, hidden on desktop) */}
+        <div className="patient-mobile-tabs" role="tablist" aria-label="Customer Dashboard Tabs">
+          {[
+            { id: 'overview', labelEn: 'Overview', labelBn: 'একনজরে', icon: Sparkles },
+            { id: 'profile', labelEn: 'Personal Info', labelBn: 'ব্যক্তিগত তথ্য', icon: User },
+            { id: 'appointments', labelEn: 'My Appointments', labelBn: 'অ্যাপয়েন্টমেন্ট', icon: Calendar, badge: upcomingApts.length },
+            { id: 'health', labelEn: 'Health Records', labelBn: 'স্বাস্থ্য ভল্ট', icon: Heart, badge: medicalRecords.length },
+            { id: 'family', labelEn: 'Family Members', labelBn: 'পারিবারিক সদস্য', icon: Users, badge: familyMembers.length },
+            { id: 'saved', labelEn: 'Saved Providers', labelBn: 'সংরক্ষিত ডাক্তার', icon: Star, badge: savedProviders.length },
+            { id: 'notifications', labelEn: 'Notifications', labelBn: 'বিজ্ঞপ্তি', icon: Bell, badge: notifications.filter((n) => !n.isRead).length },
+            { id: 'security', labelEn: 'Security & Privacy', labelBn: 'নিরাপত্তা', icon: Lock },
+            { id: 'preferences', labelEn: 'Preferences', labelBn: 'পছন্দসমূহ', icon: Settings },
+          ].map((item) => {
+            const IconComponent = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(item.id as DashboardTab)}
+                className={`patient-mobile-tab-btn ${isActive ? 'active' : ''}`}
+              >
+                <IconComponent size={15} />
+                <span>{language === 'bn' ? item.labelBn : item.labelEn}</span>
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span
+                    style={{
+                      backgroundColor: isActive ? 'rgba(255,255,255,0.3)' : '#EFF6FF',
+                      color: isActive ? '#FFFFFF' : BRAND_COLORS.primary,
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '1px 6px',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Dashboard Grid: Sidebar Navigation + Tab Views */}
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '24px', alignItems: 'start' }} className="d-desktop-grid">
-          {/* Glassmorphic Sidebar Navigation */}
+        <div className="patient-dashboard-grid">
+          {/* Glassmorphic Sidebar Navigation (Desktop only) */}
           <aside
+            className="patient-desktop-sidebar"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.85)',
               backdropFilter: 'blur(20px)',
@@ -3056,3 +3128,22 @@ export default function CustomerDashboardView() {
     </div>
   );
 }
+
+export default function CustomerDashboardView(props: CustomerDashboardViewProps = {}) {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8FAFC' }}>
+          <div style={{ textAlign: 'center', padding: '32px' }}>
+            <div style={{ width: '40px', height: '40px', border: '3px solid #0060FA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+            <div style={{ fontWeight: 800, color: '#090D14', fontSize: '15px' }}>Diagnostic Care</div>
+            <div style={{ color: '#64748B', fontSize: '13px', marginTop: '4px' }}>Loading patient portal...</div>
+          </div>
+        </div>
+      }
+    >
+      <CustomerDashboardContent {...props} />
+    </Suspense>
+  );
+}
+

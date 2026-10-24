@@ -1373,8 +1373,190 @@ body {
   .hero-search-btn-label {
     display: none !important;
   }
-  .hero-search-btn {
-    padding: 11px 14px !important;
+}
+
+/* ==========================================================================
+   Mobile First Responsive Enhancements & Portal Drawer Classes
+   ========================================================================== */
+
+/* 1. Patient / Customer Dashboard Responsive Layout */
+.patient-dashboard-grid {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+}
+
+.patient-desktop-sidebar {
+  display: block;
+}
+
+.patient-mobile-tabs {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .patient-dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .patient-desktop-sidebar {
+    display: none !important;
+  }
+
+  .patient-mobile-tabs {
+    display: flex !important;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 6px 2px 14px 2px;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .patient-mobile-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .patient-mobile-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 15px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    background: #FFFFFF;
+    color: #475569;
+    transition: all 0.15s ease;
+    min-height: 44px;
+    user-select: none;
+  }
+
+  .patient-mobile-tab-btn.active {
+    background: #0060FA !important;
+    color: #FFFFFF !important;
+    border-color: #0060FA !important;
+    box-shadow: 0 4px 12px rgba(0, 96, 250, 0.25);
+  }
+}
+
+/* 2. Doctor Portal Mobile Sidebar Drawer */
+.doctor-portal-sidebar {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s ease;
+}
+
+@media (max-width: 992px) {
+  .doctor-portal-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(300px, 85vw) !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+    transform: translateX(-105%) !important;
+    overflow-y: auto !important;
+  }
+
+  .doctor-portal-sidebar.doctor-portal-drawer-open {
+    transform: translateX(0) !important;
+  }
+}
+
+.doctor-portal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99990;
+  animation: fadeIn 0.2s ease;
+}
+
+/* 3. Admin Console Mobile Sidebar Drawer */
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s ease;
+}
+
+@media (max-width: 992px) {
+  .admin-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(300px, 85vw) !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    transform: translateX(-105%) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+    overflow-y: auto !important;
+  }
+
+  .admin-sidebar.admin-sidebar-mobile-open {
+    transform: translateX(0) !important;
+  }
+}
+
+/* 4. Doctors Listing Grid Fluid Collapse */
+.doctors-listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .doctors-listing-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Universal Safeguard: Any grid container on 320px–640px screen collapses to 1fr if its column minimum exceeds screen bounds */
+  [style*="minmax(360px"],
+  [style*="minmax(340px"],
+  [style*="minmax(320px"],
+  [style*="minmax(300px"],
+  [style*="minmax(280px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 5. Mobile Form Input Touch Ergonomics (Prevents iOS zoom and gives >= 44px touch targets) */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevents iOS auto-zoom on input focus */
+    min-height: 44px;
+  }
+
+  button,
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  a[role="button"] {
+    min-height: 44px;
+    touch-action: manipulation;
   }
 }
 

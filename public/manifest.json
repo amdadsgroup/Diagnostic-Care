@@ -1,17 +1,19 @@
 {
   "name": "Diagnostic Care",
   "short_name": "Diagnostic Care",
-  "description": "Your Healthcare Marketplace",
+  "description": "Your Healthcare Marketplace — Connect with verified specialist physicians, diagnostic centers, and hospitals across Bangladesh.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
+  "orientation": "portrait-primary",
   "background_color": "#F8FAFC",
   "theme_color": "#0060FA",
   "lang": "en",
   "dir": "ltr",
   "categories": ["medical", "health", "lifestyle"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -35,6 +37,36 @@
       "src": "/icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find Doctors",
+      "short_name": "Doctors",
+      "description": "Find and book appointments with verified doctors",
+      "url": "/doctors",
+      "icons": [{ "src": "/icons/shortcut-doctor.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Scan QR Code",
+      "short_name": "Scan QR",
+      "description": "Scan doctor prescription or chamber QR code",
+      "url": "/scan",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Appointments",
+      "short_name": "Appointments",
+      "description": "Check upcoming appointments and live queue",
+      "url": "/appointments",
+      "icons": [{ "src": "/icons/shortcut-appointments.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "24/7 Helpline",
+      "short_name": "Helpline",
+      "description": "Diagnostic Care 24/7 Support: 01886748564",
+      "url": "/messages",
+      "icons": [{ "src": "/icons/shortcut-emergency.png", "sizes": "96x96" }]
     }
   ]
 }

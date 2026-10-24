@@ -302,7 +302,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             style={{
               padding: '14px 18px',
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
               gap: '12px',
               fontSize: '13px',
             }}
@@ -472,7 +472,7 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: '#090D14' }}>
               {t.paymentMethodLabel}
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
               <button
                 type="button"
                 id="pay-cash-btn"

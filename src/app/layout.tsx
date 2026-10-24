@@ -61,6 +61,14 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Diagnostic Care" />
+        <meta name="application-name" content="Diagnostic Care" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="theme-color" content="#0060FA" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

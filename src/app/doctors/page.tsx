@@ -896,7 +896,7 @@ export default function DoctorsPage() {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '22px' }}>
+            <div className="doctors-listing-grid">
               {filteredDoctors.map((doc) => {
                 const assoc = doctorAssociations.find((a) => a.doctorId === doc.id) || doctorAssociations[0];
                 const dateKey = assoc ? `${assoc.id}_${new Date().toISOString().split('T')[0]}` : '';

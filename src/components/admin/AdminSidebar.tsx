@@ -277,7 +277,7 @@ export default function AdminSidebar({
           zIndex: 46,
           boxShadow: '6px 0 28px rgba(0, 0, 0, 0.35)',
         }}
-        className={isMobileOpen ? 'admin-sidebar-mobile-open' : ''}
+        className={`admin-sidebar ${isMobileOpen ? 'admin-sidebar-mobile-open' : ''}`}
       >
         {/* Brand Header */}
         <div

@@ -937,6 +937,15 @@ function DoctorDashboardContent() {
         ) : (
           /* VIEW C: FULL PRODUCTION DOCTOR PORTAL LAYOUT */
           <div style={{ display: 'flex', flex: 1, minHeight: 'calc(100vh - 72px)' }}>
+            {/* Mobile Backdrop for Doctor Sidebar Drawer */}
+            {isMobileSidebarOpen && (
+              <div
+                className="doctor-portal-backdrop"
+                onClick={() => setIsMobileSidebarOpen(false)}
+                aria-hidden="true"
+              />
+            )}
+
             {/* 1. COLLAPSIBLE MODERN SIDEBAR */}
             <aside
               style={{
@@ -951,7 +960,7 @@ function DoctorDashboardContent() {
                 height: '100vh',
                 zIndex: 90,
               }}
-              className="hidden lg:flex"
+              className={`doctor-portal-sidebar ${isMobileSidebarOpen ? 'doctor-portal-drawer-open' : ''}`}
             >
               {/* Sidebar Header */}
               <div
@@ -1006,20 +1015,41 @@ function DoctorDashboardContent() {
                   </div>
                 )}
 
-                <button
-                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#94A3B8',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: isSidebarCollapsed ? 'none' : 'block',
-                  }}
-                  title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-                >
-                  <ChevronRight size={18} style={{ transform: isSidebarCollapsed ? 'none' : 'rotate(180deg)' }} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {isMobileSidebarOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setIsMobileSidebarOpen(false)}
+                      style={{
+                        background: 'rgba(0,0,0,0.06)',
+                        border: 'none',
+                        color: '#64748B',
+                        borderRadius: '8px',
+                        padding: '6px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                      aria-label="Close Sidebar"
+                    >
+                      <X size={18} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#94A3B8',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: isSidebarCollapsed ? 'none' : 'block',
+                    }}
+                    title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+                  >
+                    <ChevronRight size={18} style={{ transform: isSidebarCollapsed ? 'none' : 'rotate(180deg)' }} />
+                  </button>
+                </div>
               </div>
 
               {/* Sidebar Navigation Items */}
@@ -1040,7 +1070,10 @@ function DoctorDashboardContent() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id as any)}
+                      onClick={() => {
+                        setActiveTab(item.id as any);
+                        setIsMobileSidebarOpen(false);
+                      }}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -1087,7 +1120,10 @@ function DoctorDashboardContent() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id as any)}
+                      onClick={() => {
+                        setActiveTab(item.id as any);
+                        setIsMobileSidebarOpen(false);
+                      }}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -1135,7 +1171,10 @@ function DoctorDashboardContent() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id as any)}
+                      onClick={() => {
+                        setActiveTab(item.id as any);
+                        setIsMobileSidebarOpen(false);
+                      }}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -1195,9 +1234,11 @@ function DoctorDashboardContent() {
                 {/* Left: Mobile Toggle & Title */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <button
+                    type="button"
                     onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-                    className="lg:hidden"
-                    style={{ background: 'none', border: 'none', color: '#090D14', cursor: 'pointer', padding: '6px' }}
+                    className="d-mobile-flex"
+                    style={{ background: 'none', border: 'none', color: '#090D14', cursor: 'pointer', padding: '6px', alignItems: 'center', justifyContent: 'center' }}
+                    aria-label="Toggle Clinical Navigation Drawer"
                   >
                     <Menu size={22} />
                   </button>
@@ -1444,8 +1485,61 @@ function DoctorDashboardContent() {
                 </div>
               </div>
 
+              {/* Doctor Mobile Quick Tab Bar */}
+              <div
+                className="patient-mobile-tabs"
+                style={{
+                  padding: '8px 16px 12px',
+                  backgroundColor: '#FFFFFF',
+                  borderBottom: '1px solid rgba(226, 232, 240, 0.9)',
+                }}
+              >
+                {[
+                  { id: 'overview', labelEn: 'Overview', labelBn: 'সারসংক্ষেপ', icon: Activity },
+                  { id: 'queue', labelEn: 'Queue', labelBn: 'লাইভ সিরিয়াল', icon: Users, badge: queue.length > 0 ? String(queue.length) : undefined },
+                  { id: 'appointments', labelEn: 'Appointments', labelBn: 'অ্যাপয়েন্টমেন্ট', icon: CalendarDays },
+                  { id: 'prescriptions', labelEn: 'Rx Prescriptions', labelBn: 'প্রেসক্রিপশন', icon: FileText },
+                  { id: 'schedule', labelEn: 'Schedule', labelBn: 'সময়সূচি', icon: Clock },
+                  { id: 'affiliations', labelEn: 'Affiliations', labelBn: 'এফিলিয়েশন', icon: Building2, badge: pendingInvitations.length > 0 ? `${pendingInvitations.length}` : undefined },
+                  { id: 'qr_code', labelEn: 'My QR', labelBn: 'কিউআর কোড', icon: QrCode },
+                  { id: 'profile', labelEn: 'Profile', labelBn: 'প্রোফাইল', icon: UserCheck },
+                  { id: 'security', labelEn: 'Security', labelBn: 'নিরাপত্তা', icon: Lock },
+                ].map((item) => {
+                  const isActive = activeTab === item.id;
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(item.id as any);
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className={`patient-mobile-tab-btn ${isActive ? 'active' : ''}`}
+                    >
+                      <Icon size={15} />
+                      <span>{language === 'en' ? item.labelEn : item.labelBn}</span>
+                      {item.badge && (
+                        <span
+                          style={{
+                            backgroundColor: isActive ? 'rgba(255,255,255,0.3)' : '#0060FA',
+                            color: '#FFFFFF',
+                            fontSize: '10.5px',
+                            fontWeight: 800,
+                            padding: '1px 6px',
+                            borderRadius: '6px',
+                          }}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* BODY CONTAINER */}
-              <div style={{ padding: '24px 28px', flex: 1 }}>
+              <div style={{ padding: '24px 28px', flex: 1, minWidth: 0 }}>
                 {/* Pending Invitations Alert Banner */}
                 {pendingInvitations.length > 0 && activeTab !== 'affiliations' && (
                   <div
