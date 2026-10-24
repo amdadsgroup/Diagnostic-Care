@@ -41,6 +41,8 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
   const [activeMode, setActiveMode] = useState<'camera' | 'upload' | 'manual'>('camera');
   const [cameraFacing, setCameraFacing] = useState<'environment' | 'user'>('environment');
+  const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
   const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
   const [cameraRequested, setCameraRequested] = useState<boolean>(false);
   const [isRequestingPermission, setIsRequestingPermission] = useState<boolean>(false);
@@ -74,7 +76,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     setScannedResult(null);
     setErrorMessage(null);
 
-    // Live permission monitoring
+    // Live permission monitoring (without surprise auto-start)
     let permObj: PermissionStatus | null = null;
     if (typeof navigator !== 'undefined' && navigator.permissions?.query) {
       navigator.permissions.query({ name: 'camera' as any })
@@ -83,21 +85,14 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
           if (res.state === 'granted') {
             setPermissionDenied(false);
             setErrorMessage(null);
-            if (activeMode === 'camera') {
-              setCameraRequested(true);
-              startCamera(cameraFacing);
-            }
           } else if (res.state === 'denied') {
             setPermissionDenied(true);
           }
 
-          // Automatically start when user unblocks in browser address bar!
           res.onchange = () => {
             if (res.state === 'granted') {
               setPermissionDenied(false);
               setErrorMessage(null);
-              setCameraRequested(true);
-              startCamera(cameraFacing);
             } else if (res.state === 'denied') {
               setPermissionDenied(true);
             } else {
@@ -116,13 +111,6 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     };
   }, [isOpen, activeMode]);
 
-  // Handle camera switch when camera is already active
-  useEffect(() => {
-    if (isOpen && activeMode === 'camera' && cameraRequested && isCameraActive) {
-      startCamera(cameraFacing);
-    }
-  }, [cameraFacing]);
-
   // Request browser permission explicitly on user gesture
   const handleRequestCameraPermission = async () => {
     setIsRequestingPermission(true);
@@ -135,45 +123,44 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
         throw new Error('Camera device not supported by this browser');
       }
 
-      // Check if any camera hardware is actually detected on the system
-      if (navigator.mediaDevices.enumerateDevices) {
-        try {
-          const devices = await navigator.mediaDevices.enumerateDevices();
-          const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-          if (devices.length > 0 && videoDevices.length === 0) {
-            setNoCameraHardware(true);
-            setIsRequestingPermission(false);
-            setErrorMessage(
-              language === 'en'
-                ? 'No webcam or camera device was detected on your computer. Please connect a camera or use "Upload Image" instead.'
-                : 'আপনার ডিভাইসে কোনো ক্যামেরা পাওয়া যায়নি। অনুগ্রহ করে ওয়েবক্যাম সংযোগ করুন অথবা "ছবি আপলোড" অপশন ব্যবহার করুন।'
-            );
-            return;
-          }
-        } catch {
-          // Continue if enumerateDevices fails
-        }
-      }
-
-      // Explicit user-gesture camera permission prompt
+      // Explicit user-gesture camera permission request
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: cameraFacing }
+          video: { facingMode: cameraFacing },
         });
       } catch {
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
       }
 
-      // Stop probe stream so Html5Qrcode can bind the camera device cleanly
+      // Stop probe stream tracks cleanly
       stream.getTracks().forEach((track) => track.stop());
+
+      // Discover camera hardware & enumerate devices
+      let preferredCamId = '';
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length > 0) {
+          setCameras(devices);
+          // Prefer back/rear camera on mobile devices
+          const rearCam = devices.find((d) => /back|rear|environment/i.test(d.label));
+          if (rearCam) {
+            preferredCamId = rearCam.id;
+          } else {
+            preferredCamId = devices[0].id;
+          }
+          setSelectedCameraId(preferredCamId);
+        }
+      } catch (enumErr) {
+        console.warn('Camera device enumeration note:', enumErr);
+      }
 
       setCameraRequested(true);
       setIsRequestingPermission(false);
 
-      // Give React one tick to render #dc-qr-reader container
+      // Render camera container then start scanner
       setTimeout(() => {
-        startCamera(cameraFacing);
+        startCamera(cameraFacing, preferredCamId);
       }, 150);
     } catch (err: any) {
       setIsRequestingPermission(false);
@@ -185,7 +172,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
         setNoCameraHardware(true);
         setErrorMessage(
           language === 'en'
-            ? 'No webcam was found on your computer. You can upload an image of the QR code or enter the code manually.'
+            ? 'No webcam was found on your device. You can upload an image of the QR code or enter the code manually.'
             : 'আপনার ডিভাইসে কোনো ক্যামেরা নেই। প্রেসক্রিপশন বা কার্ডের ছবি আপলোড করুন অথবা কোডটি লিখুন।'
         );
       } else if (isDenied) {
@@ -206,7 +193,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
   };
 
   // Start Camera Stream
-  const startCamera = async (facing: 'environment' | 'user') => {
+  const startCamera = async (facing: 'environment' | 'user', specificCameraId?: string) => {
     try {
       setPermissionDenied(false);
       setErrorMessage(null);
@@ -239,26 +226,50 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
         aspectRatio: 1.0,
       };
 
-      // Try preferred facing mode first, fall back to any camera if OverconstrainedError
-      try {
-        await html5QrCode.start(
-          { facingMode: facing },
-          config,
-          (decodedText) => {
-            handleDetectedCode(decodedText, 'camera_scan');
-          },
-          () => {}
-        );
-      } catch (firstErr) {
-        // Fallback constraint: generic camera
-        await html5QrCode.start(
-          { facingMode: 'user' },
-          config,
-          (decodedText) => {
-            handleDetectedCode(decodedText, 'camera_scan');
-          },
-          () => {}
-        );
+      const camIdToUse = specificCameraId || selectedCameraId;
+
+      if (camIdToUse) {
+        try {
+          await html5QrCode.start(
+            camIdToUse,
+            config,
+            (decodedText) => {
+              handleDetectedCode(decodedText, 'camera_scan');
+            },
+            () => {}
+          );
+        } catch {
+          // Fallback to facingMode constraint if camera ID fails
+          await html5QrCode.start(
+            { facingMode: facing },
+            config,
+            (decodedText) => {
+              handleDetectedCode(decodedText, 'camera_scan');
+            },
+            () => {}
+          );
+        }
+      } else {
+        // Preferred facing mode with automatic fallback
+        try {
+          await html5QrCode.start(
+            { facingMode: facing },
+            config,
+            (decodedText) => {
+              handleDetectedCode(decodedText, 'camera_scan');
+            },
+            () => {}
+          );
+        } catch {
+          await html5QrCode.start(
+            { facingMode: 'user' },
+            config,
+            (decodedText) => {
+              handleDetectedCode(decodedText, 'camera_scan');
+            },
+            () => {}
+          );
+        }
       }
 
       setIsCameraActive(true);
@@ -283,7 +294,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     }
   };
 
-  // Stop Camera Stream
+  // Stop Camera Stream cleanly and release hardware tracks
   const stopCamera = async () => {
     if (html5QrCodeRef.current) {
       try {
@@ -296,13 +307,42 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
       }
       html5QrCodeRef.current = null;
     }
+
+    // Explicitly release any media stream tracks
+    if (typeof document !== 'undefined') {
+      try {
+        const videoEl = document.getElementById('dc-qr-reader')?.querySelector('video') as HTMLVideoElement | null;
+        if (videoEl?.srcObject) {
+          const stream = videoEl.srcObject as MediaStream;
+          stream.getTracks().forEach((track) => track.stop());
+        }
+      } catch {
+        // Ignore
+      }
+    }
+
     setIsCameraActive(false);
   };
 
-  // Switch between front and rear cameras
-  const handleToggleCamera = () => {
-    const nextFacing = cameraFacing === 'environment' ? 'user' : 'environment';
-    setCameraFacing(nextFacing);
+  // Switch between front and rear cameras or cycle through detected camera devices
+  const handleToggleCamera = async () => {
+    if (cameras.length > 1) {
+      const currentIndex = cameras.findIndex((c) => c.id === selectedCameraId);
+      const nextIndex = (currentIndex + 1) % cameras.length;
+      const nextCam = cameras[nextIndex];
+      setSelectedCameraId(nextCam.id);
+      if (isCameraActive) {
+        await stopCamera();
+        setTimeout(() => startCamera(cameraFacing, nextCam.id), 150);
+      }
+    } else {
+      const nextFacing = cameraFacing === 'environment' ? 'user' : 'environment';
+      setCameraFacing(nextFacing);
+      if (isCameraActive) {
+        await stopCamera();
+        setTimeout(() => startCamera(nextFacing), 150);
+      }
+    }
   };
 
   // Process detected QR code
@@ -315,8 +355,8 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
     // Stop scanning camera
     stopCamera();
 
-    // Validate destination
-    const validation = QRService.validateDestinationUrl(decodedText);
+    // Validate destination and resolve shortcodes / slugs
+    const validation = await QRService.resolveDestinationUrlAsync(decodedText);
 
     if (!validation.isValid) {
       setIsProcessing(false);
@@ -783,29 +823,93 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   >
                     <div id="dc-qr-reader" style={{ width: '100%', height: '100%' }} />
 
-                    {/* Switch Camera Overlay Button */}
-                    <button
-                      onClick={handleToggleCamera}
-                      title="Switch front/rear camera"
-                      style={{
-                        position: 'absolute',
-                        top: '12px',
-                        right: '12px',
-                        backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '8px',
-                        cursor: 'pointer',
-                        zIndex: 10,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backdropFilter: 'blur(4px)',
-                      }}
-                    >
-                      <SwitchCamera size={18} />
-                    </button>
+                    {/* Switch Camera Overlay Button or Device Selector */}
+                    {cameras.length > 1 ? (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          zIndex: 10,
+                        }}
+                      >
+                        <select
+                          value={selectedCameraId}
+                          onChange={async (e) => {
+                            const newCamId = e.target.value;
+                            setSelectedCameraId(newCamId);
+                            await stopCamera();
+                            setTimeout(() => {
+                              startCamera(cameraFacing, newCamId);
+                            }, 150);
+                          }}
+                          style={{
+                            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                            color: '#FFFFFF',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRadius: '8px',
+                            padding: '6px 8px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backdropFilter: 'blur(4px)',
+                            cursor: 'pointer',
+                            outline: 'none',
+                            maxWidth: '140px',
+                          }}
+                        >
+                          {cameras.map((c, idx) => (
+                            <option key={c.id} value={c.id} style={{ color: '#0F172A', backgroundColor: '#FFFFFF' }}>
+                              {c.label || `Camera ${idx + 1}`}
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          onClick={handleToggleCamera}
+                          title="Switch camera"
+                          style={{
+                            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                            color: '#FFFFFF',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRadius: '8px',
+                            padding: '6px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backdropFilter: 'blur(4px)',
+                          }}
+                        >
+                          <SwitchCamera size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleToggleCamera}
+                        title="Switch front/rear camera"
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '8px',
+                          padding: '8px',
+                          cursor: 'pointer',
+                          zIndex: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backdropFilter: 'blur(4px)',
+                        }}
+                      >
+                        <SwitchCamera size={18} />
+                      </button>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '12px' }}>

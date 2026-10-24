@@ -66,6 +66,11 @@ export function constructMetadata({
     description,
     keywords: mergedKeywords,
     metadataBase: new URL(PRODUCTION_DOMAIN),
+    manifest: '/manifest.json',
+    icons: {
+      icon: '/logo.png',
+      apple: '/icons/apple-touch-icon.png',
+    },
     alternates: {
       canonical: canonicalUrl,
       languages: alternateLanguages || {

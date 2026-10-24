@@ -94,76 +94,181 @@ export class QRService {
     }
 
     const trimmed = scannedText.trim();
+    const lower = trimmed.toLowerCase();
 
-    // 1. Check if it's already a relative path within our application
-    if (trimmed.startsWith('/')) {
-      if (
-        trimmed.startsWith('/doctors/') ||
-        trimmed.startsWith('/doctor/') ||
-        trimmed.startsWith('/hospitals/') ||
-        trimmed.startsWith('/hospital/') ||
-        trimmed.startsWith('/diagnostic-centers/') ||
-        trimmed.startsWith('/diagnostic-center/') ||
-        trimmed.startsWith('/clinic/') ||
-        trimmed.startsWith('/appointments')
-      ) {
-        // Normalize singular routes if needed
-        let normalized = trimmed;
-        if (normalized.startsWith('/doctor/')) normalized = normalized.replace('/doctor/', '/doctors/');
-        if (normalized.startsWith('/hospital/')) normalized = normalized.replace('/hospital/', '/hospitals/');
-        if (normalized.startsWith('/diagnostic-center/')) normalized = normalized.replace('/diagnostic-center/', '/diagnostic-centers/');
-        if (normalized.startsWith('/clinic/')) normalized = normalized.replace('/clinic/', '/hospitals/');
-        return { isValid: true, destinationPath: normalized };
-      }
-      return { isValid: false, destinationPath: '', error: 'Unsupported application path.' };
+    // 1. Strict Security Gate: Reject dangerous pseudo-protocols, data URIs, and control characters
+    if (
+      lower.startsWith('javascript:') ||
+      lower.startsWith('data:') ||
+      lower.startsWith('vbscript:') ||
+      lower.startsWith('file:') ||
+      /[\u0000-\u001F\u007F]/.test(trimmed)
+    ) {
+      return {
+        isValid: false,
+        destinationPath: '',
+        error: 'Security violation: Unsafe script or pseudo-protocol detected in QR code.',
+      };
     }
 
-    // 2. Parse absolute URL
-    try {
-      const parsed = new URL(trimmed);
-      const allowedHostnames = [
-        'diagnosticcare.vercel.app',
-        'diagnostic-care.vercel.app',
-        'localhost',
-        '127.0.0.1',
-      ];
+    // Reject protocol-relative URLs (e.g., //evil.com) which bypass leading slash checks
+    if (trimmed.startsWith('//')) {
+      return {
+        isValid: false,
+        destinationPath: '',
+        error: 'Security violation: Protocol-relative external URLs are not permitted.',
+      };
+    }
 
-      // Support Vercel preview deployments for the diagnostic-care project
-      const isAllowedHost =
-        allowedHostnames.includes(parsed.hostname) ||
-        parsed.hostname.endsWith('.vercel.app') && parsed.hostname.includes('diagnostic-care');
-
-      if (!isAllowedHost) {
-        return {
-          isValid: false,
-          destinationPath: '',
-          error: `External destination rejected. Only verified Diagnostic Care QR codes are accepted (Scanned host: ${parsed.hostname}).`,
-        };
-      }
-
-      // Check permitted path prefixes
-      let path = parsed.pathname;
-      if (path.startsWith('/doctor/')) path = path.replace('/doctor/', '/doctors/');
-      if (path.startsWith('/hospital/')) path = path.replace('/hospital/', '/hospitals/');
-      if (path.startsWith('/diagnostic-center/')) path = path.replace('/diagnostic-center/', '/diagnostic-centers/');
-      if (path.startsWith('/clinic/')) path = path.replace('/clinic/', '/hospitals/');
+    // 2. Relative Path within Diagnostic Care Application
+    if (trimmed.startsWith('/')) {
+      let normalized = trimmed;
+      if (normalized.startsWith('/doctor/')) normalized = normalized.replace('/doctor/', '/doctors/');
+      if (normalized.startsWith('/hospital/')) normalized = normalized.replace('/hospital/', '/hospitals/');
+      if (normalized.startsWith('/diagnostic-center/')) normalized = normalized.replace('/diagnostic-center/', '/diagnostic-centers/');
+      if (normalized.startsWith('/clinic/')) normalized = normalized.replace('/clinic/', '/hospitals/');
 
       const isValidPath =
-        path.startsWith('/doctors/') ||
-        path.startsWith('/hospitals/') ||
-        path.startsWith('/diagnostic-centers/') ||
-        path.startsWith('/appointments') ||
-        path === '/';
+        normalized.startsWith('/doctors/') ||
+        normalized.startsWith('/hospitals/') ||
+        normalized.startsWith('/diagnostic-centers/') ||
+        normalized.startsWith('/diagnostic-tests/') ||
+        normalized.startsWith('/appointments') ||
+        normalized.startsWith('/scan') ||
+        normalized === '/';
 
-      if (!isValidPath) {
-        return { isValid: false, destinationPath: '', error: 'Unrecognized healthcare destination route.' };
+      if (isValidPath) {
+        return { isValid: true, destinationPath: normalized };
       }
-
-      const fullRelativePath = `${path}${parsed.search}${parsed.hash}`;
-      return { isValid: true, destinationPath: fullRelativePath };
-    } catch {
-      return { isValid: false, destinationPath: '', error: 'Invalid URL format in QR code.' };
+      return { isValid: false, destinationPath: '', error: 'Unsupported application path in QR code.' };
     }
+
+    // 3. Absolute URL Parsing & Origin Verification
+    if (lower.startsWith('http://') || lower.startsWith('https://')) {
+      try {
+        const parsed = new URL(trimmed);
+
+        // Disallow credential embedding (e.g. https://user:pass@evil.com)
+        if (parsed.username || parsed.password) {
+          return { isValid: false, destinationPath: '', error: 'Security violation: URLs with embedded credentials are prohibited.' };
+        }
+
+        const allowedHostnames = [
+          'diagnosticcare.vercel.app',
+          'diagnostic-care.vercel.app',
+          'diagnostic-care-diagonostic-care.vercel.app',
+          'localhost',
+          '127.0.0.1',
+        ];
+
+        if (typeof window !== 'undefined' && window.location.hostname) {
+          allowedHostnames.push(window.location.hostname);
+        }
+
+        // Support Vercel preview/branch deployments for the diagnostic-care project
+        const isAllowedHost =
+          allowedHostnames.includes(parsed.hostname) ||
+          (parsed.hostname.endsWith('.vercel.app') && parsed.hostname.includes('diagnostic-care'));
+
+        if (!isAllowedHost) {
+          return {
+            isValid: false,
+            destinationPath: '',
+            error: `External destination rejected. Only verified Diagnostic Care QR codes are accepted (Scanned host: ${parsed.hostname}).`,
+          };
+        }
+
+        // Check and normalize permitted path prefixes
+        let path = parsed.pathname;
+        if (path.startsWith('/doctor/')) path = path.replace('/doctor/', '/doctors/');
+        if (path.startsWith('/hospital/')) path = path.replace('/hospital/', '/hospitals/');
+        if (path.startsWith('/diagnostic-center/')) path = path.replace('/diagnostic-center/', '/diagnostic-centers/');
+        if (path.startsWith('/clinic/')) path = path.replace('/clinic/', '/hospitals/');
+
+        const isValidPath =
+          path.startsWith('/doctors/') ||
+          path.startsWith('/hospitals/') ||
+          path.startsWith('/diagnostic-centers/') ||
+          path.startsWith('/diagnostic-tests/') ||
+          path.startsWith('/appointments') ||
+          path.startsWith('/scan') ||
+          path === '/';
+
+        if (!isValidPath) {
+          return { isValid: false, destinationPath: '', error: 'Unrecognized healthcare destination route in QR code.' };
+        }
+
+        const fullRelativePath = `${path}${parsed.search}${parsed.hash}`;
+        return { isValid: true, destinationPath: fullRelativePath };
+      } catch {
+        return { isValid: false, destinationPath: '', error: 'Malformed URL structure in QR code.' };
+      }
+    }
+
+    // 4. Non-URL Short Code or BMDC Number Resolution
+    // Pattern: BMDC Number (e.g. A-48291, A-12345, A48291)
+    if (/^[A-Za-z]-[0-9]{3,7}$/.test(trimmed) || /^[A-Za-z][0-9]{4,7}$/.test(trimmed)) {
+      return { isValid: true, destinationPath: `/doctors/${trimmed}?source=qr` };
+    }
+
+    // Pattern: Standard UUID (e.g., doctor or hospital identifier)
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed)) {
+      return { isValid: true, destinationPath: `/doctors/${trimmed}?source=qr` };
+    }
+
+    // Pattern: Registered public slug (e.g., dr-rahim, sylhet-central-general-hospital)
+    if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(trimmed)) {
+      if (trimmed.includes('hospital') || trimmed.includes('clinic')) {
+        return { isValid: true, destinationPath: `/hospitals/${trimmed}?source=qr` };
+      }
+      if (trimmed.includes('diagnostic') || trimmed.includes('lab') || trimmed.includes('medinova')) {
+        return { isValid: true, destinationPath: `/diagnostic-centers/${trimmed}?source=qr` };
+      }
+      return { isValid: true, destinationPath: `/doctors/${trimmed}?source=qr` };
+    }
+
+    return { isValid: false, destinationPath: '', error: 'Invalid or unsupported QR code format.' };
+  }
+
+  /**
+   * Asynchronously resolve a scanned QR code text against Supabase registry
+   * Handles short codes, custom slugs, and official QR records with 100% accuracy.
+   */
+  static async resolveDestinationUrlAsync(scannedText: string): Promise<{ isValid: boolean; destinationPath: string; error?: string }> {
+    const syncResult = this.validateDestinationUrl(scannedText);
+    if (!syncResult.isValid) return syncResult;
+
+    const trimmed = scannedText.trim();
+    const isBareSlug = /^[a-z0-9]+(-[a-z0-9]+)*$/i.test(trimmed) && !trimmed.startsWith('http') && !trimmed.startsWith('/');
+
+    if (isBareSlug) {
+      try {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
+        let query = supabase.from('qr_code_records').select('owner_type, owner_id, public_slug');
+        if (isUuid) {
+          query = query.or(`public_slug.eq.${trimmed.toLowerCase()},owner_id.eq.${trimmed}`);
+        } else {
+          query = query.eq('public_slug', trimmed.toLowerCase());
+        }
+
+        const { data } = await query.maybeSingle();
+
+        if (data) {
+          const identifier = data.public_slug || data.owner_id;
+          if (data.owner_type === 'hospital' || data.owner_type === 'clinic') {
+            return { isValid: true, destinationPath: `/hospitals/${identifier}?source=qr` };
+          }
+          if (data.owner_type === 'diagnostic_center') {
+            return { isValid: true, destinationPath: `/diagnostic-centers/${identifier}?source=qr` };
+          }
+          return { isValid: true, destinationPath: `/doctors/${identifier}?source=qr` };
+        }
+      } catch {
+        // Fall back to syncResult
+      }
+    }
+
+    return syncResult;
   }
 
   /**

@@ -81,13 +81,35 @@ export default function DiagnosticCenterDetailPage() {
   useEffect(() => {
     async function loadCenterData() {
       try {
-        const { data: centerData, error: centerErr } = await supabase
-          .from('diagnostic_centers')
-          .select('*')
-          .or(`id.eq.${id},slug.eq.${id}`)
-          .maybeSingle();
+        const cleanId = (id || '').trim();
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
+        let query = supabase.from('diagnostic_centers').select('*');
+        if (isUuid) {
+          query = query.eq('id', cleanId);
+        } else {
+          query = query.eq('slug', cleanId);
+        }
+        let { data: centerData, error: centerErr } = await query.maybeSingle();
 
-        if (!centerErr && centerData) {
+        // Fallback: check qr_code_records if not found by direct slug
+        if (!centerData && !isUuid) {
+          const { data: qrMatch } = await supabase
+            .from('qr_code_records')
+            .select('owner_id')
+            .eq('owner_type', 'diagnostic_center')
+            .eq('public_slug', cleanId)
+            .maybeSingle();
+          if (qrMatch?.owner_id) {
+            const { data: resolvedCenter } = await supabase
+              .from('diagnostic_centers')
+              .select('*')
+              .eq('id', qrMatch.owner_id)
+              .maybeSingle();
+            if (resolvedCenter) centerData = resolvedCenter;
+          }
+        }
+
+        if (centerData) {
           setCenter(centerData);
 
           // Track QR scan telemetry if source=qr

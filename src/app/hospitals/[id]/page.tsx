@@ -42,13 +42,35 @@ export default function HospitalDetailPage() {
   useEffect(() => {
     async function loadHospital() {
       try {
-        const { data, error } = await supabase
-          .from('hospitals')
-          .select('*')
-          .or(`id.eq.${id},slug.eq.${id}`)
-          .maybeSingle();
+        const cleanId = (id || '').trim();
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
+        let query = supabase.from('hospitals').select('*');
+        if (isUuid) {
+          query = query.eq('id', cleanId);
+        } else {
+          query = query.eq('slug', cleanId);
+        }
+        let { data, error } = await query.maybeSingle();
 
-        if (!error && data) {
+        // Fallback: check qr_code_records if not found by direct slug
+        if (!data && !isUuid) {
+          const { data: qrMatch } = await supabase
+            .from('qr_code_records')
+            .select('owner_id')
+            .eq('owner_type', 'hospital')
+            .eq('public_slug', cleanId)
+            .maybeSingle();
+          if (qrMatch?.owner_id) {
+            const { data: resolvedHosp } = await supabase
+              .from('hospitals')
+              .select('*')
+              .eq('id', qrMatch.owner_id)
+              .maybeSingle();
+            if (resolvedHosp) data = resolvedHosp;
+          }
+        }
+
+        if (data) {
           setHospital(data);
 
           // Track QR scan telemetry if source=qr

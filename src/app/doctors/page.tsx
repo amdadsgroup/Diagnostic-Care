@@ -15,6 +15,7 @@ import { AppointmentService } from '@/services/appointment.service';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { INITIAL_APP_STATE } from '@/lib/store';
 import { Doctor, ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
+import { BANGLADESH_DIVISIONS, BANGLADESH_DISTRICTS } from '@/data/bangladesh-divisions';
 import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { getCachedData } from '@/lib/cache';
 import { CardSkeleton } from '@/components/ui/CardSkeleton';
@@ -527,16 +528,19 @@ export default function DoctorsPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  <option value="ALL">{language === 'en' ? 'All Bangladesh' : 'সমগ্র বাংলাদেশ'}</option>
-                  <option value="Dhaka">Dhaka (ঢাকা - গেটওয়ে)</option>
-                  <option value="Chattogram">Chattogram (চট্টগ্রাম)</option>
-                  <option value="Rajshahi">Rajshahi (রাজশাহী)</option>
-                  <option value="Khulna">Khulna (খুলনা)</option>
-                  <option value="Barishal">Barishal (বরিশাল)</option>
-                  <option value="Sylhet">Sylhet (সিলেট)</option>
-                  <option value="Rangpur">Rangpur (রংপুর)</option>
-                  <option value="Mymensingh">Mymensingh (ময়মনসিংহ)</option>
-                  <option value="Moulvibazar">Moulvibazar (মৌলভীবাজার)</option>
+                  <option value="ALL">{language === 'en' ? 'All Bangladesh (64 Districts)' : 'সমগ্র বাংলাদেশ (৬৪ জেলা)'}</option>
+                  {BANGLADESH_DIVISIONS.map((div) => {
+                    const divDistricts = BANGLADESH_DISTRICTS.filter((d) => d.divisionSlug === div.slug);
+                    return (
+                      <optgroup key={div.id} label={language === 'en' ? div.nameEn : div.nameBn}>
+                        {divDistricts.map((d) => (
+                          <option key={d.id} value={d.nameEn}>
+                            {language === 'en' ? `${d.nameEn} (${d.nameBn})` : `${d.nameBn} (${d.nameEn})`}
+                          </option>
+                        ))}
+                      </optgroup>
+                    );
+                  })}
                 </select>
               </div>
 
@@ -746,33 +750,64 @@ export default function DoctorsPage() {
                 <Stethoscope size={28} />
               </div>
               <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#10294F', marginBottom: '8px' }}>
-                {language === 'en' ? 'No doctors match your criteria' : 'আপনার ফিল্টারে কোনো ডাক্তার পাওয়া যায়নি'}
+                {selectedDistrict !== 'ALL'
+                  ? (language === 'en'
+                      ? `Expanding Network in ${selectedDistrict}`
+                      : `${selectedDistrict} জেলায় সম্প্রসারণ কার্যক্রম চলমান`)
+                  : (language === 'en'
+                      ? 'No doctors match your criteria'
+                      : 'আপনার ফিল্টারে কোনো ডাক্তার পাওয়া যায়নি')}
               </h3>
-              <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px' }}>
-                {language === 'en'
-                  ? 'Try selecting "All Specialties" or removing the location and price filters.'
-                  : 'অনুগ্রহ করে "সকল বিশেষজ্ঞ" নির্বাচন করুন অথবা ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।'}
+              <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px', lineHeight: '1.6' }}>
+                {selectedDistrict !== 'ALL'
+                  ? (language === 'en'
+                      ? `Diagnostic Care is actively onboarding verified specialists and partner clinics in ${selectedDistrict}. Are you a doctor or clinic located in ${selectedDistrict}? Partner with us today!`
+                      : `ডায়াগনস্টিক কেয়ার ${selectedDistrict} জেলায় বিশেষজ্ঞ ডাক্তার ও পার্টনার ক্লিনিক যুক্ত করছে। আপনি এই জেলার ডাক্তার বা ক্লিনিক হলে আজই আমাদের সাথে যুক্ত হোন!`)
+                  : (language === 'en'
+                      ? 'Try selecting "All Specialties" or removing the location and price filters.'
+                      : 'অনুগ্রহ করে "সকল বিশেষজ্ঞ" নির্বাচন করুন অথবা ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।')}
               </p>
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedSpecialty('ALL');
-                  setSelectedDistrict('ALL');
-                  setSelectedFeeRange('ALL');
-                }}
-                style={{
-                  backgroundColor: '#1769F5',
-                  color: '#FFFFFF',
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                {language === 'en' ? 'Reset All Filters' : 'সকল ফিল্টার মুছুন'}
-              </button>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedSpecialty('ALL');
+                    setSelectedDistrict('ALL');
+                    setSelectedFeeRange('ALL');
+                  }}
+                  style={{
+                    backgroundColor: '#1769F5',
+                    color: '#FFFFFF',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {language === 'en' ? 'View All Bangladesh Doctors' : 'সমগ্র বাংলাদেশের ডাক্তার দেখুন'}
+                </button>
+                {selectedDistrict !== 'ALL' && (
+                  <Link
+                    href="/partner/apply"
+                    style={{
+                      backgroundColor: '#F1F5F9',
+                      color: '#10294F',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '13.5px',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {language === 'en' ? 'Register as Doctor / Clinic' : 'ডাক্তার বা ক্লিনিক হিসেবে যুক্ত হোন'}
+                  </Link>
+                )}
+              </div>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '22px' }}>

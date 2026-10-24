@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase/client';
 import { BRAND_COLORS, BRAND_CONSTANTS } from '@/config/brand';
+import { BANGLADESH_DIVISIONS, BANGLADESH_DISTRICTS } from '@/data/bangladesh-divisions';
 import { fetchWithCache, getCachedData } from '@/lib/cache';
 import { CardSkeleton } from '@/components/ui/CardSkeleton';
 import {
@@ -59,28 +60,43 @@ export default function HospitalsDirectoryPage() {
       }
 
       const { data } = await fetchWithCache('hospitals_directory_active_all', async () => {
-        const { data: dbData, error: dbError } = await supabase
-          .from('hospitals')
-          .select(`
-            id,
-            name,
-            name_bn,
-            slug,
-            phone,
-            emergency_phone,
-            email,
-            total_beds,
-            icu_beds,
-            has_icu,
-            has_nicu,
-            has_emergency_24_7,
-            dghs_registration_number,
-            verification_status,
-            status
-          `)
-          .eq('status', 'active');
+        const [{ data: dbData, error: dbError }, { data: locData }] = await Promise.all([
+          supabase
+            .from('hospitals')
+            .select(`
+              id,
+              name,
+              name_bn,
+              slug,
+              phone,
+              emergency_phone,
+              email,
+              total_beds,
+              icu_beds,
+              has_icu,
+              has_nicu,
+              has_emergency_24_7,
+              dghs_registration_number,
+              verification_status,
+              status
+            `)
+            .eq('status', 'active'),
+          supabase
+            .from('provider_locations')
+            .select('provider_id, districts(name)')
+            .eq('provider_type', 'hospital'),
+        ]);
 
         if (dbError) throw dbError;
+
+        const locMap: Record<string, string> = {};
+        if (locData) {
+          for (const loc of locData) {
+            if (loc.districts && (loc.districts as any).name) {
+              locMap[loc.provider_id] = (loc.districts as any).name;
+            }
+          }
+        }
 
         return (dbData || []).map((h: any) => ({
           id: h.id,
@@ -97,11 +113,11 @@ export default function HospitalsDirectoryPage() {
           hasEmergency247: Boolean(h.has_emergency_24_7),
           dghsRegistrationNumber: h.dghs_registration_number,
           verificationStatus: h.verification_status || 'verified',
-          district: h.name.includes('Moulvibazar')
+          district: locMap[h.id] || (h.name.includes('Moulvibazar')
             ? 'Moulvibazar'
             : h.name.includes('Sylhet')
             ? 'Sylhet'
-            : 'Dhaka',
+            : 'Dhaka'),
         }));
       }, { ttlMs: 10 * 60 * 1000 });
 
@@ -224,8 +240,39 @@ export default function HospitalsDirectoryPage() {
             />
           </div>
 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#F8FAFC', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+            <MapPin size={16} color="#0060FA" />
+            <select
+              value={districtFilter}
+              onChange={(e) => setDistrictFilter(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                fontSize: '13px',
+                color: '#0F172A',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <option value="ALL">{language === 'bn' ? 'সমগ্র বাংলাদেশ (৬৪ জেলা)' : 'All Bangladesh (64 Districts)'}</option>
+              {BANGLADESH_DIVISIONS.map((div) => {
+                const divDistricts = BANGLADESH_DISTRICTS.filter((d) => d.divisionSlug === div.slug);
+                return (
+                  <optgroup key={div.id} label={language === 'bn' ? div.nameBn : div.nameEn}>
+                    {divDistricts.map((d) => (
+                      <option key={d.id} value={d.nameEn}>
+                        {language === 'bn' ? `${d.nameBn} (${d.nameEn})` : `${d.nameEn} (${d.nameBn})`}
+                      </option>
+                    ))}
+                  </optgroup>
+                );
+              })}
+            </select>
+          </div>
+
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {['ALL', 'Dhaka', 'Chattogram', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh', 'Moulvibazar'].map((dist) => (
+            {['ALL', 'Dhaka', 'Chattogram', 'Sylhet', 'Moulvibazar'].map((dist) => (
               <button
                 key={dist}
                 onClick={() => setDistrictFilter(dist)}
@@ -242,7 +289,7 @@ export default function HospitalsDirectoryPage() {
                   transition: 'all 0.15s ease',
                 }}
               >
-                {dist === 'ALL' ? (language === 'bn' ? 'সকল বিভাগ ও জেলা' : 'All Bangladesh') : dist}
+                {dist === 'ALL' ? (language === 'bn' ? 'সকল' : 'All') : dist}
               </button>
             ))}
           </div>
