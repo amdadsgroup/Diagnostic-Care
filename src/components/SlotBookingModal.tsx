@@ -5,7 +5,8 @@ import { ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
 import { BRAND_CONSTANTS, SupportedLanguage } from '@/config/brand';
 import { TRANSLATIONS } from '@/i18n/translations';
 import { useLanguage } from '@/context/LanguageContext';
-import { Clock, Shield, AlertTriangle, CheckCircle, X, Phone, User, Calendar, CreditCard } from 'lucide-react';
+import { Clock, Shield, AlertTriangle, CheckCircle, X, Phone, User, Calendar, CreditCard, Heart } from 'lucide-react';
+import { WishlistService } from '@/services/wishlist.service';
 
 interface SlotBookingModalProps {
   slot: ScheduleSlot;
@@ -55,10 +56,26 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
     } else if (relation === 'FATHER') {
       setPatientGender('MALE');
       if (currentUser?.phone && !patientPhone) setPatientPhone(currentUser.phone);
-    } else if (relation === 'CHILD') {
-      if (currentUser?.phone && !patientPhone) setPatientPhone(currentUser.phone);
     }
     setErrorMessage(null);
+  };
+
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    if (currentUser?.id && association.doctor?.id) {
+      WishlistService.isDoctorWishlisted(currentUser.id, association.doctor.id).then(setIsWishlisted);
+    }
+  }, [currentUser, association.doctor]);
+
+  const handleToggleWishlist = async () => {
+    if (!currentUser?.id || !association.doctor) return;
+    try {
+      const added = await WishlistService.toggleWishlist(currentUser.id, association.doctor);
+      setIsWishlisted(added);
+    } catch {
+      // ignore
+    }
   };
 
   // 5-minute countdown timer
@@ -291,7 +308,27 @@ export const SlotBookingModal: React.FC<SlotBookingModalProps> = ({
             }}
           >
             <div>
-              <div style={{ color: '#627680', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Doctor & Chamber</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ color: '#627680', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Doctor & Chamber</div>
+                {currentUser && (
+                  <button
+                    type="button"
+                    onClick={handleToggleWishlist}
+                    title={isWishlisted ? 'Saved to Wishlist' : 'Save to Wishlist'}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      color: isWishlisted ? '#EF4444' : '#94A3B8',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Heart size={15} fill={isWishlisted ? '#EF4444' : 'none'} />
+                  </button>
+                )}
+              </div>
               <div style={{ fontWeight: 800, color: '#090D14' }}>{association.doctor?.fullName}</div>
               <div style={{ color: '#0060FA', fontSize: '12px', fontWeight: 600 }}>{association.doctor?.specialization}</div>
             </div>

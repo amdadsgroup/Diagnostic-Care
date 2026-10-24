@@ -29,8 +29,9 @@ export class QRService {
    */
   static getPublicProfileUrl(ownerType: QROwnerType, ownerId: string, origin?: string): string {
     const base = origin || (typeof window !== 'undefined' ? window.location.origin : 'https://diagnosticcare.vercel.app');
+    const type = ((ownerType as string) || 'doctor').toLowerCase();
     
-    switch (ownerType) {
+    switch (type) {
       case 'doctor':
         return `${base}/doctors/${ownerId}?source=qr`;
       case 'hospital':
@@ -176,10 +177,11 @@ export class QRService {
     try {
       const referrer = typeof document !== 'undefined' ? document.referrer || undefined : undefined;
       const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 150) : undefined;
+      const normalizedOwnerType = ((params.ownerType as string) || 'doctor').toLowerCase();
 
       // Call stored procedure if available, or insert directly
       const { error: rpcErr } = await supabase.rpc('fn_track_qr_scan', {
-        p_owner_type: params.ownerType,
+        p_owner_type: normalizedOwnerType,
         p_owner_id: params.ownerId,
         p_channel: params.channel || 'camera_scan',
         p_referrer: referrer,
@@ -189,7 +191,7 @@ export class QRService {
       if (rpcErr) {
         // Fallback: direct table insert with anonymized data
         await supabase.from('qr_scan_events').insert({
-          owner_type: params.ownerType,
+          owner_type: normalizedOwnerType,
           owner_id: params.ownerId,
           channel: params.channel || 'camera_scan',
           referrer,
@@ -210,14 +212,15 @@ export class QRService {
     title: string;
     subtitle?: string;
   }): Promise<QRCodeRecord> {
-    const publicUrl = this.getPublicProfileUrl(params.ownerType, params.ownerId);
-    const slug = `${params.ownerType}-${params.ownerId.substring(0, 8)}`;
+    const normalizedOwnerType = ((params.ownerType as string) || 'doctor').toLowerCase() as QROwnerType;
+    const publicUrl = this.getPublicProfileUrl(normalizedOwnerType, params.ownerId);
+    const slug = `${normalizedOwnerType}-${params.ownerId.substring(0, 8)}`;
 
     try {
       const { data, error } = await supabase
         .from('qr_code_records')
         .select('*')
-        .eq('owner_type', params.ownerType)
+        .eq('owner_type', normalizedOwnerType)
         .eq('owner_id', params.ownerId)
         .maybeSingle();
 
@@ -239,7 +242,7 @@ export class QRService {
 
       // Insert new record
       const newRecord = {
-        owner_type: params.ownerType,
+        owner_type: normalizedOwnerType,
         owner_id: params.ownerId,
         public_slug: slug,
         public_url: publicUrl,

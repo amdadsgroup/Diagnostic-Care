@@ -22,7 +22,11 @@ import {
   Home,
   Info,
   RefreshCw,
+  QrCode,
+  X,
 } from 'lucide-react';
+import QRCodeStudio from '@/components/qr/QRCodeStudio';
+import { QRService } from '@/services/qr.service';
 
 interface DiagnosticCenter {
   id: string;
@@ -72,6 +76,7 @@ export default function DiagnosticCenterDetailPage() {
   const [tests, setTests] = useState<LabTestItem[]>([]);
   const [affiliatedDoctors, setAffiliatedDoctors] = useState<AffiliatedDoctor[]>([]);
   const [isLoading, setIsLoading] = useState(!initialCenter);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadCenterData() {
@@ -84,6 +89,15 @@ export default function DiagnosticCenterDetailPage() {
 
         if (!centerErr && centerData) {
           setCenter(centerData);
+
+          // Track QR scan telemetry if source=qr
+          if (typeof window !== 'undefined' && window.location.search.includes('source=qr')) {
+            QRService.recordScanEvent({
+              ownerType: 'diagnostic_center',
+              ownerId: centerData.id,
+              channel: 'camera_scan',
+            });
+          }
 
           // Fetch lab tests offered by this diagnostic center
           const { data: testData } = await supabase
@@ -315,16 +329,36 @@ export default function DiagnosticCenterDetailPage() {
               </div>
             </div>
 
-            {center.phone && (
-              <a
-                href={`tel:${center.phone}`}
-                className="btn-primary"
-                style={{ padding: '9px 18px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setIsQrModalOpen(true)}
+                className="btn-secondary"
+                style={{
+                  padding: '9px 14px',
+                  fontSize: '13px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                }}
               >
-                <Phone size={14} />
-                <span>Call Diagnostic Desk: {center.phone}</span>
-              </a>
-            )}
+                <QrCode size={15} />
+                <span>{language === 'bn' ? 'সেন্টার কিউআর কোড' : 'Center QR Code'}</span>
+              </button>
+
+              {center.phone && (
+                <a
+                  href={`tel:${center.phone}`}
+                  className="btn-primary"
+                  style={{ padding: '9px 18px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Phone size={14} />
+                  <span>Call Diagnostic Desk: {center.phone}</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
@@ -456,6 +490,69 @@ export default function DiagnosticCenterDetailPage() {
             </div>
           </div>
         )}
+      {/* Center QR Code Studio Modal */}
+      {isQrModalOpen && center && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '16px',
+          }}
+          onClick={() => setIsQrModalOpen(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '840px',
+              width: '100%',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              padding: '24px',
+              position: 'relative',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsQrModalOpen(false)}
+              aria-label="Close QR Studio"
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#64748B',
+                padding: '4px',
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <QRCodeStudio
+              details={{
+                ownerType: 'diagnostic_center',
+                ownerId: center.id,
+                name: language === 'bn' && center.name_bn ? center.name_bn : center.name,
+                designation: center.dghs_registration_number ? `DGHS Reg: ${center.dghs_registration_number}` : 'Accredited Diagnostic Facility',
+                specialty: `Tests: ${tests.length} Available • Pathology & Imaging`,
+                organizationName: 'Diagnostic Care Verified Network',
+                publicUrl: QRService.getPublicProfileUrl('diagnostic_center', center.id),
+                isVerified: Boolean(center.dghs_registration_number),
+              }}
+              showAnalyticsSummary={true}
+            />
+          </div>
+        </div>
+      )}
       </main>
 
       <Footer language={language} />

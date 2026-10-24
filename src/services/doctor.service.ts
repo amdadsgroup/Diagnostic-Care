@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase/client';
 import { Doctor, DoctorAssociation, Appointment, ScheduleSlot } from '@/types';
 import { concurrencyEngine } from '@/lib/concurrency-lock';
-import { fetchWithCache, CACHE_TTL } from '@/lib/cache';
+import { fetchWithCache, CACHE_TTL, getCachedData } from '@/lib/cache';
 
 export class DoctorService {
   /**
@@ -105,11 +105,15 @@ export class DoctorService {
   }
 
   /**
-   * Fetch doctor by specific ID
+   * Fetch doctor by specific ID, BMDC registration number, or public slug
    */
-  static async getDoctorById(id: string): Promise<Doctor | null> {
+  static async getDoctorById(idOrSlug: string): Promise<Doctor | null> {
+    if (!idOrSlug) return null;
+    const clean = idOrSlug.trim();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean);
+
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('doctors')
         .select(`
           id,
@@ -134,9 +138,15 @@ export class DoctorService {
             avatar_url,
             phone
           )
-        `)
-        .eq('id', id)
-        .single();
+        `);
+
+      if (isUuid) {
+        query = query.eq('id', clean);
+      } else {
+        query = query.eq('bmdc_registration_number', clean);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (!error && data) {
         const profile = Array.isArray(data.profiles) ? (data.profiles[0] as any) : (data.profiles as any);
@@ -157,6 +167,25 @@ export class DoctorService {
           languages: ['Bangla', 'English', 'Sylheti'],
         };
       }
+
+      // If non-UUID not found by BMDC, check qr_code_records for public_slug
+      if (!isUuid) {
+        const { data: qrData } = await supabase
+          .from('qr_code_records')
+          .select('owner_id')
+          .eq('owner_type', 'doctor')
+          .eq('public_slug', clean)
+          .maybeSingle();
+
+        if (qrData?.owner_id) {
+          return this.getDoctorById(qrData.owner_id);
+        }
+      }
+
+      // Check cached active doctors list for fallback match
+      const cached = getCachedData<Doctor[]>('doctors_list_active_all', true) || [];
+      const match = cached.find((d) => d.id === clean || d.bmdcNumber === clean || d.userId === clean);
+      if (match) return match;
 
       return null;
     } catch {

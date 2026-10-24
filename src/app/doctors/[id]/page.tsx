@@ -148,9 +148,12 @@ export default function DoctorDetailPage() {
   }, [doctorId, currentUser]);
 
   // Wishlist toggle handler
+  const [pendingWishlistAction, setPendingWishlistAction] = useState(false);
+
   const handleToggleWishlist = async () => {
     if (!doctor) return;
     if (!currentUser) {
+      setPendingWishlistAction(true);
       setIsAuthModalOpen(true);
       return;
     }
@@ -1033,6 +1036,14 @@ export default function DoctorDetailPage() {
           onAuthSuccess={(user: any) => {
             setCurrentUser(user);
             setIsAuthModalOpen(false);
+            if (pendingWishlistAction && doctor) {
+              setPendingWishlistAction(false);
+              WishlistService.addToWishlist(user.id, doctor.id, doctor).then(() => {
+                setIsWishlisted(true);
+                setWishlistToast(language === 'en' ? 'Saved to your Wishlist!' : 'আপনার পছন্দের তালিকায় যুক্ত হয়েছে!');
+                setTimeout(() => setWishlistToast(null), 3000);
+              });
+            }
           }}
         />
       )}

@@ -26,7 +26,7 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=(self)',
+    value: 'camera=(self), microphone=(), geolocation=(self)',
   },
 ];
 
@@ -38,6 +38,30 @@ const nextConfig = {
   generateBuildId: async () => 'diagnostic-care-prod-build',
   images: {
     unoptimized: true,
+  },
+  async redirects() {
+    return [
+      {
+        source: '/doctor/:id',
+        destination: '/doctors/:id',
+        permanent: true,
+      },
+      {
+        source: '/hospital/:id',
+        destination: '/hospitals/:id',
+        permanent: true,
+      },
+      {
+        source: '/diagnostic-center/:id',
+        destination: '/diagnostic-centers/:id',
+        permanent: true,
+      },
+      {
+        source: '/clinic/:id',
+        destination: '/hospitals/:id',
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [

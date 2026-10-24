@@ -18,6 +18,7 @@ import { Doctor, ScheduleSlot, DoctorAssociation, Appointment } from '@/types';
 import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { getCachedData } from '@/lib/cache';
 import { CardSkeleton } from '@/components/ui/CardSkeleton';
+import { WishlistService } from '@/services/wishlist.service';
 import {
   Search,
   MapPin,
@@ -37,6 +38,7 @@ import {
   Star,
   X,
   RefreshCw,
+  Heart,
 } from 'lucide-react';
 
 export default function DoctorsPage() {
@@ -46,6 +48,9 @@ export default function DoctorsPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Dhaka');
+  const [wishlistMap, setWishlistMap] = useState<Record<string, boolean>>({});
+  const [pendingWishlistDoctor, setPendingWishlistDoctor] = useState<Doctor | null>(null);
+  const [wishlistToast, setWishlistToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 
   // Synchronous cache hydration for instant 0ms first render
   const cachedDocs = typeof window !== 'undefined' ? getCachedData<Doctor[]>('doctors_list_active_all', true) : null;
@@ -96,7 +101,16 @@ export default function DoctorsPage() {
   useEffect(() => {
     // Check current user
     AuthService.getCurrentUser().then((u) => {
-      if (u) setCurrentUser(u);
+      if (u) {
+        setCurrentUser(u);
+        WishlistService.getWishlist(u.id).then((items) => {
+          const map: Record<string, boolean> = {};
+          items.forEach((item) => {
+            map[item.doctorId] = true;
+          });
+          setWishlistMap(map);
+        });
+      }
     });
 
     const savedLoc = localStorage.getItem('dc_user_location');
@@ -104,6 +118,31 @@ export default function DoctorsPage() {
 
     fetchDoctorData();
   }, []);
+
+  const handleToggleWishlist = async (doc: Doctor, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!currentUser) {
+      setPendingWishlistDoctor(doc);
+      setIsAuthModalOpen(true);
+      return;
+    }
+    try {
+      const added = await WishlistService.toggleWishlist(currentUser.id, doc);
+      setWishlistMap((prev) => ({ ...prev, [doc.id]: added }));
+      setWishlistToast({
+        message: added
+          ? (language === 'bn' ? `${doc.fullName} আপনার পছন্দ তালিকায় যুক্ত হয়েছে!` : `${doc.fullName} added to your wishlist!`)
+          : (language === 'bn' ? `${doc.fullName} পছন্দ তালিকা থেকে বাদ দেওয়া হয়েছে।` : `${doc.fullName} removed from your wishlist.`),
+        type: added ? 'success' : 'info',
+      });
+      setTimeout(() => setWishlistToast(null), 3500);
+    } catch {
+      // ignore
+    }
+  };
 
   const specialties = [
     { id: 'ALL', labelEn: 'All Specialties', labelBn: 'সকল বিশেষজ্ঞ' },
@@ -776,16 +815,41 @@ export default function DoctorsPage() {
                         </div>
 
                         <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                            <Link
-                              href={`/doctors/${doc.id}`}
-                              style={{ textDecoration: 'none', color: '#090D14' }}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <Link
+                                href={`/doctors/${doc.id}`}
+                                style={{ textDecoration: 'none', color: '#090D14' }}
+                              >
+                                <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>
+                                  {doc.fullName}
+                                </h2>
+                              </Link>
+                              <ShieldCheck size={16} color="#15803D" />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => handleToggleWishlist(doc, e)}
+                              aria-label={wishlistMap[doc.id] ? 'Remove from wishlist' : 'Save to wishlist'}
+                              title={wishlistMap[doc.id] ? 'Remove from wishlist' : 'Save to wishlist'}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                color: wishlistMap[doc.id] ? '#EF4444' : '#94A3B8',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.15s ease',
+                              }}
                             >
-                              <h2 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>
-                                {doc.fullName}
-                              </h2>
-                            </Link>
-                            <ShieldCheck size={16} color="#15803D" />
+                              <Heart
+                                size={18}
+                                fill={wishlistMap[doc.id] ? '#EF4444' : 'none'}
+                                strokeWidth={2}
+                              />
+                            </button>
                           </div>
 
                           <div style={{ fontSize: '13px', fontWeight: 700, color: '#0060FA', marginBottom: '3px' }}>
@@ -966,6 +1030,32 @@ export default function DoctorsPage() {
         />
       )}
 
+      {/* Wishlist Toast Notification */}
+      {wishlistToast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 9999,
+            backgroundColor: wishlistToast.type === 'success' ? '#0F172A' : '#334155',
+            color: '#FFFFFF',
+            padding: '12px 20px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '13.5px',
+            fontWeight: 600,
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <Heart size={16} color="#EF4444" fill="#EF4444" />
+          <span>{wishlistToast.message}</span>
+        </div>
+      )}
+
       {/* Auth Modal */}
       {isAuthModalOpen && (
         <AuthModal
@@ -975,6 +1065,18 @@ export default function DoctorsPage() {
           onLoginSuccess={(u) => {
             setCurrentUser(u);
             setIsAuthModalOpen(false);
+            if (pendingWishlistDoctor) {
+              const docToSave = pendingWishlistDoctor;
+              setPendingWishlistDoctor(null);
+              WishlistService.addToWishlist(u.id, docToSave.id, docToSave).then(() => {
+                setWishlistMap((prev) => ({ ...prev, [docToSave.id]: true }));
+                setWishlistToast({
+                  message: language === 'bn' ? `${docToSave.fullName} আপনার পছন্দ তালিকায় যুক্ত হয়েছে!` : `${docToSave.fullName} added to your wishlist!`,
+                  type: 'success',
+                });
+                setTimeout(() => setWishlistToast(null), 3500);
+              });
+            }
           }}
         />
       )}

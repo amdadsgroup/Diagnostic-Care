@@ -20,7 +20,11 @@ import {
   Mail,
   CheckCircle2,
   RefreshCw,
+  QrCode,
+  X,
 } from 'lucide-react';
+import QRCodeStudio from '@/components/qr/QRCodeStudio';
+import { QRService } from '@/services/qr.service';
 
 export default function HospitalDetailPage() {
   const params = useParams();
@@ -33,6 +37,7 @@ export default function HospitalDetailPage() {
   const [hospital, setHospital] = useState<any | null>(initialHosp);
   const [affiliatedDoctors, setAffiliatedDoctors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(!initialHosp);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadHospital() {
@@ -45,6 +50,15 @@ export default function HospitalDetailPage() {
 
         if (!error && data) {
           setHospital(data);
+
+          // Track QR scan telemetry if source=qr
+          if (typeof window !== 'undefined' && window.location.search.includes('source=qr')) {
+            QRService.recordScanEvent({
+              ownerType: 'hospital',
+              ownerId: data.id,
+              channel: 'camera_scan',
+            });
+          }
 
           // Fetch doctors scheduled or associated with this hospital
           const { data: schedData } = await supabase
@@ -237,16 +251,36 @@ export default function HospitalDetailPage() {
               </div>
             </div>
 
-            {hospital.phone && (
-              <a
-                href={`tel:${hospital.phone}`}
-                className="btn-primary"
-                style={{ padding: '9px 18px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setIsQrModalOpen(true)}
+                className="btn-secondary"
+                style={{
+                  padding: '9px 14px',
+                  fontSize: '13px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                }}
               >
-                <Phone size={14} />
-                <span>Call Hospital: {hospital.phone}</span>
-              </a>
-            )}
+                <QrCode size={15} />
+                <span>{language === 'bn' ? 'হাসপাতাল কিউআর কোড' : 'Hospital QR Code'}</span>
+              </button>
+
+              {hospital.phone && (
+                <a
+                  href={`tel:${hospital.phone}`}
+                  className="btn-primary"
+                  style={{ padding: '9px 18px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Phone size={14} />
+                  <span>Call Hospital: {hospital.phone}</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
@@ -331,6 +365,70 @@ export default function HospitalDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Hospital QR Code Studio Modal */}
+        {isQrModalOpen && hospital && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(6px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              padding: '16px',
+            }}
+            onClick={() => setIsQrModalOpen(false)}
+          >
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                maxWidth: '840px',
+                width: '100%',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+                padding: '24px',
+                position: 'relative',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setIsQrModalOpen(false)}
+                aria-label="Close QR Studio"
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                  padding: '4px',
+                }}
+              >
+                <X size={20} />
+              </button>
+
+              <QRCodeStudio
+                details={{
+                  ownerType: 'hospital',
+                  ownerId: hospital.id,
+                  name: hospital.name,
+                  designation: hospital.dghs_registration_number ? `DGHS Reg: ${hospital.dghs_registration_number}` : 'Accredited Healthcare Hospital',
+                  specialty: `Doctors: ${affiliatedDoctors.length} On Duty • 24/7 Emergency`,
+                  organizationName: 'Diagnostic Care Verified Network',
+                  publicUrl: QRService.getPublicProfileUrl('hospital', hospital.id),
+                  isVerified: Boolean(hospital.dghs_registration_number),
+                }}
+                showAnalyticsSummary={true}
+              />
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer language={language} />
