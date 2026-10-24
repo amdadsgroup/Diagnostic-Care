@@ -37,5 +37,10 @@ CREATE INDEX IF NOT EXISTS idx_doctor_schedules_active_provider
 CREATE INDEX IF NOT EXISTS idx_doctor_schedules_doctor_active 
   ON public.doctor_schedules (doctor_id, is_active);
 
-CREATE INDEX IF NOT EXISTS idx_doctor_slots_doctor_date_status 
-  ON public.doctor_schedule_slots (doctor_id, schedule_date, status);
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'doctor_schedule_slots') THEN
+    CREATE INDEX IF NOT EXISTS idx_doctor_slots_doctor_date_status 
+      ON public.doctor_schedule_slots (doctor_id, schedule_date, status);
+  END IF;
+END $$;

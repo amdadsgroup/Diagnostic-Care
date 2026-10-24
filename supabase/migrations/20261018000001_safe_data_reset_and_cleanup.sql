@@ -18,7 +18,7 @@ BEGIN
 
     -- 2. Clean diagnostic test bookings generated during testing
     DELETE FROM public.diagnostic_bookings 
-    WHERE booking_code ILIKE 'TEST%' OR contact_name ILIKE '%test%';
+    WHERE booking_code ILIKE 'TEST%' OR patient_name ILIKE '%test%';
 
     -- 3. Clean test notifications and temporary ledger entries
     DELETE FROM public.notifications 
@@ -26,7 +26,7 @@ BEGIN
 
     -- 4. Clean test provider leads
     DELETE FROM public.provider_leads 
-    WHERE contact_name ILIKE '%test%' OR organization_name ILIKE '%test%';
+    WHERE contact_person ILIKE '%test%' OR organization_name ILIKE '%test%';
 
     -- 5. Guarantee super_admin account integrity
     UPDATE public.profiles
