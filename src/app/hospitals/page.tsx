@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -10,6 +10,7 @@ import { BRAND_COLORS, BRAND_CONSTANTS } from '@/config/brand';
 import { BANGLADESH_DIVISIONS, BANGLADESH_DISTRICTS } from '@/data/bangladesh-divisions';
 import { fetchWithCache, getCachedData } from '@/lib/cache';
 import { CardSkeleton } from '@/components/ui/CardSkeleton';
+import { GeoService, UserLocationDetails } from '@/services/geo.service';
 import {
   Building2,
   MapPin,
@@ -45,6 +46,7 @@ export default function HospitalsDirectoryPage() {
   const { language, setLanguage } = useLanguage();
   const [search, setSearch] = useState('');
   const [districtFilter, setDistrictFilter] = useState('ALL');
+  const [userLocation, setUserLocation] = useState<UserLocationDetails | null>(null);
 
   // Synchronous cache hydration for instant 0ms first render
   const cachedHospitals = typeof window !== 'undefined' ? getCachedData<HospitalRecord[]>('hospitals_directory_active_all', true) : null;
@@ -134,20 +136,52 @@ export default function HospitalsDirectoryPage() {
 
   useEffect(() => {
     fetchHospitals();
+
+    const stored = GeoService.getStoredUserLocation();
+    if (stored) {
+      setUserLocation(stored);
+      if (stored.districtName && stored.districtName !== 'ALL') {
+        setDistrictFilter(stored.districtName);
+      }
+    }
+
+    const unsub = GeoService.subscribe((loc) => {
+      setUserLocation(loc);
+      if (loc.districtName && loc.districtName !== 'ALL') {
+        setDistrictFilter(loc.districtName);
+      } else {
+        setDistrictFilter('ALL');
+      }
+    });
+
+    return () => unsub();
   }, []);
 
-  const filteredHospitals = hospitals.filter((h) => {
-    const matchesSearch =
-      !search ||
-      h.name.toLowerCase().includes(search.toLowerCase()) ||
-      (h.nameBn && h.nameBn.includes(search)) ||
-      (h.district && h.district.toLowerCase().includes(search.toLowerCase()));
-    const matchesDistrict =
-      districtFilter === 'ALL' ||
-      (h.district && h.district.toLowerCase() === districtFilter.toLowerCase()) ||
-      (h.name && h.name.toLowerCase().includes(districtFilter.toLowerCase()));
-    return matchesSearch && matchesDistrict;
-  });
+  const filteredHospitals = useMemo(() => {
+    return hospitals
+      .filter((h) => {
+        const matchesSearch =
+          !search ||
+          h.name.toLowerCase().includes(search.toLowerCase()) ||
+          (h.nameBn && h.nameBn.includes(search)) ||
+          (h.district && h.district.toLowerCase().includes(search.toLowerCase()));
+        const matchesDistrict =
+          districtFilter === 'ALL' ||
+          (h.district && h.district.toLowerCase() === districtFilter.toLowerCase()) ||
+          (h.name && h.name.toLowerCase().includes(districtFilter.toLowerCase()));
+        return matchesSearch && matchesDistrict;
+      })
+      .sort((a, b) => {
+        if (userLocation) {
+          const distA = GeoService.calculateDistance(userLocation, null, null, a.district);
+          const distB = GeoService.calculateDistance(userLocation, null, null, b.district);
+          if (distA !== null && distB !== null) return distA - distB;
+          if (distA !== null) return -1;
+          if (distB !== null) return 1;
+        }
+        return 0;
+      });
+  }, [hospitals, search, districtFilter, userLocation]);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
@@ -418,9 +452,19 @@ export default function HospitalsDirectoryPage() {
                     {language === 'bn' && hosp.nameBn ? hosp.nameBn : hosp.name}
                   </h2>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontSize: '12.5px', marginBottom: '14px' }}>
-                    <MapPin size={14} color="#0060FA" />
-                    <span>{hosp.district || 'Bangladesh'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#64748B', fontSize: '12.5px', marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MapPin size={14} color="#0060FA" />
+                      <span>{hosp.district || 'Bangladesh'}</span>
+                    </div>
+                    {userLocation && (() => {
+                      const dist = GeoService.calculateDistance(userLocation, null, null, hosp.district);
+                      return dist !== null ? (
+                        <span style={{ color: '#15803D', fontWeight: 700, backgroundColor: '#DCFCE7', padding: '2px 8px', borderRadius: '9999px', fontSize: '11px' }}>
+                          {GeoService.formatDistanceString(dist, language)} {language === 'bn' ? 'দূরে' : 'away'}
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
 
                   <div

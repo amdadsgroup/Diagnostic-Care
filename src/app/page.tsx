@@ -43,6 +43,7 @@ import PilotFeedbackModal from '@/components/common/PilotFeedbackModal';
 import { AuthService, AuthUserProfile } from '@/services/auth.service';
 import { DoctorService } from '@/services/doctor.service';
 import { AppointmentService } from '@/services/appointment.service';
+import { GeoService, UserLocationDetails } from '@/services/geo.service';
 
 import {
   Search,
@@ -137,6 +138,7 @@ export default function HomePage() {
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [selectedSpecialty, setSelectedSpecialty] = useState('ALL');
   const [selectedLocation, setSelectedLocation] = useState('Dhaka');
+  const [userLocation, setUserLocation] = useState<UserLocationDetails | null>(null);
 
   // Modal State
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
@@ -161,10 +163,29 @@ export default function HomePage() {
   // Restore location and detect PWA shortcut action from URL + Load Supabase data
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedLoc = localStorage.getItem('dc_user_location');
-      if (savedLoc) {
-        setSelectedLocation(savedLoc);
+      const stored = GeoService.getStoredUserLocation();
+      if (stored) {
+        setUserLocation(stored);
+        setSelectedLocation(stored.name);
+        if (stored.districtName && stored.districtName !== 'ALL') {
+          setSelectedDistrict(stored.districtName);
+        }
+      } else {
+        const savedLoc = localStorage.getItem('dc_user_location');
+        if (savedLoc) {
+          setSelectedLocation(savedLoc);
+        }
       }
+
+      const unsub = GeoService.subscribe((loc) => {
+        setUserLocation(loc);
+        setSelectedLocation(loc.name);
+        if (loc.districtName && loc.districtName !== 'ALL') {
+          setSelectedDistrict(loc.districtName);
+        } else {
+          setSelectedDistrict('ALL');
+        }
+      });
 
       // Check active Supabase Auth user
       AuthService.getCurrentUser().then((user) => {
@@ -405,19 +426,30 @@ export default function HomePage() {
     }));
   };
 
-  // Filter doctors
-  const filteredAssociations = appState.doctorAssociations.filter((assoc) => {
-    const doc = assoc.doctor || appState.doctors.find((d) => d.id === assoc.doctorId);
-    const matchesQuery =
-      !searchQuery ||
-      Boolean(doc?.fullName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      Boolean(doc?.specialization?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      Boolean(assoc.organizationName?.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesDistrict = selectedDistrict === 'ALL' || assoc.districtName === selectedDistrict;
-    const matchesSpecialty =
-      selectedSpecialty === 'ALL' || Boolean(doc?.specialization?.toLowerCase().includes(selectedSpecialty.toLowerCase()));
-    return matchesQuery && matchesDistrict && matchesSpecialty;
-  });
+  // Filter doctors & sort by proximity when location is active
+  const filteredAssociations = appState.doctorAssociations
+    .filter((assoc) => {
+      const doc = assoc.doctor || appState.doctors.find((d) => d.id === assoc.doctorId);
+      const matchesQuery =
+        !searchQuery ||
+        Boolean(doc?.fullName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        Boolean(doc?.specialization?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        Boolean(assoc.organizationName?.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesDistrict = selectedDistrict === 'ALL' || assoc.districtName === selectedDistrict;
+      const matchesSpecialty =
+        selectedSpecialty === 'ALL' || Boolean(doc?.specialization?.toLowerCase().includes(selectedSpecialty.toLowerCase()));
+      return matchesQuery && matchesDistrict && matchesSpecialty;
+    })
+    .sort((a, b) => {
+      if (userLocation) {
+        const distA = GeoService.calculateDistance(userLocation, a.latitude, a.longitude, a.districtName);
+        const distB = GeoService.calculateDistance(userLocation, b.latitude, b.longitude, b.districtName);
+        if (distA !== null && distB !== null) return distA - distB;
+        if (distA !== null) return -1;
+        if (distB !== null) return 1;
+      }
+      return 0;
+    });
 
   // Category navigation handler across Header & CategoryNavigator
   const handleCategorySelection = (category: string) => {
@@ -1614,7 +1646,18 @@ export default function HomePage() {
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}
         selectedLocation={selectedLocation}
-        onSelectLocation={(loc) => setSelectedLocation(loc)}
+        onSelectLocation={(loc, details) => {
+          setSelectedLocation(loc);
+          if (details) {
+            setUserLocation(details);
+            if (details.districtName && details.districtName !== 'ALL') {
+              setSelectedDistrict(details.districtName);
+            } else {
+              setSelectedDistrict('ALL');
+            }
+          }
+          setIsLocationModalOpen(false);
+        }}
         language={language}
       />
 

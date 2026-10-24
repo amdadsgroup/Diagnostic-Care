@@ -20,6 +20,7 @@ import { BRAND_CONSTANTS, BRAND_COLORS } from '@/config/brand';
 import { getCachedData } from '@/lib/cache';
 import { CardSkeleton } from '@/components/ui/CardSkeleton';
 import { WishlistService } from '@/services/wishlist.service';
+import { GeoService, UserLocationDetails } from '@/services/geo.service';
 import {
   Search,
   MapPin,
@@ -40,6 +41,8 @@ import {
   X,
   RefreshCw,
   Heart,
+  Navigation,
+  Radio,
 } from 'lucide-react';
 
 export default function DoctorsPage() {
@@ -49,6 +52,7 @@ export default function DoctorsPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Dhaka');
+  const [userLocation, setUserLocation] = useState<UserLocationDetails | null>(null);
   const [wishlistMap, setWishlistMap] = useState<Record<string, boolean>>({});
   const [pendingWishlistDoctor, setPendingWishlistDoctor] = useState<Doctor | null>(null);
   const [wishlistToast, setWishlistToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
@@ -69,7 +73,7 @@ export default function DoctorsPage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState('ALL');
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [selectedFeeRange, setSelectedFeeRange] = useState<'ALL' | 'UNDER_600' | '600_1000' | 'ABOVE_1000'>('ALL');
-  const [sortBy, setSortBy] = useState<'RATING' | 'FEE_LOW' | 'FEE_HIGH' | 'EXPERIENCE'>('RATING');
+  const [sortBy, setSortBy] = useState<'RATING' | 'FEE_LOW' | 'FEE_HIGH' | 'EXPERIENCE' | 'DISTANCE'>('RATING');
 
   // Booking Modal State
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
@@ -87,8 +91,8 @@ export default function DoctorsPage() {
       DoctorService.getDoctorAssociations(),
     ])
       .then(([dbDocs, dbAssocs]) => {
-        if (dbDocs) setDoctors(dbDocs);
-        if (dbAssocs) setDoctorAssociations(dbAssocs);
+        if (dbDocs && dbDocs.length > 0) setDoctors(dbDocs);
+        if (dbAssocs && dbAssocs.length > 0) setDoctorAssociations(dbAssocs);
       })
       .catch((err) => {
         console.warn('Doctors load notice:', err);
@@ -114,10 +118,39 @@ export default function DoctorsPage() {
       }
     });
 
-    const savedLoc = localStorage.getItem('dc_user_location');
-    if (savedLoc) setSelectedLocation(savedLoc);
+    // Hydrate user location & GPS coordinates
+    const stored = GeoService.getStoredUserLocation();
+    if (stored) {
+      setUserLocation(stored);
+      setSelectedLocation(stored.name);
+      if (stored.districtName && stored.districtName !== 'ALL') {
+        setSelectedDistrict(stored.districtName);
+      }
+      if (stored.isGps) {
+        setSortBy('DISTANCE');
+      }
+    } else {
+      const savedLoc = localStorage.getItem('dc_user_location');
+      if (savedLoc) setSelectedLocation(savedLoc);
+    }
+
+    // Subscribe to live location updates across app
+    const unsub = GeoService.subscribe((loc) => {
+      setUserLocation(loc);
+      setSelectedLocation(loc.name);
+      if (loc.districtName && loc.districtName !== 'ALL') {
+        setSelectedDistrict(loc.districtName);
+      } else {
+        setSelectedDistrict('ALL');
+      }
+      if (loc.isGps) {
+        setSortBy('DISTANCE');
+      }
+    });
 
     fetchDoctorData();
+
+    return () => unsub();
   }, []);
 
   const handleToggleWishlist = async (doc: Doctor, e?: React.MouseEvent) => {
@@ -158,6 +191,46 @@ export default function DoctorsPage() {
     { id: 'Ophthalmology', labelEn: 'Ophthalmology (Eye)', labelBn: 'চক্ষুরোগ বিশেষজ্ঞ' },
   ];
 
+  const doctorDistanceMap = useMemo(() => {
+    const map = new Map<string, { distanceKm: number; chamberName: string; districtName: string }>();
+    if (!userLocation || userLocation.latitude === undefined || userLocation.longitude === undefined) {
+      return map;
+    }
+
+    doctors.forEach((doc) => {
+      const assocs = doctorAssociations.filter((a) => a.doctorId === doc.id);
+      let minDistance: number | null = null;
+      let bestChamber = '';
+      let bestDistrict = '';
+
+      for (const assoc of assocs) {
+        const dist = GeoService.calculateDistance(
+          userLocation,
+          assoc.latitude,
+          assoc.longitude,
+          assoc.districtName
+        );
+        if (dist !== null) {
+          if (minDistance === null || dist < minDistance) {
+            minDistance = dist;
+            bestChamber = assoc.branchName || assoc.organizationName;
+            bestDistrict = assoc.districtName;
+          }
+        }
+      }
+
+      if (minDistance !== null) {
+        map.set(doc.id, {
+          distanceKm: minDistance,
+          chamberName: bestChamber,
+          districtName: bestDistrict,
+        });
+      }
+    });
+
+    return map;
+  }, [doctors, doctorAssociations, userLocation]);
+
   const filteredDoctors = useMemo(() => {
     return doctors
       .filter((doc) => {
@@ -194,6 +267,14 @@ export default function DoctorsPage() {
         return true;
       })
       .sort((a, b) => {
+        if (sortBy === 'DISTANCE') {
+          const distA = doctorDistanceMap.get(a.id)?.distanceKm;
+          const distB = doctorDistanceMap.get(b.id)?.distanceKm;
+          if (distA !== undefined && distB !== undefined) return distA - distB;
+          if (distA !== undefined) return -1;
+          if (distB !== undefined) return 1;
+          return (b.rating || 5) - (a.rating || 5);
+        }
         if (sortBy === 'RATING') {
           return (b.rating || 5) - (a.rating || 5);
         }
@@ -208,7 +289,7 @@ export default function DoctorsPage() {
         if (sortBy === 'FEE_HIGH') return feeB - feeA;
         return 0;
       });
-  }, [doctors, doctorAssociations, searchQuery, selectedSpecialty, selectedDistrict, selectedFeeRange, sortBy]);
+  }, [doctors, doctorAssociations, searchQuery, selectedSpecialty, selectedDistrict, selectedFeeRange, sortBy, doctorDistanceMap]);
 
   // Handle slot selection & temporary 5-min atomic hold
   const handleSlotSelect = (slot: ScheduleSlot, assoc: DoctorAssociation) => {
@@ -603,6 +684,11 @@ export default function DoctorsPage() {
                     cursor: 'pointer',
                   }}
                 >
+                  <option value="DISTANCE">
+                    {userLocation?.isGps
+                      ? (language === 'en' ? '📍 Nearest First (GPS)' : '📍 কাছের ডাক্তার আগে (জিপিএস)')
+                      : (language === 'en' ? '📍 Nearest First (Proximity)' : '📍 দূরত্ব অনুযায়ী কাছের ডাক্তার')}
+                  </option>
                   <option value="RATING">{language === 'en' ? 'Top Rated' : 'সর্বোচ্চ রেটিং'}</option>
                   <option value="EXPERIENCE">{language === 'en' ? 'Most Experienced' : 'সর্বাধিক অভিজ্ঞ'}</option>
                   <option value="FEE_LOW">{language === 'en' ? 'Fee: Low to High' : 'ফি: কম থেকে বেশি'}</option>
@@ -924,6 +1010,28 @@ export default function DoctorsPage() {
                           </div>
                         )}
 
+                        {doctorDistanceMap.has(doc.id) && (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
+                            <span style={{ color: '#0060FA', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                              <Navigation size={12} />
+                              <span>{language === 'en' ? 'Proximity:' : 'দূরত্ব:'}</span>
+                            </span>
+                            <span
+                              style={{
+                                fontWeight: 800,
+                                color: '#15803D',
+                                backgroundColor: '#DCFCE7',
+                                padding: '2px 8px',
+                                borderRadius: '9999px',
+                                fontSize: '11px',
+                              }}
+                            >
+                              {GeoService.formatDistanceString(doctorDistanceMap.get(doc.id)!.distanceKm, language)}{' '}
+                              {language === 'en' ? 'away' : 'দূরে'}
+                            </span>
+                          </div>
+                        )}
+
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
                           <span style={{ color: '#627680' }}>Consultation Fee:</span>
                           <span style={{ fontWeight: 800, color: '#0060FA', fontSize: '13.5px' }}>
@@ -1122,9 +1230,19 @@ export default function DoctorsPage() {
           isOpen={isLocationModalOpen}
           onClose={() => setIsLocationModalOpen(false)}
           currentLocation={selectedLocation}
-          onSelectLocation={(loc) => {
+          onSelectLocation={(loc, details) => {
             setSelectedLocation(loc);
-            localStorage.setItem('dc_user_location', loc);
+            if (details) {
+              setUserLocation(details);
+              if (details.districtName && details.districtName !== 'ALL') {
+                setSelectedDistrict(details.districtName);
+              } else {
+                setSelectedDistrict('ALL');
+              }
+              if (details.isGps) {
+                setSortBy('DISTANCE');
+              }
+            }
             setIsLocationModalOpen(false);
           }}
           language={language}

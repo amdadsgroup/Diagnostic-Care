@@ -23,6 +23,7 @@ import {
   QrCode,
 } from 'lucide-react';
 import QRScannerModal from '@/components/qr/QRScannerModal';
+import { GeoService } from '@/services/geo.service';
 
 interface HeaderProps {
   language?: SupportedLanguage;
@@ -66,15 +67,26 @@ export const Header: React.FC<HeaderProps> = ({
   const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isGpsActive, setIsGpsActive] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
+    const loc = GeoService.getStoredUserLocation();
+    if (loc?.isGps) setIsGpsActive(true);
+
+    const unsub = GeoService.subscribe((newLoc) => {
+      setIsGpsActive(Boolean(newLoc?.isGps));
+    });
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      unsub();
+    };
   }, []);
 
   const handleNavClick = (tab: string, category?: string) => {
@@ -136,6 +148,21 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <MapPin size={11} color="#5EEAD4" />
               <span>Location: <strong>{selectedLocation}</strong></span>
+              {isGpsActive && (
+                <span
+                  style={{
+                    backgroundColor: '#10B981',
+                    color: '#FFFFFF',
+                    fontSize: '9px',
+                    fontWeight: 800,
+                    padding: '1px 5px',
+                    borderRadius: '4px',
+                    marginLeft: '2px',
+                  }}
+                >
+                  GPS
+                </span>
+              )}
               <ChevronDown size={10} color="#94A3B8" />
             </button>
           </div>
@@ -354,6 +381,18 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="header-location-text">
                 {selectedLocation}
               </span>
+              {isGpsActive && (
+                <span
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: '#10B981',
+                    marginLeft: '4px',
+                  }}
+                  title="GPS Active"
+                />
+              )}
             </button>
 
             {/* Auth Button */}

@@ -142,6 +142,8 @@ export interface DoctorAssociation {
   followupValidityDays: number;
   commissionRatePercent: number;
   isActive: boolean;
+  latitude?: number;
+  longitude?: number;
   doctor?: Doctor;
 }
 
